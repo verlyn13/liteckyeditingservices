@@ -1,0 +1,28 @@
+# GitHub CODEOWNERS
+# These owners will be requested for review when someone opens a pull request
+
+# Global owners
+* @verlyn13
+
+# Policy and validation
+/policy/ @verlyn13
+/scripts/ @verlyn13
+/desired-state/ @verlyn13
+/.github/ @verlyn13
+
+# Critical configuration
+/package.json @verlyn13
+/astro.config.mjs @verlyn13
+/tsconfig.json @verlyn13
+/wrangler.toml @verlyn13
+
+# Documentation
+/docs/ @verlyn13
+/*.md @verlyn13
+
+# Workers and functions (when created)
+/workers/ @verlyn13
+/functions/ @verlyn13
+
+# CMS configuration (when created)
+/public/admin/ @verlyn13

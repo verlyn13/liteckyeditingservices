@@ -1,0 +1,21 @@
+[tools]
+node = "24"
+pnpm = "10.16.0"
+
+[env]
+NODE_ENV = "development"
+
+[tasks.check]
+description = "Run all validation checks"
+run = "pnpm run validate:all"
+
+[tasks.setup]
+description = "Initial project setup"
+run = """
+  pnpm install --frozen-lockfile
+  pnpm run validate:all
+"""
+
+[tasks.validate]
+description = "Validate project configuration"
+depends = ["check"]

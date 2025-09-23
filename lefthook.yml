@@ -1,0 +1,31 @@
+# Lefthook configuration for pre-commit hooks
+# Runs validation checks before allowing commits
+
+pre-commit:
+  parallel: true
+  commands:
+    package-versions:
+      run: node scripts/validate/package-versions.mjs
+      tags: versions
+
+    repo-structure:
+      run: node scripts/validate/repo-structure.mjs
+      tags: structure
+
+    forbidden-files:
+      glob: "*.{env,env.local,dev.vars}"
+      run: |
+        echo "❌ Attempting to commit forbidden file: {staged_files}"
+        exit 1
+
+    lint:
+      glob: "*.{js,mjs,ts,tsx,astro,svelte}"
+      run: pnpm check --silent
+
+pre-push:
+  commands:
+    docs-gate:
+      run: node scripts/gates/require-docs.mjs
+      skip:
+        - merge
+        - rebase

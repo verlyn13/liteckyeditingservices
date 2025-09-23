@@ -215,6 +215,19 @@ liteckyeditingservices/
    - GitHub repository created: verlyn13/liteckyeditingservices
    - Initial commit pushed
 
+2. **Documentation Reorganization** (September 22, 2025 - 19:15)
+   - All 15 spec docs moved to `_archive/`
+   - User docs created from templates
+   - Clear separation between specs and active docs
+
+3. **Policy as Code Implementation** (September 22, 2025 - 19:30)
+   - Rego policies created for all aspects
+   - Validation scripts for versions and structure
+   - Desired state configurations defined
+   - GitHub Actions workflows configured
+   - Pre-commit hooks via lefthook
+   - Documentation gates enforced
+
 2. **Project Setup**
    - Astro project initialized with pnpm
    - Directory structure created:

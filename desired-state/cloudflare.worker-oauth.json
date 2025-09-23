@@ -1,0 +1,6 @@
+{
+  "secrets": [
+    "GITHUB_OAUTH_ID",
+    "GITHUB_OAUTH_SECRET"
+  ]
+}

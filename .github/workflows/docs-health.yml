@@ -1,0 +1,67 @@
+name: Documentation Health
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Weekly on Monday at 9 AM UTC
+  workflow_dispatch:
+
+jobs:
+  check-docs:
+    name: Check Documentation Health
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Check for broken links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          config-file: '.github/markdown-link-check.json'
+          folder-path: 'docs/'
+
+      - name: Check documentation completeness
+        run: |
+          echo "Checking for required documentation files..."
+
+          required_files=(
+            "README.md"
+            "CONTRIBUTING.md"
+            "ENVIRONMENT.md"
+            "PROJECT-STATUS.md"
+            "IMPLEMENTATION-ROADMAP.md"
+            "DOCUMENTATION-MASTER-INDEX.md"
+            "docs/onboarding.md"
+          )
+
+          missing=()
+          for file in "${required_files[@]}"; do
+            if [[ ! -f "$file" ]]; then
+              missing+=("$file")
+            fi
+          done
+
+          if [[ ${#missing[@]} -gt 0 ]]; then
+            echo "❌ Missing required documentation:"
+            printf '%s\n' "${missing[@]}"
+            exit 1
+          else
+            echo "✅ All required documentation present"
+          fi
+
+      - name: Check documentation freshness
+        run: |
+          echo "Checking documentation update dates..."
+
+          # Find docs not updated in 90 days
+          old_docs=$(find docs -name "*.md" -mtime +90 2>/dev/null || true)
+
+          if [[ -n "$old_docs" ]]; then
+            echo "⚠️ Documentation older than 90 days:"
+            echo "$old_docs"
+          else
+            echo "✅ All documentation is recent"
+          fi
