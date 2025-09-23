@@ -83,6 +83,17 @@ Build sequence:
 
 Check these files to understand current state and next actions.
 
+## Memory Bank System
+
+The project includes Memory Bank configuration files in `_archive/` that define operational modes:
+- **.clinerules-architect** - High-level planning and system design mode
+- **.clinerules-ask** - Q&A and exploration mode
+- **.clinerules-code** - Implementation and coding mode
+- **.clinerules-debug** - Troubleshooting and debugging mode
+- **.clinerules-test** - Testing and validation mode
+
+These files provide context-specific rules and behaviors for different types of work. Switch modes based on the task at hand for optimal assistance.
+
 ## Validation Framework
 
 The project has strict validation to prevent drift:
