@@ -1,0 +1,29 @@
+---
+export interface Props {
+  logos?: Array<{ src: string; alt: string; width?: number; height?: number }>;
+}
+
+const { logos = [] } = Astro.props;
+---
+
+<section class="bg-white border-y border-soft-gray">
+  <div class="container py-6">
+    <p class="text-sm uppercase tracking-wide text-text-secondary mb-4">Trusted by scholars from</p>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 items-center">
+      {logos.length === 0 ? (
+        <>
+          <div class="h-8 bg-soft-gray/60 rounded" aria-hidden="true"></div>
+          <div class="h-8 bg-soft-gray/60 rounded" aria-hidden="true"></div>
+          <div class="h-8 bg-soft-gray/60 rounded" aria-hidden="true"></div>
+          <div class="h-8 bg-soft-gray/60 rounded" aria-hidden="true"></div>
+          <div class="h-8 bg-soft-gray/60 rounded" aria-hidden="true"></div>
+        </>
+      ) : (
+        logos.map((l) => (
+          <img src={l.src} alt={l.alt} width={l.width} height={l.height} class="max-h-8 object-contain" loading="lazy" />
+        ))
+      )}
+    </div>
+  </div>
+  </section>
+

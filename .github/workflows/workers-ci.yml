@@ -1,0 +1,30 @@
+name: Workers CI (Stubs)
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'workers/**'
+      - 'functions/**'
+
+jobs:
+  lint-only:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.16.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm run lint || true
+      - name: Typecheck (if present)
+        run: pnpm run typecheck || true
+      - name: Note
+        run: echo "Deployment steps are handled separately with Cloudflare credentials."
+

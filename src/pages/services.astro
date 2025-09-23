@@ -1,0 +1,68 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import { getCollection } from 'astro:content';
+
+const services = (await getCollection('services')).sort((a, b) =>
+  (a.data.order ?? 0) - (b.data.order ?? 0)
+);
+---
+
+<BaseLayout title="Services" description="Clarity-first academic editing services">
+  <script type="application/ld+json" is:inline>{JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    'serviceType': 'Academic Editing',
+    'provider': {
+      '@type': 'ProfessionalService',
+      'name': 'Litecky Editing Services'
+    },
+    'hasOfferCatalog': {
+      '@type': 'OfferCatalog',
+      'name': 'Academic Editing Services',
+      'itemListElement': [
+        {
+          '@type': 'Offer',
+          'itemOffered': {
+            '@type': 'Service',
+            'name': 'Substantive Editing',
+            'description': 'Structure, argument flow, and clarity improvements with suggestions'
+          }
+        },
+        {
+          '@type': 'Offer',
+          'itemOffered': {
+            '@type': 'Service',
+            'name': 'Proofreading & Style',
+            'description': 'Grammar, punctuation, APA/Chicago style consistency, and minor rewrites'
+          }
+        }
+      ]
+    }
+  })}</script>
+  <Header currentPath={Astro.url.pathname} />
+  <main id="main" class="section">
+    <div class="container">
+      <h1 class="text-3xl md:text-4xl font-bold text-primary-navy">Services</h1>
+      <p class="mt-3 text-text-secondary max-w-prose">Choose the level of support that matches your goals and timeline. Simple, outcome-focused options with transparent scope.</p>
+
+      <section class="mt-8 grid md:grid-cols-2 gap-6">
+        {services.map((s) => (
+          <article class="bg-white border border-soft-gray rounded p-6">
+            <h2 class="text-2xl font-semibold text-primary-navy">{s.data.title}</h2>
+            <p class="mt-2 text-text-secondary">{s.data.description}</p>
+            {s.data.features?.length ? (
+              <details class="mt-3">
+                <summary class="cursor-pointer text-primary-navy">What’s included</summary>
+                <ul class="mt-2 list-disc pl-5 text-text-secondary">
+                  {s.data.features.map((f) => (<li>{f}</li>))}
+                </ul>
+              </details>
+            ) : null}
+            <a class="btn btn-primary mt-4 inline-flex" href="/contact">Get a Quote</a>
+          </article>
+        ))}
+      </section>
+    </div>
+  </main>
+</BaseLayout>

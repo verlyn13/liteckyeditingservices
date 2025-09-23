@@ -76,6 +76,11 @@ pnpm lint:fix     # Auto-fix linting issues
 - **Preview**: Every PR gets a preview URL automatically
 - **Rollback**: Revert commit or use Cloudflare dashboard
 
+### Deployment Constraints
+- Cloudflare Pages only. Do not add Vercel/Netlify adapters.
+- Current output is `static`; when SSR is required, use `@astrojs/cloudflare`.
+- Validators and Rego policies enforce these constraints to prevent drift.
+
 ### ⚠️ Deployment Constraints
 
 **This project deploys ONLY to Cloudflare Pages**. Do not add or use:

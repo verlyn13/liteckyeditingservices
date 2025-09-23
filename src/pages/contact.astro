@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import FileUpload from '../components/FileUpload.svelte';
+import contactScriptUrl from '../scripts/contact-form.js?url';
+---
+
+<BaseLayout title="Contact" description="Request a free quote for academic editing services. Fast turnaround, secure document handling, PhD-qualified editors.">
+  <script type="application/ld+json" is:inline>{JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    'mainEntity': {
+      '@type': 'ProfessionalService',
+      'name': 'Litecky Editing Services',
+      'description': 'Professional academic editing for dissertations and theses',
+      'areaServed': 'Worldwide',
+      'priceRange': '$$',
+      'aggregateRating': {
+        '@type': 'AggregateRating',
+        'ratingValue': '4.9',
+        'reviewCount': '150'
+      }
+    }
+  })}</script>
+  <Header currentPath={Astro.url.pathname} />
+  <main id="main" class="section">
+    <div class="container max-w-2xl">
+      <h1 class="text-3xl md:text-4xl font-bold text-primary-navy">Get a Quote</h1>
+      <p class="mt-3 text-text-secondary">Short, low-pressure form. We only ask for what we need to provide an accurate quote.</p>
+
+      <form class="mt-6 space-y-4" method="post" action="/api/contact" data-contact-form>
+        <div>
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required />
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required />
+        </div>
+        <div>
+          <label for="service">Service Type</label>
+          <select id="service" name="service" required>
+            <option value="">Select an option</option>
+            <option value="substantive">Substantive Editing</option>
+            <option value="proofreading">Proofreading & Style</option>
+          </select>
+        </div>
+        <div>
+          <label for="deadline">Project Deadline</label>
+          <input id="deadline" name="deadline" type="date" min={new Date().toISOString().split('T')[0]} required />
+          <p class="text-xs text-text-secondary mt-1">When do you need this completed?</p>
+        </div>
+        <div>
+          <label for="message">Message (optional)</label>
+          <textarea id="message" name="message" rows="4" placeholder="Any context you'd like to share"></textarea>
+        </div>
+        <div>
+          <FileUpload />
+          <p class="text-sm text-text-secondary mt-2">
+            <svg class="inline w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            Securely upload your document (max 10MB). Your files are encrypted and confidential.
+          </p>
+        </div>
+        <div>
+          <button class="btn btn-primary" type="submit">Get My Free Quote</button>
+        </div>
+      </form>
+    </div>
+  </main>
+  <script type="module" src={contactScriptUrl} defer></script>
+</BaseLayout>

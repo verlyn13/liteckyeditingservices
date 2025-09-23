@@ -4,13 +4,22 @@ import '@fontsource/lora/600.css';
 import '@fontsource/lora/700.css';
 import '@fontsource-variable/inter';
 import '../styles/global.css';
+import menuToggleUrl from '../scripts/menu-toggle.js?url';
 
 export interface Props {
   title: string;
   description?: string;
+  noindex?: boolean;
 }
 
-const { title, description = 'Professional academic editing services' } = Astro.props;
+const {
+  title,
+  description = 'Professional academic editing services',
+  noindex = false,
+} = Astro.props;
+
+const site = Astro.site?.href?.replace(/\/$/, '') ?? 'https://liteckyeditingservices.com';
+const canonical = `${site}${Astro.url.pathname}`;
 ---
 
 <!DOCTYPE html>
@@ -19,11 +28,45 @@ const { title, description = 'Professional academic editing services' } = Astro.
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Litecky Editing Services" />
+    <meta property="og:title" content={`${title} | Litecky Editing Services`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} | Litecky Editing Services`} />
+    <meta name="twitter:description" content={description} />
+
     <title>{title} | Litecky Editing Services</title>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json" is:inline>{JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Litecky Editing Services',
+      url: site,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: `${site}/?q={search_term_string}`,
+        'query-input': 'required name=search_term_string'
+      }
+    })}</script>
+    <script type="application/ld+json" is:inline>{JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'Litecky Editing Services',
+      url: site
+    })}</script>
   </head>
   <body>
+    <a href="#main" class="skip-link">Skip to content</a>
     <slot />
+    <script type="module" src={menuToggleUrl} defer></script>
   </body>
-</html>
+  </html>

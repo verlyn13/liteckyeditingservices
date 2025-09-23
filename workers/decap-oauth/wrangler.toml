@@ -1,0 +1,13 @@
+name = "litecky-decap-oauth"
+main = "src/index.ts"
+compatibility_date = "2025-09-22"
+compatibility_flags = ["nodejs_compat"]
+
+# Optional custom domain (configure in Cloudflare)
+# routes = [
+#   { pattern = "cms-auth.liteckyeditingservices.com", custom_domain = true }
+# ]
+
+[vars]
+# Configure via Cloudflare dashboard or wrangler secrets
+ENVIRONMENT = "production"

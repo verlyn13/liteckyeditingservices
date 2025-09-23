@@ -1,17 +1,18 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import TrustBar from '../components/TrustBar.astro';
+import ProcessSnapshot from '../components/ProcessSnapshot.astro';
+import FeaturedTestimonial from '../components/FeaturedTestimonial.astro';
 ---
 
 <BaseLayout title="Home" description="Professional academic editing services">
-  <a href="#main" class="skip-link">Skip to content</a>
-  <main id="main" class="container section">
-    <h1 class="text-3xl font-bold text-primary-navy">Litecky Editing Services</h1>
-    <p class="mt-4 text-text-secondary max-w-prose">
-      Expert academic editing for dissertations and theses. PhD-qualified editors, 2–3 day turnaround,
-      secure and confidential.
-    </p>
-    <div class="mt-6">
-      <a class="btn btn-primary" href="/contact">Get Started</a>
-    </div>
+  <Header currentPath={Astro.url.pathname} />
+  <main id="main">
+    <Hero title="Expert Academic Editing" />
+    <TrustBar />
+    <ProcessSnapshot />
+    <FeaturedTestimonial quote="They transformed my dissertation into a polished, publication-ready document." author="Doctoral Candidate" role="Education" />
   </main>
-</BaseLayout>
+  </BaseLayout>

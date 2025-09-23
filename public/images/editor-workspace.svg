@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Calm workspace illustration</title>
+  <desc id="desc">Abstract placeholder representing a professional editor workspace.</desc>
+  <rect width="1200" height="900" fill="#F7F7F5" />
+  <rect x="80" y="120" width="1040" height="660" rx="16" fill="#FFFFFF" stroke="#E8E8E6" />
+  <rect x="120" y="180" width="480" height="24" rx="12" fill="#192A51" opacity="0.9" />
+  <rect x="120" y="230" width="760" height="16" rx="8" fill="#5A716A" opacity="0.3" />
+  <rect x="120" y="260" width="720" height="16" rx="8" fill="#5A716A" opacity="0.25" />
+  <rect x="120" y="290" width="680" height="16" rx="8" fill="#5A716A" opacity="0.2" />
+  <rect x="120" y="340" width="320" height="40" rx="8" fill="#5A716A" opacity="0.35" />
+  <circle cx="980" cy="720" r="40" fill="#5A716A" opacity="0.2" />
+  <circle cx="1040" cy="720" r="16" fill="#192A51" opacity="0.6" />
+</svg>

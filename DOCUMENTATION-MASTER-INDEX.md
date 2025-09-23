@@ -50,6 +50,8 @@ Documentation Read: 100% (15/15 files analyzed)
 |----------|----------|--------|---------|
 | `CLOUDFLARE-REQUIREMENTS.md` | Root | ✅ Created | Complete Cloudflare services requirements |
 | `CLOUDFLARE-DEPLOYMENT-WORKFLOW.md` | Root | ✅ Created | 6-phase deployment workflow with tracking |
+| `CLOUDFLARE-DEPLOYMENT-DIRECTIVE.md` | Root | ✅ Created | Deployment instructions and troubleshooting |
+| `CLOUDFLARE-WORKERS-SETUP.md` | Root | ✅ Created | Workers and Workers for Platforms setup |
 | `docs/infrastructure/README.md` | Infrastructure | ✅ Created | Overview and quick reference |
 | `docs/infrastructure/CLOUDFLARE-STATUS.md` | Infrastructure | ✅ Created | Current domain audit results |
 | `docs/infrastructure/CLOUDFLARE-ANALYSIS.md` | Infrastructure | ✅ Created | DNS and deployment analysis |
@@ -57,6 +59,7 @@ Documentation Read: 100% (15/15 files analyzed)
 | `scripts/cloudflare-audit.fish` | Scripts | ✅ Created | Domain audit tool |
 | `scripts/cf-dns-manage.fish` | Scripts | ✅ Created | DNS management tool |
 | `scripts/cf-pages-deploy.fish` | Scripts | ✅ Created | Pages deployment helper |
+| `scripts/load-cloudflare-env.fish` | Scripts | ✅ Updated | Credential loader with account ID |
 
 ### 5. GOVERNANCE DOCUMENTATION (How to Govern)
 **Purpose**: Policies and rules

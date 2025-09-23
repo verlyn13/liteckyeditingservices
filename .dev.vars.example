@@ -1,0 +1,21 @@
+# Cloudflare Configuration
+# Get your API token from: https://dash.cloudflare.com/profile/api-tokens
+CF_API_TOKEN=your-cloudflare-api-token-here
+CF_ZONE_ID=your-cloudflare-zone-id-here
+CF_ACCOUNT_ID=your-cloudflare-account-id-here
+
+# Alternative: Legacy API Key (not recommended)
+# CF_API_KEY=your-global-api-key-here
+# CF_API_EMAIL=your-email@example.com
+
+# Turnstile (CAPTCHA) - Test keys for development
+# Production keys will be different
+TURNSTILE_SITE_KEY=1x00000000000000000000AA
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+
+# SendGrid Email Configuration
+SENDGRID_API_KEY=your-sendgrid-api-key-here
+SENDGRID_FROM_EMAIL=noreply@liteckyeditingservices.com
+
+# Environment
+NODE_ENV=development

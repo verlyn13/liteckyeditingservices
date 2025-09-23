@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import { getCollection } from 'astro:content';
+
+const faqs = (await getCollection('faq')).sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+---
+
+<BaseLayout title="FAQ" description="Clear answers to common questions">
+  <script type="application/ld+json" is:inline>{JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    'mainEntity': [
+      {
+        '@type': 'Question',
+        'name': 'How fast is the turnaround?',
+        'acceptedAnswer': {
+          '@type': 'Answer',
+          'text': 'Most projects complete in 2–3 days. We\'ll confirm timelines before we begin.'
+        }
+      },
+      {
+        '@type': 'Question',
+        'name': 'Is my document secure?',
+        'acceptedAnswer': {
+          '@type': 'Answer',
+          'text': 'Yes. Files are handled confidentially and stored securely. We never publish or share your work.'
+        }
+      }
+    ]
+  })}</script>
+  <Header currentPath={Astro.url.pathname} />
+  <main id="main" class="section">
+    <div class="container max-w-3xl">
+      <h1 class="text-3xl md:text-4xl font-bold text-primary-navy">FAQ</h1>
+      {faqs.map((f, i) => (
+        <details class={`mt-4 bg-white border border-soft-gray rounded p-4 ${i>0 ? 'mt-3' : ''}`}>
+          <summary class="font-semibold text-primary-navy cursor-pointer">{f.data.question}</summary>
+          <p class="mt-2 text-text-secondary">{f.data.answer}</p>
+        </details>
+      ))}
+    </div>
+  </main>
+</BaseLayout>
