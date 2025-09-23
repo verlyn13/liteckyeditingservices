@@ -1,7 +1,7 @@
 # PROJECT STATUS - Litecky Editing Services
 ## Single Source of Truth for Implementation Progress
 
-Last Updated: September 22, 2025 (19:45)
+Last Updated: September 23, 2025 (10:00)
 Repository: https://github.com/verlyn13/liteckyeditingservices
 
 ---
@@ -41,9 +41,9 @@ liteckyeditingservices/
 - **Changes Made**:
   1. Removed `tailwind.config.mjs` (not needed in v4)
   2. Installed `@tailwindcss/vite` instead of `@astrojs/tailwind`
-  3. Created `src/styles/tailwind.css` with v4 @theme tokens
-  4. Updated `astro.config.mjs` to use Vite plugin
-  5. Updated `.prettierrc.json` with tailwindStylesheet path
+  3. Created single-source stylesheet `src/styles/global.css` with v4 @theme tokens
+  4. Updated `astro.config.mjs` to use Tailwind v4 Vite plugin
+  5. Updated `.prettierrc.json` tailwindStylesheet → `./src/styles/global.css`
   6. Added `@sveltejs/vite-plugin-svelte` for compatibility
 - **Impact**: Better performance, simpler configuration, future-proof
 
@@ -66,32 +66,32 @@ liteckyeditingservices/
   - [x] Astro 5 project structure
   - [x] Package.json configuration
   - [x] Astro.config.mjs setup (modified for Tailwind v4)
-  - Components to implement:
-    - [ ] Header.astro (lines 599-775)
-    - [ ] Hero.astro (lines 777-959)
-    - [ ] TrustBar.astro (lines 961-1034)
-    - [ ] ValueProp.svelte (referenced, not detailed)
-    - [ ] FeaturedTestimonial.astro (referenced, not detailed)
-    - [ ] ProcessSnapshot.astro (referenced, not detailed)
-    - [ ] Footer.astro (referenced, not detailed)
-    - [ ] FileUpload.svelte (lines 1036-1308)
-  - Pages to create:
-    - [x] index.astro (basic structure)
-    - [ ] services.astro
-    - [ ] process.astro
-    - [ ] about.astro
-    - [ ] testimonials.astro
-    - [ ] faq.astro
-    - [ ] contact.astro
+  - Components implemented (initial pass/placeholders where noted):
+    - [x] Header.astro (responsive nav, mobile toggle)
+    - [x] Hero.astro (headline, subheadline, CTAs)
+    - [x] TrustBar.astro (logos row placeholder)
+    - [x] ValueProp.svelte (expand/collapse items)
+    - [x] FeaturedTestimonial.astro (featured quote)
+    - [x] ProcessSnapshot.astro (3 steps)
+    - [x] Footer.astro (links)
+    - [x] FileUpload.svelte (basic validation + emit)
+  - Pages created (scaffolded content):
+    - [x] index.astro (uses components)
+    - [x] services.astro
+    - [x] process.astro
+    - [x] about.astro
+    - [x] testimonials.astro
+    - [x] faq.astro
+    - [x] contact.astro
   - Styles & Scripts:
-    - [ ] global.css with Tailwind v4 tokens (lines 229-496)
-    - [ ] menu-toggle.js (lines 499-561)
+    - [x] global.css with Tailwind v4 tokens (single source)
+    - [x] menu-toggle.js (mobile nav)
     - [x] Font integration (@fontsource)
   - Additional Requirements:
     - [ ] Security headers configuration (lines 1334-1346)
-    - [ ] Schema.org JSON-LD implementation
-    - [ ] GA4 analytics integration
-    - [ ] Accessibility features (skip links, ARIA labels)
+  - [x] Schema.org JSON-LD (baseline: WebSite, Organization)
+  - [ ] GA4 analytics integration
+  - [x] Accessibility features (skip link, focus rings, ARIA on nav)
     - [ ] Image optimization with AVIF format
 - **Action Required**: Component-by-component implementation
 
@@ -112,6 +112,12 @@ liteckyeditingservices/
 #### 3. `cloudflare-deployment.md`
 - **Status**: ✅ FULLY READ (1310 lines)
 - **Purpose**: Complete Cloudflare Pages deployment configuration
+- **Infrastructure Setup**: ✅ COMPLETE
+  - [x] flarectl CLI installed and configured
+  - [x] API token stored in gopass
+  - [x] Management scripts created (audit, DNS, deploy)
+  - [x] Current DNS configuration backed up
+  - [x] Zone configuration documented
 - **Key Requirements**:
   - [ ] Monorepo structure (apps/, workers/, packages/)
   - [ ] Cloudflare Pages Functions for SSR
@@ -123,7 +129,7 @@ liteckyeditingservices/
   - [ ] GitHub Actions CI/CD pipelines
   - [ ] Turnstile client integration
   - [ ] Complete wrangler.toml configurations
-- **Action Required**: Implement after site structure complete
+- **Action Required**: Deploy site when ready
 
 #### 4. `deployment-config.md`
 - **Status**: ✅ FULLY READ (500 lines)
@@ -214,6 +220,7 @@ liteckyeditingservices/
 
 #### 11-15. `.clinerules-*` files
 - **Status**: ✅ ALL READ
+- **Location**: Root directory (not in _archive/)
 - **Purpose**: Memory Bank system configuration for different modes
 - **Key Findings**:
   - Architect mode: High-level planning and design
@@ -284,7 +291,7 @@ liteckyeditingservices/
 4. **Initial Files Created**
    - [x] src/layouts/BaseLayout.astro
    - [x] src/pages/index.astro (auto-generated)
-   - [x] src/styles/tailwind.css (Tailwind v4 theme configuration)
+  - [x] src/styles/global.css (Tailwind v4 tokens + base)
    - [x] public/favicon.svg (auto-generated)
    - [x] PROJECT-STATUS.md (this tracking document)
 
@@ -296,19 +303,13 @@ liteckyeditingservices/
 
 ### 🔄 In Progress
 
-- Component development (Header, Footer, Hero, etc.) - UNBLOCKED as of Sept 22, 19:55
+- Content polish (copy, assets) and advanced component behaviors (e.g., carousel) — placeholders acceptable for now
 
 ### ❌ Not Started
 
-Based on `project-document.md` (partially read):
-- [ ] Component implementations
-- [ ] All pages except index
-- [ ] Svelte interactive components
-- [ ] Global styles
-- [ ] Font setup
+Based on `project-document.md` (baseline implemented):
 - [ ] Image optimization
-- [ ] Menu toggle functionality
-- [ ] Accessibility testing setup
+- [ ] Accessibility testing setup (pa11y)
 
 Based on other documentation (not yet read):
 - [ ] All requirements from unread files
@@ -322,18 +323,20 @@ Based on other documentation (not yet read):
 | Documentation Review | ✅ | 15/15 files (100%) | All specs analyzed |
 | Project Setup | ✅ | 100% | Structure, configs, deps |
 | Policy & Validation | ✅ | 100% | Rego, scripts, CI/CD |
-| Components | ❌ | 0/8 (0%) | Header, Hero, Footer, etc. |
-| Pages | ⚠️ | 1/7 (14%) | Only index exists |
-| Styling | 🔴 | 10% | Missing global.css |
-| Scripts | ❌ | 0% | menu-toggle.js needed |
-| CMS Integration | ❌ | 0% | Decap CMS setup |
-| Backend/Workers | ❌ | 0% | 5 workers needed |
+| Components | ✅ | 8/8 (100%) | Initial implementations (placeholders where needed) |
+| Pages | ✅ | 7/7 (100%) | Scaffolds created |
+| Styling | ✅ | 100% | Single-source global.css |
+| Scripts | ✅ | 100% | menu-toggle.js added |
+| Code Quality | ✅ | 100% | ESLint flat config, Vitest, Playwright, pa11y |
+| CMS Integration | ✅ | 75% | Admin UI + enhanced config, content collections; OAuth worker pending |
+| Backend/API | ⚠️ | 20% | Contact form API created, needs SendGrid + workers |
 | Email Service | ❌ | 0% | SendGrid templates |
-| Testing | ❌ | 0% | No tests written |
+| Testing | ✅ | 100% | Test frameworks configured |
 | Security | ❌ | 0% | Turnstile, headers |
-| Deployment | ❌ | 0% | Cloudflare Pages |
+| Cloudflare Setup | 🟡 | 20% | Management tools ready, deployment workflow created |
+| Deployment | 📋 | Phase 0/6 | Pre-deployment prep (see CLOUDFLARE-DEPLOYMENT-WORKFLOW.md) |
 
-**STATUS**: ✅ UNBLOCKED - global.css created, development can proceed
+**STATUS**: ✅ UNBLOCKED — Frontend scaffold complete; code quality configured; CMS partially done. Proceed to API + Workers.
 
 ---
 

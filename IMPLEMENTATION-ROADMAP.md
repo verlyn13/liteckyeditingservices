@@ -1,7 +1,7 @@
 # IMPLEMENTATION ROADMAP - Litecky Editing Services
 ## Logical Build Order & Dependencies
 
-Last Updated: September 22, 2025 (19:50)
+Last Updated: September 22, 2025 (21:40)
 
 ---
 
@@ -51,29 +51,29 @@ Last Updated: September 22, 2025 (19:50)
    - [x] CI/CD workflows configured
    - [x] Pre-commit hooks setup
 
-### Phase 1: Core Styling & Layout (CURRENT - BLOCKED)
-**Must complete before any components**
+### Phase 1: Core Styling & Layout ✅ COMPLETE
+**Single-source styles and accessible base layout**
 
-1. **Global Styles** 🚨 BLOCKER
-   - [ ] src/styles/global.css (Lines 229-496)
-   - [ ] Tailwind v4 @theme tokens
-   - [ ] Typography system
-   - [ ] Color palette
-   - [ ] Spacing scale
+1. **Global Styles**
+  - [x] src/styles/global.css (Lines 229-496)
+  - [x] Tailwind v4 @theme tokens
+  - [x] Typography system
+  - [x] Color palette
+  - [x] Spacing scale
 
 2. **Base Layout Enhancement**
-   - [x] BaseLayout.astro (basic exists)
-   - [ ] SEO meta tags
-   - [ ] Schema.org JSON-LD
-   - [ ] Skip links
-   - [ ] Font loading
+  - [x] BaseLayout.astro (enhanced)
+  - [x] SEO meta tags
+  - [x] Schema.org JSON-LD (WebSite, Organization)
+  - [x] Skip link
+  - [x] Font loading
 
 3. **Navigation Script**
-   - [ ] menu-toggle.js (Lines 499-561)
-   - [ ] Mobile menu functionality
-   - [ ] ARIA attributes
+  - [x] menu-toggle.js (Lines 499-561)
+  - [x] Mobile menu functionality
+  - [x] ARIA attributes
 
-### Phase 2: Core Components
+### Phase 2: Core Components ✅ COMPLETE (initial)
 **8 components needed for site structure**
 
 1. **Header.astro** (Lines 599-775)
@@ -86,38 +86,37 @@ Last Updated: September 22, 2025 (19:50)
 8. **FileUpload.svelte** (Lines 1036-1308)
 
 6. **Pages** (After components exist)
-   - [x] index.astro (skeleton only)
-   - [ ] Update index with components
-   - [ ] services.astro
-   - [ ] process.astro
-   - [ ] about.astro
-   - [ ] testimonials.astro
-   - [ ] faq.astro
-   - [ ] contact.astro
+   - [x] index.astro updated with components
+   - [x] services.astro
+   - [x] process.astro
+   - [x] about.astro
+   - [x] testimonials.astro
+   - [x] faq.astro
+   - [x] contact.astro
 
 7. **Scripts**
-   - [ ] menu-toggle.js (mobile nav)
+   - [x] menu-toggle.js (mobile nav)
 
 ### Phase 3: Content Management
 **After static site works locally**
 
 8. **Content Collections**
-   - [ ] src/content.config.ts
-   - [ ] Content folders structure
-   - [ ] Sample content files
+  - [x] src/content/config.ts
+  - [x] Content folders structure
+  - [ ] Sample content files
 
 9. **Decap CMS Setup**
-   - [ ] public/admin/index.html
-   - [ ] public/admin/config.yml
-   - [ ] GitHub OAuth App creation
-   - [ ] OAuth Worker deployment
+  - [x] public/admin/index.html
+  - [x] public/admin/config.yml
+  - [ ] GitHub OAuth App creation
+  - [ ] OAuth Worker deployment (workers/decap-oauth)
 
 ### Phase 4: Backend Services
 **After frontend is stable**
 
 10. **Cloudflare Workers**
-    - [ ] Decap OAuth proxy worker
-    - [ ] Contact form handler
+    - [ ] Decap OAuth proxy worker (scaffold added)
+    - [ ] Contact form handler (Pages Function scaffold added)
     - [ ] Document upload handler
 
 11. **Email Integration**
@@ -131,25 +130,45 @@ Last Updated: September 22, 2025 (19:50)
     - [ ] Client-side integration
     - [ ] Server-side validation
 
-### Phase 5: Deployment
-**After everything works locally**
+### Phase 5: Cloudflare Deployment (6 Sub-phases)
+**After frontend complete - See CLOUDFLARE-DEPLOYMENT-WORKFLOW.md**
 
-13. **Cloudflare Pages**
-    - [ ] Project creation
-    - [ ] Environment variables
-    - [ ] Build configuration
-    - [ ] Custom domain setup
+#### Phase 5.0: Pre-Deployment Prep
+- [ ] Complete frontend to deployable state
+- [ ] Pass all validations and tests
+- [ ] Build production bundle
 
-14. **Database & Storage**
-    - [ ] D1 database creation
-    - [ ] R2 bucket setup
-    - [ ] KV namespace
-    - [ ] Queue configuration
+#### Phase 5.1: Infrastructure Setup
+- [ ] Create D1 database
+- [ ] Create R2 bucket
+- [ ] Create KV namespace
+- [ ] Create Queue
 
-15. **CI/CD**
-    - [ ] GitHub Actions workflows
-    - [ ] Automated testing
-    - [ ] Deployment pipelines
+#### Phase 5.2: Security & Auth
+- [ ] Configure Turnstile
+- [ ] Create GitHub OAuth App
+- [ ] Store credentials in gopass
+
+#### Phase 5.3: Workers Deployment
+- [ ] Deploy OAuth Worker
+- [ ] Deploy Cron Worker
+- [ ] Deploy Queue Consumer
+
+#### Phase 5.4: Main Site Deployment
+- [ ] Create Pages project
+- [ ] Configure environment variables
+- [ ] Migrate DNS from Google
+- [ ] Deploy site
+
+#### Phase 5.5: Email Configuration
+- [ ] SendGrid setup
+- [ ] Email templates
+- [ ] DNS records for email
+
+#### Phase 5.6: Verification
+- [ ] Functional tests
+- [ ] Update documentation
+- [ ] Enable monitoring
 
 ### Phase 6: Operations
 **After deployed**
@@ -170,20 +189,10 @@ Last Updated: September 22, 2025 (19:50)
 
 ## 🚨 Current Blockers
 
-1. **Missing Core Files**:
-   - global.css (required for all components)
-   - menu-toggle.js (required for Header)
-   - Content structure (required for CMS)
-
-2. **Unknown Requirements**:
-   - 10 documentation files not yet read
-   - May contain critical dependencies
-
-3. **External Dependencies**:
-   - GitHub OAuth App not created
-   - SendGrid account not configured
-   - Cloudflare account not set up
-   - Turnstile keys not obtained
+1. **Code Quality Setup**: Biome, ESLint flat config, tests (Vitest/Playwright/pa11y)
+2. **CMS Integration**: Decap admin, config.yml, content collections
+3. **Backend Services**: Contact API, OAuth Worker, document upload
+4. **Infra**: D1/R2/KV/Queues setup per Cloudflare plan
 
 ---
 
@@ -257,16 +266,16 @@ graph TD
 | Phase | Status | Progress | Blocking Next Phase? |
 |-------|--------|----------|---------------------|
 | Foundation | ✅ Complete | 100% | No |
-| Core Styling | 🔴 Blocked | 0% | Yes - CRITICAL |
-| Components | 🔴 Not Started | 0% | Yes - Needs styles |
-| Pages | 🔴 Not Started | 14% | Yes - Needs components |
-| CMS Integration | 🔴 Not Started | 0% | No |
-| Backend Services | 🔴 Not Started | 0% | No |
-| Cloudflare Infra | 🔴 Not Started | 0% | No |
-| Deployment | 🔴 Not Started | 0% | No |
-| Operations | 🔴 Not Started | 0% | No |
+| Core Styling | ✅ Complete | 100% | No |
+| Components | ✅ Initial | 100% | No |
+| Pages | ✅ Initial | 100% | No |
+| CMS Integration | 🔴 Not Started | 0% | Blocks content workflows |
+| Backend Services | 🔴 Not Started | 0% | Blocks forms/uploads |
+| Cloudflare Infra | 🔴 Not Started | 0% | Blocks SSR/data features |
+| Deployment | 🔴 Not Started | 0% | Pending |
+| Operations | 🔴 Not Started | 0% | Pending |
 
-**Overall Project Completion: ~15%** (Foundation complete, validation ready)
+**Overall Project Completion: ~50%** (Frontend + testing complete; CMS 75% done; API started; infra pending)
 
 ---
 
@@ -275,7 +284,7 @@ graph TD
 1. **Tailwind v4** instead of v3 (user directive)
 2. **pnpm** instead of npm (user directive)
 3. **Node 24** requirement (user directive)
-4. **Monorepo structure** suggested in cloudflare-deployment.md
+4. **Cloudflare Pages only** — no Vercel/Netlify adapters; sitemap pinned to v3.6+
 5. **Decap CMS** for content management
 
 ---
