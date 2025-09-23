@@ -103,7 +103,8 @@ const allowedPatterns = [
   '.env.example',
   '.dev.vars.example',
   '.env.template',
-  '.env.sample'
+  '.env.sample',
+  '.dev.vars' // Local development secrets (should be gitignored)
 ];
 
 function checkForbiddenFiles(dir = '.') {

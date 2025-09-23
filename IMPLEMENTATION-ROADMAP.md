@@ -1,7 +1,7 @@
 # IMPLEMENTATION ROADMAP - Litecky Editing Services
 ## Logical Build Order & Dependencies
 
-Last Updated: September 23, 2025 (11:15)
+Last Updated: September 23, 2025 (11:45)
 
 ---
 
@@ -144,10 +144,10 @@ Last Updated: September 23, 2025 (11:15)
 - [x] Create KV namespace (CACHE: 6d85733ce2654d9980caf3239a12540a)
 - [x] Create Queue (deferred - requires paid plan)
 
-#### Phase 5.2: Security & Auth
-- [ ] Configure Turnstile
+#### Phase 5.2: Security & Auth 🟡
+- [x] Configure Turnstile (Widget created, keys stored)
 - [ ] Create GitHub OAuth App
-- [ ] Store credentials in gopass
+- [x] Store credentials in gopass (Turnstile keys stored)
 
 #### Phase 5.3: Workers Deployment
 - [ ] Deploy OAuth Worker
@@ -271,7 +271,7 @@ graph TD
 | Deployment | 🟡 In Progress | 40% | Initial deployment complete |
 | Operations | 🔴 Not Started | 0% | Pending |
 
-**Overall Project Completion: ~60%** (Frontend complete; testing configured; CMS 75% done; API started; infrastructure created; initial deployment live)
+**Overall Project Completion: ~65%** (Frontend complete; Turnstile security active; CMS 75% done; API enhanced; infrastructure deployed; live site protected)
 
 ---
 

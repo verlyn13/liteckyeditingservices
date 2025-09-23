@@ -57,18 +57,20 @@ This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-
 - [x] Mark KV Namespace as created
 - [x] Mark Queue as deferred (paid plan required)
 
-### Phase 2: Security & Authentication Setup 🔐
-**Status**: Not Started
-**Dependencies**: Phase 1
+### Phase 2: Security & Authentication Setup 🟡
+**Status**: PARTIALLY COMPLETE
+**Dependencies**: Phase 1 ✅
 
-#### 2.1 Turnstile Setup
+#### 2.1 Turnstile Setup ✅
 ```bash
-# Via Cloudflare Dashboard
-# 1. Navigate to Turnstile
-# 2. Create new widget for liteckyeditingservices.com
-# 3. Save keys to gopass:
-gopass insert cloudflare/litecky/turnstile/site-key
-gopass insert cloudflare/litecky/turnstile/secret-key
+# COMPLETED:
+# 1. Widget created: litecky-editing-production
+# 2. Mode: Managed with pre-clearance
+# 3. Keys stored in gopass:
+#    Site key: 0x4AAAAAAB27CNFPS0wEzPP5
+#    Secret stored at: cloudflare/litecky/turnstile/secret-key
+# 4. Integrated into contact form
+# 5. Server-side validation active
 ```
 
 #### 2.2 GitHub OAuth App
@@ -83,7 +85,7 @@ gopass insert github/litecky/oauth/client-secret
 ```
 
 #### 2.3 Update Trackers
-- [ ] Update PROJECT-STATUS.md: Turnstile configured
+- [x] Update PROJECT-STATUS.md: Turnstile configured
 - [ ] Update PROJECT-STATUS.md: GitHub OAuth created
 
 ### Phase 3: Workers Deployment 👷
@@ -163,7 +165,8 @@ wrangler pages secret put SENDGRID_API_KEY
 # COMPLETED:
 pnpm build
 wrangler pages deploy dist --project-name=litecky-editing-services
-# Deployed to: https://c9bfafd5.litecky-editing-services.pages.dev
+# Initial deployment: https://c9bfafd5.litecky-editing-services.pages.dev
+# With Turnstile: https://22910e05.litecky-editing-services.pages.dev
 ```
 
 #### 4.5 Update Trackers ✅
