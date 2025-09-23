@@ -30,8 +30,7 @@ chore: update dependencies
 ## Development Setup
 
 ### Required Tools
-- Node.js 24+ (use nvm or volta)
-- pnpm 10.16+
+- mise (for version management)
 - Git
 
 ### Optional Tools

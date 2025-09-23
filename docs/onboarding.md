@@ -5,8 +5,9 @@ Welcome! This guide will get you productive in ~45 minutes.
 ## Prerequisites
 
 ### Required Tools
-- **Node.js 24+** (install via [nvm](https://github.com/nvm-sh/nvm))
-- **pnpm 10.16+** (`npm install -g pnpm@10.16.0`)
+- **mise** (version manager - [install](https://mise.jdx.dev/))
+- **Node.js 24+** (managed via mise)
+- **pnpm 10.16+** (managed via mise)
 - **Git** (with GitHub account)
 
 ### Optional Tools
@@ -20,6 +21,10 @@ Welcome! This guide will get you productive in ~45 minutes.
 # Clone repository
 git clone https://github.com/verlyn13/liteckyeditingservices
 cd liteckyeditingservices
+
+# Activate mise (will install Node 24 and pnpm 10.16)
+mise install
+mise trust
 
 # Install dependencies
 pnpm install

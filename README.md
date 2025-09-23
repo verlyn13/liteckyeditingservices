@@ -19,12 +19,13 @@ Professional academic editing services for graduate students, built with modern 
 ## Quick Start (Development)
 
 ```bash
-# Prerequisites: Node 24+, pnpm 10.16+
+# Prerequisites: mise (version manager)
 # Optional: gopass/age for secret management
 
 # 1. Clone and install
 git clone https://github.com/verlyn13/liteckyeditingservices
 cd liteckyeditingservices
+mise install  # Installs Node 24 and pnpm 10.16
 pnpm install
 
 # 2. Set up local environment
