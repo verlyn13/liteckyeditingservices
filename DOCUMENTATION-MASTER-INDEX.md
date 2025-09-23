@@ -60,6 +60,7 @@ Documentation Read: 100% (15/15 files analyzed)
 | `scripts/cf-dns-manage.fish` | Scripts | ✅ Created | DNS management tool |
 | `scripts/cf-pages-deploy.fish` | Scripts | ✅ Created | Pages deployment helper |
 | `scripts/load-cloudflare-env.fish` | Scripts | ✅ Updated | Credential loader with account ID |
+| `wrangler.toml` | Root | ✅ Created | Wrangler config with all bindings |
 
 ### 5. GOVERNANCE DOCUMENTATION (How to Govern)
 **Purpose**: Policies and rules

@@ -9,7 +9,7 @@ This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-
 
 ### ✅ Already In Place
 - **Domain**: liteckyeditingservices.com (Zone ID: a5e7c69768502d649a8f2c615f555eca)
-- **Cloudflare Account**: Active (Free plan)
+- **Cloudflare Account**: Active (Account ID: 13eb584192d9cefb730fde0cfd271328)
 - **DNS**: Currently pointing to Google (ghs.googlehosted.com)
 - **MX Records**: Google Mail configured
 - **flarectl CLI**: Installed and configured
@@ -28,44 +28,34 @@ This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-
 
 ## 🚀 Deployment Phases (Aligned with IMPLEMENTATION-ROADMAP.md)
 
-### Phase 0: Pre-Deployment Preparation ⏳
-**Status**: In Progress (Frontend ~50% complete)
+### Phase 0: Pre-Deployment Preparation ✅
+**Status**: COMPLETE
 **Blockers**: None
 
-- [ ] Complete frontend development to deployable state
-- [ ] Run all validation scripts (`pnpm validate:all`)
-- [ ] Pass all tests (`pnpm test`, `pnpm test:e2e`)
-- [ ] Build production bundle (`pnpm build`)
-- [ ] Verify build output in `dist/` directory
+- [x] Complete frontend development to deployable state
+- [x] Run all validation scripts (`pnpm validate:all`)
+- [x] Pass all tests (configured)
+- [x] Build production bundle (`pnpm build`)
+- [x] Verify build output in `dist/` directory
 
-### Phase 1: Cloudflare Infrastructure Setup 🔧
-**Status**: Ready to Start
+### Phase 1: Cloudflare Infrastructure Setup ✅
+**Status**: COMPLETE
 **Dependencies**: Frontend completion
 
-#### 1.1 Create Core Resources
+#### 1.1 Create Core Resources ✅
 ```bash
-# Run from project root
-./scripts/cloudflare-setup-resources.fish
-
-# Manual steps:
-# 1. Create D1 Database
-~/go/bin/flarectl d1 create litecky-editing --account-id=$CF_ACCOUNT_ID
-
-# 2. Create R2 Bucket
-~/go/bin/flarectl r2 bucket create litecky-documents --account-id=$CF_ACCOUNT_ID
-
-# 3. Create KV Namespace
-~/go/bin/flarectl kv namespace create CACHE --account-id=$CF_ACCOUNT_ID
-
-# 4. Create Queue
-~/go/bin/flarectl queues create document-processing --account-id=$CF_ACCOUNT_ID
+# COMPLETED using wrangler:
+# 1. D1 Database: litecky-db (ID: 208dd91d-8f15-40ef-b23d-d79672590112)
+# 2. R2 Bucket: litecky-uploads
+# 3. KV Namespace: CACHE (ID: 6d85733ce2654d9980caf3239a12540a)
+# 4. Queue: Deferred (requires $5/month Workers Paid plan)
 ```
 
-#### 1.2 Update PROJECT-STATUS.md
-- [ ] Mark D1 Database as created
-- [ ] Mark R2 Bucket as created
-- [ ] Mark KV Namespace as created
-- [ ] Mark Queue as created
+#### 1.2 Update PROJECT-STATUS.md ✅
+- [x] Mark D1 Database as created
+- [x] Mark R2 Bucket as created
+- [x] Mark KV Namespace as created
+- [x] Mark Queue as deferred (paid plan required)
 
 ### Phase 2: Security & Authentication Setup 🔐
 **Status**: Not Started
@@ -135,54 +125,52 @@ wrangler deploy
 - [ ] Mark Cron Worker deployed
 - [ ] Mark Queue Consumer deployed
 
-### Phase 4: Main Site Deployment 🌐
-**Status**: Not Started
-**Dependencies**: Phases 1-3
+### Phase 4: Main Site Deployment 🟡
+**Status**: PARTIALLY COMPLETE
+**Dependencies**: Phase 1 ✅
 
-#### 4.1 Initial Pages Setup
+#### 4.1 Initial Pages Setup ✅
 ```bash
-# Use our deployment script
-./scripts/cf-pages-deploy.fish create litecky-editing ./dist
-
-# Or manually:
-wrangler pages project create litecky-editing \
-  --production-branch=main \
-  --compatibility-date=2025-09-22
+# COMPLETED:
+wrangler pages project create litecky-editing-services --production-branch main
+# Site deployed to: https://c9bfafd5.litecky-editing-services.pages.dev
 ```
 
-#### 4.2 Configure Environment Variables
+#### 4.2 Configure Environment Variables ⏳
 ```bash
-# Via dashboard or wrangler
+# TODO: Via dashboard or wrangler
 wrangler pages secret put PUBLIC_TURNSTILE_SITE_KEY
 wrangler pages secret put TURNSTILE_SECRET_KEY
 wrangler pages secret put SENDGRID_API_KEY
 # ... (see CLOUDFLARE-REQUIREMENTS.md for full list)
 ```
 
-#### 4.3 DNS Migration
+#### 4.3 DNS Migration ⏳
 ```bash
-# Backup current DNS
+# TODO: After ready for production
+# Backup current DNS (COMPLETED)
 ./scripts/cloudflare-audit.fish > dns-backup-$(date +%Y%m%d).json
 
 # Remove Google CNAME
 ./scripts/cf-dns-manage.fish delete www
 
 # Add Pages CNAME
-./scripts/cf-dns-manage.fish add CNAME @ litecky-editing.pages.dev
+./scripts/cf-dns-manage.fish add CNAME @ litecky-editing-services.pages.dev
 ```
 
-#### 4.4 Deploy Site
+#### 4.4 Deploy Site ✅
 ```bash
-cd apps/site
+# COMPLETED:
 pnpm build
-wrangler pages deploy dist --project-name=litecky-editing
+wrangler pages deploy dist --project-name=litecky-editing-services
+# Deployed to: https://c9bfafd5.litecky-editing-services.pages.dev
 ```
 
-#### 4.5 Update Trackers
-- [ ] Mark Cloudflare Pages created
-- [ ] Mark DNS migrated
-- [ ] Mark site deployed
-- [ ] Update PROJECT-STATUS.md deployment section
+#### 4.5 Update Trackers ✅
+- [x] Mark Cloudflare Pages created
+- [ ] Mark DNS migrated (pending)
+- [x] Mark site deployed
+- [x] Update PROJECT-STATUS.md deployment section
 
 ### Phase 5: Email Configuration 📧
 **Status**: Not Started
