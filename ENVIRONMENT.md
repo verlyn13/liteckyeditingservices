@@ -14,8 +14,8 @@
 | `OAUTH_GITHUB_CLIENT_ID` | Production ID | Preview ID | Test ID | Variable | Yes |
 | `OAUTH_GITHUB_CLIENT_SECRET` | Via wrangler secret | Via wrangler secret | Test secret | Secret | Yes |
 | **Turnstile** |
-| `PUBLIC_TURNSTILE_SITE_KEY` | Real key | Real key | Test key | Public | Yes |
-| `TURNSTILE_SECRET_KEY` | Real secret | Real secret | Test secret | Secret | Yes |
+| `PUBLIC_TURNSTILE_SITE_KEY` | 0x4AAAAAAB27CNFPS0wEzPP5 | Same | 1x00000000000000000000AA | Public | Yes |
+| `TURNSTILE_SECRET_KEY` | Via wrangler secret | Via wrangler secret | 2x0000000000000000000000000000000AA | Secret | Yes |
 | `USE_TURNSTILE_TEST` | - | `1` | `1` | Variable | No |
 | `TURNSTILE_TEST_SITE_KEY` | - | Test key | Test key | Variable | No |
 | `TURNSTILE_TEST_SECRET_KEY` | - | Test secret | Test secret | Secret | No |
@@ -45,9 +45,9 @@
 ### Local Development (.dev.vars)
 
 ```bash
-# apps/site/.dev.vars
-PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
-TURNSTILE_SECRET_KEY=2x0000000000000000000000000000000AA
+# .dev.vars (project root)
+PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAB27CNFPS0wEzPP5
+TURNSTILE_SECRET_KEY=0x4AAAAAAB27CNz7ilbhng3rNxH8TK2Bg7Q
 SENDGRID_API_KEY=SG.test_key_here
 ADMIN_EMAIL=test@example.com
 ENVIRONMENT=development

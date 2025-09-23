@@ -3,6 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import FileUpload from '../components/FileUpload.svelte';
 import contactScriptUrl from '../scripts/contact-form.js?url';
+
+const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 ---
 
 <BaseLayout title="Contact" description="Request a free quote for academic editing services. Fast turnaround, secure document handling, PhD-qualified editors.">
@@ -63,11 +65,46 @@ import contactScriptUrl from '../scripts/contact-form.js?url';
             Securely upload your document (max 10MB). Your files are encrypted and confidential.
           </p>
         </div>
+
+        <!-- Turnstile Widget -->
+        <div
+          class="cf-turnstile"
+          data-sitekey={turnstileSiteKey}
+          data-theme="auto"
+          data-size="normal"
+          data-callback="onTurnstileSuccess"
+          data-error-callback="onTurnstileError"
+          data-expired-callback="onTurnstileExpired"
+        ></div>
+
         <div>
-          <button class="btn btn-primary" type="submit">Get My Free Quote</button>
+          <button class="btn btn-primary" type="submit" id="submit-btn" disabled>Get My Free Quote</button>
         </div>
       </form>
     </div>
   </main>
+
+  <!-- Turnstile Script -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+  <!-- Turnstile Callbacks -->
+  <script is:inline>
+    window.onTurnstileSuccess = function(token) {
+      console.log('Turnstile verification successful');
+      document.getElementById('submit-btn').disabled = false;
+    };
+
+    window.onTurnstileError = function(errorCode) {
+      console.error('Turnstile error:', errorCode);
+      document.getElementById('submit-btn').disabled = true;
+      alert('Verification failed. Please refresh the page and try again.');
+    };
+
+    window.onTurnstileExpired = function() {
+      console.warn('Turnstile token expired');
+      document.getElementById('submit-btn').disabled = true;
+    };
+  </script>
+
   <script type="module" src={contactScriptUrl} defer></script>
 </BaseLayout>
