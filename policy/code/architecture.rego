@@ -15,19 +15,25 @@ file_exists(path) {
   input.present[j] == path
 }
 
-# No .env files committed
+# No .env files committed (except .example files)
 deny[msg] {
   input.kind == "git.files"
   some f
-  regex.match(`(^|/)\.env($|\.|-)`, input.files[f])
+  regex.match(`(^|/)\.env($|\.)`, input.files[f])
+  not regex.match(`\.example$`, input.files[f])
+  not regex.match(`\.template$`, input.files[f])
+  not regex.match(`\.sample$`, input.files[f])
   msg := sprintf("forbidden committed file (env): %s", [input.files[f]])
 }
 
-# No .dev.vars files committed
+# No .dev.vars files committed (except .example files)
 deny[msg] {
   input.kind == "git.files"
   some f
   regex.match(`(^|/)\.dev\.vars`, input.files[f])
+  not endswith(input.files[f], ".example")
+  not endswith(input.files[f], ".template")
+  not endswith(input.files[f], ".sample")
   msg := sprintf("forbidden committed file (.dev.vars): %s", [input.files[f]])
 }
 

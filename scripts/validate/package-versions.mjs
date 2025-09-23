@@ -64,24 +64,46 @@ if (packageJson.engines?.pnpm) {
   hasErrors = true;
 }
 
+// Semver helpers for simple range assertions on specs like ^3.6.0
+function extractSemverTuple(spec) {
+  const m = (spec || '').match(/(\d+)\.(\d+)\.(\d+)/);
+  if (!m) return null;
+  return { major: parseInt(m[1], 10), minor: parseInt(m[2], 10), patch: parseInt(m[3], 10) };
+}
+
 // Check key dependencies
 for (const [name, minVersion] of Object.entries(requiredVersions.dependencies)) {
   const actual = packageJson.dependencies?.[name];
   if (!actual) {
     console.error(`❌ Missing dependency: ${name}`);
     hasErrors = true;
-  } else {
-    // Extract major version
-    const actualMajor = actual.match(/\d+/)?.[0];
-    const requiredMajor = minVersion.split('.')[0];
+    continue;
+  }
 
-    if (parseInt(actualMajor) < parseInt(requiredMajor)) {
-      console.error(`❌ ${name} version ${actual} is older than required ${minVersion}`);
+  const actualSem = extractSemverTuple(actual);
+  const requiredSem = extractSemverTuple(minVersion);
+  if (!actualSem || !requiredSem) {
+    console.error(`❌ Unable to parse version for ${name}: '${actual}'`);
+    hasErrors = true;
+    continue;
+  }
+
+  if (actualSem.major < requiredSem.major) {
+    console.error(`❌ ${name} version ${actual} is older than required ${minVersion}`);
+    hasErrors = true;
+    continue;
+  }
+
+  // Special case: enforce @astrojs/sitemap >= 3.6.0 (stay on v3)
+  if (name === '@astrojs/sitemap') {
+    if (actualSem.major !== 3 || actualSem.minor < 6) {
+      console.error(`❌ @astrojs/sitemap must be ^3.6.0 (found ${actual}). Do not upgrade to v4.`);
       hasErrors = true;
-    } else {
-      console.log(`✅ ${name}: ${actual}`);
+      continue;
     }
   }
+
+  console.log(`✅ ${name}: ${actual}`);
 }
 
 // Check required scripts
@@ -116,7 +138,7 @@ if (packageJson.devDependencies?.['@tailwindcss/vite']) {
   hasErrors = true;
 }
 
-// Check for incorrect adapters
+// Check for incorrect adapters in package.json
 if (packageJson.dependencies?.['@astrojs/vercel']) {
   console.error('❌ Found @astrojs/vercel - should not be present (deploying to Cloudflare)');
   hasErrors = true;

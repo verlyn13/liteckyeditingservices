@@ -76,6 +76,15 @@ pnpm lint:fix     # Auto-fix linting issues
 - **Preview**: Every PR gets a preview URL automatically
 - **Rollback**: Revert commit or use Cloudflare dashboard
 
+### ⚠️ Deployment Constraints
+
+**This project deploys ONLY to Cloudflare Pages**. Do not add or use:
+- ❌ `@astrojs/vercel` adapter
+- ❌ `@astrojs/netlify` adapter
+- ❌ Any non-Cloudflare deployment adapters
+
+The project runs as a static site. When SSR is needed, we'll add `@astrojs/cloudflare`.
+
 ## Content Management
 
 - **For editors**: Use the CMS at `/admin` (requires GitHub access)

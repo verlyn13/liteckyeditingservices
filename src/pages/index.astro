@@ -1,16 +1,17 @@
 ---
-
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Home" description="Professional academic editing services">
+  <a href="#main" class="skip-link">Skip to content</a>
+  <main id="main" class="container section">
+    <h1 class="text-3xl font-bold text-primary-navy">Litecky Editing Services</h1>
+    <p class="mt-4 text-text-secondary max-w-prose">
+      Expert academic editing for dissertations and theses. PhD-qualified editors, 2–3 day turnaround,
+      secure and confidential.
+    </p>
+    <div class="mt-6">
+      <a class="btn btn-primary" href="/contact">Get Started</a>
+    </div>
+  </main>
+</BaseLayout>

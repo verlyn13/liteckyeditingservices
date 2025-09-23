@@ -1,5 +1,18 @@
 package infra.cloudflare
 
+# No non-Cloudflare adapters allowed in package.json
+deny[msg] {
+  input.name == "package.json"
+  input.dependencies["@astrojs/vercel"]
+  msg := "package.json must not include @astrojs/vercel (Cloudflare deployment only)"
+}
+
+deny[msg] {
+  input.name == "package.json"
+  input.dependencies["@astrojs/netlify"]
+  msg := "package.json must not include @astrojs/netlify (Cloudflare deployment only)"
+}
+
 # Wrangler TOML must not contain plain secrets
 deny[msg] {
   input.name == "wrangler.toml"
