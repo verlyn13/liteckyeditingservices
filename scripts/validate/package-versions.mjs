@@ -23,7 +23,7 @@ const requiredVersions = {
     astro: '5.13.0',
     svelte: '5.0.0',
     '@astrojs/svelte': '7.0.0',
-    '@astrojs/sitemap': '4.0.0'
+    '@astrojs/sitemap': '3.6.0'  // Current latest version
   },
   devDependencies: {
     '@biomejs/biome': '2.0.0',
@@ -115,6 +115,20 @@ if (packageJson.devDependencies?.['@tailwindcss/vite']) {
   console.error('❌ Missing @tailwindcss/vite for Tailwind v4');
   hasErrors = true;
 }
+
+// Check for incorrect adapters
+if (packageJson.dependencies?.['@astrojs/vercel']) {
+  console.error('❌ Found @astrojs/vercel - should not be present (deploying to Cloudflare)');
+  hasErrors = true;
+}
+
+if (packageJson.dependencies?.['@astrojs/netlify']) {
+  console.error('❌ Found @astrojs/netlify - should not be present (deploying to Cloudflare)');
+  hasErrors = true;
+}
+
+// Note: @astrojs/cloudflare will be added when we need SSR
+console.log('ℹ️  No adapter configured (static site). Will add @astrojs/cloudflare when SSR is needed.');
 
 if (hasErrors) {
   console.error('\n❌ Package version validation failed');

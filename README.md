@@ -51,6 +51,13 @@ pnpm test:e2e     # Run Playwright tests
 pnpm lint:fix     # Auto-fix linting issues
 ```
 
+## Styling
+
+- Single source of truth: `src/styles/global.css`.
+- Tailwind v4 is enabled via `@import "tailwindcss"` in that file.
+- Design tokens live under the `@theme { ... }` block (colors, fonts, spacing, breakpoints).
+- Global base styles, minimal utilities, and simple components (e.g., `.btn`) are defined there.
+
 ## Project Structure
 
 ```

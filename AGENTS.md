@@ -24,7 +24,8 @@
 - Indentation: 2 spaces; no tabs.
 - Languages: TypeScript preferred; avoid `any`.
 - Components: Astro for pages/layouts; Svelte 5 for interactivity.
-- CSS: Tailwind utilities; custom CSS only when necessary.
+- CSS: Tailwind v4 utilities; custom CSS only when necessary.
+- Single source of truth for styles: `src/styles/global.css` (tokens + base). Prettier `tailwindStylesheet` points here.
 - Formatting: Prettier (`.prettierrc.json`). Fix with `pnpm format`.
 - Linting: ESLint (`eslint.config.js`). Fix with `pnpm lint:fix`.
 - File naming: kebab-case for files; PascalCase for Svelte components.

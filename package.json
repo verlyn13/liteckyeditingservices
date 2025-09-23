@@ -26,9 +26,8 @@
     "prepush": "pnpm run gate:docs"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^4.0.0",
+    "@astrojs/sitemap": "^3.6.0",
     "@astrojs/svelte": "^7.1.1",
-    "@astrojs/vercel": "^8.2.8",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource/lora": "^5.2.8",
     "astro": "^5.13.10",

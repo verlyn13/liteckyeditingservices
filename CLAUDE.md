@@ -12,6 +12,7 @@ This is the Litecky Editing Services website - a professional academic editing s
 2. **Tailwind CSS v4** - Using @tailwindcss/vite plugin, NOT v3 config files
 3. **September 2025 versions** - All packages must use latest versions as of Sept 2025
 4. **Policy enforcement** - Validation scripts prevent version downgrades and enforce standards
+5. **Cloudflare deployment** - NO Vercel/Netlify adapters. Static site now, will add @astrojs/cloudflare when SSR needed
 
 ## Essential Commands
 

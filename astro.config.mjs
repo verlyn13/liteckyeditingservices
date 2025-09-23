@@ -2,7 +2,6 @@
 import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
-import vercel from '@astrojs/vercel/static';
 import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
@@ -12,15 +11,9 @@ export default defineConfig({
     svelte(),
     sitemap()
   ],
+  // Static output for Cloudflare Pages
+  // Will change to 'server' when we add SSR functions
   output: 'static',
-  adapter: vercel({
-    webAnalytics: {
-      enabled: true
-    },
-    speedInsights: {
-      enabled: true
-    }
-  }),
   compressHTML: true,
   build: {
     inlineStylesheets: 'auto',
@@ -53,11 +46,7 @@ export default defineConfig({
       }
     }
   },
-  experimental: {
-    contentCollectionCache: true,
-    contentLayer: true,
-    globalRoutingPriority: true
-  },
+  // No experimental flags enabled
   security: {
     checkOrigin: true
   },
