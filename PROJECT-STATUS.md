@@ -1,8 +1,29 @@
 # PROJECT STATUS - Litecky Editing Services
 ## Single Source of Truth for Implementation Progress
 
-Last Updated: September 22, 2025
+Last Updated: September 22, 2025 (16:30)
 Repository: https://github.com/verlyn13/liteckyeditingservices
+
+---
+
+## ⚠️ IMPORTANT DEVIATIONS FROM ORIGINAL SPECS
+
+### Tailwind CSS v4 Migration (User-Directed)
+- **Original Spec**: Tailwind CSS v3 with traditional config file
+- **Implemented**: Tailwind CSS v4 with new architecture
+- **Changes Made**:
+  1. Removed `tailwind.config.mjs` (not needed in v4)
+  2. Installed `@tailwindcss/vite` instead of `@astrojs/tailwind`
+  3. Created `src/styles/tailwind.css` with v4 @theme tokens
+  4. Updated `astro.config.mjs` to use Vite plugin
+  5. Updated `.prettierrc.json` with tailwindStylesheet path
+  6. Added `@sveltejs/vite-plugin-svelte` for compatibility
+- **Impact**: Better performance, simpler configuration, future-proof
+
+### Package Updates
+- **All packages updated to latest versions** as of September 2025
+- **Node 24** requirement (was Node 20 in some docs)
+- **pnpm 10.16** as package manager
 
 ---
 
@@ -139,12 +160,12 @@ Repository: https://github.com/verlyn13/liteckyeditingservices
      ```
 
 3. **Configuration Files Created**
-   - [x] package.json (with current versions)
-   - [x] package-2025.json (with future versions for September 2025)
-   - [x] astro.config.mjs
-   - [x] tailwind.config.mjs
+   - [x] package.json (updated with latest versions)
+   - [x] package-2025.json (reference for September 2025 versions)
+   - [x] astro.config.mjs (updated for Tailwind v4)
+   - [x] ~~tailwind.config.mjs~~ (removed - not needed in v4)
    - [x] .gitignore
-   - [x] .prettierrc.json
+   - [x] .prettierrc.json (updated for Tailwind v4)
    - [x] eslint.config.js
    - [x] .env.example
    - [x] tsconfig.json
@@ -152,11 +173,15 @@ Repository: https://github.com/verlyn13/liteckyeditingservices
 4. **Initial Files Created**
    - [x] src/layouts/BaseLayout.astro
    - [x] src/pages/index.astro (auto-generated)
+   - [x] src/styles/tailwind.css (Tailwind v4 theme configuration)
    - [x] public/favicon.svg (auto-generated)
+   - [x] PROJECT-STATUS.md (this tracking document)
 
 5. **Dependencies**
    - [x] Dependencies installed with pnpm
    - [x] Node 24 / pnpm 10.16 requirement specified
+   - [x] Tailwind CSS v4 migration completed
+   - [x] All packages at latest versions with no peer dependency issues
 
 ### 🔄 In Progress
 

@@ -1,7 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel/static';
 import sitemap from '@astrojs/sitemap';
 
@@ -10,10 +10,6 @@ export default defineConfig({
   site: 'https://liteckyeditingservices.com',
   integrations: [
     svelte(),
-    tailwind({
-      applyBaseStyles: false,
-      nesting: true
-    }),
     sitemap()
   ],
   output: 'static',
@@ -31,6 +27,7 @@ export default defineConfig({
     assets: '_assets'
   },
   vite: {
+    plugins: [tailwindcss()],
     build: {
       cssCodeSplit: true,
       rollupOptions: {

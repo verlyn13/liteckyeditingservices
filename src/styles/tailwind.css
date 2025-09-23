@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+/* Tailwind v4: Define tokens with @theme */
+@theme {
+  /* Typography */
+  --font-sans: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: Lora, Merriweather, Georgia, "Times New Roman", serif;
+
+  /* Brand Colors */
+  --color-primary-navy: #192A51;
+  --color-accent-sage: #5A716A;
+  --color-light-sage: #87a96b;
+  --color-dark-navy: #1e3a5f;
+  --color-off-white: #F4F4F2;
+  --color-soft-gray: #E8E8E6;
+
+  /* Extended Palette */
+  --color-warm-gray: #9B9891;
+  --color-error: #DC2626;
+  --color-success: #16A34A;
+  --color-warning: #F59E0B;
+  --color-info: #3B82F6;
+}
