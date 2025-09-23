@@ -1,43 +1,86 @@
-# Astro Starter Kit: Minimal
+# Litecky Editing Services — Website
 
-```sh
-pnpm create astro@latest -- --template minimal
+Professional academic editing services for graduate students, built with modern web technologies and a focus on simplicity and reliability.
+
+**Production**: https://liteckyeditingservices.com
+**Preview**: Auto-deployed via Cloudflare Pages on PRs
+**CMS**: https://liteckyeditingservices.com/admin (GitHub auth required)
+
+## Stack
+
+- **Frontend**: Astro 5 + Svelte 5 + Tailwind CSS 4
+- **Hosting**: Cloudflare Pages (static + SSR functions)
+- **Workers**: Cloudflare Workers (OAuth proxy, future cron jobs)
+- **CMS**: Decap CMS with GitHub backend
+- **Email**: SendGrid (transactional templates)
+- **Security**: Cloudflare Turnstile (spam protection)
+- **Analytics**: Cloudflare Web Analytics (privacy-first)
+
+## Quick Start (Development)
+
+```bash
+# Prerequisites: Node 24+, pnpm 10.16+
+# Optional: gopass/age for secret management
+
+# 1. Clone and install
+git clone https://github.com/verlyn13/liteckyeditingservices
+cd liteckyeditingservices
+pnpm install
+
+# 2. Set up local environment
+cp apps/site/.env.example apps/site/.env
+cp apps/site/.dev.vars.example apps/site/.dev.vars
+# Edit .dev.vars with your test keys
+
+# 3. Run development server
+pnpm dev
+
+# Site available at http://localhost:4321
+# CMS available at http://localhost:4321/admin
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Key Commands
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```bash
+pnpm dev          # Start development server
+pnpm build        # Build for production
+pnpm preview      # Preview production build
+pnpm check        # Run all quality checks
+pnpm test:e2e     # Run Playwright tests
+pnpm lint:fix     # Auto-fix linting issues
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Project Structure
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```
+├── apps/site/          # Main website (Astro)
+├── workers/            # Cloudflare Workers
+│   └── decap-oauth/    # GitHub OAuth proxy for CMS
+├── config/             # Shared configuration
+├── scripts/            # Build and deployment scripts
+├── docs/               # Detailed documentation
+└── _archive/           # Original specification documents
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Deployment
 
-## 🧞 Commands
+- **Automatic**: Push to `main` branch triggers deployment via Cloudflare Pages
+- **Preview**: Every PR gets a preview URL automatically
+- **Rollback**: Revert commit or use Cloudflare dashboard
 
-All commands are run from the root of the project, from a terminal:
+## Content Management
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+- **For editors**: Use the CMS at `/admin` (requires GitHub access)
+- **For developers**: Edit Markdown files in `apps/site/src/content/`
 
-## 👀 Want to learn more?
+## Getting Help
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- **Project Status**: See [PROJECT-STATUS.md](./PROJECT-STATUS.md)
+- **Implementation Roadmap**: See [IMPLEMENTATION-ROADMAP.md](./IMPLEMENTATION-ROADMAP.md)
+- **Documentation Index**: See [DOCUMENTATION-MASTER-INDEX.md](./DOCUMENTATION-MASTER-INDEX.md)
+- **New developer setup**: See [docs/onboarding.md](./docs/onboarding.md)
+- **Specific problems**: Check [docs/playbooks/](./docs/playbooks/)
+
+## License
+
+Private repository - All rights reserved
