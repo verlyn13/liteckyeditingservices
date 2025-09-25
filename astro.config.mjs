@@ -11,9 +11,9 @@ export default defineConfig({
     svelte(),
     sitemap()
   ],
-  // Static output for Cloudflare Pages
-  // Will change to 'server' when we add SSR functions
-  output: 'static',
+  // Server output for API endpoints
+  // Using hybrid mode: static by default, server for marked endpoints
+  output: 'hybrid',
   compressHTML: true,
   build: {
     inlineStylesheets: 'auto',

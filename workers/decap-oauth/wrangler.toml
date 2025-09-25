@@ -2,12 +2,15 @@ name = "litecky-decap-oauth"
 main = "src/index.ts"
 compatibility_date = "2025-09-22"
 compatibility_flags = ["nodejs_compat"]
+account_id = "13eb584192d9cefb730fde0cfd271328"
 
-# Optional custom domain (configure in Cloudflare)
+# The worker will be available at:
+# https://litecky-decap-oauth.verlyn13.workers.dev
+
+# Optional custom domain (configure in Cloudflare dashboard after deployment)
 # routes = [
-#   { pattern = "cms-auth.liteckyeditingservices.com", custom_domain = true }
+#   { pattern = "cms-auth.liteckyeditingservices.com/*", custom_domain = true }
 # ]
 
 [vars]
-# Configure via Cloudflare dashboard or wrangler secrets
 ENVIRONMENT = "production"

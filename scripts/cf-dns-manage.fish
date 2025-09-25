@@ -80,7 +80,19 @@ function add_record
     # Build JSON payload
     if test "$record_type" = "MX"
         set json_data "{\"type\":\"$record_type\",\"name\":\"$record_name\",\"content\":\"$record_content\",\"priority\":$record_priority}"
+    else if test "$record_type" = "TXT"
+        # TXT records cannot be proxied
+        set json_data "{\"type\":\"$record_type\",\"name\":\"$record_name\",\"content\":\"$record_content\",\"proxied\":false}"
+    else if test "$record_type" = "CNAME"
+        # Check if this is an email-related CNAME (should not be proxied)
+        if string match -q "*sendgrid*" "$record_content"; or string match -q "*_domainkey*" "$record_name"; or string match -q "*email*" "$record_name"; or string match -q "*mail*" "$record_name"
+            set json_data "{\"type\":\"$record_type\",\"name\":\"$record_name\",\"content\":\"$record_content\",\"proxied\":false}"
+        else
+            # Other CNAME records can be proxied
+            set json_data "{\"type\":\"$record_type\",\"name\":\"$record_name\",\"content\":\"$record_content\",\"proxied\":true}"
+        end
     else
+        # A records can be proxied
         set json_data "{\"type\":\"$record_type\",\"name\":\"$record_name\",\"content\":\"$record_content\",\"proxied\":true}"
     end
     
@@ -93,6 +105,44 @@ function add_record
         echo -e "$GREEN✓ Record added successfully$NC"
     else
         echo -e "$RED✗ Failed to add record$NC"
+        echo $response | python3 -m json.tool
+    end
+end
+
+function update_record
+    set record_id $argv[1]
+    set new_content $argv[2]
+
+    echo -e "$BLUE→ Updating record $record_id with new content: $new_content$NC"
+
+    # First get the record details
+    set record_details (curl -s -X GET "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$record_id" \
+        -H "Authorization: Bearer $CF_API_TOKEN" \
+        -H "Content-Type: application/json")
+
+    # Extract record type and name
+    set record_type (echo $record_details | python3 -c "import sys, json; print(json.load(sys.stdin)['result']['type'])" 2>/dev/null)
+    set record_name (echo $record_details | python3 -c "import sys, json; print(json.load(sys.stdin)['result']['name'])" 2>/dev/null)
+
+    # Build update payload
+    if test "$record_type" = "TXT"
+        set json_data "{\"type\":\"$record_type\",\"name\":\"$record_name\",\"content\":\"$new_content\",\"proxied\":false}"
+    else if test "$record_type" = "MX"
+        set priority (echo $record_details | python3 -c "import sys, json; print(json.load(sys.stdin)['result']['priority'])" 2>/dev/null)
+        set json_data "{\"type\":\"$record_type\",\"name\":\"$record_name\",\"content\":\"$new_content\",\"priority\":$priority}"
+    else
+        set json_data "{\"type\":\"$record_type\",\"name\":\"$record_name\",\"content\":\"$new_content\",\"proxied\":true}"
+    end
+
+    set response (curl -s -X PUT "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/$record_id" \
+        -H "Authorization: Bearer $CF_API_TOKEN" \
+        -H "Content-Type: application/json" \
+        -d $json_data)
+
+    if echo $response | grep -q '"success":true'
+        echo -e "$GREEN✓ Record updated successfully$NC"
+    else
+        echo -e "$RED✗ Failed to update record$NC"
         echo $response | python3 -m json.tool
     end
 end
@@ -167,6 +217,13 @@ switch $argv[1]
             exit 1
         end
         add_record $argv[2..]
+    case update
+        if test (count $argv) -lt 3
+            echo -e "$RED✗ Missing arguments for update command$NC"
+            show_usage
+            exit 1
+        end
+        update_record $argv[2] $argv[3]
     case delete
         if test (count $argv) -lt 2
             echo -e "$RED✗ Missing record ID$NC"

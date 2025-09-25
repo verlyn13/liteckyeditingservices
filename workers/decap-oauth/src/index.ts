@@ -1,7 +1,7 @@
-type Env = {
+interface Env {
   GITHUB_OAUTH_ID: string;
   GITHUB_OAUTH_SECRET: string;
-};
+}
 
 const GITHUB_AUTHORIZE = 'https://github.com/login/oauth/authorize';
 const GITHUB_TOKEN = 'https://github.com/login/oauth/access_token';
@@ -23,27 +23,53 @@ function getCookie(request: Request, name: string): string | undefined {
   return found?.split('=')[1];
 }
 
-function htmlPostMessage(token: string, origin: string): string {
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Authenticating…</title></head><body><script>(function(){try{var t=${JSON.stringify(
-    token,
-  )};var o=${JSON.stringify(
-    getSiteOrigin(),
-  )};if(window.opener&&t){window.opener.postMessage({token:t},o)}}catch(e){}setTimeout(function(){window.close()},100)})();</script><p>Authentication successful. You can close this window.</p></body></html>`;
+function htmlPostMessage(token: string): string {
+  const origin = getSiteOrigin();
+  return `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Authenticating…</title>
+</head>
+<body>
+  <script>
+    (function() {
+      try {
+        var token = ${JSON.stringify(token)};
+        var origin = ${JSON.stringify(origin)};
+        if (window.opener && token) {
+          window.opener.postMessage({ token: token }, origin);
+        }
+      } catch(e) {
+        console.error('Auth error:', e);
+      }
+      setTimeout(function() { window.close(); }, 100);
+    })();
+  </script>
+  <p>Authentication successful. You can close this window.</p>
+</body>
+</html>`;
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
-    // Health
+    // Health check
     if (url.pathname === '/') {
-      return new Response('Litecky Decap OAuth Proxy - Operational', { headers: { 'Content-Type': 'text/plain' } });
+      return new Response('Litecky Decap OAuth Proxy - Operational', {
+        status: 200,
+        headers: { 'Content-Type': 'text/plain' }
+      });
     }
 
-    // Start OAuth
+    // Start OAuth flow
     if (url.pathname === '/auth') {
-      const state = crypto.getRandomValues(new Uint8Array(16)).reduce((s, b) => s + b.toString(16).padStart(2, '0'), '');
-      const redirectUri = `https://${url.hostname}/callback`;
+      const state = crypto.getRandomValues(new Uint8Array(16))
+        .reduce((s, b) => s + b.toString(16).padStart(2, '0'), '');
+
+      // Use the worker's URL as base for callback
+      const redirectUri = `${url.origin}/callback`;
 
       const authUrl = new URL(GITHUB_AUTHORIZE);
       authUrl.searchParams.set('client_id', env.GITHUB_OAUTH_ID);
@@ -53,33 +79,67 @@ export default {
 
       return new Response(null, {
         status: 302,
-        headers: { Location: authUrl.toString(), 'Set-Cookie': setStateCookie(state, url.hostname), 'Cache-Control': 'no-store' },
+        headers: {
+          'Location': authUrl.toString(),
+          'Set-Cookie': setStateCookie(state, url.hostname),
+          'Cache-Control': 'no-store'
+        },
       });
     }
 
-    // Callback
+    // OAuth callback
     if (url.pathname === '/callback') {
       const code = url.searchParams.get('code');
       const state = url.searchParams.get('state');
-      const expected = getCookie(request, 'decap_oauth_state');
-      if (!code || !state || !expected || state !== expected) {
-        return new Response('Invalid OAuth state', { status: 400, headers: { 'Content-Type': 'text/plain' } });
+      const expectedState = getCookie(request, 'decap_oauth_state');
+
+      // Validate state parameter
+      if (!code || !state || !expectedState || state !== expectedState) {
+        return new Response('Invalid OAuth state', {
+          status: 400,
+          headers: { 'Content-Type': 'text/plain' }
+        });
       }
 
-      const tokenResp = await fetch(GITHUB_TOKEN, {
+      // Exchange code for token
+      const redirectUri = `${url.origin}/callback`;
+
+      const tokenResponse = await fetch(GITHUB_TOKEN, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ client_id: env.GITHUB_OAUTH_ID, client_secret: env.GITHUB_OAUTH_SECRET, code, redirect_uri: `https://${url.hostname}/callback` }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: env.GITHUB_OAUTH_ID,
+          client_secret: env.GITHUB_OAUTH_SECRET,
+          code,
+          redirect_uri: redirectUri
+        }),
       });
-      if (!tokenResp.ok) {
-        const txt = await tokenResp.text();
-        return new Response(`Authentication failed: ${txt}`, { status: 502, headers: { 'Content-Type': 'text/plain' } });
+
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        console.error('GitHub token exchange failed:', errorText);
+        return new Response(`Authentication failed: ${errorText}`, {
+          status: 502,
+          headers: { 'Content-Type': 'text/plain' }
+        });
       }
-      const data = (await tokenResp.json()) as { access_token?: string };
-      if (!data.access_token) {
-        return new Response('Authentication failed: no token', { status: 502, headers: { 'Content-Type': 'text/plain' } });
+
+      const tokenData = await tokenResponse.json() as { access_token?: string; error?: string };
+
+      if (!tokenData.access_token) {
+        console.error('No access token in response:', tokenData);
+        return new Response('Authentication failed: no token received', {
+          status: 502,
+          headers: { 'Content-Type': 'text/plain' }
+        });
       }
-      const html = htmlPostMessage(data.access_token, getSiteOrigin());
+
+      // Return HTML that posts token to opener window
+      const html = htmlPostMessage(tokenData.access_token);
+
       return new Response(html, {
         headers: {
           'Content-Type': 'text/html; charset=utf-8',

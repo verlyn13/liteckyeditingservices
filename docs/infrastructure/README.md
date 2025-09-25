@@ -15,6 +15,7 @@ This directory contains all Cloudflare infrastructure documentation and configur
 - **CLOUDFLARE-STATUS.md** - Current domain configuration and API audit results
 - **CLOUDFLARE-ANALYSIS.md** - Analysis of DNS, SSL/TLS, and deployment requirements
 - **CLOUDFLARE-MANAGEMENT.md** - Complete management guide with commands and procedures
+- **BROWSER-AUTOMATION-SETUP.md** - Browser automation configuration for testing
 
 ### Backups
 - **dns-backup-*.json** - DNS configuration backups (timestamped)
@@ -30,6 +31,7 @@ All infrastructure management scripts are located in `/scripts/`:
 | `cf-pages-deploy.fish` | Pages deployment helper | `status`, `prepare`, `deploy` |
 | `cf.fish` | Quick flarectl wrapper | Direct flarectl commands |
 | `load-cloudflare-env.fish` | Load credentials from gopass | `source scripts/load-cloudflare-env.fish` |
+| `launch-browser.fish` | Browser automation launcher | `dev`, `headless`, `debug`, `test` |
 
 ## Configuration Files
 
