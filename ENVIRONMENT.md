@@ -44,15 +44,34 @@
 
 ### Local Development (.dev.vars)
 
+All development credentials are stored in gopass for security and portability:
+
+```bash
+# Store credentials in gopass (first time setup)
+./store-dev-vars-in-gopass.sh
+
+# Generate .dev.vars from gopass (on any system)
+./scripts/generate-dev-vars.sh
+```
+
+Example `.dev.vars` structure:
 ```bash
 # .dev.vars (project root)
 PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAB27CNFPS0wEzPP5
 TURNSTILE_SECRET_KEY=0x4AAAAAAB27CNz7ilbhng3rNxH8TK2Bg7Q
 SENDGRID_API_KEY=SG.test_key_here
-ADMIN_EMAIL=test@example.com
-ENVIRONMENT=development
-DEBUG=true
+EMAIL_FROM=hello@liteckyeditingservices.com
+EMAIL_TO=ahnie@liteckyeditingservices.com
+SENDGRID_DOMAIN_ID=54920324
+# SENDGRID_FORCE_SEND=true  # Uncomment to send real emails in dev
 ```
+
+#### Gopass Organization
+
+Credentials are stored in the following gopass paths:
+- `development/turnstile/*` - Turnstile test keys
+- `development/sendgrid/*` - SendGrid configuration
+- `github/oauth/litecky-editing/*` - GitHub OAuth credentials
 
 ### Worker Secrets
 
