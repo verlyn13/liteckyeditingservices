@@ -1,19 +1,21 @@
-export const onRequestOptions: PagesFunction = async () => {
-	return new Response(null, {
-		status: 204,
-		headers: {
-			"Access-Control-Allow-Origin": "*",
-			"Access-Control-Allow-Methods": "POST, OPTIONS",
-			"Access-Control-Allow-Headers": "Content-Type",
-		},
-	});
+import type { PagesFunction, Response as CFResponse } from '@cloudflare/workers-types';
+
+export const onRequestOptions: PagesFunction = async (): Promise<CFResponse> => {
+    return new Response(null, {
+        status: 204,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+        },
+    }) as unknown as CFResponse;
 };
 
-export const onRequestPost: PagesFunction = async ({ request, env }) => {
+export const onRequestPost: PagesFunction = async ({ request, env }): Promise<CFResponse> => {
 	try {
 		const contentType = request.headers.get("content-type") || "";
 		if (!contentType.includes("application/json")) {
-			return json({ error: "Unsupported Media Type" }, 415);
+            return json({ error: "Unsupported Media Type" }, 415);
 		}
 		const data = (await request.json()) as {
 			name?: string;
@@ -23,7 +25,7 @@ export const onRequestPost: PagesFunction = async ({ request, env }) => {
 		};
 
 		if (!data?.name || !data?.email) {
-			return json({ error: "Missing required fields: name, email" }, 400);
+            return json({ error: "Missing required fields: name, email" }, 400);
 		}
 
 		// If a Queue producer is bound, enqueue an email job
@@ -32,7 +34,7 @@ export const onRequestPost: PagesFunction = async ({ request, env }) => {
 			| undefined;
 		if (queue && typeof queue.send === "function") {
 			await queue.send({ kind: "contact", data });
-			return json({ status: "enqueued" }, 202);
+            return json({ status: "enqueued" }, 202);
 		}
 
 		// Otherwise, if SendGrid env vars are present, attempt to send an email directly
@@ -67,28 +69,28 @@ export const onRequestPost: PagesFunction = async ({ request, env }) => {
 				body: JSON.stringify(payload),
 			});
 
-			if (resp.ok) {
-				return json({ status: "sent" }, 202);
-			}
-			return json(
-				{ status: "accepted-no-email", reason: "sendgrid_error" },
-				202,
-			);
+            if (resp.ok) {
+                return json({ status: "sent" }, 202);
+            }
+            return json(
+                { status: "accepted-no-email", reason: "sendgrid_error" },
+                202,
+            );
 		}
 
 		// Accept without email if SendGrid not configured yet
-		return json({ status: "accepted-no-email" }, 202);
-	} catch (_err) {
-		return json({ error: "Invalid JSON" }, 400);
-	}
+        return json({ status: "accepted-no-email" }, 202);
+    } catch (_err) {
+        return json({ error: "Invalid JSON" }, 400);
+    }
 };
 
-function json(body: unknown, status = 200) {
-	return new Response(JSON.stringify(body), {
-		status,
-		headers: {
-			"content-type": "application/json; charset=utf-8",
-			"Access-Control-Allow-Origin": "*",
-		},
-	});
+function json(body: unknown, status = 200): CFResponse {
+    return new Response(JSON.stringify(body), {
+        status,
+        headers: {
+            "content-type": "application/json; charset=utf-8",
+            "Access-Control-Allow-Origin": "*",
+        },
+    }) as unknown as CFResponse;
 }

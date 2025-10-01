@@ -7,8 +7,6 @@
 	"exclude": [
 		"dist",
 		"vitest.config.ts",
-		"workers/**",
-		"functions/**",
 		"astro.config.mjs"
 	]
 }
