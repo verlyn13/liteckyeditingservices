@@ -24,9 +24,10 @@ jobs:
       - name: Wrangler version
         run: pnpm exec wrangler --version
       - name: Verify decap-oauth worker config
-        working-directory: workers/decap-oauth
         run: |
+          cd workers/decap-oauth
           test -f wrangler.toml && echo "wrangler.toml present" || (echo "wrangler.toml missing" && exit 1)
+          cd ../..
           pnpm exec wrangler --version
   lint-only:
     runs-on: ubuntu-latest
