@@ -1,16 +1,16 @@
 {
-  "templates": [
-    {
-      "id": "d-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-      "name": "ContactReceived"
-    },
-    {
-      "id": "d-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
-      "name": "ContactConfirmation"
-    },
-    {
-      "id": "d-cccccccccccccccccccccccccccccccc",
-      "name": "ContactError"
-    }
-  ]
+	"templates": [
+		{
+			"id": "d-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			"name": "ContactReceived"
+		},
+		{
+			"id": "d-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+			"name": "ContactConfirmation"
+		},
+		{
+			"id": "d-cccccccccccccccccccccccccccccccc",
+			"name": "ContactError"
+		}
+	]
 }

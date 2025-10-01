@@ -1,64 +1,18 @@
-# Wrangler Configuration for Litecky Editing Services
-# Generated: 2025-09-23
-# Account: 13eb584192d9cefb730fde0cfd271328
+# Cloudflare Pages configuration (code-first)
+# Docs: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
 
-name = "litecky-editing-services"
-main = "src/index.ts"
-compatibility_date = "2025-09-23"
-account_id = "13eb584192d9cefb730fde0cfd271328"
-
-# Environment variables (loaded from .dev.vars locally)
-# Production values set in Cloudflare dashboard
-[vars]
-ENVIRONMENT = "production"
-SITE_URL = "https://liteckyeditingservices.com"
-
-# D1 Database binding
-[[d1_databases]]
-binding = "DB"
-database_name = "litecky-db"
-database_id = "208dd91d-8f15-40ef-b23d-d79672590112"
-
-# R2 Bucket binding
-[[r2_buckets]]
-binding = "UPLOADS"
-bucket_name = "litecky-uploads"
-
-# KV Namespace binding
-[[kv_namespaces]]
-binding = "CACHE"
-id = "6d85733ce2654d9980caf3239a12540a"
-
-# Queue binding (requires Workers Paid plan - $5/month)
-# Uncomment when upgraded to paid plan
-# [[queues.producers]]
-# binding = "DOCUMENT_QUEUE"
-# queue = "document-processing"
-
-# Pages configuration
+name = "litecky-editing-site"
+compatibility_date = "2025-09-30"
 pages_build_output_dir = "./dist"
+compatibility_flags = ["nodejs_compat"]
 
-[site]
-bucket = "./dist"
-
-# Development configuration
-[env.development]
-vars = { ENVIRONMENT = "development" }
-
-# Staging configuration
-[env.staging]
-vars = { ENVIRONMENT = "staging", SITE_URL = "https://staging.liteckyeditingservices.com" }
-
-# Build configuration
 [build]
 command = "pnpm build"
 cwd = "."
 watch_paths = ["src/**/*", "public/**/*"]
 
-# Observability
 [observability]
 enabled = true
 
-# Compatibility flags
-[compatibility_flags]
-nodejs_compat = true
+# Do NOT add secrets here. Use Pages environment variables or Worker Secrets.
+

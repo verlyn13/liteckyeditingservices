@@ -13,8 +13,8 @@
 #### Puppeteer Managed Chrome
 - **Location**: `~/.cache/puppeteer/chrome/`
 - **Available Versions**:
-  - `chrome@131.0.6778.204` - `/home/verlyn13/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome`
-  - `chrome@140.0.7339.82` - `/home/verlyn13/.cache/puppeteer/chrome/linux-140.0.7339.82/chrome-linux64/chrome`
+  - `chrome@131.0.6778.204` - `$HOME/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome`
+  - `chrome@140.0.7339.82` - `$HOME/.cache/puppeteer/chrome/linux-140.0.7339.82/chrome-linux64/chrome`
   - `chrome-headless-shell@131.0.6778.204` - For headless automation
 
 ## Puppeteer Configuration
@@ -100,7 +100,7 @@ chromium-browser --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-dev
 npx puppeteer browsers launch chrome
 
 # Or launch with specific flags
-~/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome \
+$HOME/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome \
   --remote-debugging-port=9222 \
   --user-data-dir=/tmp/chrome-dev \
   --disable-web-security \

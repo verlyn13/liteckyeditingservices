@@ -1,6 +1,0 @@
-# mise.toml - Litecky Editing Services Project Configuration
-# Node.js and tooling versions
-
-[tools]
-node = "24"        # Node 24.x (as required by package.json)
-pnpm = "10.16.0"   # pnpm version from packageManager field

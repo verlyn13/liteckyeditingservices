@@ -20,7 +20,7 @@ pre-commit:
 
     lint:
       glob: "*.{js,mjs,ts,tsx,astro,svelte}"
-      run: pnpm check --silent
+      run: pnpm check
 
 pre-push:
   commands:

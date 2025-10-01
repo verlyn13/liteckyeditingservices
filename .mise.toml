@@ -1,6 +1,6 @@
 [tools]
 node = "24"
-pnpm = "10.16.0"
+pnpm = "latest"
 
 [env]
 NODE_ENV = "development"

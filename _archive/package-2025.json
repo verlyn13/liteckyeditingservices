@@ -1,0 +1,53 @@
+{
+	"name": "litecky-editing-services",
+	"type": "module",
+	"version": "1.0.0",
+	"description": "Professional academic editing services website - Full-stack application",
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"build": "astro check && astro build",
+		"preview": "astro preview",
+		"astro": "astro",
+		"lint": "eslint .",
+		"format": "prettier --write .",
+		"test": "vitest",
+		"test:e2e": "playwright test",
+		"test:a11y": "pa11y-ci",
+		"typecheck": "astro check && tsc --noEmit"
+	},
+	"dependencies": {
+		"astro": "^6.5.0",
+		"@astrojs/svelte": "^8.2.0",
+		"@astrojs/tailwind": "^7.5.0",
+		"@astrojs/vercel": "^9.5.0",
+		"@astrojs/sitemap": "^5.2.0",
+		"svelte": "^6.2.0",
+		"@fontsource/lora": "^6.1.0",
+		"@fontsource-variable/inter": "^6.1.0",
+		"tailwindcss": "^4.2.0",
+		"sharp": "^0.35.0"
+	},
+	"devDependencies": {
+		"@types/node": "^24.2.0",
+		"typescript": "^6.0.0",
+		"vite": "^8.0.0",
+		"eslint": "^10.2.0",
+		"eslint-plugin-astro": "^2.1.0",
+		"prettier": "^4.1.0",
+		"prettier-plugin-astro": "^0.16.0",
+		"vitest": "^3.2.0",
+		"@playwright/test": "^1.55.0",
+		"pa11y-ci": "^5.1.0",
+		"autoprefixer": "^11.1.0",
+		"postcss": "^9.1.0",
+		"@tailwindcss/typography": "^0.6.1",
+		"@tailwindcss/forms": "^0.6.1",
+		"@tailwindcss/container-queries": "^0.2.1"
+	},
+	"engines": {
+		"node": ">=24.0.0",
+		"pnpm": ">=10.16.0"
+	},
+	"packageManager": "pnpm@10.16.0"
+}

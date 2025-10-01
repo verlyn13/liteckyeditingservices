@@ -43,7 +43,8 @@ See [ENVIRONMENT.md](./ENVIRONMENT.md) for complete reference.
 
 For local development, copy and edit:
 ```bash
-cp apps/site/.dev.vars.example apps/site/.dev.vars
+cp .dev.vars.example .dev.vars
+direnv allow .  # loads .dev.vars via .envrc
 ```
 
 ## Quality Standards
@@ -54,12 +55,9 @@ cp apps/site/.dev.vars.example apps/site/.dev.vars
 pnpm check
 
 # Or individually:
-pnpm exec biome check .          # Linting and formatting
-pnpm exec prettier --check "**/*.{astro,svelte}"
-pnpm exec eslint .
-pnpm exec tsc --noEmit
-pnpm --filter @ae/site exec astro check
-pnpm --filter @ae/site exec sv check
+pnpm run typecheck               # astro check && tsc --noEmit
+pnpm run lint                    # eslint .
+pnpm exec prettier --check .     # verify formatting
 ```
 
 ### Testing
@@ -120,6 +118,18 @@ Every PR runs:
 3. Build verification
 4. E2E tests (Playwright)
 5. Deployment preview
+
+## Branch Management
+
+- Default branch: `main`
+- Protect `main` with required status checks:
+  - Require passing: "Quality Gate", "Documentation Health"
+  - Require PR review before merging
+  - Disallow force pushes and deletions
+- Feature flow:
+  - Create `feature/*`, `fix/*`, `docs/*`, `deps/*` branches
+  - Open PRs to `main`; ensure CI is green
+  - Use Conventional Commits in PR titles/descriptions
 
 ### Nightly Tests
 - Smoke tests run at 2:30 AM Alaska time
