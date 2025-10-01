@@ -73,7 +73,7 @@ export async function sendEmail(
 				: message.from;
 
 		// Prepare mail object with all features
-		const mail: any = {
+		const mail: Record<string, unknown> = {
 			to: message.to,
 			from: {
 				email: fromEmail,
@@ -134,7 +134,7 @@ export async function sendEmail(
 		}
 
 		// Send the email
-		const [response] = (await sgMail.send(mail)) as ClientResponse[];
+		const [response] = (await sgMail.send(mail as any)) as ClientResponse[];
 
 		// Extract Message-ID from headers
 		const messageId =
@@ -160,24 +160,25 @@ export async function sendEmail(
 			statusCode: response.statusCode,
 			timestamp,
 		};
-	} catch (error: any) {
+	} catch (error: unknown) {
 		// Parse SendGrid error details
 		let errorMessage = "Unknown error occurred";
 		let statusCode: number | undefined;
 
-		if (error.response) {
-			statusCode = error.response.status;
-			const body = error.response.body;
+		if (error && typeof error === "object" && "response" in error) {
+			const errorObj = error as { response?: { status?: number; body?: any } };
+			statusCode = errorObj.response?.status;
+			const body = errorObj.response?.body;
 
 			if (body?.errors && Array.isArray(body.errors)) {
 				errorMessage = body.errors
-					.map((e: any) => `${e.field}: ${e.message}`)
+					.map((e: { field?: string; message?: string }) => `${e.field}: ${e.message}`)
 					.join("; ");
 			} else if (body?.message) {
 				errorMessage = body.message;
 			}
-		} else if (error.message) {
-			errorMessage = error.message;
+		} else if (error && typeof error === "object" && "message" in error) {
+			errorMessage = String(error.message);
 		}
 
 		// Log error for telemetry

@@ -9,7 +9,8 @@ import {
 } from "../../lib/email";
 
 // This endpoint must be server-rendered for POST requests
-export const prerender = false;
+// TODO: Re-enable when we switch to hybrid mode
+// export const prerender = false;
 
 // Initialize SendGrid on module load
 const sendGridApiKey = import.meta.env.SENDGRID_API_KEY;

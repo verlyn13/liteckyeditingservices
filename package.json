@@ -46,6 +46,7 @@
 		"tailwindcss": "latest"
 	},
 	"devDependencies": {
+		"@astrojs/check": "latest",
 		"@biomejs/biome": "latest",
 		"@eslint/js": "latest",
 		"@playwright/test": "latest",

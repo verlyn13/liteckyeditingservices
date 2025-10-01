@@ -9,9 +9,8 @@ import { defineConfig } from "astro/config";
 export default defineConfig({
 	site: "https://liteckyeditingservices.com",
 	integrations: [svelte(), sitemap()],
-	// Server output for API endpoints
-	// Using hybrid mode: static by default, server for marked endpoints
-	output: "hybrid",
+	// Static output for now, will switch to hybrid when SSR is needed
+	output: "static",
 	compressHTML: true,
 	build: {
 		inlineStylesheets: "auto",
