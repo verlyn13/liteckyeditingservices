@@ -6,13 +6,13 @@ compatibility_date = "2025-09-30"
 pages_build_output_dir = "./dist"
 compatibility_flags = ["nodejs_compat"]
 
-[build]
-command = "pnpm build"
-cwd = "."
-watch_paths = ["src/**/*", "public/**/*"]
-
 [observability]
 enabled = true
+
+# Queue producer binding for async email processing
+[[queues.producers]]
+queue = "send-email-queue"
+binding = "SEND_EMAIL"
 
 # Do NOT add secrets here. Use Pages environment variables or Worker Secrets.
 
