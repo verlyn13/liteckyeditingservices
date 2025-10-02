@@ -5,17 +5,20 @@
 
 Professional academic editing services for graduate students, built with modern web technologies and a focus on simplicity and reliability.
 
-**Production**: https://liteckyeditingservices.com
+**Status**: ✅ Deployed to Production (October 2, 2025)
+**Production**: https://b9ee6806.litecky-editing-services.pages.dev (DNS migration pending)
+**Future Domain**: https://liteckyeditingservices.com
 **Preview**: Auto-deployed via Cloudflare Pages on PRs
-**CMS**: https://liteckyeditingservices.com/admin (GitHub auth required)
+**CMS**: /admin (GitHub auth required)
 
 ## Stack
 
 - Frontend: Astro 5 + Svelte 5 + Tailwind CSS 4
-- Hosting: Cloudflare Pages (static + SSR functions as needed)
-- Workers: Cloudflare Workers (OAuth proxy, future cron jobs)
+- Hosting: Cloudflare Pages (static + Pages Functions for API)
+- Workers: Cloudflare Workers (OAuth proxy, Queue consumer for async email)
+- Queue: Cloudflare Queues (async email processing)
 - CMS: Decap CMS with GitHub backend
-- Email: SendGrid (transactional templates)
+- Email: SendGrid (via queue-based async processing)
 - Security: Cloudflare Turnstile (spam protection)
 - Analytics: Cloudflare Web Analytics (privacy-first)
 
@@ -75,7 +78,8 @@ pnpm lint:fix     # Auto-fix linting issues
 ```
 ├── src/                # Astro pages, Svelte components, content, styles
 ├── public/             # Static assets
-├── workers/            # Cloudflare Workers (e.g., decap-oauth)
+├── workers/            # Cloudflare Workers (decap-oauth, queue-consumer)
+├── functions/          # Cloudflare Pages Functions (API routes)
 ├── scripts/            # Validation and automation scripts
 ├── policy/             # Rego policies (quality/infra)
 ├── desired-state/      # Deployment/config templates
