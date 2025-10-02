@@ -37,20 +37,27 @@ pnpm exec playwright install chromium
 
 ### Option A: Using gopass (Recommended for team members)
 ```bash
-# Get access to gopass store from team lead
-# Then export secrets
-./scripts/export-dev-vars.sh
+# First-time only: store credentials in gopass (optional helper)
+./store-dev-vars-in-gopass.sh
+
+# Generate .dev.vars from gopass
+./scripts/generate-dev-vars.sh
+# If direnv is unavailable, use: pnpm run dev:env
+direnv allow .
 ```
 
 ### Option B: Manual Setup
 ```bash
-# Copy templates
-cp apps/site/.dev.vars.example apps/site/.dev.vars
+# Copy templates at repo root
+cp .env.example .env
+cp .dev.vars.example .dev.vars
 
 # Edit with test values
 # - Use Turnstile test keys (see ENVIRONMENT.md)
 # - Use SendGrid test key or sandbox mode
-# - Set USE_TURNSTILE_TEST=1
+# - Set USE_TURNSTILE_TEST=1 (if applicable)
+# If direnv is unavailable, use: pnpm run dev:env
+direnv allow .
 ```
 
 ## Step 3: Verify Setup (5 minutes)
@@ -99,7 +106,7 @@ pnpm test:e2e
 git checkout -b test/your-name-onboarding
 
 # Edit a page
-vim apps/site/src/content/pages/about.md
+vim src/pages/about.astro
 
 # Run checks
 pnpm check
@@ -115,10 +122,14 @@ git push origin test/your-name-onboarding
 ## Step 7: Understand the Codebase (5 minutes)
 
 ### Key Directories
-- `apps/site/` - Main website (Astro)
+- `src/` - Astro pages, Svelte components, content, styles
+- `public/` - Static assets
 - `workers/` - Cloudflare Workers
 - `docs/` - Documentation
-- `scripts/` - Build and utility scripts
+- `scripts/` - Validation and utility scripts
+- `policy/` - Rego policies
+- `desired-state/` - Deployment templates
+- `tests/` - Unit, E2E, a11y tests
 - `_archive/` - Original specification documents
 
 ### Important Files
@@ -189,7 +200,7 @@ code --install-extension bradlc.vscode-tailwindcss
 ```
 
 ### Settings
-Already configured in `.vscode/settings.json`
+Use extension defaults or configure to taste. No repo settings file is checked in.
 
 ## Troubleshooting
 

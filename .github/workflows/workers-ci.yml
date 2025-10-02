@@ -8,13 +8,34 @@ on:
       - 'functions/**'
 
 jobs:
+  wrangler-sanity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Wrangler version
+        run: pnpm exec wrangler --version
+      - name: Verify decap-oauth worker config
+        run: |
+          cd workers/decap-oauth
+          test -f wrangler.toml && echo "wrangler.toml present" || (echo "wrangler.toml missing" && exit 1)
+          cd ../..
+          pnpm exec wrangler --version
   lint-only:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
-          version: 10.16.0
+          version: 10.17.1
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -27,4 +48,3 @@ jobs:
         run: pnpm run typecheck || true
       - name: Note
         run: echo "Deployment steps are handled separately with Cloudflare credentials."
-

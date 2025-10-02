@@ -1,0 +1,6 @@
+{
+	"ignorePatterns": [{ "pattern": "^https?://" }],
+	"timeout": "20s",
+	"retryOn429": true,
+	"httpStatusCodesToIgnore": [429, 403]
+}

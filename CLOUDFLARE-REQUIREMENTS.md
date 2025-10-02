@@ -159,33 +159,10 @@ WEBHOOK_SECRET="whsec_[...]"
 
 ## 📦 Wrangler Configuration Files
 
-### Main Site (`apps/site/wrangler.toml`)
-```toml
-name = "litecky-editing-site"
-compatibility_date = "2025-09-22"
-compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = "./dist"
-
-[[kv_namespaces]]
-binding = "CACHE"
-id = "[kv-namespace-id]"
-
-[[r2_buckets]]
-binding = "DOCUMENTS"
-bucket_name = "litecky-documents"
-
-[[d1_databases]]
-binding = "DB"
-database_name = "litecky-editing"
-database_id = "[d1-database-id]"
-
-[[queues.producers]]
-queue = "document-processing"
-binding = "DOCUMENT_QUEUE"
-
-[[analytics_engine_datasets]]
-binding = "ANALYTICS"
-```
+### Site (Cloudflare Pages)
+- Code-first configuration via root `wrangler.toml` (Pages V2 build system).
+- Build output: `dist` (see `astro.config.mjs`).
+- Environment variables and secrets set per environment in Pages settings (do not inline secrets in `wrangler.toml`).
 
 ### OAuth Worker (`workers/decap-oauth/wrangler.toml`)
 ```toml

@@ -1,9 +1,11 @@
 name = "litecky-queue-consumer"
 main = "src/worker.ts"
-compatibility_date = "2025-09-22"
+compatibility_date = "2025-09-30"
 compatibility_flags = ["nodejs_compat"]
+account_id = "13eb584192d9cefb730fde0cfd271328"
 
 [[queues.consumers]]
-queue = "send-email"
-binding = "SEND_EMAIL"
+queue = "send-email-queue"
+max_batch_size = 10
+max_batch_timeout = 30
 

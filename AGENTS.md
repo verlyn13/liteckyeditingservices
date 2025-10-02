@@ -50,3 +50,13 @@
 ## Agent Tips
 - Use `pnpm` (repo is pinned: `packageManager` in `package.json`).
 - Keep changes minimal and align with existing patterns. Update docs when behavior changes.
+
+## Development Environment
+- Version manager: `mise` controls Node and pnpm versions from `.mise.toml`.
+- Env loading: `.envrc` + `direnv` load `.dev.vars` and `.env` when present. Optional.
+- If direnv is unavailable: `pnpm run dev:env` loads `.dev.vars` and starts dev.
+- First-time setup:
+  - `mise install` to install tool versions
+  - `direnv allow .` to trust and auto-load env on `cd` (optional)
+- Quality gates: `pnpm validate:all` and `pnpm policy:check` must pass locally.
+- Hooks: `lefthook` enforces pre-commit/pre-push checks (auto-installed via pnpm dlx).
