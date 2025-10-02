@@ -1,6 +1,12 @@
 # Deployment Guide (Cloudflare Pages + Workers)
 
-This project deploys to Cloudflare Pages (site) and Cloudflare Workers (Decap OAuth and optional Queue consumer).
+This project deploys to Cloudflare Pages (site) and Cloudflare Workers (Decap OAuth and Queue consumer for async email processing).
+
+**Current Status** (October 2, 2025):
+- ✅ Site deployed to Cloudflare Pages
+- ✅ Queue consumer worker deployed
+- ✅ OAuth worker deployed
+- ⏳ DNS migration pending (currently using Pages subdomain)
 
 ## Environments
 
@@ -16,18 +22,24 @@ This project deploys to Cloudflare Pages (site) and Cloudflare Workers (Decap OA
 
 ## Configure Environment Variables (Pages)
 
+**Status**: ✅ All variables configured (October 2, 2025)
+
 Pages → Project → Settings → Environment variables
 
 Required (Production and Preview):
-- SENDGRID_API_KEY (secret)
-- SENDGRID_FROM (variable) — e.g., quotes@liteckyeditingservices.com
-- SENDGRID_TO (variable) — internal recipient
-- TURNSTILE_SECRET_KEY (secret)
-- PUBLIC_TURNSTILE_SITE_KEY (variable)
+- ✅ SENDGRID_API_KEY (secret) - Configured via `wrangler pages secret put`
+- ✅ SENDGRID_FROM (secret) - Configured via `wrangler pages secret put`
+- ✅ SENDGRID_TO (secret) - Configured via `wrangler pages secret put`
+- ✅ TURNSTILE_SECRET_KEY (secret) - Configured via `wrangler pages secret put`
+- PUBLIC_TURNSTILE_SITE_KEY (variable) - Set in code: `0x4AAAAAAB27CNFPS0wEzPP5`
 
-These enable `/api/contact` to send emails. If not set, the endpoint still accepts but responds `accepted-no-email`.
+These enable `/api/contact` to send emails via queue. All variables are currently configured and operational.
 
 ## Deploy the Site (Pages)
+
+**Status**: ✅ Deployed (October 2, 2025)
+- **Production URL**: https://b9ee6806.litecky-editing-services.pages.dev
+- **Latest deployment**: 67 files (55 cached, 12 new)
 
 Option A — GitHub Integration (recommended)
 1. Connect repository in Cloudflare Pages
@@ -40,7 +52,7 @@ Option B — Manual Deploy
 ```bash
 pnpm install
 pnpm build
-pnpm wrangler pages deploy dist --project-name=litecky-editing-services
+pnpm wrangler pages deploy dist --project-name=litecky-editing-services --commit-dirty=true
 pnpm wrangler pages deployments list --project-name=litecky-editing-services
 ```
 
@@ -61,17 +73,27 @@ pnpm wrangler deploy
 ```
 Set `public/admin/config.yml` → `base_url` to your worker domain, `auth_endpoint: /auth`.
 
-Queue Consumer Worker (optional)
+Queue Consumer Worker ✅ **DEPLOYED**
 ```bash
-# Create queue (one-time)
-pnpm wrangler queues create send-email-queue
+# Queue already created: send-email-queue (ID: a2fafae4567242b5b9acb8a4a32fa615)
+# Worker already deployed: litecky-queue-consumer.jeffreyverlynjohnson.workers.dev
 
-# Ensure wrangler.toml has queue bindings, then deploy
+# To redeploy or update:
 cd workers/queue-consumer
 pnpm install
-pnpm wrangler deploy
+pnpm wrangler deploy --cwd workers/queue-consumer
+
+# Configure secrets (already set):
+pnpm wrangler secret put SENDGRID_API_KEY --cwd workers/queue-consumer
+pnpm wrangler secret put SENDGRID_FROM --cwd workers/queue-consumer
+pnpm wrangler secret put SENDGRID_TO --cwd workers/queue-consumer
 ```
-If a queue producer binding `SEND_EMAIL` is configured for Pages Functions, `/api/contact` enqueues email jobs; otherwise falls back to direct SendGrid send.
+
+**Current Configuration**:
+- Queue producer binding `SEND_EMAIL` is active on Pages Functions
+- `/api/contact` enqueues messages (returns 202/enqueued)
+- Queue consumer processes batches (max 10 messages, 30s timeout)
+- Fallback to direct SendGrid if queue unavailable
 
 ## DNS and Domains
 
