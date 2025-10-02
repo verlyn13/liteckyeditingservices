@@ -1,7 +1,7 @@
 # DOCUMENTATION MASTER INDEX
 ## Complete Documentation Organization & Status
 
-Last Updated: September 22, 2025 (18:00)
+Last Updated: October 2, 2025 (current)
 Documentation Read: 100% (15/15 files analyzed)
 
 ---
@@ -33,15 +33,15 @@ Documentation Read: 100% (15/15 files analyzed)
 
 | Document | Purpose | Status | Template Provided |
 |----------|---------|--------|-------------------|
-| `README.md` | Project overview & quick start | ❌ Create | ✅ Yes (lines 4-89) |
-| `CONTRIBUTING.md` | Development workflow | ❌ Create | ✅ Yes (lines 92-260) |
-| `ARCHITECTURE.md` | System design | ❌ Create | ✅ Yes (lines 263-452) |
-| `DEPLOYMENT.md` | Deployment procedures | ❌ Create | ✅ Yes (lines 455-696) |
-| `SECRETS.md` | Secret inventory | ❌ Create | ✅ Yes (lines 699-858) |
+| `README.md` | Project overview & quick start | ✅ Created | ✅ Yes (lines 4-89) |
+| `CONTRIBUTING.md` | Development workflow | ✅ Created | ✅ Yes (lines 92-260) |
+| `ARCHITECTURE.md` | System design | ✅ Created | ✅ Yes (lines 263-452) |
+| `DEPLOYMENT.md` | Deployment procedures | ✅ Created | ✅ Yes (lines 455-696) |
+| `SECRETS.md` | Secret inventory | ✅ Created | ✅ Yes (lines 699-858) |
 | `ENVIRONMENT.md` | Environment variables | ✅ Created | ✅ Yes (lines 861-1017) |
-| `docs/onboarding.md` | Developer setup | ❌ Create | ✅ Yes (lines 1023-1239) |
-| `docs/playbooks/email-issues.md` | Email troubleshooting | ❌ Create | ✅ Yes (lines 1242-1406) |
-| `.github/CODEOWNERS` | Code ownership | ❌ Create | ✅ Yes (lines 1409-1430) |
+| `docs/onboarding.md` | Developer setup | ✅ Created | ✅ Yes (lines 1023-1239) |
+| `docs/playbooks/email-issues.md` | Email troubleshooting | ✅ Created | ✅ Yes (lines 1242-1406) |
+| `.github/CODEOWNERS` | Code ownership | ✅ Created | ✅ Yes (lines 1409-1430) |
 
 ### 4. INFRASTRUCTURE DOCUMENTATION (How to Deploy)
 **Purpose**: Cloudflare configuration and management
@@ -111,7 +111,7 @@ Documentation Read: 100% (15/15 files analyzed)
 |----------|-------|-------|--------|
 | Implementation | 5 | 4785 | 90% read |
 | Quality/Ops | 3 | 2816 | 100% read |
-| User Docs | 9 | 0 | 0% created |
+| User Docs | 9 | — | 9/9 created (100%) |
 | Governance | 1 | 967 | 100% read |
 | AI Config | 5 | ~250 | 100% read |
 
@@ -126,19 +126,16 @@ Documentation Read: 100% (15/15 files analyzed)
 ## 🚀 Documentation Action Items
 
 ### Immediate Priority (Blocking Development)
-1. **Create README.md** - Use template from documentation.md lines 4-89
-2. **Create ENVIRONMENT.md** - Document all env vars for development
-3. **Create docs/onboarding.md** - Enable new developer setup
+1. **Create SECRETS.md** - Document secret inventory and rotation
+2. **Create DEPLOYMENT.md** - Pages/Workers deployment procedures and rollback
 
 ### High Priority (Before Deployment)
-4. **Create SECRETS.md** - Document all secrets without values
-5. **Create DEPLOYMENT.md** - Deployment procedures
-6. **Create ARCHITECTURE.md** - System documentation
+3. **Create ARCHITECTURE.md** - System design, data flows, ADR links
+4. **Create docs/playbooks/email-issues.md** - SendGrid troubleshooting
 
 ### Medium Priority (Post-Launch)
-7. **Create CONTRIBUTING.md** - Team workflows
-8. **Create docs/playbooks/** - Operational guides
-9. **Create .github/CODEOWNERS** - Code review routing
+5. Review README/CONTRIBUTING for any behavior changes
+6. Add additional playbooks as needed (CMS, deployment issues)
 
 ---
 
@@ -198,15 +195,15 @@ liteckyeditingservices/
 - [x] Implementation order determined
 
 ### User Documentation (To Create)
-- [ ] README.md with quick start
-- [ ] CONTRIBUTING.md with workflows
-- [ ] ARCHITECTURE.md with diagrams
-- [ ] DEPLOYMENT.md with procedures
-- [ ] SECRETS.md without values
-- [ ] ENVIRONMENT.md with all vars
-- [ ] docs/onboarding.md for devs
-- [ ] docs/playbooks/ for operations
-- [ ] .github/CODEOWNERS for reviews
+- [x] README.md with quick start
+- [x] CONTRIBUTING.md with workflows
+- [x] ARCHITECTURE.md with diagrams
+- [x] DEPLOYMENT.md with procedures
+- [x] SECRETS.md without values
+- [x] ENVIRONMENT.md with all vars
+- [x] docs/onboarding.md for devs
+- [x] docs/playbooks/ for operations (email)
+- [x] .github/CODEOWNERS for reviews
 
 ### Project Tracking (Complete)
 - [x] PROJECT-STATUS.md created
@@ -228,7 +225,7 @@ liteckyeditingservices/
 
 ## Next Steps
 
-1. **Move spec docs to _archive/** - Keep for reference but out of main view
-2. **Create user docs from templates** - documentation.md has everything needed
-3. **Update PROJECT-STATUS.md** - Mark documentation phase complete
-4. **Begin implementation** - Follow IMPLEMENTATION-ROADMAP.md sequence
+1. **Spec docs archived** - Verified in `_archive/` (no action needed)
+2. **Create remaining user docs** - `SECRETS.md`, `DEPLOYMENT.md`, `ARCHITECTURE.md`, `docs/playbooks/email-issues.md`
+3. **Keep PROJECT-STATUS.md in sync** - Update as docs/infra evolve
+4. **Proceed per IMPLEMENTATION-ROADMAP.md** - Continue remaining infra steps

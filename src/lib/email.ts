@@ -75,41 +75,50 @@ export async function sendEmail(
 					)
 				: message.from;
 
-			// Prepare mail object with all features
-			const initialContent: Array<{ type: 'text/plain' | 'text/html'; value: string }> = [];
-			// Will be populated below; provide minimal slot to satisfy types
-			if (!message.text && !message.html) {
-				initialContent.push({ type: 'text/plain', value: '' });
-			}
-			const mail: MailDataRequired = {
-				to: message.to,
-				from: {
-					email: fromEmail,
-					name: message.fromName || "Litecky Editing Services",
-				},
-				subject: message.subject,
-				content: initialContent as any,
-			};
+		// Prepare mail object with all features
+		const initialContent: Array<{
+			type: "text/plain" | "text/html";
+			value: string;
+		}> = [];
+		// Will be populated below; provide minimal slot to satisfy types
+		if (!message.text && !message.html) {
+			initialContent.push({ type: "text/plain", value: "" });
+		}
+		const mail: MailDataRequired = {
+			to: message.to,
+			from: {
+				email: fromEmail,
+				name: message.fromName || "Litecky Editing Services",
+			},
+			subject: message.subject,
+			content: initialContent as any,
+		};
 
-			// Template and content
-			if (message.templateId) {
-				(mail as MailDataRequired & { templateId?: string }).templateId = message.templateId;
-				if (message.dynamicTemplateData) {
-					(mail as MailDataRequired & { dynamicTemplateData?: Record<string, unknown> }).dynamicTemplateData =
-						message.dynamicTemplateData;
-				}
+		// Template and content
+		if (message.templateId) {
+			(mail as MailDataRequired & { templateId?: string }).templateId =
+				message.templateId;
+			if (message.dynamicTemplateData) {
+				(
+					mail as MailDataRequired & {
+						dynamicTemplateData?: Record<string, unknown>;
+					}
+				).dynamicTemplateData = message.dynamicTemplateData;
 			}
-			const content: Array<{ type: 'text/plain' | 'text/html'; value: string }> = [];
-			if (message.text) content.push({ type: 'text/plain', value: message.text });
-			if (message.html) content.push({ type: 'text/html', value: message.html });
-			if (content.length > 0) {
-				(mail as MailDataRequired & { content?: any }).content = content as any;
-			}
+		}
+		const content: Array<{ type: "text/plain" | "text/html"; value: string }> =
+			[];
+		if (message.text) content.push({ type: "text/plain", value: message.text });
+		if (message.html) content.push({ type: "text/html", value: message.html });
+		if (content.length > 0) {
+			(mail as MailDataRequired & { content?: any }).content = content as any;
+		}
 
 		// Add optional fields
 		if (message.replyTo) {
-			(mail as MailDataRequired & { replyTo?: string | { email: string } }).replyTo =
-				message.replyTo;
+			(
+				mail as MailDataRequired & { replyTo?: string | { email: string } }
+			).replyTo = message.replyTo;
 		}
 
 		if (message.categories && message.categories.length > 0) {
@@ -137,21 +146,25 @@ export async function sendEmail(
 		const sandboxEnabled =
 			options.devSandbox ??
 			(import.meta.env.DEV && !import.meta.env.SENDGRID_FORCE_SEND);
-		(mail as MailDataRequired & {
-			mailSettings?: { sandboxMode?: { enable?: boolean } };
-		}).mailSettings = {
+		(
+			mail as MailDataRequired & {
+				mailSettings?: { sandboxMode?: { enable?: boolean } };
+			}
+		).mailSettings = {
 			sandboxMode: {
 				enable: sandboxEnabled,
 			},
 		};
 
 		// Tracking settings
-		(mail as MailDataRequired & {
-			trackingSettings?: {
-				clickTracking?: { enable?: boolean; enableText?: boolean };
-				openTracking?: { enable?: boolean };
-			};
-		}).trackingSettings = {
+		(
+			mail as MailDataRequired & {
+				trackingSettings?: {
+					clickTracking?: { enable?: boolean; enableText?: boolean };
+					openTracking?: { enable?: boolean };
+				};
+			}
+		).trackingSettings = {
 			clickTracking: {
 				enable: options.trackClicks ?? true,
 				enableText: false, // Don't add tracking to plain text
@@ -163,7 +176,9 @@ export async function sendEmail(
 
 		// Add List-Id header if provided
 		if (options.listId) {
-			(mail as MailDataRequired & { headers?: Record<string, string> }).headers = {
+			(
+				mail as MailDataRequired & { headers?: Record<string, string> }
+			).headers = {
 				"List-Id": options.listId,
 			};
 		}

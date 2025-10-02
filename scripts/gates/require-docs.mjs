@@ -61,7 +61,9 @@ const touchedDocs = diff.some(
 );
 
 console.log("Changed files:");
-diff.forEach((f) => console.log(`  - ${f}`));
+for (const f of diff) {
+	console.log(`  - ${f}`);
+}
 console.log("");
 console.log(`Code touched: ${touchedCode}`);
 console.log(`Docs touched: ${touchedDocs}`);

@@ -20,10 +20,11 @@
 		"test:a11y": "node tests/a11y/check.js",
 		"test:admin": "node tests/admin-smoke.spec.mjs",
 		"test:sendgrid": "node tests/sendgrid-test.mjs",
-    "typecheck": "tsc --noEmit && tsc -p functions/tsconfig.json --noEmit && tsc -p workers/queue-consumer/tsconfig.json --noEmit",
+		"typecheck": "tsc --noEmit && tsc -p functions/tsconfig.json --noEmit && tsc -p workers/queue-consumer/tsconfig.json --noEmit",
+		"clean": "rm -rf dist .astro",
 		"biome:check": "biome check --write .",
 		"biome:ci": "biome ci .",
-		"check": "pnpm run validate:all && pnpm run biome:check && pnpm run typecheck",
+		"check": "pnpm run clean && pnpm run validate:all && pnpm run biome:check && pnpm run typecheck",
 		"lint:fix": "pnpm run format && pnpm run lint --fix",
 		"validate:versions": "node scripts/validate/package-versions.mjs",
 		"validate:structure": "node scripts/validate/repo-structure.mjs",
@@ -45,7 +46,7 @@
 		"svelte": "latest",
 		"tailwindcss": "latest"
 	},
-  "devDependencies": {
+	"devDependencies": {
 		"@astrojs/check": "latest",
 		"@biomejs/biome": "latest",
 		"@eslint/js": "latest",
@@ -76,9 +77,9 @@
 		"typescript": "latest",
 		"vite": "latest",
 		"vitest": "latest",
-    "wrangler": "latest",
-    "@cloudflare/workers-types": "latest"
-  },
+		"wrangler": "latest",
+		"@cloudflare/workers-types": "latest"
+	},
 	"engines": {
 		"node": ">=24 <25",
 		"pnpm": ">=10.16.0"

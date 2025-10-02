@@ -14,7 +14,7 @@ type Env = {
 	SENDGRID_TO?: string;
 };
 
-import type { MessageBatch } from '@cloudflare/workers-types';
+import type { MessageBatch } from "@cloudflare/workers-types";
 
 export default {
 	async queue(batch: MessageBatch<ContactMessage>, env: Env): Promise<void> {

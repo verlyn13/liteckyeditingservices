@@ -115,6 +115,7 @@ The project runs as a static site. When SSR is needed, we'll add `@astrojs/cloud
 - Implementation Roadmap: see `IMPLEMENTATION-ROADMAP.md`
 - Documentation Index: see `DOCUMENTATION-MASTER-INDEX.md`
 - New developer setup: see `docs/onboarding.md`
+- Workflow overview: see `WORKFLOW.md`
 - Specific problems: check `docs/playbooks/`
 
 ## License

@@ -55,9 +55,9 @@ direnv allow .  # loads .dev.vars via .envrc
 pnpm check
 
 # Or individually:
-pnpm run typecheck               # astro check && tsc --noEmit
-pnpm run lint                    # eslint .
-pnpm exec prettier --check .     # verify formatting
+pnpm run typecheck               # TypeScript checks (root + workers)
+pnpm run lint                    # ESLint for Astro/Svelte
+pnpm exec prettier --check .     # verify formatting (optional)
 ```
 
 ### Testing
@@ -69,7 +69,7 @@ pnpm test
 pnpm test:e2e
 
 # E2E with UI
-pnpm test:e2e:headed
+pnpm test:e2e:ui
 ```
 
 ## Code Style

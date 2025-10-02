@@ -38,5 +38,7 @@
 	});
 
 	// Close after navigating
-	menuLinks.forEach((link) => link.addEventListener("click", closeMenu));
+	for (const link of menuLinks) {
+		link.addEventListener("click", closeMenu);
+	}
 })();

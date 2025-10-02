@@ -17,6 +17,7 @@
 	"files": {
 		"includes": ["**/*.{js,mjs,cjs,ts,tsx,json,jsonc}"],
 		"experimentalScannerIgnores": [
+			".astro/**",
 			"dist/**",
 			"node_modules/**",
 			"public/admin/**"
