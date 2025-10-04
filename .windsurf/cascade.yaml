@@ -1,0 +1,76 @@
+# Windsurf Cascade configuration for this repository
+# Focuses agent workflows around pnpm scripts and key paths.
+
+version: 1
+
+context:
+  include:
+    - "src/**"
+    - "tests/**"
+    - "docs/**"
+    - "policy/**"
+    - "scripts/**"
+    - "desired-state/**"
+    - "workers/**"
+    - "functions/**"
+    - "public/**"
+    - "astro.config.mjs"
+    - "package.json"
+    - "playwright.config.ts"
+    - "tsconfig.json"
+    - "vitest.config.ts"
+    - ".mise.toml"
+    - ".prettierrc.json"
+    - "eslint.config.js"
+    - "lefthook.yml"
+    - "wrangler.toml"
+    - "README.md"
+    - "AGENTS.md"
+    - "ENVIRONMENT.md"
+    - "ARCHITECTURE.md"
+  exclude:
+    - "node_modules/**"
+    - "dist/**"
+    - ".astro/**"
+    - "playwright-report/**"
+    - "test-results/**"
+
+workflows:
+  - name: "Dev Loop"
+    description: "Plan, implement, and validate changes with tests and linting"
+    steps:
+      - run: "pnpm install"
+      - run: "pnpm check"
+      - run: "pnpm test"
+      - run: "pnpm test:e2e"
+      - run: "pnpm lint:fix"
+
+  - name: "Quick Validate"
+    description: "Fast repo gates + typecheck"
+    steps:
+      - run: "pnpm validate:all"
+      - run: "pnpm typecheck"
+
+  - name: "A11y + E2E"
+    description: "Accessibility checks and E2E tests"
+    steps:
+      - run: "pnpm test:a11y"
+      - run: "pnpm test:e2e"
+
+  - name: "Build Preview"
+    description: "Typecheck and build for local preview"
+    steps:
+      - run: "pnpm build"
+      - run: "pnpm preview"
+
+  - name: "Docs Gate"
+    description: "Ensure docs are in sync before push"
+    steps:
+      - run: "pnpm gate:docs"
+
+  - name: "Policy Gate"
+    description: "Validate repo structure and policy checks"
+    steps:
+      - run: "pnpm validate:all"
+      - run: "pnpm policy:check"
+
