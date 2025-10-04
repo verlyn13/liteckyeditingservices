@@ -27,7 +27,7 @@ test.describe("@admin Decap CMS Admin", () => {
 			contentType: "text/plain",
 		});
 		await page.screenshot({
-			path: `admin-${testInfo.project.name}.png`,
+			path: testInfo.outputPath(`admin-${testInfo.project.name}.png`),
 			fullPage: true,
 		});
 
