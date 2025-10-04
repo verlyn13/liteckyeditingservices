@@ -20,6 +20,7 @@
 		"test:e2e:ui": "playwright test --ui",
 		"test:e2e:ui:prod": "PLAYWRIGHT_BASE_URL=https://liteckyeditingservices.com playwright test --ui",
 		"test:e2e:visual": "playwright test -g @visual",
+		"test:admin:prod": "PLAYWRIGHT_BASE_URL=https://www.liteckyeditingservices.com playwright test -g @admin",
 		"test:a11y": "node tests/a11y/check.js",
 		"test:admin": "node tests/admin-smoke.spec.mjs",
 		"test:sendgrid": "node tests/sendgrid-test.mjs",

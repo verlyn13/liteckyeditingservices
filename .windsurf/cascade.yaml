@@ -79,6 +79,11 @@ workflows:
     steps:
       - run: "pnpm gate:docs"
 
+  - name: "Admin Check (Prod)"
+    description: "Run Playwright admin smoke test against production"
+    steps:
+      - run: "pnpm test:admin:prod"
+
   - name: "Policy Gate"
     description: "Validate repo structure and policy checks"
     steps:

@@ -3,6 +3,8 @@
 **Started**: October 4, 2025  
 **Status**: Week 1 - In Progress
 
+> Update (Admin stability): Pinned Decap CMS to 3.8.4 with cache-busting, relaxed admin CSP (same-origin frames, child-src/worker-src), and added a Playwright admin smoke test plus a Cascade workflow ("Admin Check (Prod)") to guard against regressions.
+
 ## Completed Tasks
 
 ### ✅ Production E2E Tests (#9)
