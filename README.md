@@ -66,6 +66,20 @@ pnpm test:e2e     # Run Playwright tests
 pnpm lint:fix     # Auto-fix linting issues
 ```
 
+## Windsurf/Cascade
+
+- **Config location**: `.windsurf/` contains `cascade.yaml` and `mcp.json`.
+- **Workflows** (run from Windsurf/Cascade panel):
+  - **Dev Loop**: `pnpm install` → `pnpm check` → `pnpm test` → `pnpm test:e2e` → `pnpm lint:fix`
+  - **Quick Validate**: `pnpm validate:all` → `pnpm typecheck`
+  - **A11y + E2E**: `pnpm test:a11y` → `pnpm test:e2e`
+  - **Build Preview**: `pnpm build` → `pnpm preview`
+  - **Docs Gate**: `pnpm gate:docs`
+  - **Policy Gate**: `pnpm validate:all` → `pnpm policy:check`
+- **Context**: Cascade focuses on `src/`, `tests/`, `docs/`, `policy/`, `scripts/`, `desired-state/`, `workers/`, `functions/`, and key config files (`astro.config.mjs`, `package.json`, etc.).
+- **MCP servers**: Filesystem, Ripgrep, and Git via `pnpm dlx` (see `.windsurf/mcp.json`). No global installs required.
+- **Prereqs**: Run `mise install` then `pnpm install` before using workflows that start the dev server.
+
 ## Styling
 
 - Single source of truth: `src/styles/global.css`.
