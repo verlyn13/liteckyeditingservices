@@ -1,0 +1,20 @@
+---
+// Static admin shell page for Decap CMS pinned to a known-good version.
+// Using Astro page ensures it is always present in the build at /admin/.
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="Cache-Control" content="no-store" />
+    <title>Content Manager</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <!-- Decap CMS UMD bundle (self-initializes). Pinned + cache-busted. -->
+    <script src="https://cdn.jsdelivr.net/npm/decap-cms@3.8.4/dist/decap-cms.js?v=20251004"></script>
+  </body>
+  </html>
+
