@@ -5,9 +5,8 @@
 
 Professional academic editing services for graduate students, built with modern web technologies and a focus on simplicity and reliability.
 
-**Status**: ✅ Deployed to Production (October 2, 2025)
-**Production**: https://b9ee6806.litecky-editing-services.pages.dev (DNS migration pending)
-**Future Domain**: https://liteckyeditingservices.com
+**Status**: ✅ Live in Production (DNS migrated October 4, 2025)
+**Production**: https://liteckyeditingservices.com | https://www.liteckyeditingservices.com
 **Preview**: Auto-deployed via Cloudflare Pages on PRs
 **CMS**: /admin (GitHub auth required)
 

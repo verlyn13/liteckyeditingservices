@@ -6,7 +6,7 @@ This project deploys to Cloudflare Pages (site) and Cloudflare Workers (Decap OA
 - ✅ Site deployed to Cloudflare Pages
 - ✅ Queue consumer worker deployed
 - ✅ OAuth worker deployed
-- ⏳ DNS migration pending (currently using Pages subdomain)
+- ✅ DNS migration complete (production domain live)
 
 ## Environments
 
@@ -37,9 +37,10 @@ These enable `/api/contact` to send emails via queue. All variables are currentl
 
 ## Deploy the Site (Pages)
 
-**Status**: ✅ Deployed (October 2, 2025)
-- **Production URL**: https://b9ee6806.litecky-editing-services.pages.dev
-- **Latest deployment**: 67 files (55 cached, 12 new)
+**Status**: ✅ Deployed (October 2, 2025) | DNS Migrated (October 4, 2025)
+- **Production URL**: https://liteckyeditingservices.com
+- **Alternate URL**: https://www.liteckyeditingservices.com
+- **Pages Subdomain**: https://litecky-editing-services.pages.dev (still accessible)
 
 Option A — GitHub Integration (recommended)
 1. Connect repository in Cloudflare Pages
