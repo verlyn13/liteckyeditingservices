@@ -1,7 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:4321";
-const useExternalBase = !!process.env.PLAYWRIGHT_BASE_URL && !process.env.PLAYWRIGHT_BASE_URL.includes("localhost");
+const useExternalBase =
+	!!process.env.PLAYWRIGHT_BASE_URL &&
+	!process.env.PLAYWRIGHT_BASE_URL.includes("localhost");
 
 export default defineConfig({
 	testDir: "./tests/e2e",
@@ -39,8 +41,8 @@ export default defineConfig({
 	webServer: useExternalBase
 		? undefined
 		: {
-			command: "pnpm dev",
-			url: "http://localhost:4321",
-			reuseExistingServer: !process.env.CI,
-		},
+				command: "pnpm dev",
+				url: "http://localhost:4321",
+				reuseExistingServer: !process.env.CI,
+			},
 });
