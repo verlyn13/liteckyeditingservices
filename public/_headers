@@ -1,0 +1,31 @@
+# Security Headers for Cloudflare Pages
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+/*
+  # HSTS - Force HTTPS for 1 year, include subdomains
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  
+  # Content Security Policy
+  # - self for scripts, styles, images
+  # - Turnstile CDN for captcha
+  # - unsafe-inline for Svelte reactive styles (to be replaced with nonces in future)
+  # - data: for inline images
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;
+  
+  # Prevent clickjacking
+  X-Frame-Options: DENY
+  
+  # Restrict browser features
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  
+  # Already set by Pages, but explicit here for clarity
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  
+  # Prevent MIME sniffing in older browsers
+  X-Download-Options: noopen
+  X-Permitted-Cross-Domain-Policies: none
+
+# Slightly relaxed CSP for admin (Decap CMS needs more permissions)
+/admin/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: blob: https:; font-src 'self' data: https://unpkg.com; connect-src 'self' https://challenges.cloudflare.com https://api.github.com https://github.com https://api.netlify.com; frame-src https://challenges.cloudflare.com; object-src 'none'; base-uri 'self'; form-action 'self' https://github.com; frame-ancestors 'none';

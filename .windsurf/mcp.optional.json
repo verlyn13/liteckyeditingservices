@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "tavily": {
+      "command": "pnpm",
+      "args": ["dlx", "-y", "tavily-mcp"],
+      "note": "Requires TAVILY_API_KEY in your environment"
+    },
+    "firecrawl": {
+      "command": "pnpm",
+      "args": ["dlx", "-y", "firecrawl-mcp"],
+      "note": "Requires FIRECRAWL_API_KEY in your environment"
+    }
+  }
+}
+

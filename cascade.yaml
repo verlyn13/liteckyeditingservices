@@ -1,5 +1,4 @@
-# Windsurf Cascade configuration for this repository
-# Focuses agent workflows around pnpm scripts and key paths.
+# Mirror of .windsurf/cascade.yaml for editors that only read root-level config
 
 version: 1
 
@@ -11,19 +10,6 @@ context:
     - "policy/**"
     - "scripts/**"
     - "desired-state/**"
-    - "workers/**"
-    - "functions/**"
-    - "public/**"
-    - "astro.config.mjs"
-    - "package.json"
-    - "playwright.config.ts"
-    - "tsconfig.json"
-    - "vitest.config.ts"
-    - ".mise.toml"
-    - ".prettierrc.json"
-    - "eslint.config.js"
-    - "lefthook.yml"
-    - "wrangler.toml"
     - "README.md"
     - "AGENTS.md"
     - "ENVIRONMENT.md"
@@ -32,8 +18,6 @@ context:
     - "node_modules/**"
     - "dist/**"
     - ".astro/**"
-    - "playwright-report/**"
-    - "test-results/**"
 
 workflows:
   - name: "Dev Loop"
@@ -62,25 +46,20 @@ workflows:
     steps:
       - run: "pnpm test:e2e:prod"
 
-  - name: "Dev Setup"
-    description: "Set up local toolchain and dependencies"
-    steps:
-      - run: "mise install"
-      - run: "pnpm install"
-
   - name: "Build Preview"
     description: "Typecheck and build for local preview"
     steps:
       - run: "pnpm build"
       - run: "pnpm preview"
 
+  - name: "Dev Setup"
+    description: "Set up local toolchain and dependencies"
+    steps:
+      - run: "mise install"
+      - run: "pnpm install"
+
   - name: "Docs Gate"
     description: "Ensure docs are in sync before push"
     steps:
       - run: "pnpm gate:docs"
 
-  - name: "Policy Gate"
-    description: "Validate repo structure and policy checks"
-    steps:
-      - run: "pnpm validate:all"
-      - run: "pnpm policy:check"

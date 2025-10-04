@@ -15,7 +15,7 @@ test("contact form submits with success message", async ({ page }) => {
 		await route.fallback();
 	});
 
-	await page.goto("http://localhost:4321/contact");
+	await page.goto("/contact");
 	await page.getByLabel("Name").fill("Test User");
 	await page.getByLabel("Email").fill("test@example.com");
 	await page.getByLabel("Service Type").selectOption("substantive");

@@ -7,6 +7,65 @@
 
 ---
 
+## 🚀 Next Steps Plan (Oct 4–18, 2025)
+
+Objectives
+- Stabilize operations with proactive monitoring and alerts.
+- Improve reliability with expanded tests (prod-targeted + visual regression).
+- Tighten security (CSP, headers) and boost performance/SEO.
+
+Workstreams & Tasks (Week 1: 6/6 Complete ✅)
+
+1) Monitoring & Reliability (Documentation Complete - Ready for Implementation)
+- [x] ✅ **Documentation**: External uptime monitoring guide (UptimeRobot/Pingdom) - `docs/infrastructure/UPTIME-MONITORING.md`
+- [x] ✅ **Documentation**: Error alerting implementation guide (Workers Analytics) - `docs/infrastructure/ERROR-ALERTING.md`
+- [x] ✅ **Documentation**: Queue health monitoring guide - `docs/infrastructure/QUEUE-HEALTH.md`
+- [ ] **Implementation**: Set up UptimeRobot monitors (30 min)
+- [ ] **Implementation**: Deploy error monitoring Worker (2 hours)
+- [ ] **Implementation**: Deploy queue health Worker (2.5 hours)
+
+2) Testing & Quality
+- [x] ✅ Run Playwright suite against production domain - All tests passing
+- [x] ✅ Add visual regression tests - 4 baseline screenshots created (home + services, desktop + mobile)
+- [x] ✅ Security headers E2E tests created - `tests/e2e/security-headers.spec.ts`
+- [ ] Expand E2E coverage for form failure states and Turnstile edge cases
+- [ ] A11y sweep to WCAG 2.1 AA for top 7 pages (pa11y + manual screen reader checks)
+
+3) Performance
+- [ ] Image optimization audit (ensure optimal sizes, formats, and caching). Acceptance: LCP < 2.5s on mobile 4G for home/services.
+- [ ] Code-splitting review for heavy interactive components.
+- [ ] Cloudflare caching/headers tune (static + HTML cache TTL where safe).
+- [ ] Core Web Vitals monitoring configured (Lab + Field via Cloudflare Analytics or alternative).
+
+4) Security (Implementation Complete ✅)
+- [x] ✅ **Implemented**: Comprehensive security headers in `public/_headers`
+  - HSTS with 1-year max-age, includeSubDomains, preload
+  - Content-Security-Policy with Turnstile support
+  - X-Frame-Options: DENY
+  - X-Content-Type-Options: nosniff
+  - Permissions-Policy restrictions
+  - Separate relaxed CSP for /admin/* (Decap CMS)
+- [x] ✅ **Documentation**: Security headers guide - `docs/SECURITY-HEADERS.md`
+- [x] ✅ **Validation**: Post-deployment playbook - `docs/playbooks/security-headers-validation.md`
+- [ ] **Post-Deployment**: Run validation playbook (30 min)
+- [ ] **Post-Deployment**: Verify SecurityHeaders.com grade A
+- [ ] Dependency updates and audit (biome/eslint/astro/svelte/tailwind). Acceptance: `pnpm audit` low/no vuln; builds green.
+
+5) SEO & Content
+- [ ] Meta descriptions for all pages and Open Graph images. Acceptance: `pnpm build` injects required tags without regressions.
+- [ ] Submit sitemap to Google/Bing. Acceptance: indexed pages visible, no coverage errors.
+- [ ] Add 2–3 high-value content pieces (case study, resources).
+
+Developer Workflow Hooks
+- Prefer Windsurf Cascade workflows (Dev Loop, Quick Validate, A11y + E2E, Build Preview).
+- Commands: `pnpm validate:all`, `pnpm typecheck`, `pnpm test`, `pnpm test:e2e`, `pnpm test:a11y`, `pnpm build`.
+
+Milestones
+- ✅ Week 1 (Oct 4, 2025): Monitoring docs + prod E2E + security headers + visual regression - **COMPLETE**
+- Week 2 (Oct 7-11, 2025): Implement monitoring Workers + performance audit + SEO meta/OG + a11y sweep
+
+---
+
 ## 📊 Documentation Phase ✅ COMPLETE
 
 ### All Files Read (15/15 - 100%)

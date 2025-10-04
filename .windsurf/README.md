@@ -16,3 +16,11 @@ Notes
 - No secrets are stored here. If any workflow needs API keys, use your local Windsurf model/account settings or environment variables from `.env`/`.dev.vars` (see ENVIRONMENT.md).
 - If Cascade reports an “Invalid argument” error, it typically indicates a malformed YAML key or an unsupported workflow step. Validate YAML and ensure commands exist in package.json.
 
+Optional MCP servers
+- You can add third‑party MCP servers by editing `.windsurf/mcp.json` and using `pnpm dlx` to avoid global installs. Common options (require API keys):
+  - tavily-mcp (web search) — requires `TAVILY_API_KEY`
+  - firecrawl-mcp (web crawl) — requires `FIRECRAWL_API_KEY`
+- Keep secrets out of the repo; export them in your shell or use `.env` locally.
+
+Visual regression tests
+- Use `pnpm test:e2e:visual` locally, or inspect the CI artifact from the `e2e-visual` workflow.
