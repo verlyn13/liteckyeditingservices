@@ -20,6 +20,7 @@
   - ✅ **Security Testing**: Automated E2E tests for header validation
   - ✅ **Documentation**: 6 new comprehensive guides + validation playbook
   - ✅ **Admin Fix**: Decap CMS pinned to 3.8.4; admin CSP relaxed to allow same-origin frames/preview, OAuth worker added to connect-src
+  - ✅ **Admin Route**: Added Astro page at `src/pages/admin/index.astro` to guarantee /admin/ serves the pinned admin shell in every build
 
 **Previous Progress** (Oct 4, 2025):
 - ✅ DNS migration complete - Production domain live
