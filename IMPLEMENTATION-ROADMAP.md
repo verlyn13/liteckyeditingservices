@@ -9,59 +9,138 @@
 
 ## 🚀 Next Steps Plan (Oct 4–18, 2025)
 
-Objectives
-- Stabilize operations with proactive monitoring and alerts.
-- Improve reliability with expanded tests (prod-targeted + visual regression).
-- Tighten security (CSP, headers) and boost performance/SEO.
+### 🔴 CRITICAL: Deployment Infrastructure Fix
 
-Workstreams & Tasks (Week 1: 6/6 Complete ✅)
+Issue: Cloudflare Pages project is NOT Git-connected. Production is 1 week behind with old admin shell (`decap-cms@^3.3.3`).
 
-1) Monitoring & Reliability (Documentation Complete - Ready for Implementation)
-- [x] ✅ **Documentation**: External uptime monitoring guide (UptimeRobot/Pingdom) - `docs/infrastructure/UPTIME-MONITORING.md`
-- [x] ✅ **Documentation**: Error alerting implementation guide (Workers Analytics) - `docs/infrastructure/ERROR-ALERTING.md`
-- [x] ✅ **Documentation**: Queue health monitoring guide - `docs/infrastructure/QUEUE-HEALTH.md`
-- [ ] **Implementation**: Set up UptimeRobot monitors (30 min)
-- [ ] **Implementation**: Deploy error monitoring Worker (2 hours)
-- [ ] **Implementation**: Deploy queue health Worker (2.5 hours)
+Immediate Actions (TODAY)
+1) Fix Production (choose one)
+- Option A: Promote preview `234d73ca` to production in Cloudflare Dashboard
+- Option B: Manual deploy: `pnpm build && pnpm exec wrangler pages deploy dist --project-name=litecky-editing-services --branch=main`
 
-2) Testing & Quality
-- [x] ✅ Run Playwright suite against production domain - All tests passing
-- [x] ✅ Add visual regression tests - 4 baseline screenshots created (home + services, desktop + mobile)
-- [x] ✅ Security headers E2E tests created - `tests/e2e/security-headers.spec.ts`
-- [ ] Expand E2E coverage for form failure states and Turnstile edge cases
-- [ ] A11y sweep to WCAG 2.1 AA for top 7 pages (pa11y + manual screen reader checks)
+2) Enable CI/CD
+- [ ] Create `.github/workflows/deploy-production.yml` for automated deploys
+- [ ] Add GitHub secrets: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
+- [ ] Test deployment on next push to main
 
-3) Performance
-- [ ] Image optimization audit (ensure optimal sizes, formats, and caching). Acceptance: LCP < 2.5s on mobile 4G for home/services.
-- [ ] Code-splitting review for heavy interactive components.
-- [ ] Cloudflare caching/headers tune (static + HTML cache TTL where safe).
-- [ ] Core Web Vitals monitoring configured (Lab + Field via Cloudflare Analytics or alternative).
+### Phase 7: Deployment & Operations Enhancement (5 Weeks)
 
-4) Security (Implementation Complete ✅)
-- [x] ✅ **Implemented**: Comprehensive security headers in `public/_headers`
-  - HSTS with 1-year max-age, includeSubDomains, preload
-  - Content-Security-Policy with Turnstile support
-  - X-Frame-Options: DENY
-  - X-Content-Type-Options: nosniff
-  - Permissions-Policy restrictions
-  - Separate relaxed CSP for /admin/* (Decap CMS)
-- [x] ✅ **Documentation**: Security headers guide - `docs/SECURITY-HEADERS.md`
-- [x] ✅ **Validation**: Post-deployment playbook - `docs/playbooks/security-headers-validation.md`
-- [ ] **Post-Deployment**: Run validation playbook (30 min)
-- [ ] **Post-Deployment**: Verify SecurityHeaders.com grade A
-- [ ] Dependency updates and audit (biome/eslint/astro/svelte/tailwind). Acceptance: `pnpm audit` low/no vuln; builds green.
+#### Week 1: Foundation (Oct 4-11, 2025)
+**Deployment Automation & Monitoring Setup**
 
-5) SEO & Content
-- [ ] Meta descriptions for all pages and Open Graph images. Acceptance: `pnpm build` injects required tags without regressions.
-- [ ] Submit sitemap to Google/Bing. Acceptance: indexed pages visible, no coverage errors.
-- [ ] Add 2–3 high-value content pieces (case study, resources).
+1) **CI/CD Pipeline** 🔴 PRIORITY
+- [ ] Fix production deployment (promote preview or manual deploy)
+- [ ] Create automated deployment workflow (`.github/workflows/deploy-production.yml`)
+- [ ] Add pre-deployment quality checks
+- [ ] Configure deployment notifications
+- [ ] Set up preview deployments for PRs
+
+2) **Monitoring & Reliability**
+- [x] ✅ Documentation complete (3 guides ready)
+- [ ] Set up UptimeRobot monitors (30 min)
+- [ ] Deploy error monitoring Worker (2 hours)
+- [ ] Deploy queue health Worker (2.5 hours)
+- [ ] Create uptime monitoring workflow (`.github/workflows/uptime-monitor.yml`)
+
+3) **Testing & Quality**
+- [x] ✅ Production E2E tests passing
+- [x] ✅ Visual regression tests (4 baselines)
+- [x] ✅ Security headers tests created
+- [ ] Post-deployment validation workflow
+- [ ] Expand E2E coverage for edge cases
+- [ ] A11y sweep to WCAG 2.1 AA
+
+#### Week 2: Enhanced Testing (Oct 12-18, 2025)
+**Pre/Post Deployment Validation**
+
+1) **Pre-deployment Suite**
+- [ ] Lighthouse CI integration
+- [ ] Bundle size analysis
+- [ ] Security vulnerability scanning (Snyk)
+- [ ] Dependency audit automation
+
+2) **Post-deployment Validation**
+- [ ] E2E tests against production
+- [ ] Admin panel health checks
+- [ ] Security headers verification
+- [ ] SSL certificate monitoring
+- [ ] Performance metrics collection
+
+#### Week 3: Observability (Oct 19-25, 2025)
+**Analytics & Performance Monitoring**
+
+1) **Analytics Integration**
+- [ ] Deploy analytics collector Worker
+- [ ] Set up Cloudflare Analytics Engine
+- [ ] Configure custom events tracking
+- [ ] Create performance dashboard
+
+2) **Performance Monitoring**
+- [ ] Implement Server-Timing headers
+- [ ] Core Web Vitals tracking
+- [ ] Slow response logging
+- [ ] Resource timing analysis
+
+#### Week 4: Advanced Features (Oct 26-Nov 1, 2025)
+**Blue-Green Deployment & Rollback**
+
+1) **Deployment Strategies**
+- [ ] Blue-green deployment workflow
+- [ ] Quick rollback capability
+- [ ] Feature flag system (KV-based)
+- [ ] A/B testing infrastructure
+
+2) **Traffic Management**
+- [ ] Canary deployments
+- [ ] Gradual rollout controls
+- [ ] Geographic routing rules
+- [ ] Maintenance mode toggle
+
+#### Week 5: Disaster Recovery (Nov 2-8, 2025)
+**Backup & Recovery Systems**
+
+1) **Backup Strategy**
+- [ ] Daily D1 database backups
+- [ ] KV namespace exports
+- [ ] R2 bucket replication
+- [ ] Automated backup to R2
+
+2) **Recovery Planning**
+- [ ] Incident response runbooks
+- [ ] Restore procedure testing
+- [ ] Disaster recovery drills
+- [ ] Business continuity plan
+
+### Original Workstreams (Continuing)
+
+4) **Security** ✅ Complete
+- [x] ✅ Comprehensive security headers implemented
+- [x] ✅ Admin CSP properly configured
+- [ ] Run validation playbook (30 min)
+- [ ] Verify SecurityHeaders.com grade A
+
+5) **SEO & Content**
+- [ ] Meta descriptions for all pages and Open Graph images
+- [ ] Submit sitemap to Google/Bing
+- [ ] Add 2–3 high-value content pieces
 
 Developer Workflow Hooks
 - Prefer Windsurf Cascade workflows (Dev Loop, Quick Validate, A11y + E2E, Build Preview).
 - Commands: `pnpm validate:all`, `pnpm typecheck`, `pnpm test`, `pnpm test:e2e`, `pnpm test:a11y`, `pnpm build`.
 
-Milestones
+### Deployment Workflow Files Created
+- ✅ `.github/workflows/deploy-production.yml` - Automated deployment on push to main
+- ✅ `.github/workflows/post-deploy-validation.yml` - Post-deployment health checks
+
+### Required GitHub Secrets (TO ADD)
+```bash
+CLOUDFLARE_ACCOUNT_ID      # Your Cloudflare account ID
+CLOUDFLARE_API_TOKEN        # API token with Pages:Edit permission
+```
+
+### Milestones
 - ✅ Week 1 (Oct 4, 2025): Monitoring docs + prod E2E + security headers + visual regression - **COMPLETE**
+- 🔴 **IMMEDIATE**: Fix production deployment + add CI/CD automation
 - Week 2 (Oct 7-11, 2025): Implement monitoring Workers + performance audit + SEO meta/OG + a11y sweep
 
 ---

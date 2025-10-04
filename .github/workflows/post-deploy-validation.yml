@@ -1,0 +1,56 @@
+name: post-deploy-validation
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["deploy-production"]
+    types: ["completed"]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      BASE_URL: https://www.liteckyeditingservices.com
+      PLAYWRIGHT_BASE_URL: https://www.liteckyeditingservices.com
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Quick header check (200 + CSP/XFO)
+        run: |
+          set -euo pipefail
+          curl -sI "$BASE_URL" | tee headers.txt
+          test $(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL") -eq 200
+          grep -i "content-security-policy\|x-frame-options\|strict-transport-security" -n headers.txt || true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Security headers E2E (@prod)
+        run: pnpm test:e2e:prod -g "Security Headers"
+
+      - name: Admin smoke test (@admin)
+        run: pnpm test:admin:prod
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+

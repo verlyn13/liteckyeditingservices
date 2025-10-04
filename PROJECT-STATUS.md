@@ -10,7 +10,21 @@
 
 ## 📊 EXECUTIVE SUMMARY
 
-**Status**: ✅ **LIVE IN PRODUCTION** - Full-stack application deployed to Cloudflare with custom domain and queue-based email processing.
+**Status**: ⚠️ **PRODUCTION DEPLOYMENT ISSUE** - Site live but NOT auto-deploying. Manual intervention required.
+
+### 🔴 CRITICAL ISSUE DISCOVERED
+
+**Problem**: Cloudflare Pages project lacks Git connection. Production is 1 week stale with old admin shell (`decap-cms@^3.3.3`).
+
+**Evidence**:
+- `wrangler pages project list` shows: Git Provider = No
+- Latest production deployments are from 1 week ago
+- Live site still serves `https://unpkg.com/decap-cms@^3.3.3/dist/decap-cms.js`
+- Preview `234d73ca` has the fix with pinned `decap-cms@3.8.4`
+
+**Immediate Fix Required** (Choose one):
+1. **Option A**: Promote preview `234d73ca` to production in Cloudflare Dashboard
+2. **Option B**: Manual deploy via Wrangler CLI
 
 **Recent Progress - Phase 7: Week 1** (Oct 4, 2025):
   - ✅ **Security Headers**: Comprehensive CSP, HSTS, X-Frame-Options implemented in `public/_headers`
@@ -21,6 +35,7 @@
   - ✅ **Documentation**: 6 new comprehensive guides + validation playbook
   - ✅ **Admin Fix**: Decap CMS pinned to 3.8.4; admin CSP relaxed to allow same-origin frames/preview, OAuth worker added to connect-src
   - ✅ **Admin Route**: Added Astro page at `src/pages/admin/index.astro` to guarantee /admin/ serves the pinned admin shell in every build
+  - ❌ **Deployment**: Fixes NOT in production due to missing Git connection
 
 **Previous Progress** (Oct 4, 2025):
 - ✅ DNS migration complete - Production domain live
@@ -38,7 +53,19 @@
 - ✅ Contact API responding with async queue processing (202/enqueued)
 - ✅ All CI checks passing (5/5 workflows ✅)
 
-**Current Focus**: Security header validation, monitoring implementation, performance optimization
+**Current Focus**: 🔴 **FIXING PRODUCTION DEPLOYMENT** - Then CI/CD automation, monitoring implementation
+
+### CI/CD Workflows Added
+- ✅ `.github/workflows/deploy-production.yml` - Auto-deploy on push to main
+- ✅ `.github/workflows/post-deploy-validation.yml` - Automated post-deploy checks
+- ✅ `.github/workflows/admin-check.yml` - Scheduled admin health checks (every 6 hours)
+- ✅ `.github/workflows/quality-gate.yml` - PR quality checks
+- ✅ `.github/workflows/e2e-visual.yml` - Visual regression testing
+
+**Next Steps**:
+1. Deploy admin fix to production (promote preview or manual deploy)
+2. Add GitHub secrets (`CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`)
+3. Test automated deployment pipeline
 
 ---
 

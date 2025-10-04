@@ -5,6 +5,10 @@
 
 > Update (Admin stability): Pinned Decap CMS to 3.8.4 with cache-busting, relaxed admin CSP (same-origin frames, child-src/worker-src), and added a Playwright admin smoke test plus a Cascade workflow ("Admin Check (Prod)") to guard against regressions.
 
+> Update (CI/CD): Added two GitHub Actions workflows:
+- `.github/workflows/deploy-production.yml` – builds and deploys with Wrangler on push to main (promote in Pages if project isn’t Git-connected).
+- `.github/workflows/post-deploy-validation.yml` – runs post-deploy health checks (headers + E2E security + admin smoke) on-demand and after deploys.
+
 ## Completed Tasks
 
 ### ✅ Production E2E Tests (#9)

@@ -1,0 +1,54 @@
+name: deploy-production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CF_PAGES_PROJECT_NAME: litecky-editing-services
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Install Wrangler
+        run: pnpm add -D wrangler@^4
+
+      - name: Wrangler whoami (sanity)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: pnpm exec wrangler whoami
+
+      - name: Deploy to Cloudflare Pages (dist → preview)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          pnpm exec wrangler pages deploy dist \
+            --project-name=${{ env.CF_PAGES_PROJECT_NAME }} \
+            --commit-message "CI deploy from $GITHUB_SHA"
+
+      # Note: If the project is Git-connected in Pages, pushes to main will create a Production deployment automatically.
+      # If not Git-connected, this action creates a Preview deployment; promote it to Production in the Pages dashboard.
+
