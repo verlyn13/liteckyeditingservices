@@ -13,12 +13,13 @@
 **Status**: ✅ **LIVE IN PRODUCTION** - Full-stack application deployed to Cloudflare with custom domain and queue-based email processing.
 
 **Recent Progress - Phase 7: Week 1** (Oct 4, 2025):
-- ✅ **Security Headers**: Comprehensive CSP, HSTS, X-Frame-Options implemented in `public/_headers`
-- ✅ **Production E2E Tests**: All tests passing against live site
-- ✅ **Visual Regression**: 4 baseline screenshots (home + services, desktop + mobile)
-- ✅ **Monitoring Documentation**: Complete implementation guides for uptime, error alerting, and queue health
-- ✅ **Security Testing**: Automated E2E tests for header validation
-- ✅ **Documentation**: 6 new comprehensive guides + validation playbook
+  - ✅ **Security Headers**: Comprehensive CSP, HSTS, X-Frame-Options implemented in `public/_headers`
+  - ✅ **Production E2E Tests**: All tests passing against live site
+  - ✅ **Visual Regression**: 4 baseline screenshots (home + services, desktop + mobile)
+  - ✅ **Monitoring Documentation**: Complete implementation guides for uptime, error alerting, and queue health
+  - ✅ **Security Testing**: Automated E2E tests for header validation
+  - ✅ **Documentation**: 6 new comprehensive guides + validation playbook
+  - ✅ **Admin Fix**: Decap CMS pinned to 3.8.4; admin CSP relaxed to allow same-origin frames/preview, OAuth worker added to connect-src
 
 **Previous Progress** (Oct 4, 2025):
 - ✅ DNS migration complete - Production domain live
