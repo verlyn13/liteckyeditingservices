@@ -52,9 +52,15 @@
 - [ ] Deploy error monitoring Worker (2 hours) - Week 2
 - [ ] Deploy queue health Worker (2.5 hours) - Week 2
 
-3) **Testing & Quality** - ✅ COMPLETE
+3) **Testing & Quality** - 🔄 MODERNIZED (Oct 5, 2025)
 - [x] ✅ Production E2E tests passing (18/20 tests)
-- [x] ✅ Visual regression tests (4 baselines)
+- [x] ✅ Visual regression tests MODERNIZED with October 2025 best practices:
+  - ✅ Deterministic rendering in `playwright.config.ts`
+  - ✅ Screenshot stabilization CSS (`_screenshot.css`)
+  - ✅ Hardening helpers in `_prepare.ts`
+  - ✅ Modern GitHub Actions workflow with baseline management
+  - ✅ Viewport-only screenshots (avoiding fullPage flake)
+  - ✅ Component-level visual tests for stability
 - [x] ✅ Security headers tests (15/15 passing in production)
 - [x] ✅ CSP violations fixed (data: URI support added)
 - [x] ✅ Post-deployment validation workflow active

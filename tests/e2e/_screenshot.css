@@ -1,0 +1,98 @@
+/*
+ * Screenshot stabilization stylesheet
+ * Applied by Playwright only during screenshot capture
+ * Removes all dynamic/volatile elements that cause false positives
+ */
+
+/* Kill all animations & transitions */
+*,
+*::before,
+*::after {
+  animation: none !important;
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  transition: none !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+}
+
+/* Freeze animated UI components */
+[aria-busy="true"],
+.skeleton,
+.loading,
+.carousel,
+.slider,
+marquee,
+.animate,
+[class*="animated"],
+[class*="spinner"] {
+  animation: none !important;
+}
+
+/* Hide truly dynamic/noisy areas */
+iframe,
+[data-test="ad"],
+[data-testid="advertisement"],
+time[datetime],
+.live-timestamp,
+.timestamp,
+.date-display,
+[data-dynamic="true"] {
+  visibility: hidden !important;
+}
+
+/* Prevent blinking carets from altering diffs */
+input,
+textarea,
+[contenteditable="true"] {
+  caret-color: transparent !important;
+}
+
+/* Stabilize hover states */
+a:hover,
+button:hover,
+[role="button"]:hover {
+  transition: none !important;
+}
+
+/* Normalize scrollbars (they vary by OS) */
+::-webkit-scrollbar {
+  width: 12px !important;
+  height: 12px !important;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1 !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888 !important;
+  border-radius: 6px !important;
+}
+
+/* Disable smooth scrolling */
+html {
+  scroll-behavior: auto !important;
+}
+
+/* Stabilize focus outlines */
+*:focus {
+  outline-offset: 2px !important;
+  outline-width: 2px !important;
+}
+
+/* Hide video elements (they're never consistent) */
+video {
+  visibility: hidden !important;
+}
+
+/* Stabilize placeholder text opacity */
+::placeholder {
+  opacity: 0.5 !important;
+}
+
+/* Ensure consistent image rendering */
+img {
+  image-rendering: auto !important;
+  -webkit-font-smoothing: antialiased !important;
+}
