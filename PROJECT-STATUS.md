@@ -1,10 +1,10 @@
 # PROJECT STATUS - Litecky Editing Services
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 4, 2025 (21:55 UTC)
+**Last Updated**: October 5, 2025 (03:40 UTC)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
-**Overall Completion**: 100% (Live in Production with Custom Domain)
+**Overall Completion**: 100% (Live in Production with Git-Connected Deployment)
 
 ---
 
@@ -22,15 +22,26 @@
 - ✅ Automatic deployment on push to main branch
 - ✅ PR preview deployments working
 - ✅ All security headers and configurations preserved
+- ✅ CI/CD workflows updated for Git-connected mode
 
 **Evidence of Success**:
 - Site responding at https://www.liteckyeditingservices.com (200 OK)
 - SSL certificates active and valid
-- Security headers present (HSTS, CSP, X-Frame-Options)
+- Security headers present with CSP fix deployed (data: URI support)
 - Admin panel functional at /admin/
 - Automatic builds triggered by Git commits
+- All security headers E2E tests passing (15/15)
 
-**Recent Progress - Phase 7: Week 1** (Oct 4, 2025):
+**Recent Progress - October 5, 2025**:
+  - ✅ **Git Migration**: Completed migration to Git-connected deployment
+  - ✅ **CSP Fix**: Added `data:` to script-src for Vite-inlined scripts (deployed to production)
+  - ✅ **E2E Tests**: Stabilized mobile nav, contact navigation, security headers validation
+  - ✅ **CI Workflows**: Updated deploy-production.yml with noop job for Git-connected mode
+  - ✅ **Secrets Automation**: Created gopass sync scripts for Pages and Workers
+  - ✅ **DNS Documentation**: Added DNS-CONFIGURATION.md with verification commands
+  - ✅ **Production Validation**: 15/15 security header tests passing, 18/20 smoke tests passing
+
+**Previous Progress - Phase 7: Week 1** (Oct 4, 2025):
   - ✅ **Security Headers**: Comprehensive CSP, HSTS, X-Frame-Options implemented in `public/_headers`
   - ✅ **Production E2E Tests**: All tests passing against live site
   - ✅ **Visual Regression**: 4 baseline screenshots (home + services, desktop + mobile)
@@ -39,7 +50,6 @@
   - ✅ **Documentation**: 6 new comprehensive guides + validation playbook
   - ✅ **Admin Fix**: Decap CMS pinned to 3.8.4; admin CSP relaxed to allow same-origin frames/preview, OAuth worker added to connect-src
   - ✅ **Admin Route**: Added Astro page at `src/pages/admin/index.astro` to guarantee /admin/ serves the pinned admin shell in every build
-  - ❌ **Deployment**: Fixes NOT in production due to missing Git connection
 
 **Previous Progress** (Oct 4, 2025):
 - ✅ DNS migration complete - Production domain live
@@ -57,27 +67,25 @@
 - ✅ Contact API responding with async queue processing (202/enqueued)
 - ✅ All CI checks passing (5/5 workflows ✅)
 
-**Current Focus**: Monitoring implementation, performance optimization, content expansion
+**Current Focus**: Phase 7 Week 2 - Monitoring implementation, performance optimization, content expansion
 
 ### Git-Connected Deployment Active
 - ✅ **Project**: `liteckyeditingservices` (Cloudflare Pages)
-- ✅ **Auto-deploy**: Enabled on push to main
+- ✅ **Auto-deploy**: Enabled on push to main (automatic builds working)
 - ✅ **PR previews**: Automatic for all pull requests
 - ✅ **Custom domains**: liteckyeditingservices.com, www.liteckyeditingservices.com
 - ✅ **CI/CD Workflows**: All GitHub Actions operational
+- ✅ **Git-connected mode**: `CF_GIT_CONNECTED=true` set in GitHub secrets
 
-### CI/CD Workflows
-- ✅ `.github/workflows/deploy-production.yml` - Disabled when Git-connected (CF_GIT_CONNECTED=true)
-- ✅ `.github/workflows/post-deploy-validation.yml` - Runs after each deployment
+### CI/CD Workflows Status
+- ✅ `.github/workflows/deploy-production.yml` - Noop mode (Git-connected deployment active)
+- ✅ `.github/workflows/post-deploy-validation.yml` - Active (security headers: 15/15 ✅)
 - ✅ `.github/workflows/admin-check.yml` - Scheduled admin health checks (every 6 hours)
-- ✅ `.github/workflows/quality-gate.yml` - PR quality checks
+- ✅ `.github/workflows/quality-gate.yml` - PR quality checks (passing ✅)
 - ✅ `.github/workflows/e2e-visual.yml` - Visual regression testing
 - ✅ `.github/workflows/preview-validation.yml` - PR preview testing
 
-**Next Steps**:
-1. Set `CF_GIT_CONNECTED=true` in GitHub secrets
-2. Monitor automated deployments
-3. Delete old direct-upload project after 48 hours
+**Cleanup Task**: Delete old direct-upload project `litecky-editing-services` after 48 hours (Oct 7, 2025)
 
 ---
 
@@ -269,13 +277,15 @@
   - Created: October 2, 2025
 
 **Pages Project**:
-- ✅ Project created: `litecky-editing-services`
+- ✅ Project: `liteckyeditingservices` (Git-connected, replaces old `litecky-editing-services`)
 - ✅ **Production domains live**:
   - https://liteckyeditingservices.com
   - https://www.liteckyeditingservices.com
-  - https://litecky-editing-services.pages.dev (Pages subdomain)
+  - https://liteckyeditingservices.pages.dev (Pages subdomain)
 - ✅ Environment variables configured (production)
 - ✅ Custom domains configured with SSL
+- ✅ Automatic deployments on push to main
+- ✅ PR preview deployments enabled
 
 **Domain Configuration**:
 - ✅ **Domain**: liteckyeditingservices.com
@@ -296,19 +306,20 @@
 
 ### ✅ Security (95% Complete)
 
-**Security Headers** (NEW - Oct 4, 2025):
+**Security Headers** (Oct 4-5, 2025):
 - ✅ **Comprehensive headers** implemented in `public/_headers`
 - ✅ **HSTS**: 1-year max-age with includeSubDomains and preload
-- ✅ **CSP**: Content-Security-Policy with Turnstile CDN support
-- ✅ **X-Frame-Options**: DENY (clickjacking protection)
+- ✅ **CSP**: Content-Security-Policy with `data:` URI support for Vite-inlined scripts (fixed Oct 5)
+- ✅ **X-Frame-Options**: SAMEORIGIN (allows same-origin admin preview)
 - ✅ **X-Content-Type-Options**: nosniff
 - ✅ **Referrer-Policy**: strict-origin-when-cross-origin
 - ✅ **Permissions-Policy**: Restricts accelerometer, camera, geolocation, etc.
-- ✅ **Separate admin CSP**: Relaxed policy for Decap CMS at `/admin/*`
-- ✅ **Automated tests**: E2E tests for header validation
+- ✅ **Separate admin CSP**: Relaxed policy for Decap CMS at `/admin/*` with unsafe-eval
+- ✅ **Automated tests**: E2E tests for header validation (15/15 passing in production)
 - ✅ **Documentation**: Complete guide at `docs/SECURITY-HEADERS.md`
 - ✅ **Validation playbook**: `docs/playbooks/security-headers-validation.md`
-- ⏳ **Post-deployment**: SecurityHeaders.com validation (target: Grade A)
+- ✅ **Production validated**: All CSP violations resolved, no console errors
+- ⏳ **Optional**: SecurityHeaders.com grade validation (target: Grade A)
 
 **Turnstile (Cloudflare CAPTCHA)**:
 - ✅ Widget created: `litecky-editing-production`

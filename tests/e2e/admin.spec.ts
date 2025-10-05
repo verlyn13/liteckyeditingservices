@@ -21,7 +21,7 @@ test.describe("@admin Decap CMS Admin", () => {
 		await page.waitForFunction(
 			() =>
 				!!document.querySelector(
-					"#nc-root, [class*=\"CMS\"], [data-testid=\"decap-cms-root\"]",
+					'#nc-root, [class*="CMS"], [data-testid="decap-cms-root"]',
 				) || document.body.innerText.length > 0,
 			{ timeout: 5000 },
 		);

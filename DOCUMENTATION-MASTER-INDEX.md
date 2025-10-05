@@ -1,9 +1,9 @@
 # DOCUMENTATION MASTER INDEX
 ## Complete Documentation Organization & Status
 
-Last Updated: October 4, 2025 (post-DNS migration)
+Last Updated: October 5, 2025 (post-Git migration + CSP fix)
 Documentation Read: 100% (15/15 files analyzed)
-Deployment Status: ✅ LIVE with Custom Domain (DNS migrated October 4, 2025)
+Deployment Status: ✅ LIVE with Git-Connected Deployment (migrated October 5, 2025)
 
 ---
 
@@ -240,11 +240,14 @@ liteckyeditingservices/
 7. **Windsurf/Cascade** - ✅ Workflows configured and documented
 8. **Test scripts organized** - ✅ Moved to proper directories
 
-### ✅ Phase 7: Week 1 Complete (October 4, 2025)
-1. **Security Headers** - ✅ CSP, HSTS, X-Frame-Options implemented + tested
-2. **Production E2E Tests** - ✅ All tests passing against live site
-3. **Visual Regression** - ✅ 4 baseline screenshots created
-4. **Monitoring Documentation** - ✅ Complete guides for uptime, error alerting, queue health
+### ✅ Phase 7: Week 1 Complete (October 4-5, 2025)
+1. **Security Headers** - ✅ CSP with data: URI support, HSTS, X-Frame-Options (deployed + tested)
+2. **Git-Connected Deployment** - ✅ Migration complete, auto-deployments working
+3. **Production E2E Tests** - ✅ 15/15 security headers tests passing, 18/20 smoke tests passing
+4. **Visual Regression** - ✅ 4 baseline screenshots created
+5. **Monitoring Documentation** - ✅ Complete guides for uptime, error alerting, queue health
+6. **CI/CD Workflows** - ✅ All workflows updated for Git-connected mode
+7. **Secrets Automation** - ✅ Gopass sync scripts for Pages and Workers created
 
 **New Documentation**:
 - `docs/SECURITY-HEADERS.md` - Security headers comprehensive guide
@@ -252,11 +255,15 @@ liteckyeditingservices/
 - `docs/infrastructure/UPTIME-MONITORING.md` - Uptime monitoring setup
 - `docs/infrastructure/ERROR-ALERTING.md` - Error monitoring implementation
 - `docs/infrastructure/QUEUE-HEALTH.md` - Queue health monitoring
+- `docs/infrastructure/DNS-CONFIGURATION.md` - DNS records and verification commands
 - `docs/PHASE-7-PROGRESS.md` - Week 1 progress tracking
 - `docs/PHASE-7-SESSION-SUMMARY.md` - Detailed session summary
+- `scripts/deploy/sync-pages-secrets-from-gopass.sh` - Pages secrets automation
+- `scripts/deploy/sync-worker-secrets-from-gopass.sh` - Worker secrets automation
 
-### 🔄 Next Steps (Phase 7: Week 2)
-1. **Deploy Security Headers** - Run validation playbook (30 min)
+### 🔄 Next Steps (Phase 7: Week 2 - October 6-12, 2025)
+1. **Cleanup** - Remove old `litecky-editing-services` project after 48 hours (Oct 7)
 2. **Implement Monitoring** - UptimeRobot + error/queue Workers (5 hours)
-3. **Performance Optimization** - Image optimization, code-splitting, caching
-4. **A11y Sweep** - WCAG 2.1 AA compliance check for top 7 pages
+3. **Performance Optimization** - Image optimization, code-splitting, caching strategies
+4. **A11y Sweep** - WCAG 2.1 AA compliance check for all 7 pages
+5. **SEO Enhancement** - Meta descriptions and Open Graph images for all pages
