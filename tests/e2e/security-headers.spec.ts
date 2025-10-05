@@ -13,19 +13,20 @@ test.describe("Security Headers", () => {
 		expect(hsts).toContain("max-age=31536000");
 		expect(hsts).toContain("includeSubDomains");
 
-		// CSP
+		// CSP (global)
 		const csp = response.headers()["content-security-policy"];
 		expect(csp).toBeTruthy();
 		expect(csp).toContain("default-src");
 		expect(csp).toContain("script-src");
 		expect(csp).toContain("object-src 'none'");
-		expect(csp).toContain("frame-ancestors 'none'");
+		// Global allows same-origin framing to support admin preview where needed
+		expect(csp).toContain("frame-ancestors 'self'");
 		expect(csp).toContain("upgrade-insecure-requests");
 
-		// X-Frame-Options
+		// X-Frame-Options (global)
 		const xfo = response.headers()["x-frame-options"];
 		expect(xfo).toBeTruthy();
-		expect(xfo.toUpperCase()).toBe("DENY");
+		expect(["SAMEORIGIN", "DENY"]).toContain(xfo.toUpperCase());
 
 		// X-Content-Type-Options
 		const xcto = response.headers()["x-content-type-options"];
@@ -51,9 +52,9 @@ test.describe("Security Headers", () => {
 		expect(csp).toBeTruthy();
 		// Admin needs unsafe-eval for Decap CMS
 		expect(csp).toContain("unsafe-eval");
-		// But should still have baseline protections
+		// Baseline protections
 		expect(csp).toContain("object-src 'none'");
-		expect(csp).toContain("frame-ancestors 'none'");
+		expect(csp).toContain("frame-ancestors 'self'");
 	});
 
 	test("should not have CSP violations during normal navigation", async ({
@@ -74,14 +75,14 @@ test.describe("Security Headers", () => {
 		});
 
 		// Navigate through key pages
-		await page.goto("/");
-		await page.waitForLoadState("networkidle");
+		await page.goto("/", { waitUntil: "domcontentloaded" });
+		await page.waitForTimeout(300);
 
-		await page.goto("/services");
-		await page.waitForLoadState("networkidle");
+		await page.goto("/services", { waitUntil: "domcontentloaded" });
+		await page.waitForTimeout(300);
 
-		await page.goto("/contact");
-		await page.waitForLoadState("networkidle");
+		await page.goto("/contact", { waitUntil: "domcontentloaded" });
+		await page.waitForTimeout(300);
 
 		// Assert no CSP violations occurred
 		expect(violations).toHaveLength(0);

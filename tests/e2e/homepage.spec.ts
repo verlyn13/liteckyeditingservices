@@ -21,9 +21,14 @@ test.describe("Homepage", () => {
 	});
 
 	test("should navigate to contact page", async ({ page }) => {
-		await page.goto("/");
-		await page.click("text=Contact");
-		await expect(page).toHaveURL(/.*contact/);
+		await page.goto("/", { waitUntil: "domcontentloaded" });
+		// If mobile menu is collapsed, open it first
+		const menuButton = page.locator("[data-menu-toggle]");
+		if (await menuButton.isVisible()) {
+			await menuButton.click();
+		}
+		await page.getByRole("link", { name: /^Contact$/ }).click();
+		await expect(page).toHaveURL(/\/contact\/?/);
 		await expect(page).toHaveTitle(/Contact.*Litecky Editing Services/);
 	});
 });
