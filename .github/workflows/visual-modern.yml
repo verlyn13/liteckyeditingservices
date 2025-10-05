@@ -1,5 +1,9 @@
 name: Visual Tests (Modern)
 
+permissions:
+  issues: write
+  pull-requests: write
+
 on:
   push:
     branches: [main]
@@ -60,6 +64,10 @@ jobs:
 
       - name: Build site
         run: pnpm build
+
+      - name: Kill process on port 4321 (if any)
+        run: |
+          if lsof -i:4321; then lsof -ti:4321 | xargs kill -9 || true; fi
 
       - name: Run visual tests (normal mode)
         if: ${{ github.event.inputs.updateBaselines != 'true' }}

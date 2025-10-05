@@ -1,5 +1,9 @@
 name: visual-regression
 
+permissions:
+  issues: write
+  pull-requests: write
+
 on:
   pull_request:
     paths:
@@ -51,6 +55,7 @@ jobs:
 
       - name: Start preview server
         run: |
+          if lsof -i:4321; then lsof -ti:4321 | xargs kill -9 || true; fi
           pnpm preview &
           npx wait-on http://localhost:4321 --timeout 30000
 

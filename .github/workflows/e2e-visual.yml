@@ -32,7 +32,7 @@ jobs:
         run: pnpm exec playwright install --with-deps
 
       - name: Run visual tests (@visual)
-        run: pnpm test:e2e:visual
+        run: pnpm test:visual
 
       - name: Upload Playwright report
         if: always()
