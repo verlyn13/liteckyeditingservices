@@ -7,6 +7,7 @@ on:
 
 jobs:
   deploy:
+    if: ${{ secrets.CF_GIT_CONNECTED != 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -49,6 +50,26 @@ jobs:
             --project-name=${{ env.CF_PAGES_PROJECT_NAME }} \
             --commit-message "CI deploy from $GITHUB_SHA"
 
+      - name: Promote latest preview to Production (API)
+        if: ${{ success() }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          echo "Fetching latest preview deployment as JSON..."
+          pnpm exec wrangler pages deployment list \
+            --project-name=${{ env.CF_PAGES_PROJECT_NAME }} \
+            --environment=preview --json > preview.json
+          DEPLOYMENT_ID=$(node -e 'const j=require("./preview.json"); if(!j.result||!j.result.length){process.exit(1)} j.result.sort((a,b)=>new Date(b.created_on)-new Date(a.created_on)); console.log(j.result[0].id)')
+          echo "Latest preview deployment: $DEPLOYMENT_ID"
+          echo "Promoting to production..."
+          curl -fsSL -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CF_PAGES_PROJECT_NAME}/deployments/${DEPLOYMENT_ID}/production" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            | tee promote.json
+          node -e 'const r=require("./promote.json"); if(!r.success){console.error(r); process.exit(1)} else { console.log("Promotion success") }'
+
       # Note: If the project is Git-connected in Pages, pushes to main will create a Production deployment automatically.
       # If not Git-connected, this action creates a Preview deployment; promote it to Production in the Pages dashboard.
-

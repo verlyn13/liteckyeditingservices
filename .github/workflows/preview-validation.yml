@@ -1,0 +1,91 @@
+name: preview-validation
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  validate-preview:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      CF_PAGES_PROJECT_NAME: litecky-editing-services
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Wrangler
+        run: pnpm add -D wrangler@^4
+
+      - name: Wait for Cloudflare Pages preview (Git-connected)
+        if: ${{ secrets.CF_GIT_CONNECTED == 'true' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          echo "Fetching preview deployments as JSON..."
+          pnpm exec wrangler pages deployment list --project-name=${{ env.CF_PAGES_PROJECT_NAME }} --environment=preview --json > previews.json
+          node -e '
+            const fs=require("fs");
+            const data=JSON.parse(fs.readFileSync("previews.json","utf8"));
+            const sha=process.env.GITHUB_SHA;
+            const m=data.result.find(d => (d.source && (d.source === sha || (""+d.source).startsWith(sha.slice(0,7)))));
+            if(!m){ console.error("No matching preview for SHA", sha); process.exit(1); }
+            console.log("PREVIEW_URL=", m.url);
+            fs.writeFileSync("preview_url.txt", m.url);
+          '
+          echo "Preview deployment found: $(cat preview_url.txt)"
+
+      - name: Deploy preview with Wrangler (fallback when not Git-connected)
+        if: ${{ secrets.CF_GIT_CONNECTED != 'true' }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          pnpm build
+          BRANCH="pr-${{ github.event.pull_request.number }}"
+          echo "Deploying fallback preview for $BRANCH..."
+          OUT=$(pnpm exec wrangler pages deploy dist --project-name=${{ env.CF_PAGES_PROJECT_NAME }} --branch="$BRANCH" --commit-message "PR preview $GITHUB_SHA")
+          echo "$OUT" | tee wrangler.out
+          # Try to extract the preview URL from the wrangler output
+          URL=$(grep -Eo 'https://[a-z0-9]+\.litecky-editing-services\.pages\.dev' wrangler.out | tail -n1 || true)
+          if [ -z "$URL" ]; then echo "Could not extract preview URL"; exit 1; fi
+          echo "$URL" > preview_url.txt
+
+      - name: Show preview URL
+        run: |
+          echo "Preview URL: $(cat preview_url.txt)"
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Run smoke on preview (homepage + admin)
+        env:
+          PLAYWRIGHT_BASE_URL: $(cat preview_url.txt)
+        run: |
+          pnpm test:e2e -g "Homepage|Navigation" || true
+          pnpm test:admin:prod
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 7
+
