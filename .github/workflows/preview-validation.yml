@@ -63,7 +63,7 @@ jobs:
           OUT=$(pnpm exec wrangler pages deploy dist --project-name=${{ env.CF_PAGES_PROJECT_NAME }} --branch="$BRANCH" --commit-message "PR preview $GITHUB_SHA")
           echo "$OUT" | tee wrangler.out
           # Try to extract the preview URL from the wrangler output
-          URL=$(grep -Eo 'https://[a-z0-9]+\.litecky-editing-services\.pages\.dev' wrangler.out | tail -n1 || true)
+          URL=$(grep -Eo 'https://[a-z0-9]+\.liteckyeditingservices\.pages\.dev' wrangler.out | tail -n1 || true)
           if [ -z "$URL" ]; then echo "Could not extract preview URL"; exit 1; fi
           echo "$URL" > preview_url.txt
 
