@@ -1,0 +1,129 @@
+name: visual-regression
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'tests/e2e/visual*.spec.ts'
+      - '.github/workflows/visual-regression.yml'
+  workflow_dispatch:
+    inputs:
+      update_baselines:
+        description: 'Update baseline screenshots'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+jobs:
+  visual-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium]  # Start with chromium only for stability
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build site
+        run: pnpm build
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps ${{ matrix.browser }}
+
+      - name: Start preview server
+        run: |
+          pnpm preview &
+          npx wait-on http://localhost:4321 --timeout 30000
+
+      - name: Run visual regression tests
+        if: github.event.inputs.update_baselines != 'true'
+        run: |
+          pnpm exec playwright test tests/e2e/visual-improved.spec.ts \
+            --project=${{ matrix.browser }} \
+            --reporter=html
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:4321
+
+      - name: Update baseline screenshots
+        if: github.event.inputs.update_baselines == 'true'
+        run: |
+          pnpm exec playwright test tests/e2e/visual-improved.spec.ts \
+            --project=${{ matrix.browser }} \
+            --update-snapshots \
+            --reporter=list
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:4321
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-test-results-${{ matrix.browser }}
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 30
+
+      - name: Upload baseline updates
+        if: github.event.inputs.update_baselines == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-baselines-${{ matrix.browser }}
+          path: |
+            tests/e2e/visual-improved.spec.ts-snapshots/
+          retention-days: 30
+
+      - name: Comment on PR with results
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const browser = '${{ matrix.browser }}';
+            const runUrl = `${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}`;
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ⚠️ Visual Regression Test Failed\n\n` +
+                    `Browser: **${browser}**\n\n` +
+                    `Visual differences detected in screenshots. This could be due to:\n` +
+                    `- Intentional UI changes (update baselines if this is expected)\n` +
+                    `- Layout shifts or dynamic content\n` +
+                    `- Font rendering differences\n\n` +
+                    `**Actions:**\n` +
+                    `1. [Review test artifacts](${runUrl})\n` +
+                    `2. If changes are intentional, run workflow with 'update_baselines' = true\n` +
+                    `3. Download and commit the updated baselines\n\n` +
+                    `[View full test results](${runUrl})`
+            })
+
+  visual-stability-check:
+    needs: visual-tests
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Mark visual tests as passing
+        run: |
+          echo "✅ Visual regression tests passed!"
+          echo "All screenshots match their baselines within tolerance."
