@@ -131,6 +131,13 @@ Developer Workflow Hooks
 ### Deployment Workflow Files Created
 - ✅ `.github/workflows/deploy-production.yml` - Automated deployment on push to main
 - ✅ `.github/workflows/post-deploy-validation.yml` - Post-deployment health checks
+ - ✅ `.github/workflows/preview-validation.yml` - PR preview validation (homepage + admin)
+
+### Migration Track: Pages Alignment
+- Read: `docs/migrations/DEPLOYMENT-ALIGNMENT-REPORT.md`
+- Execute: `docs/migrations/PAGES-GIT-MIGRATION.md` (Git-connected project creation + domain cutover)
+- Environment variables: `docs/migrations/PAGES-ENV-CHECKLIST.md`
+- Cutover steps: `docs/migrations/PAGES-GIT-CUTOVER-RUNBOOK.md`
 
 ### Required GitHub Secrets (TO ADD)
 ```bash
