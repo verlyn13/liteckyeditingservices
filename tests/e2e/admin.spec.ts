@@ -12,8 +12,19 @@ test.describe("@admin Decap CMS Admin", () => {
 			if (msg.type() === "error") consoleErrors.push(msg.text());
 		});
 
-		await page.goto("/admin/index.html#/");
-		await page.waitForLoadState("networkidle");
+		await page.goto("/admin/", { waitUntil: "domcontentloaded" });
+		// Wait up to 15s for Decap to initialize and expose window.CMS
+		await page.waitForFunction(() => (window as any).CMS !== undefined, {
+			timeout: 15000,
+		});
+		// Also wait for a likely CMS root to appear
+		await page.waitForFunction(
+			() =>
+				!!document.querySelector(
+					"#nc-root, [class*=\"CMS\"], [data-testid=\"decap-cms-root\"]",
+				) || document.body.innerText.length > 0,
+			{ timeout: 5000 },
+		);
 
 		// Basic health checks
 		const hasCMS = await page.evaluate(

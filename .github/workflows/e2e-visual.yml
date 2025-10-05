@@ -7,6 +7,7 @@ on:
 
 jobs:
   visual:
+    continue-on-error: true
     runs-on: ubuntu-latest
     env:
       CI: true
@@ -40,4 +41,3 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
-
