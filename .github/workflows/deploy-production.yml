@@ -20,6 +20,8 @@ jobs:
     env:
       CF_PAGES_PROJECT_NAME: litecky-editing-services
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,17 +42,13 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Install Wrangler
-        run: pnpm add -D wrangler@^4
+      - name: Install Wrangler (latest)
+        run: pnpm add -D wrangler@latest
 
       - name: Wrangler whoami (sanity)
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: pnpm exec wrangler whoami
 
       - name: Deploy to Cloudflare Pages (dist → preview)
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           pnpm exec wrangler pages deploy dist \
             --project-name=${{ env.CF_PAGES_PROJECT_NAME }} \
@@ -58,9 +56,6 @@ jobs:
 
       - name: Promote latest preview to Production (API)
         if: ${{ success() }}
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           set -euo pipefail
           echo "Fetching latest preview deployment as JSON..."
