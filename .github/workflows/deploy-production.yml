@@ -7,13 +7,13 @@ on:
 
 jobs:
   noop:
-    if: ${{ secrets.CF_GIT_CONNECTED == 'true' }}
+    if: ${{ vars.CF_GIT_CONNECTED == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - run: echo "CF_GIT_CONNECTED=true; skipping wrangler deploy"
 
   deploy:
-    if: ${{ secrets.CF_GIT_CONNECTED != 'true' }}
+    if: ${{ vars.CF_GIT_CONNECTED != 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
