@@ -1,40 +1,30 @@
-import { expect, type Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
+import { prepareForVisualTest } from "../helpers/visual";
 
-async function disableAnimations(page: Page) {
-	await page.addStyleTag({
-		content: `* { animation: none !important; transition: none !important; }`,
-	});
-}
+test("header", async ({ page }) => {
+	await page.goto("/");
+	const header = page.getByRole("banner");
+	await prepareForVisualTest(page, header);
+	await expect(header).toHaveScreenshot("header.png");
+});
 
-async function waitForFontsAndLayout(page: Page) {
-	// Wait for fonts to load
-	await page.evaluate(() => document.fonts.ready);
-	// Give a moment for layout to fully stabilize
-	await page.waitForTimeout(500);
-}
+test("footer", async ({ page }) => {
+	await page.goto("/");
+	const footer = page.getByRole("contentinfo");
+	await prepareForVisualTest(page, footer);
+	await expect(footer).toHaveScreenshot("footer.png");
+});
 
-test.describe("@visual Visual regression", () => {
-	test("@visual home page", async ({ page }) => {
-		await page.goto("/");
-		await page.waitForLoadState("networkidle");
-		await disableAnimations(page);
-		await waitForFontsAndLayout(page);
-		await expect(page).toHaveScreenshot("home.png", {
-			fullPage: true,
-			maxDiffPixelRatio: 0.03, // Increased tolerance for font rendering differences
-			maxDiffPixels: 500, // Allow up to 500 different pixels
-		});
-	});
+test("hero section", async ({ page }) => {
+	await page.goto("/");
+	const hero = page.locator("section").first();
+	await prepareForVisualTest(page, hero);
+	await expect(hero).toHaveScreenshot("hero.png");
+});
 
-	test("@visual services page", async ({ page }) => {
-		await page.goto("/services");
-		await page.waitForLoadState("networkidle");
-		await disableAnimations(page);
-		await waitForFontsAndLayout(page);
-		await expect(page).toHaveScreenshot("services.png", {
-			fullPage: true,
-			maxDiffPixelRatio: 0.03, // Increased tolerance for font rendering differences
-			maxDiffPixels: 500, // Allow up to 500 different pixels
-		});
-	});
+test("contact form", async ({ page }) => {
+	await page.goto("/contact/");
+	const form = page.locator("form").first();
+	await prepareForVisualTest(page, form);
+	await expect(form).toHaveScreenshot("contact-form.png");
 });

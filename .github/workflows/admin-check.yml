@@ -31,8 +31,8 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
 
-      - name: Run admin smoke test (@admin)
-        run: pnpm test:admin:prod
+      - name: Run CMS UI presence check
+        run: pnpm test:cms:prod
 
       - name: Upload Playwright report
         if: always()

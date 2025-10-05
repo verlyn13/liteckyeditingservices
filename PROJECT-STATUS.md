@@ -126,7 +126,7 @@
 
 ---
 
-### ✅ Testing Infrastructure (98% Complete)
+### ✅ Testing Infrastructure (Streamlined)
 
 **Unit Tests** (Vitest 3.2.4):
 - ✅ Configured with happy-dom environment
@@ -134,10 +134,12 @@
 - ✅ Test directory: `tests/unit/`
 - 📝 Sample test present, needs expansion
 
-**E2E Tests** (Playwright 1.55.1):
-- ✅ **4 spec files** with comprehensive coverage
-- ✅ **5 browser configurations**: Chrome, Firefox, Safari, Mobile Chrome, Mobile Safari
-- ✅ **Production testing**: Tests run against live site via `pnpm test:e2e:prod`
+**E2E Tests** (Playwright):
+- ✅ Smoke: `tests/e2e/smoke.spec.ts` (banner, footer, key pages)
+- ✅ Visual: `tests/e2e/visual.spec.ts` (4 targeted screenshots; Chromium)
+- ✅ CMS: `tests/e2e/cms.spec.ts` (login UI presence; no auth)
+- ✅ Helper: `tests/helpers/visual.ts` (freeze animations; wait for fonts/images)
+- ✅ Config: single browser (Chromium), 30s timeout, 0.5% diff, 1 retry
 - ✅ Test files:
   - `homepage.spec.ts` - Main page elements and navigation
   - `contact.spec.ts` - Contact form submission (works dev + prod)
@@ -153,9 +155,10 @@
 - ✅ Test script: `tests/a11y/check.js`
 - 📝 Script command: `pnpm test:a11y`
 
-**Additional Test Scripts**:
-- ✅ `tests/admin-smoke.spec.mjs` - Decap CMS admin verification
-- ✅ `tests/sendgrid-test.mjs` - Email service testing
+**Scripts**:
+- ✅ `pnpm test:smoke` — Smoke checks
+- ✅ `pnpm test:visual` / `pnpm test:visual:update` — Visuals
+- ✅ `pnpm test:cms` — CMS presence
 
 ---
 

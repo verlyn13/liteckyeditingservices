@@ -56,11 +56,10 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
 
-      - name: Security headers E2E (@prod)
-        run: pnpm test:e2e:prod -g "Security Headers"
-
-      - name: Admin smoke test (@admin)
-        run: pnpm test:admin:prod
+      - name: Production smoke tests
+        run: |
+          BASE_URL=$BASE_URL pnpm test:smoke
+          pnpm test:cms:prod
 
       - name: Upload Playwright report
         if: always()

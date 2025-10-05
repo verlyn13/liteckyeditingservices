@@ -11,9 +11,8 @@ on:
     paths:
       - 'src/**'
       - 'public/**'
-      - 'tests/e2e/visual*.spec.ts'
-      - 'tests/e2e/_screenshot.css'
-      - 'tests/e2e/_prepare.ts'
+      - 'tests/e2e/visual.spec.ts'
+      - 'tests/helpers/visual.ts'
       - 'playwright.config.ts'
       - '.github/workflows/visual-modern.yml'
   workflow_dispatch:
@@ -71,18 +70,11 @@ jobs:
 
       - name: Run visual tests (normal mode)
         if: ${{ github.event.inputs.updateBaselines != 'true' }}
-        run: |
-          pnpm exec playwright test tests/e2e/visual-modern.spec.ts \
-            --project=chromium \
-            --reporter=html
+        run: pnpm test:visual
 
       - name: Update baseline screenshots
         if: ${{ github.event.inputs.updateBaselines == 'true' }}
-        run: |
-          pnpm exec playwright test tests/e2e/visual-modern.spec.ts \
-            --project=chromium \
-            --update-snapshots \
-            --reporter=list
+        run: pnpm test:visual:update
 
       - name: Upload test artifacts
         if: always()
@@ -102,7 +94,7 @@ jobs:
         with:
           name: updated-baselines
           path: |
-            tests/e2e/visual-modern.spec.ts-snapshots/
+            tests/e2e/visual.spec.ts-snapshots/
           retention-days: 7
 
       - name: Comment on PR with diff summary

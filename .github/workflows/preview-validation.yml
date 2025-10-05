@@ -74,12 +74,12 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
 
-      - name: Run smoke on preview (homepage + admin)
+      - name: Run smoke on preview (homepage + CMS)
         env:
-          PLAYWRIGHT_BASE_URL: $(cat preview_url.txt)
+          BASE_URL: $(cat preview_url.txt)
         run: |
-          pnpm test:e2e -g "Homepage|Navigation" || true
-          pnpm test:admin:prod
+          pnpm test:smoke || true
+          pnpm test:cms
 
       - name: Upload Playwright report
         if: always()

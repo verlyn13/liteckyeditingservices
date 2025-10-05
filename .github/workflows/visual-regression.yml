@@ -9,7 +9,8 @@ on:
     paths:
       - 'src/**'
       - 'public/**'
-      - 'tests/e2e/visual*.spec.ts'
+      - 'tests/e2e/visual.spec.ts'
+      - 'tests/helpers/visual.ts'
       - '.github/workflows/visual-regression.yml'
   workflow_dispatch:
     inputs:
@@ -61,22 +62,15 @@ jobs:
 
       - name: Run visual regression tests
         if: github.event.inputs.update_baselines != 'true'
-        run: |
-          pnpm exec playwright test tests/e2e/visual-improved.spec.ts \
-            --project=${{ matrix.browser }} \
-            --reporter=html
+        run: pnpm test:visual
         env:
-          PLAYWRIGHT_BASE_URL: http://localhost:4321
+          BASE_URL: http://localhost:4321
 
       - name: Update baseline screenshots
         if: github.event.inputs.update_baselines == 'true'
-        run: |
-          pnpm exec playwright test tests/e2e/visual-improved.spec.ts \
-            --project=${{ matrix.browser }} \
-            --update-snapshots \
-            --reporter=list
+        run: pnpm test:visual:update
         env:
-          PLAYWRIGHT_BASE_URL: http://localhost:4321
+          BASE_URL: http://localhost:4321
 
       - name: Upload test results
         if: always()
@@ -94,7 +88,7 @@ jobs:
         with:
           name: updated-baselines-${{ matrix.browser }}
           path: |
-            tests/e2e/visual-improved.spec.ts-snapshots/
+            tests/e2e/visual.spec.ts-snapshots/
           retention-days: 30
 
       - name: Comment on PR with results
