@@ -56,23 +56,49 @@ jobs:
 
       - name: Promote latest preview to Production (API)
         if: ${{ success() }}
-        env:
-          WRANGLER_SEND_METRICS: false
         run: |
           set -euo pipefail
-          echo "Fetching latest preview deployment as JSON..."
-          pnpm exec wrangler pages deployment list \
-            --project-name=${{ env.CF_PAGES_PROJECT_NAME }} \
-            --environment=preview --json > preview.json
-          DEPLOYMENT_ID=$(node -e 'const j=require("./preview.json"); if(!j.result||!j.result.length){process.exit(1)} j.result.sort((a,b)=>new Date(b.created_on)-new Date(a.created_on)); console.log(j.result[0].id)')
-          echo "Latest preview deployment: $DEPLOYMENT_ID"
+          echo "Fetching latest preview deployment via Cloudflare Pages API..."
+          curl -sS \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CF_PAGES_PROJECT_NAME}/deployments?per_page=50" \
+            > deployments.json
+
+          # Extract the latest preview deployment ID
+          DEPLOYMENT_ID=$(node -e '
+            const data = require("./deployments.json");
+            if (!data.success || !data.result?.length) {
+              console.error("No deployments found");
+              process.exit(1);
+            }
+            const previews = data.result.filter(d => d.environment === "preview");
+            if (!previews.length) {
+              console.error("No preview deployments found");
+              process.exit(1);
+            }
+            const latest = previews.sort((a, b) =>
+              new Date(b.created_on) - new Date(a.created_on)
+            )[0];
+            console.log(latest.id);
+          ')
+
+          echo "Latest preview deployment: ${DEPLOYMENT_ID}"
           echo "Promoting to production..."
+
           curl -fsSL -X POST \
             "https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/${CF_PAGES_PROJECT_NAME}/deployments/${DEPLOYMENT_ID}/production" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json" \
             | tee promote.json
-          node -e 'const r=require("./promote.json"); if(!r.success){console.error(r); process.exit(1)} else { console.log("Promotion success") }'
+
+          node -e '
+            const r = require("./promote.json");
+            if (!r.success) {
+              console.error("Promotion failed:", r);
+              process.exit(1);
+            }
+            console.log("✅ Promotion successful");
+          '
 
       # Note: If the project is Git-connected in Pages, pushes to main will create a Production deployment automatically.
       # If not Git-connected, this action creates a Preview deployment; promote it to Production in the Pages dashboard.
