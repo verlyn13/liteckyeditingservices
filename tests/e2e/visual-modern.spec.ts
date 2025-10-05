@@ -94,8 +94,8 @@ test.describe("@visual Mobile views", () => {
 		await page.goto("/");
 		await preparePageForScreenshot(page);
 
-		// Open mobile menu
-		const menuButton = page.getByRole("button", { name: /menu/i });
+		// Open mobile menu - use data attribute to avoid Astro dev overlay button
+		const menuButton = page.locator("[data-menu-toggle]").first();
 		if (await menuButton.isVisible()) {
 			await menuButton.click();
 			await page.waitForTimeout(300); // Wait for menu animation

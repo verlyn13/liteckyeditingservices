@@ -38,22 +38,23 @@ export default defineConfig({
 		colorScheme: "light",
 		locale: "en-US",
 		timezoneId: "America/Los_Angeles",
-
-		// Consistent font rendering (Chromium flags)
-		launchOptions: {
-			args: [
-				"--force-color-profile=srgb",
-				"--disable-lcd-text",
-				"--font-render-hinting=none",
-				"--disable-blink-features=AutomationControlled",
-			],
-		},
 	},
 
 	projects: [
 		{
 			name: "chromium",
-			use: { ...devices["Desktop Chrome"] },
+			use: {
+				...devices["Desktop Chrome"],
+				// Chromium-specific flags for consistent rendering
+				launchOptions: {
+					args: [
+						"--force-color-profile=srgb",
+						"--disable-lcd-text",
+						"--font-render-hinting=none",
+						"--disable-blink-features=AutomationControlled",
+					],
+				},
+			},
 		},
 		// Keep other browsers for comprehensive testing, but consider
 		// focusing on chromium for visual tests to reduce baseline management
