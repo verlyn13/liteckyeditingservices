@@ -58,10 +58,13 @@ Deployment Status: ✅ LIVE with Custom Domain (DNS migrated October 4, 2025)
 | `docs/infrastructure/CLOUDFLARE-STATUS.md` | Infrastructure | ✅ Created | Current domain audit results |
 | `docs/infrastructure/CLOUDFLARE-ANALYSIS.md` | Infrastructure | ✅ Created | DNS and deployment analysis |
 | `docs/infrastructure/CLOUDFLARE-MANAGEMENT.md` | Infrastructure | ✅ Created | Complete management guide |
+| `docs/infrastructure/DNS-CONFIGURATION.md` | Infrastructure | ✅ Created | Current DNS, email (MX/SPF/DKIM/DMARC), and verification |
 | `scripts/cloudflare-audit.fish` | Scripts | ✅ Created | Domain audit tool |
 | `scripts/cf-dns-manage.fish` | Scripts | ✅ Created | DNS management tool |
 | `scripts/cf-pages-deploy.fish` | Scripts | ✅ Created | Pages deployment helper |
 | `scripts/load-cloudflare-env.fish` | Scripts | ✅ Updated | Credential loader with account ID |
+| `scripts/deploy/configure-pages-env.sh` | Scripts | ✅ Created | Configure Pages secrets via Wrangler |
+| `scripts/deploy/preview-smoke.sh` | Scripts | ✅ Created | Quick smoke for any preview/URL |
 | `workers/*/wrangler.toml` | Workers | ✅ Created | Worker configs with bindings |
 
 ### 5. GOVERNANCE DOCUMENTATION (How to Govern)

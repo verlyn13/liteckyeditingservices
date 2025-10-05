@@ -128,10 +128,10 @@ Developer Workflow Hooks
 - Prefer Windsurf Cascade workflows (Dev Loop, Quick Validate, A11y + E2E, Build Preview).
 - Commands: `pnpm validate:all`, `pnpm typecheck`, `pnpm test`, `pnpm test:e2e`, `pnpm test:a11y`, `pnpm build`.
 
-### Deployment Workflow Files Created
-- ✅ `.github/workflows/deploy-production.yml` - Automated deployment on push to main
+### Deployment Workflow Files
+- ✅ `.github/workflows/deploy-production.yml` - Automated deployment (disabled when Git-connected)
 - ✅ `.github/workflows/post-deploy-validation.yml` - Post-deployment health checks
- - ✅ `.github/workflows/preview-validation.yml` - PR preview validation (homepage + admin)
+- ✅ `.github/workflows/preview-validation.yml` - PR preview validation (homepage + admin)
 
 ### Migration Track: Pages Alignment
 - Read: `docs/migrations/DEPLOYMENT-ALIGNMENT-REPORT.md`
@@ -139,15 +139,18 @@ Developer Workflow Hooks
 - Environment variables: `docs/migrations/PAGES-ENV-CHECKLIST.md`
 - Cutover steps: `docs/migrations/PAGES-GIT-CUTOVER-RUNBOOK.md`
 
-### Required GitHub Secrets (TO ADD)
+### Required GitHub Secrets (Final)
 ```bash
 CLOUDFLARE_ACCOUNT_ID      # Your Cloudflare account ID
 CLOUDFLARE_API_TOKEN        # API token with Pages:Edit permission
+# After migration:
+CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 ```
 
 ### Milestones
 - ✅ Week 1 (Oct 4, 2025): Monitoring docs + prod E2E + security headers + visual regression - **COMPLETE**
-- 🔴 **IMMEDIATE**: Fix production deployment + add CI/CD automation
+- ✅ Git-connected migration complete; auto-deployments enabled
+- 🔜 Cleanup: remove old project after 48 hours; archive migration docs
 - Week 2 (Oct 7-11, 2025): Implement monitoring Workers + performance audit + SEO meta/OG + a11y sweep
 
 ---
