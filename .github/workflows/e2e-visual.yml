@@ -31,6 +31,10 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
 
+      - name: Free port 4321 if in use
+        run: |
+          if lsof -i:4321; then lsof -ti:4321 | xargs kill -9 || true; fi
+
       - name: Run visual tests (@visual)
         run: pnpm test:visual
 

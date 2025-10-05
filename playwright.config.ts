@@ -9,19 +9,14 @@ export default defineConfig({
 	},
 	retries: 1, // allow a single retry for flake
 	forbidOnly: !!process.env.CI,
-	reporter: [
-		["html", { open: "never" }],
-		["list"],
-	],
+	reporter: [["html", { open: "never" }], ["list"]],
 	use: {
 		baseURL: process.env.BASE_URL ?? "http://localhost:4321",
 		trace: "retain-on-failure",
 		screenshot: "only-on-failure",
 		video: "off",
 	},
-	projects: [
-		{ name: "chromium", use: { ...devices["Desktop Chrome"] } },
-	],
+	projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 
 	// Auto-start dev server only when testing locally
 	webServer:

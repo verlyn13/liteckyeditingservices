@@ -7,18 +7,18 @@ on:
 
 jobs:
   noop:
-    if: ${{ vars.CF_GIT_CONNECTED == 'true' }}
+    if: ${{ vars.CF_GIT_CONNECTED == 'true' || secrets.CF_GIT_CONNECTED == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - run: echo "CF_GIT_CONNECTED=true; skipping wrangler deploy"
 
   deploy:
-    if: ${{ vars.CF_GIT_CONNECTED != 'true' }}
+    if: ${{ !(vars.CF_GIT_CONNECTED == 'true' || secrets.CF_GIT_CONNECTED == 'true') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
     env:
-      CF_PAGES_PROJECT_NAME: litecky-editing-services
+      CF_PAGES_PROJECT_NAME: liteckyeditingservices
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
