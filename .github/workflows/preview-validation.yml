@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CI: true
-      CF_PAGES_PROJECT_NAME: litecky-editing-services
+      CF_PAGES_PROJECT_NAME: liteckyeditingservices
     steps:
       - name: Checkout
         uses: actions/checkout@v4
