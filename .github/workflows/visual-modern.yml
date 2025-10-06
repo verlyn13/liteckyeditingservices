@@ -83,6 +83,15 @@ jobs:
           echo "Expecting files under tests/e2e/__screenshots__"
           ls -R tests/e2e/__screenshots__ || true
 
+      - name: Upload updated baselines
+        if: ${{ github.event.inputs.updateBaselines == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: updated-baselines
+          path: |
+            tests/e2e/__screenshots__/**
+          retention-days: 7
+
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
