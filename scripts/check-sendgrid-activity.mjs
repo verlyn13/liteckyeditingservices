@@ -27,7 +27,9 @@ const options = {
 https
 	.get(options, (res) => {
 		let data = "";
-		res.on("data", (chunk) => (data += chunk));
+		res.on("data", (chunk) => {
+			data += chunk;
+		});
 		res.on("end", () => {
 			try {
 				const stats = JSON.parse(data);

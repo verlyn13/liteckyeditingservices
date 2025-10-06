@@ -131,7 +131,9 @@ suppressionTypes.forEach((type) => {
 
 	https.get(suppOptions, (res) => {
 		let data = "";
-		res.on("data", (chunk) => (data += chunk));
+		res.on("data", (chunk) => {
+			data += chunk;
+		});
 		res.on("end", () => {
 			try {
 				const result = JSON.parse(data);

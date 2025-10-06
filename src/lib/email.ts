@@ -75,15 +75,11 @@ export async function sendEmail(
 					)
 				: message.from;
 
-		// Prepare mail object with all features
-		const initialContent: Array<{
-			type: "text/plain" | "text/html";
-			value: string;
-		}> = [];
-		// Will be populated below; provide minimal slot to satisfy types
-		if (!message.text && !message.html) {
-			initialContent.push({ type: "text/plain", value: "" });
-		}
+		// Prepare mail object - SendGrid requires at least one content item
+		const initialContent: [{ type: "text/plain" | "text/html"; value: string }] = [
+			{ type: "text/plain", value: message.text || message.html || "" },
+		];
+
 		const mail: MailDataRequired = {
 			to: message.to,
 			from: {
@@ -91,7 +87,7 @@ export async function sendEmail(
 				name: message.fromName || "Litecky Editing Services",
 			},
 			subject: message.subject,
-			content: initialContent as any,
+			content: initialContent as any, // SendGrid's type is overly strict
 		};
 
 		// Template and content
@@ -111,7 +107,11 @@ export async function sendEmail(
 		if (message.text) content.push({ type: "text/plain", value: message.text });
 		if (message.html) content.push({ type: "text/html", value: message.html });
 		if (content.length > 0) {
-			(mail as MailDataRequired & { content?: any }).content = content as any;
+			(
+				mail as MailDataRequired & {
+					content?: Array<{ type: string; value: string }>;
+				}
+			).content = content;
 		}
 
 		// Add optional fields
@@ -216,9 +216,16 @@ export async function sendEmail(
 		let statusCode: number | undefined;
 
 		if (error && typeof error === "object" && "response" in error) {
-			const errorObj = error as { response?: { status?: number; body?: any } };
+			const errorObj = error as {
+				response?: { status?: number; body?: unknown };
+			};
 			statusCode = errorObj.response?.status;
-			const body = errorObj.response?.body;
+			const body = errorObj.response?.body as
+				| {
+						errors?: Array<{ field?: string; message?: string }>;
+						message?: string;
+				  }
+				| undefined;
 
 			if (body?.errors && Array.isArray(body.errors)) {
 				errorMessage = body.errors

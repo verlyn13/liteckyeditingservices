@@ -22,19 +22,18 @@ export async function prepareForVisualTest(page: Page, el?: Locator) {
 	});
 
 	// Wait for fonts and images to fully load
-	await page.evaluate(() =>
-		Promise.all([
-			(document as any).fonts?.ready,
-			...Array.from(document.images)
-				.filter((img) => !img.complete)
-				.map(
-					(img) =>
-						new Promise((res) => {
-							img.onload = img.onerror = res;
-						}),
-				),
-		]),
-	);
+	await page.evaluate(() => {
+		const fontPromise = (document.fonts as FontFaceSet | undefined)?.ready;
+		const imagePromises = Array.from(document.images)
+			.filter((img) => !img.complete)
+			.map(
+				(img) =>
+					new Promise((res) => {
+						img.onload = img.onerror = res;
+					}),
+			);
+		return Promise.all([fontPromise, ...imagePromises]);
+	});
 
 	// Ensure element is visible and stable
 	if (el) {

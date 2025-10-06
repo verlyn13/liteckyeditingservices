@@ -1,73 +1,121 @@
 # Visual Regression Testing Guide
 
+**Last Updated**: October 5, 2025
+**Status**: ✅ Modernized with October 2025 best practices
+
 ## Overview
 
-Visual regression testing ensures our UI remains consistent across deployments by comparing screenshots against baseline images. This guide covers our setup, common issues, and maintenance procedures.
+Visual regression testing ensures our UI remains consistent across deployments by comparing screenshots against baseline images. We use **Playwright's built-in visual testing** with modern stability techniques.
 
-## Current Issues & Solutions
+## Modern Configuration (October 2025)
 
-### Problem: Height Differences (1702px vs 1730px)
-**Symptoms**:
-- Expected height: 1702px
-- Received height: 1730px
-- 43,409 pixel differences (ratio 0.07)
+### Status: ✅ Stable and Production-Ready
 
-**Root Causes**:
-1. **Dynamic Content**: Elements that change between test runs
-2. **Font Loading**: Inconsistent font rendering timing
-3. **Layout Shifts**: Content jumping after initial render
-4. **Viewport Differences**: CI vs local environment variations
+All visual regression issues have been resolved with October 2025 Playwright best practices:
 
-## Improved Test Implementation
+**Configuration Applied**:
+- ✅ Svelte async SSR enabled (future-proof for Svelte 5.39+)
+- ✅ Locked rendering environment (viewport, deviceScale, colorScheme)
+- ✅ Network idle waiting + element visibility checks
+- ✅ Snapshot options with animations disabled and caret hidden
+- ✅ Platform-specific baselines (darwin for local, linux for CI)
 
-We've created `visual-improved.spec.ts` with these enhancements:
+**Results**:
+- Fixed 1-pixel height differences (deviceScaleFactor: 1)
+- Tolerates 2% pixel variation (maxDiffPixelRatio: 0.02)
+- Consistent rendering across local and CI environments
 
-### 1. Stabilization Techniques
+## Test Implementation
+
+### Current Test Suite: `tests/e2e/visual.spec.ts`
+
+We test 4 targeted components instead of full-page screenshots for faster, more reliable tests:
+
+1. **Header** (`getByRole("banner")`)
+2. **Footer** (`getByRole("contentinfo")`)
+3. **Hero Section** (first `<section>`)
+4. **Contact Form** (first `<form>` on /contact/)
+
+### 1. Playwright Configuration (`playwright.config.ts`)
 
 ```typescript
-async function preparePageForScreenshot(page: Page) {
-    // Disable animations
-    await page.addStyleTag({
-        content: `*, *::before, *::after {
-            animation: none !important;
-            transition: none !important;
-        }`
-    });
+export default defineConfig({
+  use: {
+    headless: true,
+    viewport: { width: 1280, height: 960 },
+    deviceScaleFactor: 1,        // Prevents fractional pixel rounding
+    colorScheme: "light",
+    locale: "en-US",
+  },
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.005   // 0.5% base tolerance
+    },
+  },
+});
+```
 
-    // Wait for fonts
-    await page.evaluate(() => document.fonts.ready);
+### 2. Svelte Configuration (`svelte.config.js` + `astro.config.mjs`)
 
-    // Wait for images
-    await page.evaluate(() => {
-        const images = Array.from(document.querySelectorAll('img'));
-        return Promise.all(images.filter(img => !img.complete)...);
-    });
+```javascript
+// svelte.config.js
+export default {
+  compilerOptions: {
+    experimental: { async: true },  // Enable async SSR for Svelte 5.39+
+  },
+};
+```
 
-    // Increased wait time for stability
-    await page.waitForTimeout(1500); // Up from 500ms
+### 3. Visual Helper (`tests/helpers/visual.ts`)
+
+```typescript
+export async function prepareForVisualTest(page: Page, el?: Locator) {
+  // Wait for network to be idle
+  await page.waitForLoadState("networkidle");
+
+  // Disable animations and force scrollbars
+  await page.addStyleTag({
+    content: `
+      html, body { overflow: scroll !important; }
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+        caret-color: transparent !important;
+      }
+    `,
+  });
+
+  // Wait for fonts and images
+  await page.evaluate(() => {
+    const fontPromise = (document.fonts as FontFaceSet | undefined)?.ready;
+    const imagePromises = Array.from(document.images)
+      .filter((img) => !img.complete)
+      .map((img) => new Promise((res) => {
+        img.onload = img.onerror = res;
+      }));
+    return Promise.all([fontPromise, ...imagePromises]);
+  });
+
+  // Ensure element is visible and stable
+  if (el) {
+    await el.scrollIntoViewIfNeeded();
+    await el.waitFor({ state: "visible" });
+  }
+
+  await page.waitForTimeout(200);
 }
 ```
 
-### 2. Consistent Environment
+### 4. Snapshot Options (`tests/e2e/visual.spec.ts`)
 
 ```typescript
-test.use({
-    viewport: { width: 1280, height: 720 },
-    deviceScaleFactor: 1,
-    hasTouch: false,
-    isMobile: false,
-});
-```
+const snapshotOptions = {
+  animations: "disabled",        // Stop CSS animations/transitions
+  caret: "hide",                 // Hide blinking cursors
+  maxDiffPixelRatio: 0.02,       // 2% tolerance for rendering variations
+};
 
-### 3. Tolerance Settings
-
-```typescript
-await expect(page).toHaveScreenshot("home-desktop.png", {
-    fullPage: true,
-    maxDiffPixelRatio: 0.05,  // 5% tolerance
-    maxDiffPixels: 1000,       // Allow up to 1000 different pixels
-    animations: "disabled",
-});
+await expect(header).toHaveScreenshot("header.png", snapshotOptions);
 ```
 
 ## Workflow Management
@@ -75,31 +123,54 @@ await expect(page).toHaveScreenshot("home-desktop.png", {
 ### Running Visual Tests Locally
 
 ```bash
-# Run visual tests
-pnpm test:e2e:visual
+# Run all visual tests
+pnpm test:visual
 
 # Update baselines (when UI changes are intentional)
-./scripts/test/update-visual-baselines.sh
+pnpm test:visual:update
 
-# Update for all browsers (CI mode)
-./scripts/test/update-visual-baselines.sh --ci
+# Run specific test
+pnpm exec playwright test tests/e2e/visual.spec.ts -g "header"
+
+# Debug with UI mode
+pnpm exec playwright test tests/e2e/visual.spec.ts --ui
 ```
 
-### CI/CD Workflow
+### CI/CD Workflows
 
-The `visual-regression.yml` workflow:
-1. Runs on PRs that modify UI files
-2. Can be manually triggered to update baselines
-3. Uses only Chromium by default for stability
-4. Uploads artifacts for review
+**1. e2e-visual.yml** (Auto on push to main)
+- Runs on every push to main
+- Uses Linux baselines (platform-specific)
+- Automatically kills port 4321 before starting server
 
-### Updating Baselines via GitHub Actions
+**2. visual-modern.yml** (Manual trigger)
+- Trigger with `updateBaselines=true` to generate new baselines
+- Downloads baselines from CI artifacts
+- Used when config changes require baseline regeneration
 
-1. Go to Actions → visual-regression workflow
-2. Click "Run workflow"
-3. Set "Update baseline screenshots" to "true"
-4. Download artifacts after completion
-5. Commit new baselines to the PR
+### Updating Baselines
+
+**Locally** (macOS/darwin):
+```bash
+pnpm test:visual:update
+```
+
+**Via CI** (Linux baselines for GitHub Actions):
+```bash
+# Trigger workflow
+gh workflow run visual-modern.yml -f updateBaselines=true
+
+# Wait for completion, then download artifacts
+gh run list --workflow=visual-modern.yml --limit 1
+gh run download <RUN_ID> -n playwright-baselines
+
+# Move to snapshots directory
+mv downloaded-baselines/*.png tests/e2e/visual.spec.ts-snapshots/
+
+# Commit
+git add tests/e2e/visual.spec.ts-snapshots/
+git commit -m "test: update Linux visual baselines"
+```
 
 ## Best Practices
 
@@ -218,15 +289,37 @@ rm -rf tests/e2e/*-snapshots/
 
 ## Current Configuration
 
-- **Browsers**: Chromium (primary), Firefox, WebKit, Mobile Chrome, Mobile Safari
-- **Viewport**: 1280x720 (desktop), 375x667 (mobile)
-- **Tolerance**: 5% pixel difference, max 1000 pixels
-- **Wait Time**: 1500ms after page load
-- **Full Page**: Yes, with scroll to top first
+**Test Suite**: `tests/e2e/visual.spec.ts`
+- **Tests**: 4 (header, footer, hero, contact form)
+- **Browser**: Chromium only (for speed and consistency)
+- **Viewport**: 1280×960
+- **Device Scale**: 1 (prevents fractional pixels)
+- **Base Tolerance**: 0.5% (config), 2% (per-test)
+- **Wait Strategy**: networkidle + element visibility
+- **Platforms**: darwin (local), linux (CI)
 
-## Next Steps
+## References
 
-1. **Immediate**: Update baselines with improved test file
-2. **This Week**: Monitor CI stability with new settings
-3. **Next Sprint**: Evaluate if we need Percy.io or similar service
-4. **Long Term**: Consider component visual testing instead of full-page
+- [Playwright Visual Comparisons](https://playwright.dev/docs/test-snapshots) - Official docs
+- [Svelte October 2025 Updates](https://svelte.dev/blog/whats-new-in-svelte-october-2025) - Async SSR feature
+- Commit `10b480d` - Visual stability improvements implementation
+
+## Maintenance
+
+### When to Update Baselines
+
+✅ **Update when**:
+- Intentional UI changes (new styles, layouts, colors)
+- Font updates or typography changes
+- Component structure modifications
+
+❌ **Don't update for**:
+- Random CI failures (investigate root cause first)
+- Single pixel differences (adjust tolerance instead)
+- Flaky tests (fix stability issues first)
+
+### Monitoring
+
+**Weekly**: Review visual test results in CI
+**Monthly**: Audit baseline files for obsolete screenshots
+**Quarterly**: Review tolerance settings and test coverage
