@@ -26,3 +26,7 @@
 
 # CMS configuration (when created)
 /public/admin/ @verlyn13
+
+# Visual baselines (require review)
+tests/**/__screenshots__/** @verlyn13
+tests/**/*-snapshots/** @verlyn13

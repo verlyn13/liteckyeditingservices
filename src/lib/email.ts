@@ -76,9 +76,9 @@ export async function sendEmail(
 				: message.from;
 
 		// Prepare mail object - SendGrid requires at least one content item
-		const initialContent: [{ type: "text/plain" | "text/html"; value: string }] = [
-			{ type: "text/plain", value: message.text || message.html || "" },
-		];
+		const initialContent: [
+			{ type: "text/plain" | "text/html"; value: string },
+		] = [{ type: "text/plain", value: message.text || message.html || "" }];
 
 		const mail: MailDataRequired = {
 			to: message.to,

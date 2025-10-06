@@ -5,22 +5,16 @@ permissions:
   pull-requests: write
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    paths:
-      - 'src/**'
-      - 'public/**'
-      - 'tests/e2e/visual.spec.ts'
-      - 'tests/helpers/visual.ts'
-      - 'playwright.config.ts'
-      - '.github/workflows/visual-modern.yml'
   workflow_dispatch:
     inputs:
       updateBaselines:
         description: 'Update golden screenshots and open PR'
         type: boolean
         default: false
+
+concurrency:
+  group: baselines-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   visual:

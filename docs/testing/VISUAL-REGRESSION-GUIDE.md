@@ -16,13 +16,13 @@ All visual regression issues have been resolved with October 2025 Playwright bes
 **Configuration Applied**:
 - ✅ Svelte async SSR enabled (future-proof for Svelte 5.39+)
 - ✅ Locked rendering environment (viewport, deviceScale, colorScheme)
-- ✅ Network idle waiting + element visibility checks
+- ✅ Deterministic readiness (domcontentloaded + optional readySelector; no networkidle)
 - ✅ Snapshot options with animations disabled and caret hidden
 - ✅ Platform-specific baselines (darwin for local, linux for CI)
 
 **Results**:
 - Fixed 1-pixel height differences (deviceScaleFactor: 1)
-- Tolerates 2% pixel variation (maxDiffPixelRatio: 0.02)
+- 0.5% visual tolerance (maxDiffPixelRatio: 0.005)
 - Consistent rendering across local and CI environments
 
 ## Test Implementation
@@ -40,18 +40,23 @@ We test 4 targeted components instead of full-page screenshots for faster, more 
 
 ```typescript
 export default defineConfig({
+  testDir: './tests/e2e',
   use: {
     headless: true,
     viewport: { width: 1280, height: 960 },
-    deviceScaleFactor: 1,        // Prevents fractional pixel rounding
-    colorScheme: "light",
-    locale: "en-US",
+    deviceScaleFactor: 1,
+    colorScheme: 'light',
+    locale: 'en-US',
+    baseURL: process.env.BASE_URL ?? 'http://localhost:4321',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
-  expect: {
-    toHaveScreenshot: {
-      maxDiffPixelRatio: 0.005   // 0.5% base tolerance
-    },
-  },
+  expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.005 } },
+  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
+  webServer: process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')
+    ? undefined
+    : { command: 'pnpm build && pnpm preview --port 4321', url: 'http://localhost:4321', reuseExistingServer: true },
+  snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}-{platform}.png',
 });
 ```
 
@@ -69,40 +74,43 @@ export default {
 ### 3. Visual Helper (`tests/helpers/visual.ts`)
 
 ```typescript
-export async function prepareForVisualTest(page: Page, el?: Locator) {
-  // Wait for network to be idle
-  await page.waitForLoadState("networkidle");
+export async function prepareForVisualTest(page: Page, el?: Locator, opts?: { readySelector?: string }) {
+  await page.waitForLoadState('domcontentloaded');
+  if (opts?.readySelector) {
+    await page.locator(opts.readySelector).first().waitFor({ state: 'visible', timeout: 10_000 }).catch(() => {});
+  }
 
-  // Disable animations and force scrollbars
+  await page.evaluate(async () => {
+    if (document.fonts?.ready) await document.fonts.ready;
+    const pending = Array.from(document.images)
+      .filter((img) => !img.complete)
+      .map((img) => new Promise<void>((res) => {
+        img.addEventListener('load', () => res(), { once: true });
+        img.addEventListener('error', () => res(), { once: true });
+      }));
+    await Promise.all(pending);
+  });
+
   await page.addStyleTag({
     content: `
-      html, body { overflow: scroll !important; }
+      :root { scrollbar-gutter: stable both-edges; }
+      html, body { overflow: hidden !important; }
+      [data-flaky], .live-chat, .cookie-banner { visibility: hidden !important; }
       *, *::before, *::after {
         animation: none !important;
         transition: none !important;
         caret-color: transparent !important;
       }
+      ::selection { background: transparent !important; }
     `,
   });
 
-  // Wait for fonts and images
-  await page.evaluate(() => {
-    const fontPromise = (document.fonts as FontFaceSet | undefined)?.ready;
-    const imagePromises = Array.from(document.images)
-      .filter((img) => !img.complete)
-      .map((img) => new Promise((res) => {
-        img.onload = img.onerror = res;
-      }));
-    return Promise.all([fontPromise, ...imagePromises]);
-  });
-
-  // Ensure element is visible and stable
   if (el) {
     await el.scrollIntoViewIfNeeded();
-    await el.waitFor({ state: "visible" });
+    await el.waitFor({ state: 'visible' });
   }
 
-  await page.waitForTimeout(200);
+  await page.waitForTimeout(50);
 }
 ```
 
@@ -110,9 +118,9 @@ export async function prepareForVisualTest(page: Page, el?: Locator) {
 
 ```typescript
 const snapshotOptions = {
-  animations: "disabled",        // Stop CSS animations/transitions
-  caret: "hide",                 // Hide blinking cursors
-  maxDiffPixelRatio: 0.02,       // 2% tolerance for rendering variations
+  animations: 'disabled',
+  caret: 'hide',
+  maxDiffPixelRatio: 0.005, // 0.5% tolerance
 };
 
 await expect(header).toHaveScreenshot("header.png", snapshotOptions);
@@ -138,15 +146,15 @@ pnpm exec playwright test tests/e2e/visual.spec.ts --ui
 
 ### CI/CD Workflows
 
-**1. e2e-visual.yml** (Auto on push to main)
+**1. e2e-visual.yml** (Auto on push to main; soft-fail)
 - Runs on every push to main
 - Uses Linux baselines (platform-specific)
 - Automatically kills port 4321 before starting server
 
-**2. visual-modern.yml** (Manual trigger)
-- Trigger with `updateBaselines=true` to generate new baselines
-- Downloads baselines from CI artifacts
-- Used when config changes require baseline regeneration
+**2. Visual Tests (Modern)** (Manual trigger)
+- Trigger with `updateBaselines=true` to generate new Linux baselines
+- Uploads artifacts and can auto-open a PR with updated baselines
+- Use when UI changes are intentional or environment changed
 
 ### Updating Baselines
 
@@ -155,19 +163,15 @@ pnpm exec playwright test tests/e2e/visual.spec.ts --ui
 pnpm test:visual:update
 ```
 
-**Via CI** (Linux baselines for GitHub Actions):
+**Via CI** (Linux baselines on GitHub Actions):
 ```bash
-# Trigger workflow
-gh workflow run visual-modern.yml -f updateBaselines=true
+# Trigger workflow by file path (requires gh auth)
+gh workflow run .github/workflows/visual-modern.yml -f updateBaselines=true
 
-# Wait for completion, then download artifacts
-gh run list --workflow=visual-modern.yml --limit 1
-gh run download <RUN_ID> -n playwright-baselines
-
-# Move to snapshots directory
-mv downloaded-baselines/*.png tests/e2e/visual.spec.ts-snapshots/
-
-# Commit
+# The workflow uploads an artifact named "updated-baselines" and can auto-open a PR.
+# If you prefer manual commit:
+gh run download <RUN_ID> -n updated-baselines -D tmp/baselines
+mv tmp/baselines/tests/e2e/visual.spec.ts-snapshots/*.png tests/e2e/visual.spec.ts-snapshots/
 git add tests/e2e/visual.spec.ts-snapshots/
 git commit -m "test: update Linux visual baselines"
 ```
