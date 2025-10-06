@@ -75,7 +75,7 @@
 - ✅ **PR previews**: Automatic for all pull requests
 - ✅ **Custom domains**: liteckyeditingservices.com, www.liteckyeditingservices.com
 - ✅ **CI/CD Workflows**: All GitHub Actions operational
-- ✅ **Git-connected mode**: `CF_GIT_CONNECTED=true` set in GitHub secrets
+- ✅ **Git-connected mode**: `CF_GIT_CONNECTED=true` set in GitHub repository variables
 
 ### CI/CD Workflows Status
 - ✅ `.github/workflows/deploy-production.yml` - Noop mode (Git-connected deployment active)

@@ -2,17 +2,38 @@
 
 This project deploys to Cloudflare Pages (site) and Cloudflare Workers (Decap OAuth and Queue consumer for async email processing).
 
-**Current Status** (October 2, 2025):
+**Current Status** (October 5, 2025):
+- ✅ **Git-Connected Deployment Active** - Automatic deployment on push to main
+- ✅ **Project Name**: `liteckyeditingservices` (Cloudflare Pages)
 - ✅ Site deployed to Cloudflare Pages
 - ✅ Queue consumer worker deployed
 - ✅ OAuth worker deployed
 - ✅ DNS migration complete (production domain live)
 
+## Deployment Mode: Git-Connected (Automatic)
+
+**This project uses Git-connected deployment** - Cloudflare Pages automatically builds and deploys when you push to the repository.
+
+### How It Works
+- **Push to `main`** → Automatic production deployment
+- **Open a PR** → Automatic preview deployment
+- **No manual `wrangler pages deploy` needed** - Cloudflare handles it
+
+### GitHub Configuration
+Required for CI/CD workflows to work correctly:
+
+**Repository Variables** (Settings → Secrets and variables → Actions → Variables):
+- `CF_GIT_CONNECTED=true` - Tells deploy-production.yml to skip manual deployment
+
+**Repository Secrets** (Settings → Secrets and variables → Actions → Secrets):
+- `CLOUDFLARE_API_TOKEN` - For API access (if needed for other workflows)
+- `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare account ID
+
 ## Environments
 
-- Preview: Auto on pull requests via Pages (recommended) or manual deploys
-- Production: Pages main branch or manual promotion
-- Workers: Deployed independently via `wrangler`
+- **Preview**: Automatic on pull requests via Git-connected Pages
+- **Production**: Automatic on push to `main` branch
+- **Workers**: Deployed independently via `wrangler deploy`
 
 ## Prerequisites
 
@@ -37,24 +58,42 @@ These enable `/api/contact` to send emails via queue. All variables are currentl
 
 ## Deploy the Site (Pages)
 
-**Status**: ✅ Deployed (October 2, 2025) | DNS Migrated (October 4, 2025)
+**Status**: ✅ Git-Connected Deployment Active (October 5, 2025)
 - **Production URL**: https://liteckyeditingservices.com
 - **Alternate URL**: https://www.liteckyeditingservices.com
-- **Pages Subdomain**: https://litecky-editing-services.pages.dev (still accessible)
+- **Pages Project**: `liteckyeditingservices` (Git-connected to GitHub)
 
-Option A — GitHub Integration (recommended)
-1. Connect repository in Cloudflare Pages
-2. Build command: `pnpm build`
-3. Build output directory: `dist`
-4. Node version: 24.x, pnpm 10.x
-5. Save and deploy; verify preview URL
+### Deployment Happens Automatically
 
-Option B — Manual Deploy
+**You don't need to deploy manually.** Cloudflare Pages is connected to this GitHub repository:
+
+1. **Push to `main`** → Production deployment triggers automatically
+2. **Open a PR** → Preview deployment created automatically
+3. **Merge PR** → Production updated automatically
+
+### Cloudflare Pages Configuration
+
+If you need to verify or update settings in Cloudflare dashboard:
+
+**Pages → liteckyeditingservices → Settings → Builds & deployments**
+- Build command: `pnpm build`
+- Build output directory: `dist`
+- Root directory: `/` (default)
+- Node version: 24.x
+- Package manager: pnpm 10.17.1
+
+**Pages → liteckyeditingservices → Settings → Environment variables**
+- See "Configure Environment Variables" section below
+
+### Manual Deploy (Only if Git-connected fails)
+
+⚠️ **Not normally needed** - use only for troubleshooting:
+
 ```bash
 pnpm install
 pnpm build
-pnpm wrangler pages deploy dist --project-name=litecky-editing-services --commit-dirty=true
-pnpm wrangler pages deployments list --project-name=litecky-editing-services
+pnpm wrangler pages deploy dist --project-name=liteckyeditingservices
+pnpm wrangler pages deployment list --project-name=liteckyeditingservices
 ```
 
 Rollback
