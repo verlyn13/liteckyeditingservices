@@ -62,12 +62,12 @@
 - Repository structure validation
 
 ### e2e-visual.yml
-**Trigger**: Push to `main` and PRs
+**Trigger**: Push to `main` and PRs (blocking)
 
 **Purpose**: Visual regression testing
 - 4 targeted screenshots (header, footer, hero, contact form)
 - Platform-specific baselines (darwin for local, linux for CI)
- - Currently advisory until Linux baselines are seeded; will be blocking afterward
+- Blocking check on main (Linux baselines seeded)
 
 ### visual-modern.yml
 **Trigger**: Manual dispatch only (baseline update)
@@ -75,11 +75,11 @@
 **Purpose**: Baseline update workflow
 - Protected runner for seeding/updating Linux visual baselines
 - Uses `concurrency: baselines-${{ github.ref }}` to prevent overlap
-- Uploads artifacts and can open a PR with updated baselines
+- Accepts `ref` input to seed from an exact branch/SHA
+- Uploads `updated-baselines` artifact and attempts PR creation (policy permitting)
 
 ### Required vs Advisory Checks
-- Required: Quality Gate, preview-validation, post-deploy-validation
-- Advisory (now): e2e-visual — flip to required after Linux baselines are merged
+- Required: Quality Gate, preview-validation, post-deploy-validation, e2e-visual
 
 ### Version Pin Policy
 - Playwright toolchain is pinned to exact versions in `package.json` (no caret/range)

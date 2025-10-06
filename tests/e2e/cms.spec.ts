@@ -16,3 +16,48 @@ test("CMS admin route is accessible", async ({ page }) => {
 		expect(content).toMatch(/decap-cms|netlify-cms/i);
 	}
 });
+
+test("CMS admin has proper CSP configuration", async ({ page }) => {
+	// Verify CSP allows required Decap CMS resources
+	const response = await page.goto("/admin/");
+
+	if (response?.status() === 200) {
+		const cspHeader = response.headers()["content-security-policy"];
+
+		// Verify CSP header exists
+		expect(cspHeader).toBeDefined();
+
+		if (cspHeader) {
+			// Verify it allows cdn.jsdelivr.net for scripts (Decap CMS CDN)
+			expect(cspHeader).toContain("cdn.jsdelivr.net");
+
+			// Verify it allows unsafe-eval (required by Decap CMS)
+			expect(cspHeader).toContain("unsafe-eval");
+
+			// Verify it allows GitHub API (required for GitHub backend)
+			expect(cspHeader).toContain("api.github.com");
+		}
+	}
+});
+
+test("CMS script loads without CSP violations", async ({ page }) => {
+	const cspViolations: string[] = [];
+
+	// Listen for CSP violations
+	page.on("console", (msg) => {
+		if (
+			msg.type() === "error" &&
+			msg.text().includes("Content Security Policy")
+		) {
+			cspViolations.push(msg.text());
+		}
+	});
+
+	await page.goto("/admin/");
+
+	// Wait a moment for any CSP violations to be logged
+	await page.waitForTimeout(2000);
+
+	// Verify no CSP violations occurred
+	expect(cspViolations).toHaveLength(0);
+});
