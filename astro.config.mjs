@@ -8,7 +8,14 @@ import { defineConfig } from "astro/config";
 // https://astro.build/config
 export default defineConfig({
 	site: "https://liteckyeditingservices.com",
-	integrations: [svelte(), sitemap()],
+	integrations: [
+		svelte({
+			compilerOptions: {
+				experimental: { async: true },
+			},
+		}),
+		sitemap(),
+	],
 	// Static output for now, will switch to hybrid when SSR is needed
 	output: "static",
 	compressHTML: true,

@@ -98,7 +98,7 @@ pnpm add -D wrangler
 ./scripts/cf-pages-deploy.fish config
 
 # 2. Deploy to Pages
-pnpm wrangler pages deploy dist/ --project-name=litecky-editing-services
+pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
 
 # 3. Note the .pages.dev URL
 ```
@@ -112,7 +112,7 @@ pnpm wrangler pages deploy dist/ --project-name=litecky-editing-services
 ./scripts/cf-dns-manage.fish delete a8b747e6dffdb95e0bea543316e6d3cf
 
 # 3. Add new www pointing to Pages
-./scripts/cf-dns-manage.fish add CNAME www litecky-editing-services.pages.dev
+./scripts/cf-dns-manage.fish add CNAME www liteckyeditingservices.pages.dev
 
 # 4. Test before updating apex domain
 ```

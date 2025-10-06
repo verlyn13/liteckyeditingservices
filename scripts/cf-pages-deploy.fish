@@ -5,7 +5,7 @@
 
 set ZONE_ID a5e7c69768502d649a8f2c615f555eca
 set ZONE_NAME liteckyeditingservices.com
-set PROJECT_NAME litecky-editing-services
+set PROJECT_NAME liteckyeditingservices
 set -x CF_API_TOKEN (gopass show -o cloudflare/api-tokens/initial-project-setup-master)
 
 # Colors
@@ -90,7 +90,7 @@ function create_wrangler_config
     echo -e "$BLUE→ Creating wrangler.toml configuration...$NC"
     
     cat > wrangler.toml << 'EOF'
-name = "litecky-editing-services"
+name = "liteckyeditingservices"
 compatibility_date = "2025-09-23"
 
 [site]

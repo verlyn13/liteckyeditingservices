@@ -266,7 +266,7 @@ async function checkWorkersErrors(env: Env): Promise<WorkerAnalytics> {
 async function checkPagesErrors(env: Env): Promise<{ recentFailures: number }> {
   // Check Pages deployments for failures
   const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/pages/projects/litecky-editing-services/deployments`,
+    `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/pages/projects/liteckyeditingservices/deployments`,
     {
       headers: {
         'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}`,

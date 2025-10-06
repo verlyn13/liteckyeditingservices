@@ -51,10 +51,10 @@ SSL/TLS: Full
 ```
 
 ### Current DNS Configuration
-- **Apex**: CNAME to www.liteckyeditingservices.com (proxied)
-- **WWW**: CNAME to ghs.googlehosted.com (Google Sites)
+- **Apex**: CNAME (flattened) to `liteckyeditingservices.pages.dev` (proxied)
+- **WWW**: CNAME to `liteckyeditingservices.pages.dev` (proxied)
 - **Email**: Google Workspace MX records
-- **Auth**: SPF and DKIM for Google email
+- **Auth**: SPF and DKIM for Google email + SendGrid
 
 ### API Token
 - **Storage**: gopass at `cloudflare/api-tokens/initial-project-setup-master`
@@ -83,16 +83,18 @@ source scripts/load-cloudflare-env.fish
    ./scripts/cf-dns-manage.fish backup
    ```
 
-3. **Deploy to Pages**
-   ```bash
-   pnpm build
-   pnpm wrangler pages deploy dist/ --project-name=litecky-editing-services
-   ```
+3. **Deploy to Pages (Git-connected)**
+   - Cloudflare builds & deploys on push to `main` (no manual deploy required)
+   - Manual fallback (only if Git-connected is unavailable):
+     ```bash
+     pnpm build
+     pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
+     ```
 
 4. **Update DNS**
    ```bash
    ./scripts/cf-dns-manage.fish list
-   ./scripts/cf-dns-manage.fish add CNAME www litecky-editing-services.pages.dev
+   ./scripts/cf-dns-manage.fish add CNAME www liteckyeditingservices.pages.dev
    ```
 
 ### Workers Deployment

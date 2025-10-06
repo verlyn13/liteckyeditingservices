@@ -15,6 +15,12 @@ export default defineConfig({
 		trace: "retain-on-failure",
 		screenshot: "only-on-failure",
 		video: "off",
+		// Lock rendering environment for visual stability (October 2025 best practice)
+		headless: true,
+		viewport: { width: 1280, height: 960 },
+		deviceScaleFactor: 1, // Prevents fractional pixel rounding
+		colorScheme: "light",
+		locale: "en-US",
 	},
 	projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 

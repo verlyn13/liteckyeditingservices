@@ -464,7 +464,7 @@ liteckyeditingservices.com  CNAME  ghs.googlehosted.com
 New DNS (Cloudflare Pages):
 ```
 liteckyeditingservices.com      A      192.0.2.1  (Cloudflare Pages IP)
-www.liteckyeditingservices.com  CNAME  litecky-editing-services.pages.dev
+www.liteckyeditingservices.com  CNAME  liteckyeditingservices.pages.dev
 ```
 
 SendGrid DNS Records (for domain authentication):

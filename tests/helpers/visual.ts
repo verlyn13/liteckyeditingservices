@@ -1,11 +1,18 @@
 import type { Locator, Page } from "@playwright/test";
 
+/**
+ * Prepares a page for visual regression testing by ensuring stable rendering
+ * Following October 2025 Playwright best practices for visual stability
+ */
 export async function prepareForVisualTest(page: Page, el?: Locator) {
-	await page.waitForLoadState("domcontentloaded");
+	// Wait for network to be idle to ensure all resources loaded
+	await page.waitForLoadState("networkidle");
 
+	// Disable animations, transitions, and carets for deterministic rendering
 	await page.addStyleTag({
 		content: `
       [data-flaky], .live-chat, .cookie-banner { visibility: hidden !important; }
+      html, body { overflow: scroll !important; }
       *, *::before, *::after {
         animation: none !important;
         transition: none !important;
@@ -14,6 +21,7 @@ export async function prepareForVisualTest(page: Page, el?: Locator) {
     `,
 	});
 
+	// Wait for fonts and images to fully load
 	await page.evaluate(() =>
 		Promise.all([
 			(document as any).fonts?.ready,
@@ -28,6 +36,12 @@ export async function prepareForVisualTest(page: Page, el?: Locator) {
 		]),
 	);
 
-	if (el) await el.scrollIntoViewIfNeeded();
+	// Ensure element is visible and stable
+	if (el) {
+		await el.scrollIntoViewIfNeeded();
+		await el.waitFor({ state: "visible" });
+	}
+
+	// Final settle time for layout stability
 	await page.waitForTimeout(200);
 }

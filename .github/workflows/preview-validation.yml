@@ -32,7 +32,7 @@ jobs:
         run: pnpm add -D wrangler@^4
 
       - name: Wait for Cloudflare Pages preview (Git-connected)
-        if: ${{ secrets.CF_GIT_CONNECTED == 'true' }}
+        if: ${{ vars.CF_GIT_CONNECTED == 'true' || secrets.CF_GIT_CONNECTED == 'true' }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -52,7 +52,7 @@ jobs:
           echo "Preview deployment found: $(cat preview_url.txt)"
 
       - name: Deploy preview with Wrangler (fallback when not Git-connected)
-        if: ${{ secrets.CF_GIT_CONNECTED != 'true' }}
+        if: ${{ !(vars.CF_GIT_CONNECTED == 'true' || secrets.CF_GIT_CONNECTED == 'true') }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
@@ -75,9 +75,8 @@ jobs:
         run: pnpm exec playwright install --with-deps
 
       - name: Run smoke on preview (homepage + CMS)
-        env:
-          BASE_URL: $(cat preview_url.txt)
         run: |
+          export BASE_URL=$(cat preview_url.txt)
           pnpm test:smoke || true
           pnpm test:cms
 
@@ -88,4 +87,3 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
-
