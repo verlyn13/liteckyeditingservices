@@ -1,46 +1,57 @@
 import type { Locator, Page } from "@playwright/test";
 
 /**
- * Prepares a page for visual regression testing by ensuring stable rendering
- * Following October 2025 Playwright best practices for visual stability
+ * Prepare page for visual snapshots (Oct 2025 best-practice).
+ * - Avoids `networkidle` (can hang with HMR/websockets)
+ * - Stabilizes fonts/images/layout
+ * - Hides flaky UI
  */
-export async function prepareForVisualTest(page: Page, el?: Locator) {
-	// Wait for network to be idle to ensure all resources loaded
-	await page.waitForLoadState("networkidle");
+export async function prepareForVisualTest(
+	page: Page,
+	el?: Locator,
+	opts?: { readySelector?: string },
+) {
+	await page.waitForLoadState("domcontentloaded");
+	if (opts?.readySelector) {
+		await page
+			.locator(opts.readySelector)
+			.first()
+			.waitFor({ state: "visible", timeout: 10_000 })
+			.catch(() => {});
+	}
 
-	// Disable animations, transitions, and carets for deterministic rendering
+	await page.evaluate(async () => {
+		if (document.fonts?.ready) await document.fonts.ready;
+		const pending = Array.from(document.images)
+			.filter((img) => !img.complete)
+			.map(
+				(img) =>
+					new Promise<void>((res) => {
+						img.addEventListener("load", () => res(), { once: true });
+						img.addEventListener("error", () => res(), { once: true });
+					}),
+			);
+		await Promise.all(pending);
+	});
+
 	await page.addStyleTag({
 		content: `
+      :root { scrollbar-gutter: stable both-edges; }
+      html, body { overflow: hidden !important; }
       [data-flaky], .live-chat, .cookie-banner { visibility: hidden !important; }
-      html, body { overflow: scroll !important; }
       *, *::before, *::after {
         animation: none !important;
         transition: none !important;
         caret-color: transparent !important;
       }
+      ::selection { background: transparent !important; }
     `,
 	});
 
-	// Wait for fonts and images to fully load
-	await page.evaluate(() => {
-		const fontPromise = (document.fonts as FontFaceSet | undefined)?.ready;
-		const imagePromises = Array.from(document.images)
-			.filter((img) => !img.complete)
-			.map(
-				(img) =>
-					new Promise((res) => {
-						img.onload = img.onerror = res;
-					}),
-			);
-		return Promise.all([fontPromise, ...imagePromises]);
-	});
-
-	// Ensure element is visible and stable
 	if (el) {
 		await el.scrollIntoViewIfNeeded();
 		await el.waitFor({ state: "visible" });
 	}
 
-	// Final settle time for layout stability
-	await page.waitForTimeout(200);
+	await page.waitForTimeout(50);
 }

@@ -55,7 +55,8 @@ export default defineConfig({
 		checkOrigin: true,
 	},
 	prefetch: {
-		prefetchAll: true,
-		defaultStrategy: "viewport",
+		...(process.env.CI
+			? { prefetchAll: false }
+			: { prefetchAll: true, defaultStrategy: "viewport" }),
 	},
 });

@@ -58,13 +58,26 @@ chromium-browser --headless --remote-debugging-port=9222 --disable-gpu --no-sand
 
 ### Current Setup (playwright.config.ts)
 ```typescript
-projects: [
-  { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-  { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-  { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-  { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
-  { name: 'Mobile Safari', use: { ...devices['iPhone 12'] } }
-]
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests/e2e',
+  projects: [ { name: 'chromium', use: { browserName: 'chromium' } } ],
+  use: {
+    baseURL: process.env.BASE_URL ?? 'http://localhost:4321',
+    headless: true,
+    viewport: { width: 1280, height: 960 },
+    deviceScaleFactor: 1,
+    colorScheme: 'light',
+    locale: 'en-US',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+  },
+  // Use preview (no HMR websockets) when BASE_URL is not provided
+  webServer: process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')
+    ? undefined
+    : { command: 'pnpm build && pnpm preview --port 4321', url: 'http://localhost:4321', reuseExistingServer: true },
+});
 ```
 
 ### Playwright Browser Management
@@ -146,7 +159,7 @@ pnpm test:e2e
 # Run with UI mode
 pnpm test:e2e:ui
 
-# Run specific browser
+# Run specific project
 npx playwright test --project=chromium
 ```
 

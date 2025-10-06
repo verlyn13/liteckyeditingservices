@@ -49,7 +49,7 @@ importers:
         specifier: latest
         version: 9.36.0
       '@playwright/test':
-        specifier: latest
+        specifier: 1.55.1
         version: 1.55.1
       '@sveltejs/vite-plugin-svelte':
         specifier: latest
@@ -100,7 +100,7 @@ importers:
         specifier: latest
         version: 4.0.1(typescript@5.9.3)
       playwright:
-        specifier: latest
+        specifier: 1.55.1
         version: 1.55.1
       postcss:
         specifier: latest

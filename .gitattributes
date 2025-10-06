@@ -1,0 +1,4 @@
+*.png binary
+tests/**/__screenshots__/** binary
+tests/**/*-snapshots/** binary
+

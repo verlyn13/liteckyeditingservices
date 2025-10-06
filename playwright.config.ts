@@ -1,11 +1,11 @@
-import { defineConfig, devices } from "@playwright/test";
+import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
 	testDir: "./tests/e2e",
 	timeout: 30_000,
 	expect: {
 		timeout: 5_000,
-		toHaveScreenshot: { maxDiffPixelRatio: 0.005 }, // 0.5% is plenty
+		toHaveScreenshot: { maxDiffPixelRatio: 0.005 }, // 0.5% strict baseline
 	},
 	retries: 1, // allow a single retry for flake
 	forbidOnly: !!process.env.CI,
@@ -22,15 +22,23 @@ export default defineConfig({
 		colorScheme: "light",
 		locale: "en-US",
 	},
-	projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 
-	// Auto-start dev server only when testing locally
+	// Use plain chromium project so top-level `use` isn't overridden by device preset
+	projects: [{ name: "chromium", use: { browserName: "chromium" } }],
+
+	// Prefer preview (built site) for visual tests to avoid HMR websockets
 	webServer:
 		process.env.BASE_URL && !process.env.BASE_URL.includes("localhost")
 			? undefined
 			: {
-					command: "pnpm dev",
+					// Build once, then preview (static server, no HMR)
+					command: "pnpm build && pnpm preview --port 4321 --strictPort",
 					url: "http://localhost:4321",
 					reuseExistingServer: true,
+					timeout: 120_000, // Allow time for build + preview startup
 				},
+
+	// Keep snapshots organized by OS/browser (October 2025 best practice)
+	snapshotPathTemplate:
+		"{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}-{platform}.png",
 });

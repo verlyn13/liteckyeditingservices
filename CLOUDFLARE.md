@@ -1,7 +1,7 @@
 # Cloudflare Configuration Reference
 
 **Last Updated**: October 4, 2025
-**Status**: ✅ Production - All services deployed and operational
+**Status**: ✅ Production - All services deployed and operational (Git-connected Pages)
 
 ## 🔑 Account Information
 
@@ -9,6 +9,8 @@
 - **Zone ID** (liteckyeditingservices.com): `a5e7c69768502d649a8f2c615f555eca`
 - **Plan**: Workers Paid ($5/month)
 - **Capabilities**: Pages, Workers, D1, R2, KV, Queues
+
+> Note: As of Oct 2025, Pages deployment is Git-connected. Any direct `wrangler pages deploy` commands in this document are legacy/fallback-only.
 
 ## 🌐 Production URLs
 
