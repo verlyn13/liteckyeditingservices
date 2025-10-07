@@ -5,7 +5,13 @@ export default defineConfig({
 	timeout: 30_000,
 	expect: {
 		timeout: 5_000,
-		toHaveScreenshot: { maxDiffPixelRatio: 0.005 }, // 0.5% strict baseline
+		toHaveScreenshot: {
+			maxDiffPixelRatio: 0.005, // 0.5% strict baseline
+			// Hardened snapshot defaults (October 2025)
+			animations: "disabled",
+			caret: "hide",
+			threshold: 0.2, // Intensity threshold for antialiasing differences
+		},
 	},
 	retries: 1, // allow a single retry for flake
 	forbidOnly: !!process.env.CI,
@@ -19,8 +25,14 @@ export default defineConfig({
 		headless: true,
 		viewport: { width: 1280, height: 960 },
 		deviceScaleFactor: 1, // Prevents fractional pixel rounding
+		isMobile: false,
+		hasTouch: false,
 		colorScheme: "light",
 		locale: "en-US",
+		timezoneId: "UTC", // Deterministic timezone
+		permissions: [],
+		// Reduce flakiness from font loading
+		serviceWorkers: "block",
 	},
 
 	// Use plain chromium project so top-level `use` isn't overridden by device preset
