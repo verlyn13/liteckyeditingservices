@@ -41,8 +41,11 @@ export async function prepareForVisualTest(
 	// Stabilize layout BEFORE content renders
 	await page.addInitScript(() => {
 		const css = `
-      /* Prevent scrollbar-induced width shifts */
-      html { scrollbar-gutter: stable; }
+      /* Prevent scrollbar-induced width/height shifts (critical for 1px diffs) */
+      html {
+        scrollbar-gutter: stable both-edges;
+        font-size: 16px; /* Lock base font size */
+      }
       /* Ensure box-sizing is consistent */
       *, *::before, *::after { box-sizing: border-box !important; }
       /* Belt & suspenders: disable animations/transitions */
