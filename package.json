@@ -70,7 +70,7 @@
 		"@typescript-eslint/parser": "latest",
 		"@vitest/ui": "latest",
 		"autoprefixer": "latest",
-		"decap-cms": "3.8.4",
+    "decap-cms": "3.8.4",
 		"eslint": "latest",
 		"eslint-plugin-astro": "latest",
 		"eslint-plugin-svelte": "latest",
