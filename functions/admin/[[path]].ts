@@ -4,24 +4,11 @@
  * Single source of truth for admin security headers
  */
 
-type Env = {};
+interface Env {}
 
-interface EventContext<Env = unknown> {
-	request: Request;
-	env: Env;
-	params: Record<string, string>;
-	waitUntil: (promise: Promise<unknown>) => void;
-	next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-	data: Record<string, unknown>;
-}
-
-type PagesFunction<Env = unknown> = (
-	context: EventContext<Env>,
-) => Response | Promise<Response>;
-
-export const onRequest: PagesFunction<Env> = async (ctx) => {
-	const res = await ctx.next();
-	const url = new URL(ctx.request.url);
+export const onRequest: PagesFunction<Env> = async (context) => {
+	const res = await context.next();
+	const url = new URL(context.request.url);
 	const headers = new Headers(res.headers);
 
 	// -- Security headers (admin shell + app) ----------------------------
@@ -60,10 +47,7 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
 	headers.delete("cross-origin-embedder-policy");
 
 	// Cache admin HTML shell conservatively
-	if (
-		url.pathname === "/admin/" ||
-		url.pathname === "/admin/index.html"
-	) {
+	if (url.pathname === "/admin/" || url.pathname === "/admin/index.html") {
 		headers.set("cache-control", "no-store");
 	}
 
