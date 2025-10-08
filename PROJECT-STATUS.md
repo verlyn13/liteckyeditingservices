@@ -36,7 +36,7 @@
   - ✅ **CSP Fix (Pages Function)**: Created `functions/admin/[[path]].ts` to set single authoritative CSP for /admin/* routes
   - ✅ **Header Merging Resolved**: Eliminated duplicate CSP headers by using Cloudflare Pages Function instead of _headers file
   - ✅ **October 2025 Best Practice**: Implemented programmatic header control for complex CSP scenarios
-  - ✅ **OAuth Origin Fix**: OAuth worker now posts token back to the opener origin captured at /auth (supports apex and www), resolving the "Authenticated successfully" but no login continuation when visiting admin on www.
+  - ✅ **OAuth Origin + Headers**: OAuth worker posts token back to the opener origin captured at /auth (supports apex and www) and now sets COOP/CSP on callback to ensure popup → opener postMessage is allowed; fixes “Authenticated successfully” but no editor UI.
 
 **Recent Progress - October 6, 2025**:
   - ✅ **Visual Baselines (Linux)**: Seeded from main; stored under `tests/e2e/__screenshots__/...`
