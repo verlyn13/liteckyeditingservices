@@ -74,3 +74,70 @@ test("Vendored CMS assets have immutable caching", async ({ request }) => {
 	expect(cacheControl).toContain("immutable");
 	expect(cacheControl).toContain("max-age=31536000");
 });
+
+test("Admin headers allow OAuth popup handoff (October 2025 hardened)", async ({
+	page,
+}) => {
+	// Verify COOP/COEP headers are correct for popup → opener postMessage
+	const response = await page.goto("/admin/");
+
+	if (response?.status() === 200) {
+		const headers = response.headers();
+
+		// COOP must be 'unsafe-none' to allow popup to retain window.opener
+		const coop = headers["cross-origin-opener-policy"];
+		expect(coop).toBe("unsafe-none");
+
+		// COEP must NOT be set (would sever popup → opener link)
+		const coep = headers["cross-origin-embedder-policy"];
+		expect(coep).toBeUndefined();
+
+		// CSP should NOT allow 'unsafe-inline' for scripts (hardened)
+		const csp = headers["content-security-policy"];
+		if (csp) {
+			// script-src should allow 'self' but NOT 'unsafe-inline'
+			expect(csp).toMatch(/script-src[^;]*'self'/);
+			expect(csp).not.toMatch(/script-src[^;]*'unsafe-inline'/);
+		}
+	}
+});
+
+test("Admin editor UI appears after boot script loads", async ({ page }) => {
+	// Synthetic test: verify CMS actually renders after auth
+	// Note: This doesn't test full OAuth flow (requires GitHub auth)
+	// but verifies the editor shell loads correctly
+
+	// Listen for CSP violations
+	const cspViolations: string[] = [];
+	page.on("console", (msg) => {
+		const text = msg.text();
+		if (/violat(es|ion).*content security policy/i.test(text)) {
+			cspViolations.push(text);
+			test.fail(); // Fail immediately on CSP violation
+		}
+	});
+
+	await page.goto("/admin/");
+
+	// Wait for boot.js to load and initialize CMS
+	// Decap sets window.CMS when bundle loads
+	await page
+		.waitForFunction(() => !!(window as any).CMS, { timeout: 10000 })
+		.catch(() => {
+			test.fail(
+				true,
+				"window.CMS not initialized (boot.js failed or CSP blocked it)",
+			);
+		});
+
+	// Verify no CSP violations during load
+	expect(cspViolations).toHaveLength(0);
+
+	// Optional: Look for Decap UI elements (login screen or editor)
+	// This may show login screen (unauthenticated) or editor (if cookies present)
+	const hasDecapUI =
+		(await page.locator('[data-testid="login-button"]').count()) > 0 ||
+		(await page.locator(".nc-app, [class*='cms']").count()) > 0;
+
+	expect(hasDecapUI).toBe(true);
+});

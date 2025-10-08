@@ -51,6 +51,18 @@ jobs:
           echo "$hdr"
           echo "$hdr" | grep -Eiq 'jsdelivr|unpkg' && { echo "CSP should NOT allow third-party script hosts (self-hosted)"; exit 1; } || true
           echo "$hdr" | grep -qi "script-src 'self'" || { echo "CSP missing script-src 'self' on /admin/"; exit 1; }
+          echo "$hdr" | grep -qi "'unsafe-inline'" && { echo "CSP should NOT allow 'unsafe-inline' on /admin/ (hardened October 2025)"; exit 1; } || true
+
+      - name: Assert admin COOP allows popup handoff
+        run: |
+          set -euo pipefail
+          coop=$(curl -sI "$BASE_URL/admin/" | awk 'BEGIN{IGNORECASE=1} /^cross-origin-opener-policy:/ {sub(/\r$/,"");print}')
+          echo "$coop"
+          echo "$coop" | grep -qi "unsafe-none" || { echo "COOP must be 'unsafe-none' on /admin/ for OAuth popup handoff"; exit 1; }
+          coep=$(curl -sI "$BASE_URL/admin/" | awk 'BEGIN{IGNORECASE=1} /^cross-origin-embedder-policy:/ {print}')
+          if [ -n "$coep" ]; then
+            echo "COEP must NOT be set on /admin/ (breaks popup handoff): $coep"; exit 1;
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@v4

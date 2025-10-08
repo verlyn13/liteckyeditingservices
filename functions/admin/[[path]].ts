@@ -1,7 +1,7 @@
 /**
  * Cloudflare Pages Function for /admin/* routes
- * Sets a single authoritative CSP header for Decap CMS
- * This overrides any headers from public/_headers to prevent merging
+ * October 2025 hardened CSP + COOP for reliable OAuth popup handoff
+ * Single source of truth for admin security headers
  */
 
 type Env = {};
@@ -21,42 +21,51 @@ type PagesFunction<Env = unknown> = (
 
 export const onRequest: PagesFunction<Env> = async (ctx) => {
 	const res = await ctx.next();
+	const url = new URL(ctx.request.url);
 	const headers = new Headers(res.headers);
 
-	// Single authoritative CSP for admin (self-hosted Decap CMS)
-	// No third-party script hosts needed - all assets served from /vendor/decap/
+	// -- Security headers (admin shell + app) ----------------------------
+	headers.set("x-frame-options", "SAMEORIGIN");
+	headers.set("referrer-policy", "strict-origin-when-cross-origin");
+	headers.set(
+		"permissions-policy",
+		"camera=(), microphone=(), geolocation=(), usb=(), payment=()",
+	);
+
+	// -- CSP: self-hosted Decap with GitHub API direct access ------------
 	const csp = [
 		"default-src 'self'",
 		"style-src 'self' 'unsafe-inline'",
 		"img-src 'self' data: blob: https:",
 		"font-src 'self' data:",
-		// Decap CMS uses AJV codegen which requires 'unsafe-eval' in admin only
-		"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
-		// Allow GitHub APIs used by Decap; keep proxy/OAuth worker
-		"connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://api.netlify.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
+		// Self-hosted bundle (no inline) + Turnstile + Decap requires unsafe-eval for AJV codegen
+		"script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com",
+		// Direct-to-GitHub (not proxying yet)
+		"connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
 		"frame-src 'self' https://challenges.cloudflare.com",
 		"child-src 'self' blob:",
 		"worker-src 'self' blob:",
-		"object-src 'none'",
-		"base-uri 'none'",
-		"form-action 'self' https://github.com",
 		"frame-ancestors 'self'",
+		"base-uri 'none'",
+		"object-src 'none'",
+		"form-action 'self' https://github.com",
 	].join("; ");
 
-	// Remove any existing CSP headers to prevent merging
 	headers.delete("content-security-policy");
 	headers.delete("Content-Security-Policy");
-
-	// Set single CSP
 	headers.set("content-security-policy", csp);
 
-	// Ensure popup ↔ opener can communicate for OAuth handoff (admin only)
-	headers.delete("cross-origin-opener-policy");
+	// CRITICAL: Allow popup handoff (popup must retain window.opener)
 	headers.set("cross-origin-opener-policy", "unsafe-none");
 	headers.delete("cross-origin-embedder-policy");
 
-	// Avoid stale admin shell during deploys
-	headers.set("cache-control", "no-store");
+	// Cache admin HTML shell conservatively
+	if (
+		url.pathname === "/admin/" ||
+		url.pathname === "/admin/index.html"
+	) {
+		headers.set("cache-control", "no-store");
+	}
 
 	return new Response(res.body, {
 		status: res.status,

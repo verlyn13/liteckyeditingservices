@@ -1,0 +1,3 @@
+# Canonical origin enforcement (October 2025 best practice)
+# Redirect apex to www for consistent OAuth handoff
+https://liteckyeditingservices.com/* https://www.liteckyeditingservices.com/:splat 301!

@@ -10,9 +10,9 @@ publish_mode: editorial_workflow
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
-# Site configuration
-site_url: https://liteckyeditingservices.com
-display_url: https://liteckyeditingservices.com
+# Site configuration (canonical www origin for reliable OAuth handoff)
+site_url: https://www.liteckyeditingservices.com
+display_url: https://www.liteckyeditingservices.com
 
 collections:
   # Pages collection - matches src/content/config.ts schema
