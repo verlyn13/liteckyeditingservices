@@ -103,6 +103,8 @@ export default {
                         .filter(Boolean)
                         .join(", "),
                     "Cache-Control": "no-store",
+                    // Keep popup ↔ opener link; COOP must not sever relationship
+                    "Cross-Origin-Opener-Policy": "unsafe-none",
                 },
             });
         }
@@ -173,6 +175,17 @@ export default {
                 headers: {
                     "Content-Type": "text/html; charset=utf-8",
                     "Cache-Control": "no-store",
+                    // Allow popup → opener postMessage handshake; do not set COEP
+                    "Cross-Origin-Opener-Policy": "unsafe-none",
+                    // Minimal CSP for inline postMessage script
+                    "Content-Security-Policy": [
+                        "default-src 'self'",
+                        "script-src 'self' 'unsafe-inline'",
+                        "style-src 'self' 'unsafe-inline'",
+                        "img-src 'self' data:",
+                        "base-uri 'none'",
+                        "object-src 'none'",
+                    ].join('; '),
                     "Set-Cookie": `decap_oauth_state=; Max-Age=0; Path=/; Domain=${url.hostname}, decap_oauth_origin=; Max-Age=0; Path=/; Domain=${url.hostname}`,
                 },
             });
