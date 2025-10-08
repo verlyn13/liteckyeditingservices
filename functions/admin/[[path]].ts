@@ -33,13 +33,17 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 	);
 
 	// -- CSP: self-hosted Decap with GitHub API direct access ------------
+	// Hash for inline script in /admin/oauth-callback page (OAuth handshake)
+	const oauthScriptHash = "'sha256-kdYRcLOaG70SWzd+D3OlmWZHR3kTM7rPRM+yATO6xYA='";
+
 	const csp = [
 		"default-src 'self'",
 		"style-src 'self' 'unsafe-inline'",
 		"img-src 'self' data: blob: https:",
 		"font-src 'self' data:",
 		// Self-hosted bundle (no inline) + Turnstile + Decap requires unsafe-eval for AJV codegen
-		"script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com",
+		// OAuth callback page requires specific inline script hash for postMessage handshake
+		`script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com ${oauthScriptHash}`,
 		// Direct-to-GitHub (not proxying yet)
 		"connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
 		"frame-src 'self' https://challenges.cloudflare.com",
