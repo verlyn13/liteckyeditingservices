@@ -30,7 +30,8 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
 		"style-src 'self' 'unsafe-inline'",
 		"img-src 'self' data: blob: https:",
 		"font-src 'self' data:",
-		"script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+		// Decap CMS uses AJV codegen which requires 'unsafe-eval' in admin only
+		"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
 		"connect-src 'self' https://api.github.com https://github.com https://api.netlify.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
 		"frame-src 'self' https://challenges.cloudflare.com",
 		"child-src 'self' blob:",
