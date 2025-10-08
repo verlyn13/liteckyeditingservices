@@ -1,11 +1,21 @@
 import { defineConfig } from "@playwright/test";
 
+// Canonical viewport dimensions matching committed baselines
+const CANONICAL_WIDTH = 1250;
+const CANONICAL_HEIGHT = 900;
+
 export default defineConfig({
 	testDir: "./tests/e2e",
 	timeout: 30_000,
 	expect: {
 		timeout: 5_000,
-		toHaveScreenshot: { maxDiffPixelRatio: 0.005 }, // 0.5% strict baseline
+		toHaveScreenshot: {
+			maxDiffPixelRatio: 0.003, // 0.3% tolerance (tighter than before)
+			// Hardened snapshot defaults (October 2025)
+			animations: "disabled",
+			caret: "hide",
+			threshold: 0.2, // Intensity threshold for antialiasing differences
+		},
 	},
 	retries: 1, // allow a single retry for flake
 	forbidOnly: !!process.env.CI,
@@ -17,10 +27,16 @@ export default defineConfig({
 		video: "off",
 		// Lock rendering environment for visual stability (October 2025 best practice)
 		headless: true,
-		viewport: { width: 1280, height: 960 },
+		viewport: { width: CANONICAL_WIDTH, height: CANONICAL_HEIGHT },
 		deviceScaleFactor: 1, // Prevents fractional pixel rounding
+		isMobile: false,
+		hasTouch: false,
 		colorScheme: "light",
 		locale: "en-US",
+		timezoneId: "UTC", // Deterministic timezone
+		permissions: [],
+		// Reduce flakiness from font loading
+		serviceWorkers: "block",
 	},
 
 	// Use plain chromium project so top-level `use` isn't overridden by device preset

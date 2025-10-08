@@ -1,7 +1,7 @@
 # PROJECT STATUS - Litecky Editing Services
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 5, 2025 (03:40 UTC)
+**Last Updated**: October 6, 2025 (current)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment)
@@ -10,7 +10,7 @@
 
 ## 📊 EXECUTIVE SUMMARY
 
-**Status**: ✅ **MIGRATION COMPLETE** - Git-connected deployment live and operational!
+**Status**: ✅ **MIGRATION COMPLETE** - Git-connected deployment live; CI green with blocking visuals.
 
 ### ✅ SUCCESSFUL MIGRATION (October 5, 2025)
 
@@ -31,6 +31,12 @@
 - Admin panel functional at /admin/
 - Automatic builds triggered by Git commits
 - All security headers E2E tests passing (15/15)
+
+**Recent Progress - October 6, 2025**:
+  - ✅ **Visual Baselines (Linux)**: Seeded from main; stored under `tests/e2e/__screenshots__/...`
+  - ✅ **Visual Job Blocking**: `e2e-visual` made blocking and added to required checks
+  - ✅ **Tooling Pin**: Playwright pinned to `1.55.1` for deterministic CI
+  - ✅ **Workflow Hardening**: Baseline workflow accepts `ref` and uploads artifact for manual commit
 
 **Recent Progress - October 5, 2025**:
   - ✅ **Git Migration**: Completed migration to Git-connected deployment
@@ -82,7 +88,7 @@
 - ✅ `.github/workflows/post-deploy-validation.yml` - Active (security headers: 15/15 ✅)
 - ✅ `.github/workflows/admin-check.yml` - Scheduled admin health checks (every 6 hours)
 - ✅ `.github/workflows/quality-gate.yml` - PR quality checks (passing ✅)
-- ✅ `.github/workflows/e2e-visual.yml` - Visual regression testing
+- ✅ `.github/workflows/e2e-visual.yml` - Visual regression testing (blocking; green)
 - ✅ `.github/workflows/preview-validation.yml` - PR preview testing
 
 **Cleanup Task**: Delete old direct-upload project `litecky-editing-services` after 48 hours (Oct 7, 2025)

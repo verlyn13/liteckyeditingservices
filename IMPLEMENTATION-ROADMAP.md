@@ -168,6 +168,7 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 - ✅ **Week 1 (Oct 4-5, 2025)**: Monitoring docs + prod E2E + security headers + visual regression + Git migration + CSP fix - **COMPLETE**
 - ✅ **Git-connected migration**: Completed Oct 5; auto-deployments enabled
 - 🔜 **Cleanup (Oct 7, 2025)**: Remove old `litecky-editing-services` project after 48 hours
+- ✅ **Week 2 (Oct 6, 2025)**: Seed Linux visual baselines; make `e2e-visual` blocking; pin Playwright 1.55.1; align docs/workflows
 - 🔜 **Week 2 (Oct 6-12, 2025)**: Implement monitoring Workers + performance audit + SEO meta/OG + a11y sweep
 
 ---

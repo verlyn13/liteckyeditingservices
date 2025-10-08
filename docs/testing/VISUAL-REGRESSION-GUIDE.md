@@ -146,13 +146,13 @@ pnpm exec playwright test tests/e2e/visual.spec.ts --ui
 
 ### CI/CD Workflows
 
-**1. e2e-visual.yml** (Auto on push to main; soft-fail)
+**1. e2e-visual.yml** (Auto on push to main; blocking)
 - Runs on every push to main
 - Uses Linux baselines (platform-specific)
-- Automatically kills port 4321 before starting server
+- Installs system fonts to match seeding env; kills port 4321 before server start
 
 **2. Visual Tests (Modern)** (Manual trigger)
-- Trigger with `updateBaselines=true` to generate new Linux baselines
+- Trigger with `updateBaselines=true` (optionally pass `ref=<SHA>` to seed from exact commit)
 - Uploads artifacts and can auto-open a PR with updated baselines
 - Use when UI changes are intentional or environment changed
 
@@ -165,14 +165,14 @@ pnpm test:visual:update
 
 **Via CI** (Linux baselines on GitHub Actions):
 ```bash
-# Trigger workflow by file path (requires gh auth)
-gh workflow run .github/workflows/visual-modern.yml -f updateBaselines=true
+# Trigger workflow by file path (requires gh auth). Optionally pass a specific ref SHA.
+gh workflow run .github/workflows/visual-modern.yml -f updateBaselines=true -f ref=<SHA>
 
 # The workflow uploads an artifact named "updated-baselines" and can auto-open a PR.
 # If you prefer manual commit:
 gh run download <RUN_ID> -n updated-baselines -D tmp/baselines
-mv tmp/baselines/tests/e2e/visual.spec.ts-snapshots/*.png tests/e2e/visual.spec.ts-snapshots/
-git add tests/e2e/visual.spec.ts-snapshots/
+mv tmp/baselines/visual.spec.ts/*.png tests/e2e/__screenshots__/visual.spec.ts/
+git add tests/e2e/__screenshots__/visual.spec.ts/
 git commit -m "test: update Linux visual baselines"
 ```
 
