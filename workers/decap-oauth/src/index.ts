@@ -6,8 +6,11 @@ interface Env {
 const GITHUB_AUTHORIZE = "https://github.com/login/oauth/authorize";
 const GITHUB_TOKEN = "https://github.com/login/oauth/access_token";
 
-function getSiteOrigin(): string {
-	return "https://liteckyeditingservices.com";
+function getAllowedOrigins(): string[] {
+    return [
+        "https://liteckyeditingservices.com",
+        "https://www.liteckyeditingservices.com",
+    ];
 }
 
 function setStateCookie(state: string, host: string): string {
@@ -23,9 +26,12 @@ function getCookie(request: Request, name: string): string | undefined {
 	return found?.split("=")[1];
 }
 
-function htmlPostMessage(token: string): string {
-	const origin = getSiteOrigin();
-	return `<!doctype html>
+function htmlPostMessage(token: string, openerOrigin?: string): string {
+    const allowed = getAllowedOrigins();
+    const targets = Array.from(
+        new Set([openerOrigin, ...allowed].filter(Boolean) as string[]),
+    );
+    return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -36,10 +42,12 @@ function htmlPostMessage(token: string): string {
     (function() {
       try {
         var token = ${JSON.stringify(token)};
-        var origin = ${JSON.stringify(origin)};
+        var targets = ${JSON.stringify(targets)};
         if (window.opener && token) {
-          window.opener.postMessage({ token: token }, origin);
-        }
+          for (var i = 0; i < targets.length; i++) {
+            try { window.opener.postMessage({ token: token }, targets[i]); } catch(e) {}
+          }
+        }        
       } catch(e) {
         console.error('Auth error:', e);
       }
@@ -63,30 +71,41 @@ export default {
 			});
 		}
 
-		// Start OAuth flow
-		if (url.pathname === "/auth") {
-			const state = crypto
-				.getRandomValues(new Uint8Array(16))
-				.reduce((s, b) => s + b.toString(16).padStart(2, "0"), "");
+        // Start OAuth flow
+        if (url.pathname === "/auth") {
+            const state = crypto
+                .getRandomValues(new Uint8Array(16))
+                .reduce((s, b) => s + b.toString(16).padStart(2, "0"), "");
 
-			// Use the worker's URL as base for callback
-			const redirectUri = `${url.origin}/callback`;
+            // Use the worker's URL as base for callback
+            const redirectUri = `${url.origin}/callback`;
+            const originHeader = request.headers.get("origin") || undefined;
+            const openerOrigin = getAllowedOrigins().includes(originHeader || "")
+                ? originHeader
+                : undefined;
 
-			const authUrl = new URL(GITHUB_AUTHORIZE);
-			authUrl.searchParams.set("client_id", env.GITHUB_OAUTH_ID);
-			authUrl.searchParams.set("redirect_uri", redirectUri);
-			authUrl.searchParams.set("scope", "repo,user");
-			authUrl.searchParams.set("state", state);
+            const authUrl = new URL(GITHUB_AUTHORIZE);
+            authUrl.searchParams.set("client_id", env.GITHUB_OAUTH_ID);
+            authUrl.searchParams.set("redirect_uri", redirectUri);
+            authUrl.searchParams.set("scope", "repo,user");
+            authUrl.searchParams.set("state", state);
 
-			return new Response(null, {
-				status: 302,
-				headers: {
-					Location: authUrl.toString(),
-					"Set-Cookie": setStateCookie(state, url.hostname),
-					"Cache-Control": "no-store",
-				},
-			});
-		}
+            return new Response(null, {
+                status: 302,
+                headers: {
+                    Location: authUrl.toString(),
+                    "Set-Cookie": [
+                        setStateCookie(state, url.hostname),
+                        openerOrigin
+                            ? `decap_oauth_origin=${openerOrigin}; HttpOnly; Secure; SameSite=Lax; Max-Age=600; Path=/; Domain=${url.hostname}`
+                            : undefined,
+                    ]
+                        .filter(Boolean)
+                        .join(", "),
+                    "Cache-Control": "no-store",
+                },
+            });
+        }
 
 		// OAuth callback
 		if (url.pathname === "/callback") {
@@ -128,10 +147,10 @@ export default {
 				});
 			}
 
-			const tokenData = (await tokenResponse.json()) as {
-				access_token?: string;
-				error?: string;
-			};
+            const tokenData = (await tokenResponse.json()) as {
+                access_token?: string;
+                error?: string;
+            };
 
 			if (!tokenData.access_token) {
 				console.error("No access token in response:", tokenData);
@@ -141,17 +160,23 @@ export default {
 				});
 			}
 
-			// Return HTML that posts token to opener window
-			const html = htmlPostMessage(tokenData.access_token);
+            // Resolve opener origin from cookie, if present and allowed
+            const openerCookie = getCookie(request, "decap_oauth_origin");
+            const openerOrigin = getAllowedOrigins().includes(openerCookie || "")
+                ? openerCookie
+                : undefined;
 
-			return new Response(html, {
-				headers: {
-					"Content-Type": "text/html; charset=utf-8",
-					"Cache-Control": "no-store",
-					"Set-Cookie": `decap_oauth_state=; Max-Age=0; Path=/; Domain=${url.hostname}`,
-				},
-			});
-		}
+            // Return HTML that posts token to opener window
+            const html = htmlPostMessage(tokenData.access_token, openerOrigin);
+
+            return new Response(html, {
+                headers: {
+                    "Content-Type": "text/html; charset=utf-8",
+                    "Cache-Control": "no-store",
+                    "Set-Cookie": `decap_oauth_state=; Max-Age=0; Path=/; Domain=${url.hostname}, decap_oauth_origin=; Max-Age=0; Path=/; Domain=${url.hostname}`,
+                },
+            });
+        }
 
 		return new Response("Not Found", { status: 404 });
 	},
