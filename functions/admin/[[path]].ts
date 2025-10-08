@@ -4,9 +4,7 @@
  * Single source of truth for admin security headers
  */
 
-interface Env {
-	// Add bindings here as needed (D1, KV, R2, etc.)
-}
+type Env = {};
 
 interface EventContext<Env> {
 	request: Request;
@@ -17,7 +15,9 @@ interface EventContext<Env> {
 	data: Record<string, unknown>;
 }
 
-type PagesFunction<Env> = (context: EventContext<Env>) => Response | Promise<Response>;
+type PagesFunction<Env> = (
+	context: EventContext<Env>,
+) => Response | Promise<Response>;
 
 export const onRequest: PagesFunction<Env> = async (context) => {
 	const res = await context.next();
