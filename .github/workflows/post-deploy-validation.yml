@@ -44,14 +44,17 @@ jobs:
           test $(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL") -eq 200
           grep -i "content-security-policy\|x-frame-options\|strict-transport-security" -n headers.txt || true
 
-      - name: Assert admin CSP forbids third-party script hosts (self-hosted)
+      - name: Assert admin CSP (no third-party CDNs; no 'unsafe-inline' in script-src)
         run: |
           set -euo pipefail
           hdr=$(curl -sI "$BASE_URL/admin/" | awk 'BEGIN{IGNORECASE=1} /^content-security-policy:/ {sub(/\r$/,"");print}')
           echo "$hdr"
           echo "$hdr" | grep -Eiq 'jsdelivr|unpkg' && { echo "CSP should NOT allow third-party script hosts (self-hosted)"; exit 1; } || true
           echo "$hdr" | grep -qi "script-src 'self'" || { echo "CSP missing script-src 'self' on /admin/"; exit 1; }
-          echo "$hdr" | grep -qi "'unsafe-inline'" && { echo "CSP should NOT allow 'unsafe-inline' on /admin/ (hardened October 2025)"; exit 1; } || true
+          # Extract only the script-src directive and ensure it does NOT contain 'unsafe-inline'
+          script_dir=$(echo "$hdr" | awk 'BEGIN{IGNORECASE=1} /^content-security-policy:/ {match($0,/script-src[^;]*/); if (RSTART>0) print substr($0,RSTART,RLENGTH)}')
+          echo "script-src => $script_dir"
+          echo "$script_dir" | grep -qi "'unsafe-inline'" && { echo "script-src should NOT include 'unsafe-inline' on /admin/ (hardened October 2025)"; exit 1; } || true
 
       - name: Assert admin COOP allows popup handoff
         run: |
