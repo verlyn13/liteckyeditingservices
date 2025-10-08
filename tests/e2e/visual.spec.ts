@@ -1,6 +1,6 @@
 import type { Locator } from "@playwright/test";
 import { expect, test } from "../fixtures/block-noise";
-import { prepareForVisualTest } from "../helpers/visual";
+import { prepareForVisualTest, assertViewportAndRoot } from "../helpers/visual";
 
 /**
  * Visual regression tests for core UI components
@@ -35,6 +35,7 @@ async function dumpStyles(label: string, loc: Locator) {
 
 test("header", async ({ page }) => {
 	await page.goto("/");
+	await assertViewportAndRoot(page);
 	const header = page.getByRole("banner");
 	await prepareForVisualTest(page, header, { readySelector: "header" });
 	await dumpStyles("header", header);
@@ -43,6 +44,7 @@ test("header", async ({ page }) => {
 
 test("footer", async ({ page }) => {
 	await page.goto("/");
+	await assertViewportAndRoot(page);
 	const footer = page.getByRole("contentinfo");
 	await prepareForVisualTest(page, footer, { readySelector: "footer" });
 	await dumpStyles("footer", footer);
@@ -51,6 +53,7 @@ test("footer", async ({ page }) => {
 
 test("hero section", async ({ page }) => {
 	await page.goto("/");
+	await assertViewportAndRoot(page);
 	const hero = page.locator("section").first();
 	await prepareForVisualTest(page, hero, { readySelector: "section" });
 	await dumpStyles("hero", hero);
@@ -59,8 +62,20 @@ test("hero section", async ({ page }) => {
 
 test("contact form", async ({ page }) => {
 	await page.goto("/contact/");
+	await assertViewportAndRoot(page);
 	const form = page.locator("form").first();
 	await prepareForVisualTest(page, form, { readySelector: "form" });
+	// Snap form to whole pixels to avoid 1px wobble from sub-pixel rounding
+	await page.addStyleTag({
+		content: `
+		  form {
+		    margin-inline: auto !important;
+		    max-width: 1136px !important;
+		    width: 1136px !important;
+		    contain: layout paint;
+		  }
+		`,
+	});
 	await dumpStyles("contact-form", form);
 	await expect(form).toHaveScreenshot("contact-form.png");
 });

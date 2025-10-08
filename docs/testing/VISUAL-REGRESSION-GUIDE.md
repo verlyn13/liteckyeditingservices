@@ -93,8 +93,9 @@ export async function prepareForVisualTest(page: Page, el?: Locator, opts?: { re
 
   await page.addStyleTag({
     content: `
-      :root { scrollbar-gutter: stable both-edges; }
-      html, body { overflow: hidden !important; }
+      /* Option A: keep baselines at full viewport width (no gutter) */
+      :root { scrollbar-gutter: auto !important; }
+      html, body { overflow-y: hidden !important; }
       [data-flaky], .live-chat, .cookie-banner { visibility: hidden !important; }
       *, *::before, *::after {
         animation: none !important;

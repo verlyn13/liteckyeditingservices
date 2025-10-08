@@ -41,9 +41,10 @@ export async function prepareForVisualTest(
 	// Stabilize layout BEFORE content renders
 	await page.addInitScript(() => {
 		const css = `
-      /* Prevent scrollbar-induced width/height shifts (critical for 1px diffs) */
-      html {
-        scrollbar-gutter: stable both-edges;
+      /* No vertical scrollbar during capture (keeps width at 1250px) */
+      html, body {
+        overflow-y: hidden !important;
+        scrollbar-gutter: auto !important;
         font-size: 16px; /* Lock base font size */
       }
       /* Ensure box-sizing is consistent */
@@ -94,15 +95,16 @@ export async function prepareForVisualTest(
 
 	// Add runtime style locks (in case init script was bypassed)
 	await page.addStyleTag({
-		content: `
+    content: `
       /* Hide flaky dynamic elements */
       [data-flaky], .live-chat, .cookie-banner, .chat-widget {
         visibility: hidden !important;
       }
       /* Hide selection highlighting */
       ::selection { background: transparent !important; }
-      /* Ensure overflow doesn't create scrollbars mid-test */
-      html, body { overflow: hidden !important; }
+      /* Keep vertical scrollbars hidden during capture; don't reserve gutter */
+      html, body { overflow-y: hidden !important; }
+      html { scrollbar-gutter: auto !important; }
       /* Hide carets in form fields */
       *, *::before, *::after {
         caret-color: transparent !important;
@@ -118,4 +120,20 @@ export async function prepareForVisualTest(
 
 	// Final settle time for any lingering layout shifts
 	await page.waitForTimeout(100);
+}
+
+import { expect } from "@playwright/test";
+
+export async function assertViewportAndRoot(page: Page) {
+  const sz = page.viewportSize();
+  if (!sz) throw new Error("Viewport size is not set");
+  const rootWidth = await page.evaluate(
+    () => document.documentElement.getBoundingClientRect().width,
+  );
+  if (process.env.VISUAL_POLICY === "no-gutter") {
+    expect(Math.round(rootWidth)).toBe(1250);
+  } else {
+    // Linux scrollbar ~15px gutter expected
+    expect(Math.round(rootWidth)).toBe(1235);
+  }
 }
