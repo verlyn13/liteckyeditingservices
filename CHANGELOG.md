@@ -1,0 +1,8 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## Unreleased
+
+- fix(admin-cms): allow 'unsafe-eval' in admin CSP when self-hosting Decap CMS to resolve AJV codegen console errors. Scoped to `/admin/*` via Pages Function; no change to main-site CSP.
+
