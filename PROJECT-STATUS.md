@@ -1,7 +1,7 @@
 # PROJECT STATUS - Litecky Editing Services
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 7, 2025 (current)
+**Last Updated**: October 8, 2025 (current)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment)
@@ -32,11 +32,21 @@
 - Automatic builds triggered by Git commits
 - All security headers E2E tests passing (15/15)
 
+**Recent Progress - October 8, 2025**:
+  - ✅ **Hardened OAuth Popup Handoff**: Implemented October 2025 best practices for reliable Decap CMS authentication
+  - ✅ **Canonical Origin**: Added `public/_redirects` to redirect apex → www (301) for consistent OAuth flow
+  - ✅ **No Inline Scripts**: Extracted admin boot to `public/admin/boot.js`; removed `'unsafe-inline'` from admin CSP
+  - ✅ **COOP Headers**: Set `Cross-Origin-Opener-Policy: unsafe-none` on admin + OAuth worker endpoints
+  - ✅ **Enhanced Security Headers**: Added X-Frame-Options, Referrer-Policy, Permissions-Policy to admin
+  - ✅ **CI Header Validation**: Post-deploy workflow now enforces COOP/COEP/CSP requirements
+  - ✅ **Playwright Admin Tests**: Added synthetic tests for editor UI appearance and header verification
+  - ✅ **Worker Updates**: Deployed OAuth worker with COOP headers; updated wrangler to 4.42.1
+
 **Recent Progress - October 7, 2025**:
   - ✅ **CSP Fix (Pages Function)**: Created `functions/admin/[[path]].ts` to set single authoritative CSP for /admin/* routes
   - ✅ **Header Merging Resolved**: Eliminated duplicate CSP headers by using Cloudflare Pages Function instead of _headers file
   - ✅ **October 2025 Best Practice**: Implemented programmatic header control for complex CSP scenarios
-  - ✅ **OAuth Origin + Headers**: OAuth worker posts token back to the opener origin captured at /auth (supports apex and www) and now sets COOP/CSP on callback to ensure popup → opener postMessage is allowed; fixes “Authenticated successfully” but no editor UI.
+  - ✅ **OAuth Origin + Headers**: OAuth worker posts token back to the opener origin captured at /auth (supports apex and www) and now sets COOP/CSP on callback to ensure popup → opener postMessage is allowed; fixes "Authenticated successfully" but no editor UI.
 
 **Recent Progress - October 6, 2025**:
   - ✅ **Visual Baselines (Linux)**: Seeded from main; stored under `tests/e2e/__screenshots__/...`
