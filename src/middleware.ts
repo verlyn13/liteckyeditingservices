@@ -1,21 +1,18 @@
 /**
- * Middleware for development server security headers
- * In production, these are set by Cloudflare Pages via public/_headers
+ * Middleware for security headers
+ * Runs in both dev and production to ensure proper CSP configuration
+ * In production, this overrides the _headers file to prevent header merging
  */
 import { defineMiddleware } from "astro:middleware";
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const { url } = context;
 
-	// Only apply in development (production uses _headers file)
-	if (import.meta.env.PROD) {
-		return next();
-	}
-
 	// Get the response first
 	const response = await next();
 
-	// Apply relaxed CSP for admin routes in development
+	// Apply relaxed CSP for admin routes (both dev and prod)
+	// In production, this overrides the _headers file to ensure only one CSP is sent
 	if (url.pathname.startsWith("/admin")) {
 		const headers = new Headers(response.headers);
 
