@@ -7,7 +7,8 @@
 		"dev": "astro dev",
 		"dev:env": "bash ./scripts/dev-with-env.sh",
 		"start": "astro dev",
-		"build": "astro check && astro build",
+		"cms:vendor": "node scripts/vendor-decap.mjs",
+		"build": "pnpm cms:vendor && astro check && astro build",
 		"preview": "astro preview",
 		"astro": "astro",
 		"lint": "eslint . --ext .astro,.svelte",
@@ -56,6 +57,7 @@
 	"devDependencies": {
 		"@astrojs/check": "latest",
 		"@biomejs/biome": "latest",
+		"@cloudflare/workers-types": "latest",
 		"@eslint/js": "latest",
 		"@playwright/test": "1.55.1",
 		"@sveltejs/vite-plugin-svelte": "latest",
@@ -67,6 +69,7 @@
 		"@typescript-eslint/parser": "latest",
 		"@vitest/ui": "latest",
 		"autoprefixer": "latest",
+		"decap-cms": "3.8.4",
 		"eslint": "latest",
 		"eslint-plugin-astro": "latest",
 		"eslint-plugin-svelte": "latest",
@@ -84,8 +87,7 @@
 		"typescript": "latest",
 		"vite": "latest",
 		"vitest": "latest",
-		"wrangler": "latest",
-		"@cloudflare/workers-types": "latest"
+		"wrangler": "latest"
 	},
 	"engines": {
 		"node": ">=24 <25",

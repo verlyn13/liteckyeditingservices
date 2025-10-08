@@ -1,6 +1,6 @@
 ---
-// Static admin shell page for Decap CMS pinned to a known-good version.
-// Using Astro page ensures it is always present in the build at /admin/.
+// Static admin shell page for Decap CMS (self-hosted).
+// Vendored bundle loaded from /vendor/decap/ with cache-busting via manifest.
 ---
 <!doctype html>
 <html lang="en">
@@ -9,12 +9,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="Cache-Control" content="no-store" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; connect-src 'self' https://api.github.com https://github.com https://api.netlify.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev; frame-src 'self' https://challenges.cloudflare.com; frame-ancestors 'self'; base-uri 'none'; object-src 'none'"
+    />
     <title>Content Manager</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
-    <!-- Decap CMS UMD bundle (self-initializes). Pinned + cache-busted. -->
-    <script is:inline src="https://cdn.jsdelivr.net/npm/decap-cms@3.8.4/dist/decap-cms.js?v=20251004"></script>
+    <!-- Load self-hosted Decap CMS bundle with cache-busting from manifest -->
+    <script is:inline>
+      (async () => {
+        const m = await fetch('/vendor/decap/manifest.json', { cache: 'no-store' }).then(r => r.json());
+        const s = document.createElement('script');
+        s.defer = true;
+        s.src = `/vendor/decap/decap-cms.js?v=${m.version}-${m.hash}`;
+        document.head.appendChild(s);
+      })();
+    </script>
   </body>
   </html>
 

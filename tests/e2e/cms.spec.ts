@@ -17,8 +17,10 @@ test("CMS admin route is accessible", async ({ page }) => {
 	}
 });
 
-test("CMS admin has proper CSP configuration", async ({ page }) => {
-	// Verify CSP allows required Decap CMS resources
+test("CMS admin forbids third-party script hosts (self-hosted)", async ({
+	page,
+}) => {
+	// Verify self-hosted Decap CMS - no third-party CDNs in CSP
 	const response = await page.goto("/admin/");
 
 	if (response?.status() === 200) {
@@ -28,11 +30,11 @@ test("CMS admin has proper CSP configuration", async ({ page }) => {
 		expect(cspHeader).toBeDefined();
 
 		if (cspHeader) {
-			// Verify it allows cdn.jsdelivr.net for scripts (Decap CMS CDN)
-			expect(cspHeader).toContain("cdn.jsdelivr.net");
+			// Verify it does NOT allow third-party script hosts (self-hosted)
+			expect(cspHeader).not.toMatch(/jsdelivr|unpkg/i);
 
-			// Verify it allows unsafe-eval (required by Decap CMS)
-			expect(cspHeader).toContain("unsafe-eval");
+			// Verify it allows 'self' for scripts (self-hosted bundle)
+			expect(cspHeader).toContain("script-src 'self'");
 
 			// Verify it allows GitHub API (required for GitHub backend)
 			expect(cspHeader).toContain("api.github.com");
