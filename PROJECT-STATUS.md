@@ -41,6 +41,7 @@
   - ✅ **CI Header Validation**: Post-deploy workflow now enforces COOP/COEP/CSP requirements
   - ✅ **Playwright Admin Tests**: Added synthetic tests for editor UI appearance and header verification
   - ✅ **Worker Updates**: Deployed OAuth worker with COOP headers; updated wrangler to 4.42.1
+  - ✅ **Pages Function Fix**: Removed /* wildcard from _headers; used official Cloudflare PagesFunction types
 
 **Recent Progress - October 7, 2025**:
   - ✅ **CSP Fix (Pages Function)**: Created `functions/admin/[[path]].ts` to set single authoritative CSP for /admin/* routes
