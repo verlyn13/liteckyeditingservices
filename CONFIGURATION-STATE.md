@@ -152,7 +152,7 @@ _dmarc  TXT  v=DMARC1; p=quarantine; rua=mailto:dmarc@liteckyeditingservices.com
 
 ## 🔐 Security Configuration
 
-### Security Headers (`public/_headers`)
+### Security Headers (global via `public/_headers`, admin via Pages Function)
 
 #### Global Headers
 ```
@@ -169,9 +169,9 @@ Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), m
 - `unsafe-inline`: Required for Svelte reactive styles (will be replaced with nonces in future)
 - `frame-ancestors 'self'`: Allows same-origin frames for admin preview
 
-#### Admin Headers (`/admin/*`)
+#### Admin Headers (`/admin/*`) — set by `functions/admin/[[path]].ts`
 ```
-Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com; img-src 'self' data: blob: https:; font-src 'self' data: https://unpkg.com; connect-src 'self' https://challenges.cloudflare.com https://api.github.com https://github.com https://api.netlify.com https://unpkg.com https://cdn.jsdelivr.net https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev; frame-src 'self' https://challenges.cloudflare.com; child-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://github.com; frame-ancestors 'self';
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; font-src 'self' data: https://unpkg.com https://cdn.jsdelivr.net; connect-src 'self' https://challenges.cloudflare.com https://api.github.com https://github.com https://api.netlify.com https://unpkg.com https://cdn.jsdelivr.net https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev; frame-src 'self' https://challenges.cloudflare.com; child-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://github.com; frame-ancestors 'self';
 Cache-Control: no-store
 ```
 
@@ -179,6 +179,7 @@ Cache-Control: no-store
 - `unsafe-eval`: Required for Decap CMS
 - `frame-src 'self'`: Allows admin preview iframe
 - OAuth worker in `connect-src`: Required for CMS authentication
+- Admin CSP is authored and enforced in a Pages Function to prevent duplicate/merged CSP headers from `_headers`
 
 ### Turnstile Configuration
 - **Widget ID**: `litecky-editing-production`

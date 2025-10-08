@@ -25,13 +25,17 @@ jobs:
         run: |
           set -euo pipefail
           echo "Waiting for production ${URL} to return 200..."
+          ok=0
           for i in $(seq 1 30); do
             code=$(curl -s -o /dev/null -w "%{http_code}" "$URL" || echo 000)
             echo "Attempt $i => $code"
             if [ "$code" = "200" ]; then
-              echo "Production is live"; break; fi
+              echo "Production is live"; ok=1; break; fi
             sleep 10
           done
+          if [ "$ok" -ne 1 ]; then
+            echo "Timed out waiting for 200 at ${URL}"; exit 1;
+          fi
 
       - name: Quick header check (200 + CSP/XFO)
         run: |
@@ -39,6 +43,14 @@ jobs:
           curl -sI "$BASE_URL" | tee headers.txt
           test $(curl -s -o /dev/null -w "%{http_code}" "$BASE_URL") -eq 200
           grep -i "content-security-policy\|x-frame-options\|strict-transport-security" -n headers.txt || true
+
+      - name: Assert admin CSP forbids third-party script hosts (self-hosted)
+        run: |
+          set -euo pipefail
+          hdr=$(curl -sI "$BASE_URL/admin/" | awk 'BEGIN{IGNORECASE=1} /^content-security-policy:/ {sub(/\r$/,"");print}')
+          echo "$hdr"
+          echo "$hdr" | grep -Eiq 'jsdelivr|unpkg' && { echo "CSP should NOT allow third-party script hosts (self-hosted)"; exit 1; } || true
+          echo "$hdr" | grep -qi "script-src 'self'" || { echo "CSP missing script-src 'self' on /admin/"; exit 1; }
 
       - name: Setup Node
         uses: actions/setup-node@v4

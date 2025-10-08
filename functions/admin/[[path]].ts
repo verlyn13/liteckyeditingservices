@@ -23,19 +23,20 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
 	const res = await ctx.next();
 	const headers = new Headers(res.headers);
 
-	// Single authoritative CSP for admin (Decap CMS)
+	// Single authoritative CSP for admin (self-hosted Decap CMS)
+	// No third-party script hosts needed - all assets served from /vendor/decap/
 	const csp = [
 		"default-src 'self'",
-		"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net https://identity.netlify.com",
-		"style-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net",
+		"style-src 'self' 'unsafe-inline'",
 		"img-src 'self' data: blob: https:",
-		"font-src 'self' data: https://unpkg.com https://cdn.jsdelivr.net",
-		"connect-src 'self' https://challenges.cloudflare.com https://api.github.com https://github.com https://api.netlify.com https://unpkg.com https://cdn.jsdelivr.net https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
+		"font-src 'self' data:",
+		"script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+		"connect-src 'self' https://api.github.com https://github.com https://api.netlify.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
 		"frame-src 'self' https://challenges.cloudflare.com",
 		"child-src 'self' blob:",
 		"worker-src 'self' blob:",
 		"object-src 'none'",
-		"base-uri 'self'",
+		"base-uri 'none'",
 		"form-action 'self' https://github.com",
 		"frame-ancestors 'self'",
 	].join("; ");

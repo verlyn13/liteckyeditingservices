@@ -7,6 +7,9 @@ dist/
 .vercel/
 .netlify/
 
+# vendored CMS assets (built at build time)
+public/vendor/
+
 # generated types
 .astro/
 

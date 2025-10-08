@@ -2,7 +2,12 @@
 # https://developers.cloudflare.com/pages/configuration/headers/
 #
 # NOTE: /admin/* headers are managed by functions/admin/[[path]].ts
-# This file only contains headers for general routes
+# This file only contains headers for general routes and static assets
+
+# Vendored assets (Decap CMS) - immutable caching
+/vendor/decap/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
 
 # Default security headers for all other routes
 /*

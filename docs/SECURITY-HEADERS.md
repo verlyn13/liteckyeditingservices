@@ -6,7 +6,8 @@ This document describes the security headers configured for Litecky Editing Serv
 
 ## Implementation
 
-Security headers are configured in `/public/_headers` which is processed by Cloudflare Pages during deployment.
+- Global headers are configured in `public/_headers` and applied by Cloudflare Pages at deploy time.
+- Admin routes (`/admin/*`) are served by a Pages Function at `functions/admin/[[path]].ts`, which sets a single authoritative `Content-Security-Policy` for Decap CMS. This replaces any CSP that might otherwise come from `_headers`, avoiding duplicate/merged policies.
 
 ## Headers Reference
 
@@ -50,19 +51,20 @@ upgrade-insecure-requests;
 - `frame-ancestors 'none'`: Prevent embedding in iframes (clickjacking protection)
 - `upgrade-insecure-requests`: Auto-upgrade HTTP to HTTPS
 
-**Admin Panel Policy** (`/admin/*`):
+**Admin Panel Policy** (`/admin/*` via Pages Function):
 - Relaxed to allow Decap CMS requirements
 - Permits `unsafe-eval` for CMS runtime
-- Allows external resources from unpkg.com, jsdelivr.net, GitHub, Netlify Identity
+- Allows external resources from `cdn.jsdelivr.net` (primary), `unpkg.com` (optional mirror), GitHub APIs, Netlify Identity, and the OAuth Worker endpoint
+- Served and enforced by `functions/admin/[[path]].ts` to ensure a single CSP source of truth
 
 ### 3. X-Frame-Options
 
 ```
-X-Frame-Options: DENY
+X-Frame-Options: SAMEORIGIN
 ```
 
 **Purpose**: Legacy protection against clickjacking
-**Note**: Redundant with `frame-ancestors 'none'` in CSP but included for older browsers
+**Note**: Matches `frame-ancestors 'self'` in CSP to permit same-origin previews while blocking cross-origin framing
 
 ### 4. X-Content-Type-Options
 

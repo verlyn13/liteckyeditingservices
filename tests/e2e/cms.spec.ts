@@ -17,8 +17,10 @@ test("CMS admin route is accessible", async ({ page }) => {
 	}
 });
 
-test("CMS admin has proper CSP configuration", async ({ page }) => {
-	// Verify CSP allows required Decap CMS resources
+test("CMS admin forbids third-party script hosts (self-hosted)", async ({
+	page,
+}) => {
+	// Verify self-hosted Decap CMS - no third-party CDNs in CSP
 	const response = await page.goto("/admin/");
 
 	if (response?.status() === 200) {
@@ -28,11 +30,11 @@ test("CMS admin has proper CSP configuration", async ({ page }) => {
 		expect(cspHeader).toBeDefined();
 
 		if (cspHeader) {
-			// Verify it allows cdn.jsdelivr.net for scripts (Decap CMS CDN)
-			expect(cspHeader).toContain("cdn.jsdelivr.net");
+			// Verify it does NOT allow third-party script hosts (self-hosted)
+			expect(cspHeader).not.toMatch(/jsdelivr|unpkg/i);
 
-			// Verify it allows unsafe-eval (required by Decap CMS)
-			expect(cspHeader).toContain("unsafe-eval");
+			// Verify it allows 'self' for scripts (self-hosted bundle)
+			expect(cspHeader).toContain("script-src 'self'");
 
 			// Verify it allows GitHub API (required for GitHub backend)
 			expect(cspHeader).toContain("api.github.com");
@@ -55,9 +57,20 @@ test("CMS script loads without CSP violations", async ({ page }) => {
 
 	await page.goto("/admin/");
 
-	// Wait a moment for any CSP violations to be logged
-	await page.waitForTimeout(2000);
+	// Wait for CMS to initialize (self-hosted bundle loads and sets window.CMS)
+	await page.waitForFunction(() => !!(window as any).CMS, { timeout: 5000 });
 
 	// Verify no CSP violations occurred
 	expect(cspViolations).toHaveLength(0);
+});
+
+test("Vendored CMS assets have immutable caching", async ({ request }) => {
+	// Verify self-hosted bundle has proper cache headers
+	const response = await request.get("/vendor/decap/decap-cms.js");
+
+	expect(response.status()).toBe(200);
+
+	const cacheControl = response.headers()["cache-control"];
+	expect(cacheControl).toContain("immutable");
+	expect(cacheControl).toContain("max-age=31536000");
 });
