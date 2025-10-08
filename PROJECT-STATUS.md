@@ -827,3 +827,4 @@ All packages using `latest` specifier for automatic updates within semver constr
 **Last Updated**: October 2, 2025 (20:50 UTC)
 **Next Review**: After DNS migration
   - ✅ **TypeScript Fix**: Restored working Pages Function types with skipLibCheck
+  - ✅ **OAuth Message Format Fix**: Corrected postMessage to use Decap CMS expected string format
