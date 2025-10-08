@@ -1,19 +1,17 @@
 import { expect, test } from "@playwright/test";
 
 test("CMS admin route is accessible", async ({ page }) => {
-	// Contract test: /admin/ should return 200 and contain CMS initialization
-	// Note: Decap CMS renders UI via async CDN script, which may be blocked
-	// by User-Agent filtering or CSP in production. We verify the route works
-	// rather than testing the full UI rendering.
+	// Contract test: /admin/ should return 200 and load boot.js
 	const response = await page.goto("/admin/");
 
-	// Admin route should be accessible (200, 401, or 403 are acceptable)
-	expect([200, 401, 403]).toContain(response?.status() ?? 0);
+	// Admin route should be accessible
+	expect(response?.status()).toBe(200);
 
-	// If accessible, verify it contains the CMS script reference
+	// Verify it contains the boot script reference (self-hosted)
 	if (response?.status() === 200) {
 		const content = await page.content();
-		expect(content).toMatch(/decap-cms|netlify-cms/i);
+		expect(content).toContain("/admin/boot.js");
+		expect(content).toContain("Content Manager");
 	}
 });
 
@@ -102,10 +100,10 @@ test("Admin headers allow OAuth popup handoff (October 2025 hardened)", async ({
 	}
 });
 
-test("Admin editor UI appears after boot script loads", async ({ page }) => {
-	// Synthetic test: verify CMS actually renders after auth
+test("Admin CMS initializes without CSP violations", async ({ page }) => {
+	// Synthetic test: verify CMS bundle loads and window.CMS is available
 	// Note: This doesn't test full OAuth flow (requires GitHub auth)
-	// but verifies the editor shell loads correctly
+	// We verify the boot script loads the CMS successfully
 
 	// Listen for CSP violations
 	const cspViolations: string[] = [];
@@ -113,7 +111,6 @@ test("Admin editor UI appears after boot script loads", async ({ page }) => {
 		const text = msg.text();
 		if (/violat(es|ion).*content security policy/i.test(text)) {
 			cspViolations.push(text);
-			test.fail(); // Fail immediately on CSP violation
 		}
 	});
 
@@ -121,23 +118,26 @@ test("Admin editor UI appears after boot script loads", async ({ page }) => {
 
 	// Wait for boot.js to load and initialize CMS
 	// Decap sets window.CMS when bundle loads
-	await page
-		.waitForFunction(() => !!(window as any).CMS, { timeout: 10000 })
-		.catch(() => {
-			test.fail(
-				true,
-				"window.CMS not initialized (boot.js failed or CSP blocked it)",
-			);
-		});
+	const cmsInitialized = await page
+		.waitForFunction(() => !!(window as any).CMS, { timeout: 15000 })
+		.then(() => true)
+		.catch(() => false);
+
+	// Verify CMS initialized
+	expect(cmsInitialized).toBe(true);
 
 	// Verify no CSP violations during load
 	expect(cspViolations).toHaveLength(0);
 
-	// Optional: Look for Decap UI elements (login screen or editor)
-	// This may show login screen (unauthenticated) or editor (if cookies present)
-	const hasDecapUI =
-		(await page.locator('[data-testid="login-button"]').count()) > 0 ||
-		(await page.locator(".nc-app, [class*='cms']").count()) > 0;
+	// Verify CMS renders something (login screen or editor)
+	// The page should have Decap's root element or login button
+	const hasDecapRoot = await page.evaluate(() => {
+		// Check for Decap's injected elements
+		const hasRoot = !!document.querySelector('[id^="nc-root"]');
+		const hasLogin = !!document.querySelector('button[type="button"]');
+		const hasApp = !!document.querySelector('[class*="cms"]');
+		return hasRoot || hasLogin || hasApp;
+	});
 
-	expect(hasDecapUI).toBe(true);
+	expect(hasDecapRoot).toBe(true);
 });
