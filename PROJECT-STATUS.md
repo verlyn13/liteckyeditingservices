@@ -42,7 +42,7 @@
   - ✅ **Playwright Admin Tests**: Added synthetic tests for editor UI appearance and header verification
   - ✅ **Worker Updates**: Deployed OAuth worker with COOP headers; updated wrangler to 4.42.1
   - ✅ **Pages Function Fix**: Removed /* wildcard from _headers; used official Cloudflare PagesFunction types
-  - ✅ **OAuth State Fix** (CRITICAL): Fixed Decap CMS authentication by adding `state` and `token_type: "bearer"` to OAuth callback message; Decap was rejecting messages without proper state validation; added ACK handshake for reliable popup close timing
+  - ✅ **OAuth Origin Fix** (CRITICAL): Fixed Decap CMS authentication by creating same-origin callback page; Decap validates postMessage origin and was rejecting messages from worker origin; worker now redirects to `/admin/oauth-callback` which posts message from correct origin with `state` and `token_type: "bearer"`
 
 **Recent Progress - October 7, 2025**:
   - ✅ **CSP Fix (Pages Function)**: Created `functions/admin/[[path]].ts` to set single authoritative CSP for /admin/* routes

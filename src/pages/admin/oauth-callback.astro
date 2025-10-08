@@ -1,0 +1,86 @@
+---
+// OAuth callback page for Decap CMS
+// This page receives the token from the OAuth worker and posts it to the opener
+// Must be on the same origin as /admin/ for Decap CMS to accept the message
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Authenticating…</title>
+  </head>
+  <body>
+    <p>Authentication successful. Returning to editor...</p>
+    <script is:inline>
+      (function() {
+        try {
+          // Parse token and state from URL hash (set by worker redirect)
+          const hash = window.location.hash.substring(1);
+          const params = new URLSearchParams(hash);
+          const token = params.get('token');
+          const state = params.get('state');
+
+          if (!window.opener) {
+            console.error('[OAuth Callback] No opener window');
+            document.body.innerHTML = '<p style="color:red;">Error: No opener window. Please close and try again.</p>';
+            return;
+          }
+
+          if (!token || !state) {
+            console.error('[OAuth Callback] Missing token or state in URL');
+            document.body.innerHTML = '<p style="color:red;">Error: Missing authentication data. Please close and try again.</p>';
+            return;
+          }
+
+          // Decap CMS expects this exact format
+          const content = JSON.stringify({
+            token: token,
+            token_type: 'bearer',
+            provider: 'github',
+            state: state
+          });
+          const message = 'authorization:github:success:' + content;
+
+          console.log('[OAuth Callback] Sending message to opener with state:', state);
+          console.log('[OAuth Callback] Message preview:', message.substring(0, 80) + '...');
+
+          // Post message to opener (same origin, so Decap will accept it)
+          const openerOrigin = window.location.origin;
+
+          // Send multiple times with delays to ensure delivery
+          function sendMessage() {
+            window.opener.postMessage(message, openerOrigin);
+          }
+
+          sendMessage();
+          setTimeout(sendMessage, 100);
+          setTimeout(sendMessage, 250);
+
+          console.log('[OAuth Callback] Messages posted to opener');
+
+          // Listen for ACK
+          function onAck(e) {
+            if (e.data === 'authorization:ack') {
+              console.log('[OAuth Callback] Received ACK from opener');
+              window.removeEventListener('message', onAck);
+              setTimeout(function() { window.close(); }, 50);
+            }
+          }
+          window.addEventListener('message', onAck);
+
+          // Failsafe close after 2.5s
+          setTimeout(function() {
+            console.log('[OAuth Callback] Closing popup (failsafe)');
+            window.close();
+          }, 2500);
+
+        } catch (e) {
+          console.error('[OAuth Callback] Error:', e);
+          document.body.innerHTML = '<p style="color:red;">Error: ' + e.message + '</p>';
+        }
+      })();
+    </script>
+  </body>
+</html>
