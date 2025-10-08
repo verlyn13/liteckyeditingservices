@@ -809,3 +809,4 @@ All packages using `latest` specifier for automatic updates within semver constr
 
 **Last Updated**: October 2, 2025 (20:50 UTC)
 **Next Review**: After DNS migration
+
