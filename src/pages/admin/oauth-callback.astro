@@ -12,55 +12,44 @@
     <title>Authenticating…</title>
   </head>
   <body>
-    <p>Authentication successful. Returning to editor...</p>
+    <p>Authenticating, please wait...</p>
     <script is:inline>
       (function() {
+        // Check if this window was opened by another window
+        if (!window.opener) {
+          document.body.innerHTML = '<p style="color:red;">Error: This page should be opened in a popup.</p>';
+          return;
+        }
+
         try {
-          // Parse token and state from URL hash (set by worker redirect)
-          const hash = window.location.hash.substring(1);
-          const params = new URLSearchParams(hash);
+          // Use URLSearchParams to safely parse the hash
+          const params = new URLSearchParams(window.location.hash.substring(1));
           const token = params.get('token');
           const state = params.get('state');
 
-          if (!window.opener) {
-            console.error('[OAuth Callback] No opener window');
-            document.body.innerHTML = '<p style="color:red;">Error: No opener window. Please close and try again.</p>';
-            return;
-          }
-
           if (!token || !state) {
-            console.error('[OAuth Callback] Missing token or state in URL');
-            document.body.innerHTML = '<p style="color:red;">Error: Missing authentication data. Please close and try again.</p>';
-            return;
+            throw new Error('Authentication parameters (token, state) not found in URL hash.');
           }
 
-          // Decap CMS expects this exact format
-          const content = JSON.stringify({
-            token: token,
-            token_type: 'bearer',
+          // **This is the EXACT message format Decap CMS expects**
+          const messagePayload = {
             provider: 'github',
+            token_type: 'bearer', // This is required
+            token: token,
             state: state
-          });
-          const message = 'authorization:github:success:' + content;
+          };
+          const message = 'authorization:github:success:' + JSON.stringify(messagePayload);
 
           console.log('[OAuth Callback] Sending message to opener with state:', state);
           console.log('[OAuth Callback] Message preview:', message.substring(0, 80) + '...');
 
-          // Post message to opener (same origin, so Decap will accept it)
-          const openerOrigin = window.location.origin;
+          // Post the message to the parent window (the /admin page)
+          // Specify the target origin for security
+          window.opener.postMessage(message, window.location.origin);
 
-          // Send multiple times with delays to ensure delivery
-          function sendMessage() {
-            window.opener.postMessage(message, openerOrigin);
-          }
+          console.log('[OAuth Callback] Message posted to opener');
 
-          sendMessage();
-          setTimeout(sendMessage, 100);
-          setTimeout(sendMessage, 250);
-
-          console.log('[OAuth Callback] Messages posted to opener');
-
-          // Listen for ACK
+          // Listen for ACK and close popup
           function onAck(e) {
             if (e.data === 'authorization:ack') {
               console.log('[OAuth Callback] Received ACK from opener');
@@ -76,9 +65,15 @@
             window.close();
           }, 2500);
 
-        } catch (e) {
-          console.error('[OAuth Callback] Error:', e);
-          document.body.innerHTML = '<p style="color:red;">Error: ' + e.message + '</p>';
+        } catch (err) {
+          console.error('[OAuth Callback] Error:', err);
+          // Let the opener know something went wrong
+          try {
+            window.opener.postMessage('authorization:github:error:' + JSON.stringify({ message: err.message }), window.location.origin);
+          } catch (e) {
+            console.error('[OAuth Callback] Failed to send error message:', e);
+          }
+          document.body.innerHTML = '<p style="color:red;">Error: ' + err.message + '</p>';
         }
       })();
     </script>

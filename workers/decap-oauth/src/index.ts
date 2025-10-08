@@ -215,7 +215,12 @@ export default {
 				"/admin/oauth-callback",
 				openerOrigin || getAllowedOrigins()[0],
 			);
-			callbackUrl.hash = `token=${encodeURIComponent(tokenData.access_token)}&state=${encodeURIComponent(state)}`;
+			// Use URLSearchParams for robust encoding
+			const hashParams = new URLSearchParams({
+				token: tokenData.access_token,
+				state: state,
+			});
+			callbackUrl.hash = hashParams.toString();
 
 			return new Response(null, {
 				status: 302,
