@@ -1,6 +1,6 @@
 import type { Locator } from "@playwright/test";
 import { expect, test } from "../fixtures/block-noise";
-import { prepareForVisualTest, assertViewportAndRoot } from "../helpers/visual";
+import { assertViewportAndRoot, prepareForVisualTest } from "../helpers/visual";
 
 /**
  * Visual regression tests for core UI components

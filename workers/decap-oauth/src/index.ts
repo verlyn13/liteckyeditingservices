@@ -44,21 +44,25 @@ function htmlPostMessage(token: string, openerOrigin?: string): string {
         var token = ${JSON.stringify(token)};
         var targets = ${JSON.stringify(targets)};
         if (window.opener && token) {
-          // Decap CMS expects a string message in this exact format
+          // Decap CMS expects this exact format
           var content = JSON.stringify({ token: token, provider: 'github' });
           var message = 'authorization:github:success:' + content;
+          console.log('[OAuth] Sending message:', message.substring(0, 50) + '...');
           for (var i = 0; i < targets.length; i++) {
-            try {
-              window.opener.postMessage(message, targets[i]);
-            } catch(e) {
-              console.error('postMessage failed for ' + targets[i], e);
-            }
+            console.log('[OAuth] Posting to:', targets[i]);
+            window.opener.postMessage(message, targets[i]);
           }
+          console.log('[OAuth] Message posted successfully');
+        } else {
+          console.error('[OAuth] Missing window.opener or token');
         }
       } catch(e) {
-        console.error('Auth error:', e);
+        console.error('[OAuth] Error:', e);
       }
-      setTimeout(function() { window.close(); }, 100);
+      setTimeout(function() {
+        console.log('[OAuth] Closing popup');
+        window.close();
+      }, 1000);
     })();
   </script>
   <p>Authentication successful. You can close this window.</p>

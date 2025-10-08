@@ -95,7 +95,7 @@ export async function prepareForVisualTest(
 
 	// Add runtime style locks (in case init script was bypassed)
 	await page.addStyleTag({
-    content: `
+		content: `
       /* Hide flaky dynamic elements */
       [data-flaky], .live-chat, .cookie-banner, .chat-widget {
         visibility: hidden !important;
@@ -125,15 +125,15 @@ export async function prepareForVisualTest(
 import { expect } from "@playwright/test";
 
 export async function assertViewportAndRoot(page: Page) {
-  const sz = page.viewportSize();
-  if (!sz) throw new Error("Viewport size is not set");
-  const rootWidth = await page.evaluate(
-    () => document.documentElement.getBoundingClientRect().width,
-  );
-  if (process.env.VISUAL_POLICY === "no-gutter") {
-    expect(Math.round(rootWidth)).toBe(1250);
-  } else {
-    // Linux scrollbar ~15px gutter expected
-    expect(Math.round(rootWidth)).toBe(1235);
-  }
+	const sz = page.viewportSize();
+	if (!sz) throw new Error("Viewport size is not set");
+	const rootWidth = await page.evaluate(
+		() => document.documentElement.getBoundingClientRect().width,
+	);
+	if (process.env.VISUAL_POLICY === "no-gutter") {
+		expect(Math.round(rootWidth)).toBe(1250);
+	} else {
+		// Linux scrollbar ~15px gutter expected
+		expect(Math.round(rootWidth)).toBe(1235);
+	}
 }
