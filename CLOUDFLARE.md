@@ -37,6 +37,7 @@
 1. **Decap OAuth** (`workers/decap-oauth/`)
    - Handles GitHub OAuth for CMS
    - KV namespace: `CACHE` (ID: `6d85733ce2654d9980caf3239a12540a`)
+   - Posts token back to opener window's origin captured at `/auth` (supports apex and www); strict allowlist. Clears cookie at `/callback`.
 
 2. **Queue Consumer** (`workers/queue-consumer/`)
    - Processes email queue
