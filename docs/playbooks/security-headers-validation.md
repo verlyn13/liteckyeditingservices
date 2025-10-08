@@ -235,8 +235,9 @@ frame-src https://challenges.cloudflare.com;
 
 **Fix**: For self-hosted Decap, verify `/admin/*` CSP (set by Pages Function) allows:
 - `unsafe-eval` in `script-src` (AJV codegen)
-- GitHub/Netlify Identity/OAuth Worker in `connect-src` as needed
+- GitHub/Netlify Identity/OAuth Worker in `connect-src` as needed; include `api.github.com` and `raw.githubusercontent.com` if calling GitHub directly
 - No third‑party script CDNs (should NOT include unpkg/jsdelivr)
+ - COOP/COEP relaxed for admin only (no COEP; `Cross-Origin-Opener-Policy: unsafe-none`) to allow popup → opener postMessage
 
 ## Success Criteria
 

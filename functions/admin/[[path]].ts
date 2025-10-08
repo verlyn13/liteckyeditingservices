@@ -32,7 +32,8 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
 		"font-src 'self' data:",
 		// Decap CMS uses AJV codegen which requires 'unsafe-eval' in admin only
 		"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com",
-		"connect-src 'self' https://api.github.com https://github.com https://api.netlify.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
+		// Allow GitHub APIs used by Decap; keep proxy/OAuth worker
+		"connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://api.netlify.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
 		"frame-src 'self' https://challenges.cloudflare.com",
 		"child-src 'self' blob:",
 		"worker-src 'self' blob:",
@@ -48,6 +49,11 @@ export const onRequest: PagesFunction<Env> = async (ctx) => {
 
 	// Set single CSP
 	headers.set("content-security-policy", csp);
+
+	// Ensure popup ↔ opener can communicate for OAuth handoff (admin only)
+	headers.delete("cross-origin-opener-policy");
+	headers.set("cross-origin-opener-policy", "unsafe-none");
+	headers.delete("cross-origin-embedder-policy");
 
 	// Avoid stale admin shell during deploys
 	headers.set("cache-control", "no-store");

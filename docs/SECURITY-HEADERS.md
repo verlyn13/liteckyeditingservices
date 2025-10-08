@@ -55,7 +55,8 @@ upgrade-insecure-requests;
 - Relaxed to allow Decap CMS requirements
 - Permits `unsafe-eval` for CMS runtime (AJV codegen)
 - Self-hosted CMS bundle, so no third‑party script CDNs (no jsDelivr/unpkg) are allowed
-- Allows only the necessary backends (GitHub APIs/Netlify Identity/OAuth Worker) in `connect-src`
+- Allows only the necessary backends (GitHub APIs like `api.github.com` and `raw.githubusercontent.com`, Netlify Identity, and the OAuth Worker) in `connect-src`
+- Neutralizes COOP/COEP for admin only to allow OAuth popup → opener `postMessage` handshake (`Cross-Origin-Opener-Policy: unsafe-none`; COEP not set)
 - Served and enforced by `functions/admin/[[path]].ts` to ensure a single CSP source of truth
 
 ### 3. X-Frame-Options
