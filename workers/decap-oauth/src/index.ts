@@ -26,7 +26,11 @@ function getCookie(request: Request, name: string): string | undefined {
 	return found?.split("=")[1];
 }
 
-function htmlPostMessage(token: string, openerOrigin?: string): string {
+function htmlPostMessage(
+	token: string,
+	state: string,
+	openerOrigin?: string,
+): string {
 	const allowed = getAllowedOrigins();
 	const targets = Array.from(
 		new Set([openerOrigin, ...allowed].filter(Boolean) as string[]),
@@ -42,17 +46,43 @@ function htmlPostMessage(token: string, openerOrigin?: string): string {
     (function() {
       try {
         var token = ${JSON.stringify(token)};
+        var state = ${JSON.stringify(state)};
         var targets = ${JSON.stringify(targets)};
         if (window.opener && token) {
-          // Decap CMS expects this exact format
-          var content = JSON.stringify({ token: token, provider: 'github' });
+          // Decap CMS expects this exact format with state and token_type
+          var content = JSON.stringify({
+            token: token,
+            token_type: 'bearer',
+            provider: 'github',
+            state: state
+          });
           var message = 'authorization:github:success:' + content;
-          console.log('[OAuth] Sending message:', message.substring(0, 50) + '...');
+          console.log('[OAuth] Sending message with state:', state);
+          console.log('[OAuth] Message preview:', message.substring(0, 80) + '...');
+
+          // Send to all targets with retries to avoid timing issues
           for (var i = 0; i < targets.length; i++) {
             console.log('[OAuth] Posting to:', targets[i]);
             window.opener.postMessage(message, targets[i]);
+            // Retry after small delays
+            setTimeout(function(target) {
+              window.opener.postMessage(message, target);
+            }.bind(null, targets[i]), 100);
+            setTimeout(function(target) {
+              window.opener.postMessage(message, target);
+            }.bind(null, targets[i]), 250);
           }
           console.log('[OAuth] Message posted successfully');
+
+          // Listen for ACK from opener
+          function onAck(e) {
+            if (e.data === 'authorization:ack') {
+              console.log('[OAuth] Received ACK from opener');
+              window.removeEventListener('message', onAck);
+              setTimeout(function() { window.close(); }, 50);
+            }
+          }
+          window.addEventListener('message', onAck);
         } else {
           console.error('[OAuth] Missing window.opener or token');
         }
@@ -60,9 +90,9 @@ function htmlPostMessage(token: string, openerOrigin?: string): string {
         console.error('[OAuth] Error:', e);
       }
       setTimeout(function() {
-        console.log('[OAuth] Closing popup');
+        console.log('[OAuth] Closing popup (failsafe)');
         window.close();
-      }, 1000);
+      }, 2500);
     })();
   </script>
   <p>Authentication successful. You can close this window.</p>
@@ -179,8 +209,8 @@ export default {
 				? openerCookie
 				: undefined;
 
-			// Return HTML that posts token to opener window
-			const html = htmlPostMessage(tokenData.access_token, openerOrigin);
+			// Return HTML that posts token to opener window (include state for Decap CMS validation)
+			const html = htmlPostMessage(tokenData.access_token, state, openerOrigin);
 
 			return new Response(html, {
 				headers: {

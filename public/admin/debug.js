@@ -14,6 +14,17 @@ window.addEventListener(
 					? event.data.substring(0, 100)
 					: JSON.stringify(event.data).substring(0, 100),
 		});
+
+		// Send ACK to OAuth popup for authorization messages
+		const dataStr = typeof event.data === "string" ? event.data : "";
+		if (dataStr.startsWith("authorization:github:success:")) {
+			try {
+				console.log("[Admin Debug] Sending ACK to popup");
+				event.source?.postMessage?.("authorization:ack", event.origin);
+			} catch (e) {
+				console.error("[Admin Debug] Error sending ACK:", e);
+			}
+		}
 	},
 	false,
 );

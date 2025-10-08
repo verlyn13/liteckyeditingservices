@@ -42,7 +42,7 @@
   - ✅ **Playwright Admin Tests**: Added synthetic tests for editor UI appearance and header verification
   - ✅ **Worker Updates**: Deployed OAuth worker with COOP headers; updated wrangler to 4.42.1
   - ✅ **Pages Function Fix**: Removed /* wildcard from _headers; used official Cloudflare PagesFunction types
-  - 🔍 **OAuth Debug Logging**: Added comprehensive logging to diagnose editor swap issue (popup completes but editor doesn't appear); fixed Astro build error by adding `is:inline` directive to public script tags; confirmed message is received correctly, investigating why Decap CMS doesn't process it
+  - ✅ **OAuth State Fix** (CRITICAL): Fixed Decap CMS authentication by adding `state` and `token_type: "bearer"` to OAuth callback message; Decap was rejecting messages without proper state validation; added ACK handshake for reliable popup close timing
 
 **Recent Progress - October 7, 2025**:
   - ✅ **CSP Fix (Pages Function)**: Created `functions/admin/[[path]].ts` to set single authoritative CSP for /admin/* routes
