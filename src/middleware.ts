@@ -1,22 +1,24 @@
 /**
- * Middleware for security headers
- * Runs in both dev and production to ensure proper CSP configuration
- * In production, this overrides the _headers file to prevent header merging
+ * Middleware for development server security headers
+ * In production, headers are set by:
+ * - public/_headers for general routes
+ * - functions/admin/[[path]].ts for /admin/* routes
  */
 import { defineMiddleware } from "astro:middleware";
 
 export const onRequest = defineMiddleware(async (context, next) => {
 	const { url } = context;
 
-	// Get the response first
+	// Only apply in development (production uses _headers file and Pages Functions)
+	if (import.meta.env.PROD) {
+		return next();
+	}
+
 	const response = await next();
+	const headers = new Headers(response.headers);
 
-	// Apply relaxed CSP for admin routes (both dev and prod)
-	// In production, this overrides the _headers file to ensure only one CSP is sent
+	// Apply relaxed CSP for admin routes in development
 	if (url.pathname.startsWith("/admin")) {
-		const headers = new Headers(response.headers);
-
-		// Match the production CSP from public/_headers
 		headers.set(
 			"Content-Security-Policy",
 			[
@@ -46,8 +48,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 	}
 
 	// Apply standard CSP for other routes in development
-	const headers = new Headers(response.headers);
-
 	headers.set(
 		"Content-Security-Policy",
 		[
