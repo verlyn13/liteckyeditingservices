@@ -233,10 +233,10 @@ frame-src https://challenges.cloudflare.com;
 
 **Symptom**: Decap CMS doesn't load or has console errors
 
-**Fix**: Verify `/admin/*` section in `_headers` allows:
-- `unsafe-eval` in `script-src`
-- GitHub domains in `connect-src`
-- Required CDNs (unpkg, jsdelivr)
+**Fix**: For self-hosted Decap, verify `/admin/*` CSP (set by Pages Function) allows:
+- `unsafe-eval` in `script-src` (AJV codegen)
+- GitHub/Netlify Identity/OAuth Worker in `connect-src` as needed
+- No third‑party script CDNs (should NOT include unpkg/jsdelivr)
 
 ## Success Criteria
 

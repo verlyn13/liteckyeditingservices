@@ -53,8 +53,9 @@ upgrade-insecure-requests;
 
 **Admin Panel Policy** (`/admin/*` via Pages Function):
 - Relaxed to allow Decap CMS requirements
-- Permits `unsafe-eval` for CMS runtime
-- Allows external resources from `cdn.jsdelivr.net` (primary), `unpkg.com` (optional mirror), GitHub APIs, Netlify Identity, and the OAuth Worker endpoint
+- Permits `unsafe-eval` for CMS runtime (AJV codegen)
+- Self-hosted CMS bundle, so no third‑party script CDNs (no jsDelivr/unpkg) are allowed
+- Allows only the necessary backends (GitHub APIs/Netlify Identity/OAuth Worker) in `connect-src`
 - Served and enforced by `functions/admin/[[path]].ts` to ensure a single CSP source of truth
 
 ### 3. X-Frame-Options
