@@ -43,11 +43,14 @@
           console.log('[OAuth Callback] Sending message to opener with state:', state);
           console.log('[OAuth Callback] Message preview:', message.substring(0, 80) + '...');
 
-          // Post the message to the parent window (the /admin page)
-          // Specify the target origin for security
-          window.opener.postMessage(message, window.location.origin);
-
-          console.log('[OAuth Callback] Message posted to opener');
+          // Wait 100ms to give the opener window time to initialize its listeners
+          // This prevents race conditions where the message arrives before Decap is ready
+          setTimeout(function() {
+            // Post the message to the parent window (the /admin page)
+            // Specify the target origin for security
+            window.opener.postMessage(message, window.location.origin);
+            console.log('[OAuth Callback] Message posted to opener');
+          }, 100);
 
           // Listen for ACK and close popup
           function onAck(e) {
@@ -68,11 +71,13 @@
         } catch (err) {
           console.error('[OAuth Callback] Error:', err);
           // Let the opener know something went wrong
-          try {
-            window.opener.postMessage('authorization:github:error:' + JSON.stringify({ message: err.message }), window.location.origin);
-          } catch (e) {
-            console.error('[OAuth Callback] Failed to send error message:', e);
-          }
+          setTimeout(function() {
+            try {
+              window.opener.postMessage('authorization:github:error:' + JSON.stringify({ message: err.message }), window.location.origin);
+            } catch (e) {
+              console.error('[OAuth Callback] Failed to send error message:', e);
+            }
+          }, 100);
           document.body.innerHTML = '<p style="color:red;">Error: ' + err.message + '</p>';
         }
       })();

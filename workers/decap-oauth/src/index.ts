@@ -114,9 +114,15 @@ export default {
 
 		// Start OAuth flow
 		if (url.pathname === "/auth") {
-			const state = crypto
-				.getRandomValues(new Uint8Array(16))
-				.reduce((s, b) => s + b.toString(16).padStart(2, "0"), "");
+			// CRITICAL: Accept state from Decap CMS (passed via query param)
+			// DO NOT generate our own state - must use Decap's for validation to work
+			const state = url.searchParams.get("state");
+			if (!state) {
+				return new Response("Missing state parameter", {
+					status: 400,
+					headers: { "Content-Type": "text/plain" },
+				});
+			}
 
 			// Use the worker's URL as base for callback
 			const redirectUri = `${url.origin}/callback`;
