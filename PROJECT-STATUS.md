@@ -28,7 +28,7 @@
 - Site responding at https://www.liteckyeditingservices.com (200 OK)
 - SSL certificates active and valid
 - Security headers present with CSP fix deployed (data: URI support)
-- Admin panel functional at /admin/
+- Admin panel functional at /admin/ (GitHub OAuth end-to-end)
 - Automatic builds triggered by Git commits
 - All security headers E2E tests passing (15/15)
 
@@ -36,6 +36,7 @@
   - ✅ **CSP Fix (Pages Function)**: Created `functions/admin/[[path]].ts` to set single authoritative CSP for /admin/* routes
   - ✅ **Header Merging Resolved**: Eliminated duplicate CSP headers by using Cloudflare Pages Function instead of _headers file
   - ✅ **October 2025 Best Practice**: Implemented programmatic header control for complex CSP scenarios
+  - ✅ **OAuth Origin Fix**: OAuth worker now posts token back to the opener origin captured at /auth (supports apex and www), resolving the "Authenticated successfully" but no login continuation when visiting admin on www.
 
 **Recent Progress - October 6, 2025**:
   - ✅ **Visual Baselines (Linux)**: Seeded from main; stored under `tests/e2e/__screenshots__/...`
@@ -814,4 +815,3 @@ All packages using `latest` specifier for automatic updates within semver constr
 
 **Last Updated**: October 2, 2025 (20:50 UTC)
 **Next Review**: After DNS migration
-
