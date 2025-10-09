@@ -30,14 +30,18 @@
 - **Build command**: `pnpm build`
 - **Output directory**: `dist`
 - **Framework**: Astro (static output)
-- **Functions**: `/api/contact` (queue producer)
+- **Functions**:
+  - `/api/contact` (queue producer)
+  - `/api/auth` (Decap OAuth start)
+  - `/api/callback` (Decap OAuth callback → posts token to opener)
 - **Environment variables**: SendGrid API keys, Turnstile keys
 
 ### Workers
-1. **Decap OAuth** (`workers/decap-oauth/`)
-   - Handles GitHub OAuth for CMS
-   - KV namespace: `CACHE` (ID: `6d85733ce2654d9980caf3239a12540a`)
-   - Posts token back to opener window's origin captured at `/auth` (supports apex and www); strict allowlist. Clears cookie at `/callback`.
+1. **Decap OAuth** (Pages Functions on site)
+   - Start: `/api/auth` — Generates state cookie and redirects to GitHub authorize
+   - Callback: `/api/callback` — Validates state, exchanges code→token, posts token to opener (`authorization:github:success:…` string), then closes popup
+   - Headers: COOP `unsafe-none` on both; minimal CSP on callback to allow inline postMessage script
+   - Env vars: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` configured in Pages
 
 2. **Queue Consumer** (`workers/queue-consumer/`)
    - Processes email queue
