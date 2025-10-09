@@ -83,12 +83,12 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		new Set([decapOrigin, url.origin].filter(Boolean) as string[]),
 	);
 
-	// HTML that posts token to opener and closes. Use string message format Decap accepts.
+	// HTML that posts token to opener and closes. Use string + object message formats Decap accepts.
 	const html = `<!doctype html><html><body><script>(function(){\n  var t=${JSON.stringify(
 		token,
 	)}; var state=${JSON.stringify(state)}; var targets=${JSON.stringify(
 		targets,
-	)};\n  var payload='authorization:github:success:'+JSON.stringify({token:t, provider:'github', token_type:'bearer', state:state});\n  function send(){ try{ for(var i=0;i<targets.length;i++){ window.opener && window.opener.postMessage(payload, targets[i]); } }catch(e){} }\n  // resend a few times to avoid timing races\n  send(); setTimeout(send,120); setTimeout(send,300);\n  // wait for ack then close; otherwise close after fail-safe\n  function onAck(ev){ if(targets.indexOf(ev.origin)>-1 && ev.data==='authorization:ack'){ window.removeEventListener('message', onAck); setTimeout(function(){ window.close(); }, 50); } }\n  window.addEventListener('message', onAck);\n  setTimeout(function(){ window.close(); }, 2500);\n})();</script><p>You may close this window.</p></body></html>`;
+	)};\n  var payload='authorization:github:success:'+JSON.stringify({token:t, provider:'github', token_type:'bearer', state:state});\n  function send(){ try{ for(var i=0;i<targets.length;i++){ window.opener && window.opener.postMessage(payload, targets[i]); } }catch(e){} }\n  // resend a few times to avoid timing races\n  send(); setTimeout(send,120); setTimeout(send,300);\n  // also send object-style message accepted by Decap\n  var objMsg={ type:'authorization:github:success', data:{ token:t, provider:'github', token_type:'bearer', state:state } };\n  function sendObj(){ try{ for(var i=0;i<targets.length;i++){ window.opener && window.opener.postMessage(objMsg, targets[i]); } }catch(e){} }\n  sendObj(); setTimeout(sendObj,140);\n  // wait for ack then close; otherwise close after fail-safe\n  function onAck(ev){ if(targets.indexOf(ev.origin)>-1 && ev.data==='authorization:ack'){ window.removeEventListener('message', onAck); setTimeout(function(){ window.close(); }, 50); } }\n  window.addEventListener('message', onAck);\n  setTimeout(function(){ window.close(); }, 2500);\n})();</script><p>You may close this window.</p></body></html>`;
 
 	const clearState = [
 		"decap_oauth_state=; Max-Age=0",
