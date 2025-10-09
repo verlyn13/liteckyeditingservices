@@ -16,10 +16,11 @@
   </head>
   <body>
     <!-- Debug OAuth postMessage flow (temporary) -->
-    <script is:inline src="/admin/debug.js"></script>
+    <script is:inline src="/admin/debug.js?v=2025-10-09"></script>
     <!-- Diagnostic script to check CMS state -->
-    <script is:inline src="/admin/diagnose.js"></script>
+    <script is:inline src="/admin/diagnose.js?v=2025-10-09"></script>
     <!-- Load CMS boot script (no inline JS for hardened CSP) -->
-    <script is:inline src="/admin/boot.js" defer></script>
+    <!-- Cache-busting version param ensures latest code is loaded -->
+    <script is:inline src="/admin/boot.js?v=2025-10-09-spec-aligned" defer></script>
   </body>
   </html>

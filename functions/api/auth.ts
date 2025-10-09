@@ -24,47 +24,54 @@ type PagesFunction<Env = unknown> = (
 ) => Response | Promise<Response>;
 
 export const onRequestGet: PagesFunction<Env> = async (ctx) => {
-  const url = new URL(ctx.request.url);
-  const clientId = ctx.env.GITHUB_CLIENT_ID;
-  if (!clientId) return new Response("Missing GITHUB_CLIENT_ID", { status: 500 });
+	const url = new URL(ctx.request.url);
+	const clientId = ctx.env.GITHUB_CLIENT_ID;
+	if (!clientId)
+		return new Response("Missing GITHUB_CLIENT_ID", { status: 500 });
 
-  // Prefer Decap-provided state; fallback to random if absent
-  const incomingState = url.searchParams.get("state");
-  const state = incomingState || Array.from(crypto.getRandomValues(new Uint8Array(16)))
-    .map((b) => b.toString(16).padStart(2, "0")).join("");
+	// Prefer Decap-provided state; fallback to random if absent
+	const incomingState = url.searchParams.get("state");
+	const state =
+		incomingState ||
+		Array.from(crypto.getRandomValues(new Uint8Array(16)))
+			.map((b) => b.toString(16).padStart(2, "0"))
+			.join("");
 
-  // Prefer Decap-provided scope; default to repo
-  const scope = url.searchParams.get("scope") || "repo";
+	// Prefer Decap-provided scope; default to repo
+	const scope = url.searchParams.get("scope") || "repo";
 
-  // Decap often supplies site_id=openerOrigin; some forks use origin=...
-  const openerOrigin = url.searchParams.get("site_id") || url.searchParams.get("origin") || url.origin;
+	// Decap often supplies site_id=openerOrigin; some forks use origin=...
+	const openerOrigin =
+		url.searchParams.get("site_id") ||
+		url.searchParams.get("origin") ||
+		url.origin;
 
-  const redirectUri = `${url.origin}/api/callback`;
+	const redirectUri = `${url.origin}/api/callback`;
 
-  const authorize = new URL("https://github.com/login/oauth/authorize");
-  authorize.searchParams.set("client_id", clientId);
-  authorize.searchParams.set("redirect_uri", redirectUri);
-  authorize.searchParams.set("scope", scope);
-  authorize.searchParams.set("state", state);
-  // Carry opener origin through to callback for precise target origin
-  authorize.searchParams.set("decap_origin", openerOrigin);
+	const authorize = new URL("https://github.com/login/oauth/authorize");
+	authorize.searchParams.set("client_id", clientId);
+	authorize.searchParams.set("redirect_uri", redirectUri);
+	authorize.searchParams.set("scope", scope);
+	authorize.searchParams.set("state", state);
+	// Carry opener origin through to callback for precise target origin
+	authorize.searchParams.set("decap_origin", openerOrigin);
 
-  const cookie = [
-    `decap_oauth_state=${state}`,
-    "Path=/",
-    "HttpOnly",
-    "Secure",
-    "SameSite=Lax",
-    "Max-Age=600",
-  ].join("; ");
+	const cookie = [
+		`decap_oauth_state=${state}`,
+		"Path=/",
+		"HttpOnly",
+		"Secure",
+		"SameSite=Lax",
+		"Max-Age=600",
+	].join("; ");
 
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: authorize.toString(),
-      "Set-Cookie": cookie,
-      // Keep popup ↔ opener relationship intact
-      "Cross-Origin-Opener-Policy": "unsafe-none",
-    },
-  });
+	return new Response(null, {
+		status: 302,
+		headers: {
+			Location: authorize.toString(),
+			"Set-Cookie": cookie,
+			// Keep popup ↔ opener relationship intact
+			"Cross-Origin-Opener-Policy": "unsafe-none",
+		},
+	});
 };
