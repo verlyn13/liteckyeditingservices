@@ -1,21 +1,23 @@
-# Cloudflare Configuration
-# Get your API token from: https://dash.cloudflare.com/profile/api-tokens
-CF_API_TOKEN=your-cloudflare-api-token-here
-CF_ZONE_ID=your-cloudflare-zone-id-here
-CF_ACCOUNT_ID=your-cloudflare-account-id-here
+# Local development environment variables for Cloudflare Pages Functions
+# Copy this file to .dev.vars and populate with actual values from gopass
+# Run: ./scripts/generate-dev-vars.sh to auto-generate from gopass
 
-# Alternative: Legacy API Key (not recommended)
-# CF_API_KEY=your-global-api-key-here
-# CF_API_EMAIL=your-email@example.com
+# ===== GitHub OAuth (for Decap CMS authentication) =====
+# Source: gopass github/litecky/oauth/*
+GITHUB_CLIENT_ID=your-github-oauth-client-id
+GITHUB_CLIENT_SECRET=your-github-oauth-client-secret
 
-# Turnstile (CAPTCHA) - Test keys for development
-# Production keys will be different
-TURNSTILE_SITE_KEY=1x00000000000000000000AA
+# ===== Turnstile (Cloudflare bot protection) =====
+# Source: gopass development/turnstile/*
+# Use test keys that always pass for local development
+PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
 TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 
-# SendGrid Email Configuration
-SENDGRID_API_KEY=your-sendgrid-api-key-here
-SENDGRID_FROM_EMAIL=noreply@liteckyeditingservices.com
-
-# Environment
-NODE_ENV=development
+# ===== SendGrid (email service) =====
+# Source: gopass development/sendgrid/*
+# Leave commented to disable email sending in development
+# SENDGRID_API_KEY=your-sendgrid-test-api-key
+# SENDGRID_FROM=noreply@liteckyeditingservices.com
+# SENDGRID_TO=test@example.com
+# SENDGRID_DOMAIN_ID=54920324
+# SENDGRID_FORCE_SEND=true  # Uncomment to send real emails in dev

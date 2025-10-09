@@ -57,19 +57,17 @@ echo "" >> .dev.vars
 
 cat >> .dev.vars << 'EOF'
 
-# GitHub OAuth (will be added later)
-# GITHUB_CLIENT_ID=
-# GITHUB_CLIENT_SECRET=
+# GitHub OAuth (for Decap CMS)
 EOF
 
-# Check for GitHub OAuth credentials
-if gopass show github/oauth/litecky-editing/client-id &>/dev/null; then
-    echo "" >> .dev.vars
-    echo "# GitHub OAuth credentials found in gopass:" >> .dev.vars
-    echo "# Run this to add them:" >> .dev.vars
-    echo "#   echo -n 'GITHUB_CLIENT_ID=' >> .dev.vars && gopass show -o github/oauth/litecky-editing/client-id >> .dev.vars" >> .dev.vars
-    echo "#   echo -n 'GITHUB_CLIENT_SECRET=' >> .dev.vars && gopass show -o github/oauth/litecky-editing/client-secret >> .dev.vars" >> .dev.vars
-fi
+# Get GitHub OAuth credentials
+echo -n "GITHUB_CLIENT_ID=" >> .dev.vars
+(gopass show -o github/litecky/oauth/client-id 2>/dev/null || echo "# Missing github/litecky/oauth/client-id") >> .dev.vars
+echo "" >> .dev.vars
+
+echo -n "GITHUB_CLIENT_SECRET=" >> .dev.vars
+(gopass show -o github/litecky/oauth/client-secret 2>/dev/null || echo "# Missing github/litecky/oauth/client-secret") >> .dev.vars
+echo "" >> .dev.vars
 
 cat >> .dev.vars << 'EOF'
 
@@ -82,14 +80,15 @@ echo ""
 echo "✅ .dev.vars generated successfully!"
 echo ""
 echo "📋 Credentials loaded from gopass:"
+echo "   • GitHub OAuth: github/litecky/oauth/*"
 echo "   • Turnstile keys: development/turnstile/*"
 echo "   • SendGrid config: development/sendgrid/*"
-echo "   • GitHub OAuth: github/oauth/litecky-editing/* (if needed)"
 echo ""
 
 # Check if any credentials are missing
 missing=false
-for path in "development/turnstile/site-key" "development/turnstile/secret-key" \
+for path in "github/litecky/oauth/client-id" "github/litecky/oauth/client-secret" \
+            "development/turnstile/site-key" "development/turnstile/secret-key" \
             "development/sendgrid/api-key" "development/sendgrid/email-from" \
             "development/sendgrid/email-to" "development/sendgrid/domain-id"; do
     if ! gopass show "$path" &>/dev/null; then

@@ -1,5 +1,7 @@
 # Environment Variables Reference
 
+> **📋 Quick Reference**: For a complete audit of all environment variables, their sources, and setup procedures, see [docs/ENVIRONMENT-AUDIT.md](./docs/ENVIRONMENT-AUDIT.md)
+
 ## Variable Matrix
 
 | Variable | Production | Preview | Development | Type | Required |

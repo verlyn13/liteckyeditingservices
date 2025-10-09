@@ -11,6 +11,15 @@
 		const s = document.createElement("script");
 		s.defer = true;
 		s.src = `/vendor/decap/decap-cms.js?v=${m.version}-${m.hash}`;
+
+		// Wait for script to load, then initialize with correct config path
+		s.onload = () => {
+			if (window.CMS) {
+				console.log("[Decap Boot] Initializing with config: /admin/config.yml");
+				window.CMS.init({ config: "/admin/config.yml" });
+			}
+		};
+
 		document.head.appendChild(s);
 	} catch (e) {
 		console.error("Failed to load Decap CMS:", e);

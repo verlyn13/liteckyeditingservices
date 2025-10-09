@@ -17,7 +17,7 @@
 ### Primary Domains
 - **Root**: https://liteckyeditingservices.com
 - **WWW**: https://www.liteckyeditingservices.com
-- **Pages Subdomain**: https://litecky-editing-services.pages.dev
+- **Pages Subdomain**: https://liteckyeditingservices.pages.dev
 
 ### Workers
 - **OAuth Proxy**: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev
@@ -26,7 +26,7 @@
 ## 🏗️ Infrastructure Overview
 
 ### Cloudflare Pages
-- **Project**: `litecky-editing-services`
+- **Project**: `liteckyeditingservices`
 - **Build command**: `pnpm build`
 - **Output directory**: `dist`
 - **Framework**: Astro (static output)
@@ -70,7 +70,7 @@
 git push origin main
 
 # Or manual via Wrangler
-pnpm wrangler pages deploy dist --project-name=litecky-editing-services
+pnpm wrangler pages deploy dist --project-name=liteckyeditingservices
 ```
 
 ### Deploy Worker
@@ -86,7 +86,7 @@ pnpm --filter queue-consumer deploy
 ### View Logs
 ```bash
 # Pages Functions logs
-pnpm wrangler pages deployment tail --project-name=litecky-editing-services
+pnpm wrangler pages deployment tail --project-name=liteckyeditingservices
 
 # Worker logs
 pnpm wrangler tail litecky-queue-consumer
@@ -95,7 +95,7 @@ pnpm wrangler tail litecky-queue-consumer
 ### Manage Secrets
 ```bash
 # Pages secrets
-pnpm wrangler pages secret put SENDGRID_API_KEY --project-name=litecky-editing-services
+pnpm wrangler pages secret put SENDGRID_API_KEY --project-name=liteckyeditingservices
 
 # Worker secrets
 cd workers/queue-consumer
@@ -162,7 +162,7 @@ For detailed setup and deployment history, see:
 ### Pages Deployment Failed
 ```bash
 # Check build logs
-pnpm wrangler pages deployment list --project-name=litecky-editing-services
+pnpm wrangler pages deployment list --project-name=liteckyeditingservices
 
 # Re-trigger deployment
 git commit --allow-empty -m "trigger deployment"
