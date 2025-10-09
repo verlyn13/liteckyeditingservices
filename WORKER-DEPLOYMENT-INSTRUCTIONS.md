@@ -10,10 +10,11 @@ To properly deploy to Cloudflare Pages:
 
 2. **Account ID is: 13eb584192d9cefb730fde0cfd271328**
 
-3. **Deploy to Pages:**
+3. **Deploy to Pages (Git-connected project):**
    ```bash
-   # First time deployment creates the project
-   pnpm wrangler pages deploy dist/ --project-name=litecky-editing-services
+   # Project is Git-connected as 'liteckyeditingservices'; use dashboard or push to main
+   # Legacy (manual) deploy syntax retained for reference with correct project name:
+   pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
    ```
 
 4. **For Infrastructure Setup (D1, R2, KV):**
@@ -24,4 +25,3 @@ To properly deploy to Cloudflare Pages:
    Create KV: pnpm wrangler kv:namespace create CACHE
 
 Note: The script now properly loads the account ID automatically!
-
