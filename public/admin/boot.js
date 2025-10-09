@@ -25,15 +25,8 @@
         s.dataset.decapCms = "1";
         s.defer = true;
         s.src = `/vendor/decap/decap-cms.js?v=${m.version}-${m.hash}`;
-
-        // Wait for script to load, then initialize with correct config path
-        s.onload = () => {
-            if (window.CMS) {
-                console.log("[Decap Boot] Initializing with config: /admin/config.yml");
-                window.CMS.init({ config: "/admin/config.yml" });
-            }
-        };
-
+        // Do NOT call CMS.init here; Decap auto-initializes and reads config via <link rel="cms-config-url">.
+        // Calling CMS.init in parallel can cause double-render and React removeChild errors.
         document.head.appendChild(s);
     } catch (e) {
         console.error("Failed to load Decap CMS:", e);

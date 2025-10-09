@@ -60,6 +60,7 @@
   - 🔧 **Dev UX**: Added `<link rel="cms-config-url" href="/admin/config.yml">` to ensure Decap loads config.yml correctly in dev/preview
   - 🔧 **Dev UX**: Guarded admin boot loader to prevent duplicate Decap initialization under HMR (avoids React removeChild errors)
   - 🔧 **OAuth State Echo**: /api/auth now honors Decap-provided `state` and opener origin; /api/callback posts Decap-compatible payload including `token_type:"bearer"` and `state` (string + object formats) with resend+ACK
+  - 🔧 **Admin Boot**: Removed explicit `CMS.init` call; Decap auto-initializes from `<link rel="cms-config-url">` to avoid double render and React removeChild errors
   - ✅ **OAuth Origin + Headers**: OAuth worker posts token back to the opener origin captured at /auth (supports apex and www) and now sets COOP/CSP on callback to ensure popup → opener postMessage is allowed; fixes "Authenticated successfully" but no editor UI.
 
 **Recent Progress - October 6, 2025**:
