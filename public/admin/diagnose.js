@@ -44,7 +44,9 @@ async function diagnoseCMS() {
 			} catch (e) {
 				console.error("❌ Collections error:", e.message, e.status);
 				if (e.status === 401 || e.status === 403) {
-					console.error("   → Check GitHub OAuth app scopes (need: repo, user)");
+					console.error(
+						"   → Check GitHub OAuth app scopes (need: repo, user)",
+					);
 				}
 			}
 		}

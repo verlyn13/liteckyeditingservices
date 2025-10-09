@@ -1,7 +1,7 @@
 # PROJECT STATUS - Litecky Editing Services
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 8, 2025 (current)
+**Last Updated**: October 9, 2025 (current)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment)
@@ -31,6 +31,14 @@
 - Admin panel functional at /admin/ (GitHub OAuth end-to-end)
 - Automatic builds triggered by Git commits
 - All security headers E2E tests passing (15/15)
+
+**Recent Progress - October 9, 2025**:
+  - ✅ **On-Site OAuth Migration**: Migrated Decap CMS OAuth from external Cloudflare Worker to same-domain Pages Functions (`/api/auth`, `/api/callback`)
+  - ✅ **Environment Variables Audit**: Consolidated all secrets/env vars documentation; created comprehensive `docs/ENVIRONMENT-AUDIT.md`
+  - ✅ **Project Name Correction**: Fixed incorrect project name (`litecky-editing-services` → `liteckyeditingservices`) across all documentation and scripts
+  - ✅ **Config Loading Fix**: Updated Decap CMS boot script to explicitly load config from `/admin/config.yml` (fixes dev/preview 404)
+  - ✅ **Credentials Setup**: Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in Cloudflare Pages production environment
+  - ✅ **Code Quality**: Applied Biome linter fixes across OAuth functions and admin scripts
 
 **Recent Progress - October 8, 2025**:
   - ✅ **Hardened OAuth Popup Handoff**: Implemented October 2025 best practices for reliable Decap CMS authentication
