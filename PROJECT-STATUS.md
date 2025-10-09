@@ -33,6 +33,13 @@
 - All security headers E2E tests passing (15/15)
 
 **Recent Progress - October 9, 2025**:
+  - ✅ **Documentation Alignment Audit**: Completed comprehensive docs-to-code alignment across 14 files (ARCHITECTURE.md, CLOUDFLARE.md, DEPLOYMENT.md, ENVIRONMENT.md, and all migration/config docs)
+  - ✅ **Decap Spec Compliance**: Added spec-required `type="text/yaml"` to config link; created comprehensive `docs/DECAP-SPEC-COMPLIANCE.md` with verification commands
+  - ✅ **Cache-Busting Fix**: Added version query parameters to admin scripts (`/admin/boot.js?v=2025-10-09-spec-aligned`) to force browser reload and prevent double-initialization errors from stale cached scripts
+  - ✅ **SendGrid Standardization**: Unified variable naming to `SENDGRID_FROM` across all docs and scripts; documented DNS verification procedures
+  - ✅ **pnpm Version Pin**: Fixed `.mise.toml` to pin exact pnpm 10.17.1 (was "latest")
+  - ✅ **Pages Subdomain Canonicalization**: Fixed all references from `litecky-editing-services.pages.dev` to `liteckyeditingservices.pages.dev`
+  - ✅ **OAuth Architecture Documentation**: Marked external OAuth worker as legacy (decommissioned Oct 2025); documented on-site Pages Functions as current implementation
   - ✅ **On-Site OAuth Migration**: Migrated Decap CMS OAuth from external Cloudflare Worker to same-domain Pages Functions (`/api/auth`, `/api/callback`)
   - ✅ **Environment Variables Audit**: Consolidated all secrets/env vars documentation; created comprehensive `docs/ENVIRONMENT-AUDIT.md`
   - ✅ **Project Name Correction**: Fixed incorrect project name (`litecky-editing-services` → `liteckyeditingservices`) across all documentation and scripts
