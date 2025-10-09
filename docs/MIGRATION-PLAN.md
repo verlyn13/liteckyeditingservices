@@ -7,7 +7,7 @@
 - **SPF**: Includes Google email servers
 
 ## Target Setup (Astro + Cloudflare Pages)
-- **Website**: Cloudflare Pages (www → litecky-editing-services.pages.dev)
+- **Website**: Cloudflare Pages (www → liteckyeditingservices.pages.dev)
 - **Email**:
   - Google Workspace for regular email (keep existing)
   - SendGrid for transactional emails (contact form, notifications)

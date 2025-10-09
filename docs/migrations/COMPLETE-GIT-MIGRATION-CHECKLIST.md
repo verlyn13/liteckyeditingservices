@@ -19,14 +19,14 @@
 - [ ] NODE_VERSION = 24
 - [ ] PNPM_VERSION = 10.17.1
 - [ ] PUBLIC_TURNSTILE_SITE_KEY = 0x4AAAAAAB27CNFPS0wEzPP5
-- [ ] SENDGRID_FROM_EMAIL = noreply@liteckyeditingservices.com
+- [ ] SENDGRID_FROM = noreply@liteckyeditingservices.com
 - [ ] ENVIRONMENT = production
 
 **Preview Environment:**
 - [ ] NODE_VERSION = 24
 - [ ] PNPM_VERSION = 10.17.1
 - [ ] PUBLIC_TURNSTILE_SITE_KEY = 1x00000000000000000000AA
-- [ ] SENDGRID_FROM_EMAIL = noreply@liteckyeditingservices.com
+- [ ] SENDGRID_FROM = noreply@liteckyeditingservices.com
 - [ ] ENVIRONMENT = preview
 - [ ] USE_TURNSTILE_TEST = 1
 - [ ] TURNSTILE_TEST_SITE_KEY = 1x00000000000000000000AA

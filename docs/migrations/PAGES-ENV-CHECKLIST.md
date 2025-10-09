@@ -16,7 +16,7 @@ Required
 - PUBLIC_TURNSTILE_SITE_KEY (public)
 - TURNSTILE_SECRET_KEY (secret)
 - SENDGRID_API_KEY (secret)
-- SENDGRID_FROM_EMAIL (string, verified sender)
+- SENDGRID_FROM (string, verified sender)
 - SENDGRID_CONTACT_TEMPLATE_ID (string)
 - SENDGRID_CONFIRMATION_TEMPLATE_ID (string)
 - ENVIRONMENT=production
@@ -31,7 +31,7 @@ Required
 - PUBLIC_TURNSTILE_SITE_KEY (same as prod or test key)
 - TURNSTILE_SECRET_KEY (test/preview key)
 - SENDGRID_API_KEY (can be unset to avoid sending on previews)
-- SENDGRID_FROM_EMAIL
+- SENDGRID_FROM
 - SENDGRID_CONTACT_TEMPLATE_ID (preview template id)
 - SENDGRID_CONFIRMATION_TEMPLATE_ID (preview template id)
 - ENVIRONMENT=preview

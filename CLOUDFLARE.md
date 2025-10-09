@@ -20,7 +20,9 @@
 - **Pages Subdomain**: https://liteckyeditingservices.pages.dev
 
 ### Workers
-- **OAuth Proxy**: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev
+- **OAuth Proxy (Legacy)**: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev
+  - **Status**: Decommissioned Oct 2025
+  - **Replacement**: On-site Pages Functions (`/api/auth`, `/api/callback`)
 - **Queue Consumer**: https://litecky-queue-consumer.jeffreyverlynjohnson.workers.dev
 
 ## 🏗️ Infrastructure Overview
@@ -36,17 +38,26 @@
   - `/api/callback` (Decap OAuth callback → posts token to opener)
 - **Environment variables**: SendGrid API keys, Turnstile keys
 
-### Workers
-1. **Decap OAuth** (Pages Functions on site)
+### Pages Functions (Serverless)
+1. **Decap OAuth** (On-Site Authentication)
    - Start: `/api/auth` — Generates state cookie and redirects to GitHub authorize
    - Callback: `/api/callback` — Validates state, exchanges code→token, posts token to opener (`authorization:github:success:…` string), then closes popup
    - Headers: COOP `unsafe-none` on both; minimal CSP on callback to allow inline postMessage script
    - Env vars: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` configured in Pages
 
-2. **Queue Consumer** (`workers/queue-consumer/`)
+2. **Contact Form** (`/api/contact`)
+   - Accepts contact form submissions
+   - Queue producer or direct SendGrid fallback
+
+### Workers
+1. **Queue Consumer** (`workers/queue-consumer/`)
    - Processes email queue
    - Queue binding: `send-email-queue`
    - SendGrid integration
+
+2. **Decap OAuth (Legacy)** (`workers/decap-oauth/`)
+   - **Status**: Decommissioned Oct 2025
+   - **Replacement**: On-site Pages Functions (see above)
 
 ### Queues
 - **Name**: `send-email-queue`
@@ -59,8 +70,32 @@
 - **Nameservers**: `carol.ns.cloudflare.com`, `ignacio.ns.cloudflare.com`
 - **Custom domains**: Root and WWW (proxied/orange-clouded)
 - **SSL/TLS**: Full (strict) - Cloudflare managed certificates
-- **SendGrid DNS**: All DKIM, SPF, DMARC records configured
 - **Google Workspace**: MX records configured
+
+#### Email Authentication (SendGrid Domain Verification)
+**Status**: Authenticated (Verified Oct 2025)
+
+SendGrid domain authentication configured with the following DNS records:
+- **DKIM Records**: CNAME records for `s1._domainkey` and `s2._domainkey` pointing to SendGrid
+- **SPF Record**: TXT record at `@` including `include:sendgrid.net ~all`
+- **DMARC Record**: TXT record at `_dmarc` with policy configuration
+
+**Verification**:
+```bash
+# Verify DKIM records
+dig s1._domainkey.liteckyeditingservices.com CNAME +short
+dig s2._domainkey.liteckyeditingservices.com CNAME +short
+
+# Verify SPF record
+dig liteckyeditingservices.com TXT +short | grep sendgrid
+
+# Verify DMARC record
+dig _dmarc.liteckyeditingservices.com TXT +short
+```
+
+**Dashboard Check**: SendGrid → Settings → Sender Authentication should show green "Authenticated" status.
+
+See `docs/playbooks/email-issues.md` for troubleshooting email delivery problems.
 
 ## 🔧 Common Operations
 

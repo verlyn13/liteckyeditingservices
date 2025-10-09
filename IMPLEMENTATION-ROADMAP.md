@@ -511,10 +511,10 @@ graph TD
 **Live Site**:
 - **Primary**: https://liteckyeditingservices.com
 - **WWW**: https://www.liteckyeditingservices.com
-- **Pages Subdomain**: https://litecky-editing-services.pages.dev
+- **Pages Subdomain**: https://liteckyeditingservices.pages.dev
 
 **Workers**:
-- **OAuth Proxy**: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev
+- **OAuth Proxy (Legacy)**: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev (decommissioned Oct 2025 - replaced by Pages Functions)
 - **Queue Consumer**: https://litecky-queue-consumer.jeffreyverlynjohnson.workers.dev
 
 **CMS**:

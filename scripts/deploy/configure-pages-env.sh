@@ -51,7 +51,7 @@ Next steps (non-sensitive variables to set in Dashboard):
 - NODE_VERSION = 24
 - PNPM_VERSION = 10.17.1
 - PUBLIC_TURNSTILE_SITE_KEY = 0x4AAAAAAB27CNFPS0wEzPP5
-- SENDGRID_FROM_EMAIL = noreply@liteckyeditingservices.com
+- SENDGRID_FROM = noreply@liteckyeditingservices.com
 - ENVIRONMENT = production (and preview = preview)
 
 If you need different secrets for Preview vs Production, set Preview overrides in the Pages dashboard (Environment Variables → Preview) after running this script.

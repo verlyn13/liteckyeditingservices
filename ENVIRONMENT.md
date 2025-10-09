@@ -23,7 +23,7 @@
 | `TURNSTILE_TEST_SECRET_KEY` | - | Test secret | Test secret | Secret | No |
 | **SendGrid** |
 | `SENDGRID_API_KEY` | Real key | Real key | Test key | Secret | Yes |
-| `SENDGRID_FROM_EMAIL` | noreply@liteckyeditingservices.com | Same | Same | Variable | Yes |
+| `SENDGRID_FROM` | noreply@liteckyeditingservices.com | Same | Same | Variable | Yes |
 | `SENDGRID_CONTACT_TEMPLATE_ID` | `d-prod123` | `d-prev456` | `d-test789` | Variable | Yes |
 | `SENDGRID_CONFIRMATION_TEMPLATE_ID` | `d-prod234` | `d-prev567` | `d-test890` | Variable | Yes |
 | **Admin** |

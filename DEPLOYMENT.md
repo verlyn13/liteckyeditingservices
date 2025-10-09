@@ -102,16 +102,17 @@ Rollback
 
 ## Deploy Workers
 
-Decap OAuth Worker
-```bash
-cd workers/decap-oauth
-pnpm install
-pnpm wrangler secret put GITHUB_OAUTH_ID
-pnpm wrangler secret put GITHUB_OAUTH_SECRET
-pnpm wrangler deploy
-# Optional: configure custom domain (e.g., cms-auth.liteckyeditingservices.com)
-```
-Set `public/admin/config.yml` → `base_url` to your worker domain, `auth_endpoint: /auth`.
+### CMS OAuth (Current - On-Site Pages Functions)
+Uses on-site Pages Functions at `/api/auth` and `/api/callback`. No custom OAuth subdomain or external worker required.
+
+**Configuration**: Pages → Settings → Environment variables
+- `GITHUB_CLIENT_ID` (secret)
+- `GITHUB_CLIENT_SECRET` (secret)
+
+**CMS Config**: `public/admin/config.yml` → `base_url: https://www.liteckyeditingservices.com`, `auth_endpoint: /api/auth`
+
+### Legacy OAuth Worker (Decommissioned Oct 2025)
+External worker `litecky-decap-oauth` is no longer used. Legacy deployment instructions moved to `_archive/DEPLOYMENT-legacy-oauth.md`.
 
 Queue Consumer Worker ✅ **DEPLOYED**
 ```bash
@@ -150,6 +151,36 @@ pnpm test:a11y       # Accessibility checks
 - Verify `/contact` form end-to-end (Turnstile + email delivery)
 - Verify `/admin` GitHub OAuth login flow (Decap CMS)
 - Review Cloudflare logs for Pages and Workers
+
+### Admin Cache Purge (After CMS Changes)
+
+When updating admin boot scripts, initialization logic, or Decap bundle versions, purge Cloudflare Pages cache to prevent stale asset issues:
+
+**Option 1: Via Cloudflare Dashboard**
+1. Pages → `liteckyeditingservices` → Deployments
+2. Click "..." menu on latest deployment → "Retry deployment"
+3. This rebuilds and purges the cache
+
+**Option 2: Via Wrangler (if needed)**
+```bash
+# Purge specific paths
+wrangler pages deployment tail --project-name=liteckyeditingservices
+
+# Or trigger fresh deployment
+git commit --allow-empty -m "chore: purge admin cache"
+git push origin main
+```
+
+**Why this matters**: Cached `/admin/*` assets (especially boot scripts) can cause:
+- Double-initialization errors (React "removeChild" crashes)
+- Stale OAuth flow configurations
+- Outdated security headers
+
+**When to purge**:
+- After changing `public/admin/boot.js` or bundle loading logic
+- After updating `src/pages/admin/index.astro`
+- After modifying `/admin/config.yml` authentication settings
+- When switching between manual and auto-initialization modes
 
 ## Troubleshooting
 

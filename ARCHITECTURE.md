@@ -3,9 +3,12 @@
 ## System Summary
 
 - Static site built with Astro 5 and Svelte 5 components, styled via Tailwind v4 (single stylesheet `src/styles/global.css`).
-- Hosted on Cloudflare Pages. One serverless endpoint implemented as a Pages Function: `functions/api/contact.ts`.
+- Hosted on Cloudflare Pages. Serverless endpoints implemented as Pages Functions.
 - Outbound email via SendGrid (direct from Pages Function) or asynchronously via Cloudflare Queues + a Queue Consumer Worker.
-- CMS: Decap CMS served from `public/admin/` using a Cloudflare Worker (`workers/decap-oauth`) for GitHub OAuth.
+- CMS: Decap CMS served from `public/admin/` using **on-site Cloudflare Pages Functions** for GitHub OAuth.
+  - Start: `/api/auth` (state cookie + redirect to GitHub authorize)
+  - Callback: `/api/callback` (state check, code→token, postMessage to opener, close)
+  - Legacy: External worker `litecky-decap-oauth` **(decommissioned Oct 2025)** is retained only in `_archive/` docs.
 
 ## Components
 
@@ -18,10 +21,13 @@
   - `functions/api/contact.ts` — Accepts JSON POST, validates payload, and:
     - Enqueues to `SEND_EMAIL` queue if producer binding exists; or
     - Sends email directly via SendGrid with `SENDGRID_API_KEY`, `SENDGRID_FROM`, `SENDGRID_TO`.
+  - `functions/api/auth.ts` — Initiates GitHub OAuth flow for Decap CMS (sets state cookie, redirects to GitHub)
+  - `functions/api/callback.ts` — Completes OAuth flow (validates state, exchanges code for token, posts to opener window)
+  - `functions/admin/[[path]].ts` — Sets admin-specific CSP and security headers for `/admin/*` routes
 
 - Workers
-  - `workers/decap-oauth` — OAuth proxy for Decap CMS (GitHub backend)
   - `workers/queue-consumer` — Consumes `contact` messages and sends email via SendGrid
+  - `workers/decap-oauth` — **Legacy (decommissioned Oct 2025)** — Previously handled OAuth; now superseded by Pages Functions
 
 ## Data Flows
 
@@ -36,17 +42,33 @@ Contact Submission (Queued)
 2. Pages Function detects a queue producer binding and enqueues `{ kind: "contact", data }`
 3. Queue Consumer Worker receives batch, sends via SendGrid, and `ack`s on success or `retry`s on failure
 
-CMS Authentication
-1. `/admin` serves Decap CMS
-2. CMS initiates GitHub OAuth against `workers/decap-oauth`
-3. Worker exchanges code for token and redirects back to `/admin`
+CMS Authentication (Current - On-Site, Spec-Aligned)
+1. `/admin` serves Decap CMS with **spec-required** config discovery: `<link href="/admin/config.yml" type="text/yaml" rel="cms-config-url">`
+2. Decap **auto-initializes** from the vendored bundle (no manual `CMS.init()` call, per official defaults)
+3. `config.yml` specifies `backend: { name: github, repo: ..., base_url: https://www.liteckyeditingservices.com, auth_endpoint: /api/auth }`
+4. On login, Decap opens popup to `/api/auth` (GitHub OAuth start)
+5. Pages Function `/api/auth` sets state cookie and redirects to GitHub authorize
+6. GitHub redirects to `/api/callback` with authorization code
+7. Pages Function `/api/callback`:
+   - Validates state cookie
+   - Exchanges code for access token
+   - Posts **community-standard** success message to opener: `authorization:github:success:{token,provider,token_type,state}`
+   - Also posts object-style message for broader compatibility
+   - Waits for `authorization:ack` from Decap, then closes popup
+8. Decap receives token and completes authentication
+
+**Spec Compliance**:
+- Config discovery via `<link type="text/yaml" rel="cms-config-url">` (per [Decap docs](https://decapcms.org/docs/configuration-options/))
+- Auto-init mode (default behavior, per [Decap docs](https://decapcms.org/docs/manual-initialization/))
+- GitHub backend with OAuth provider (required per [GitHub backend docs](https://decapcms.org/docs/github-backend/))
+- Success message format matches [community OAuth provider standard](https://github.com/vencax/netlify-cms-github-oauth-provider)
 
 ## Configuration
 
 Environment Variables (selected)
-- Pages Functions: `SENDGRID_API_KEY`, `SENDGRID_FROM`, `SENDGRID_TO`, `TURNSTILE_SECRET_KEY`
+- Pages Functions: `SENDGRID_API_KEY`, `SENDGRID_FROM`, `SENDGRID_TO`, `TURNSTILE_SECRET_KEY`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
 - Public: `PUBLIC_TURNSTILE_SITE_KEY`
-- Worker (decap-oauth): `GITHUB_OAUTH_ID`, `GITHUB_OAUTH_SECRET`
+- Worker (queue-consumer): `SENDGRID_API_KEY`, `SENDGRID_FROM`, `SENDGRID_TO`
 
 See `ENVIRONMENT.md` and `SECRETS.md` for the complete matrix.
 

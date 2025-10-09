@@ -114,7 +114,7 @@
 **1. Wait for Build** (2-3 minutes)
 - Monitor Cloudflare Pages dashboard
 - Wait for "Success" status
-- Or check: https://litecky-editing-services.pages.dev
+- Or check: https://liteckyeditingservices.pages.dev
 
 **2. Wait for CDN Propagation** (5 minutes)
 - Allow Cloudflare to distribute changes globally

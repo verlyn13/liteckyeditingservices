@@ -480,7 +480,7 @@
 
 **Deployment Details**:
 - [x] Build completed successfully (7 pages, sitemap generated)
-- [x] Deployed to production: `https://b9ee6806.litecky-editing-services.pages.dev`
+- [x] Deployed to production: `https://liteckyeditingservices.pages.dev` (migrated from legacy project Oct 2025)
 - [x] Functions bundle uploaded (contact API with queue binding)
 - [x] Test contact form (✅ returning 202/enqueued)
 - [x] Verify Turnstile integration (✅ active)
