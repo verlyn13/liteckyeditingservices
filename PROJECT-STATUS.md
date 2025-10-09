@@ -58,6 +58,7 @@
   - ✅ **October 2025 Best Practice**: Implemented programmatic header control for complex CSP scenarios
   - 🚧 **In Progress**: Migrating Decap OAuth from external Worker to on-site Cloudflare Pages Functions (`/api/auth`, `/api/callback`) to simplify origins and harden popup handoff
   - 🔧 **Dev UX**: Added `<link rel="cms-config-url" href="/admin/config.yml">` to ensure Decap loads config.yml correctly in dev/preview
+  - 🔧 **Dev UX**: Guarded admin boot loader to prevent duplicate Decap initialization under HMR (avoids React removeChild errors)
   - ✅ **OAuth Origin + Headers**: OAuth worker posts token back to the opener origin captured at /auth (supports apex and www) and now sets COOP/CSP on callback to ensure popup → opener postMessage is allowed; fixes "Authenticated successfully" but no editor UI.
 
 **Recent Progress - October 6, 2025**:
