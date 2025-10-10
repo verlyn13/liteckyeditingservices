@@ -39,6 +39,7 @@
   - 🔧 **Deep Diagnostics**: External diagnostics (no inline), storage write tracer, pre/post state sweeps, `window.open(/api/auth)` probe, `__dumpUser()` and `__forceAccept()` shim.
   - 🔧 **PKCE Wiring**: Added client PKCE helper (`pkce-login.js`), switched callback to post code-only, added `/api/exchange-token` to swap `{ code, verifier }` for `{ token }` server-side. `/api/auth` now honors `state` (and legacy `client_state`) and PKCE params.
   - ✅ **PKCE-Only Enforcement**: Capture-phase interception prevents Decap’s internal handler; single popup/name; re-entry guard; badge. Auth prefers client `state`; `/api/exchange-token` returns upstream error details. CI gate ensures exactly one self-hosted Decap bundle.
+  - 🔁 **Back-compat Fallback**: During function rollout, admin sends both `state` and `client_state` to `/api/auth` to ensure compatibility with older deployments. This will be removed after propagation is confirmed.
   - 🔧 **Token Exchange Fix**: `/api/exchange-token` now uses `application/x-www-form-urlencoded` for GitHub’s token endpoint (JSON body returned 400).
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
 
