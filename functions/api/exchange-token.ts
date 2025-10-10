@@ -44,20 +44,20 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 			);
 		}
 
-		const res = await fetch("https://github.com/login/oauth/access_token", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Accept: "application/json",
-			},
-			body: JSON.stringify({
-				client_id: ctx.env.GITHUB_CLIENT_ID,
-				client_secret: ctx.env.GITHUB_CLIENT_SECRET,
-				code,
-				code_verifier: verifier,
-				redirect_uri: `${origin}/api/callback`,
-			}),
-		});
+			const res = await fetch("https://github.com/login/oauth/access_token", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded",
+					Accept: "application/json",
+				},
+				body: new URLSearchParams({
+					client_id: ctx.env.GITHUB_CLIENT_ID,
+					client_secret: ctx.env.GITHUB_CLIENT_SECRET,
+					code,
+					code_verifier: verifier,
+					redirect_uri: `${origin}/api/callback`,
+				}),
+			});
 
 		const data = (await res.json().catch(() => ({}))) as {
 			access_token?: string;
