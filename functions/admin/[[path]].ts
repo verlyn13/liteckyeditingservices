@@ -4,7 +4,7 @@
  * Single source of truth for admin security headers
  */
 
-type Env = {};
+type Env = Record<string, never>;
 
 interface EventContext<Env> {
 	request: Request;

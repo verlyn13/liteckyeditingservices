@@ -11,7 +11,8 @@
   </head>
   <body>
     <!-- Debug: Capture all postMessage events BEFORE Decap loads -->
-    <script src="/admin/debug-oauth.js"></script>
+    <!-- DISABLED: debug-oauth.js causes MIME type error in production (404 served as HTML) -->
+    <!-- <script src="/admin/debug-oauth.js"></script> -->
     <!-- Optional shim: enable with ?auth_shim=1 to re-emit canonical success string from admin window -->
     <script src="/admin/decap-auth-shim.js"></script>
     <!-- Exactly one bundle; Decap auto-inits from config link (no manual CMS.init()) -->

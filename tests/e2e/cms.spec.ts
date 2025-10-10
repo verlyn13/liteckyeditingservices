@@ -5,16 +5,16 @@ const isProd =
 	!/localhost|127\.0\.0\.1/i.test(process.env.BASE_URL);
 
 test("CMS admin route is accessible", async ({ page }) => {
-	// Contract test: /admin/ should return 200 and load boot.js
+	// Contract test: /admin/ should return 200 and load decap-cms.js
 	const response = await page.goto("/admin/");
 
 	// Admin route should be accessible
 	expect(response?.status()).toBe(200);
 
-	// Verify it contains the boot script reference (self-hosted)
+	// Verify it contains the Decap CMS script reference (self-hosted)
 	if (response?.status() === 200) {
 		const content = await page.content();
-		expect(content).toContain("/admin/boot.js");
+		expect(content).toContain("/vendor/decap/decap-cms.js");
 		expect(content).toContain("Content Manager");
 	}
 });
@@ -61,7 +61,10 @@ test("CMS script loads without CSP violations", async ({ page }) => {
 	await page.goto("/admin/");
 
 	// Wait for CMS to initialize (self-hosted bundle loads and sets window.CMS)
-	await page.waitForFunction(() => !!(window as any).CMS, { timeout: 5000 });
+	await page.waitForFunction(
+		() => !!(window as unknown as { CMS?: unknown }).CMS,
+		{ timeout: 5000 },
+	);
 
 	// Verify no CSP violations occurred
 	expect(cspViolations).toHaveLength(0);
@@ -123,10 +126,12 @@ test("Admin CMS initializes without CSP violations", async ({ page }) => {
 
 	await page.goto("/admin/");
 
-	// Wait for boot.js to load and initialize CMS
+	// Wait for decap-cms.js to load and initialize CMS
 	// Decap sets window.CMS when bundle loads
 	const cmsInitialized = await page
-		.waitForFunction(() => !!(window as any).CMS, { timeout: 15000 })
+		.waitForFunction(() => !!(window as unknown as { CMS?: unknown }).CMS, {
+			timeout: 15000,
+		})
 		.then(() => true)
 		.catch(() => false);
 

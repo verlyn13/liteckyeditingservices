@@ -8,14 +8,14 @@
 		(event) => {
 			try {
 				if (event.origin !== window.location.origin) return;
-				var d = event.data;
+				const d = event.data;
 				if (
 					d &&
 					typeof d === "object" &&
 					d.type === "authorization:github:success" &&
 					d.data
 				) {
-					var s = "authorization:github:success:" + JSON.stringify(d.data);
+					const s = `authorization:github:success:${JSON.stringify(d.data)}`;
 					setTimeout(() => {
 						window.postMessage(s, window.location.origin);
 					}, 50);
@@ -38,7 +38,7 @@
 				) {
 					setTimeout(async () => {
 						try {
-							var has = await (window.CMS && window.CMS.getToken
+							const has = await (window.CMS?.getToken
 								? window.CMS.getToken().then(Boolean)
 								: Promise.resolve(false));
 							if (!has) window.postMessage(event.data, window.location.origin);

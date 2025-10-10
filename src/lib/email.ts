@@ -76,10 +76,6 @@ export async function sendEmail(
 				: message.from;
 
 		// Prepare mail object - SendGrid requires at least one content item
-		const initialContent: [
-			{ type: "text/plain" | "text/html"; value: string },
-		] = [{ type: "text/plain", value: message.text || message.html || "" }];
-
 		const mail: MailDataRequired = {
 			to: message.to,
 			from: {
@@ -87,7 +83,9 @@ export async function sendEmail(
 				name: message.fromName || "Litecky Editing Services",
 			},
 			subject: message.subject,
-			content: initialContent as any, // SendGrid's type is overly strict
+			content: [
+				{ type: "text/plain", value: message.text || message.html || "" },
+			],
 		};
 
 		// Template and content

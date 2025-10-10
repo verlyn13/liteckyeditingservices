@@ -45,7 +45,7 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		console.log("[/api/callback] Request received:", {
 			url: reqUrl.toString(),
 			hasCode: !!code,
-			state: state.slice(0, 8) + "...",
+			state: `${state.slice(0, 8)}...`,
 		});
 
 		const cookie = ctx.request.headers.get("Cookie") || "";
@@ -54,7 +54,7 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		const openerOrigin = decodeURIComponent(cookies.decap_opener_origin ?? "");
 
 		console.log("[/api/callback] Cookie state:", {
-			wantState: wantState.slice(0, 8) + "...",
+			wantState: `${wantState.slice(0, 8)}...`,
 			openerOrigin,
 			stateMatch: state === wantState,
 		});
@@ -128,7 +128,7 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		console.log("[/api/callback] Token received:", {
 			hasToken: !!token,
 			tokenType,
-			tokenPreview: token.slice(0, 8) + "...",
+			tokenPreview: `${token.slice(0, 8)}...`,
 		});
 
 		// Post success message to opener (Decap 3.8.x compatible), then close
@@ -156,9 +156,8 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		const isHttps = reqUrl.protocol === "https:";
 		const secure = isHttps ? "; Secure" : "";
 		const clearCookies = [
-			"decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0" + secure,
-			"decap_opener_origin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0" +
-				secure,
+			`decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+			`decap_opener_origin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
 		];
 
 		return new Response(html, {
