@@ -44,20 +44,24 @@ This document records how our Decap CMS integration complies with current specs,
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 
-- Files: `functions/api/auth.ts`, `functions/api/callback.ts`
-- Flow:
-  1) `/api/auth` (same origin as `/admin`)
+- Files: `functions/api/auth.ts`, `functions/api/callback.ts`, `public/admin/oauth-callback.html`
+- Flow (TWO-callback architecture):
+  1) `/api/auth` (server-side, same origin as `/admin`)
      - Honors Decap `state` and `site_id`/`origin` (opener)
      - Persists state in HttpOnly cookie
      - Redirects to GitHub authorize (includes `redirect_uri`, `scope`, `state`, and carries `decap_origin`)
-  2) `/api/callback` (same origin as `/admin`)
+  2) `/api/callback` (server-side, GitHub redirect target)
      - Validates state cookie
      - Exchanges code for access token
+     - Redirects to `/admin/oauth-callback` with token in URL hash fragment
+  3) `/admin/oauth-callback` (client-side HTML popup page)
+     - Parses token from URL hash (client-side only, never logged)
      - Posts success message to opener in both formats:
        - String: `authorization:github:success:` + JSON.stringify({ token, provider:'github', token_type:'bearer', state })
        - Object: `{ type:'authorization:github:success', data:{ token, provider:'github', token_type:'bearer', state } }`
-     - Resends (0/120/300ms) + ACK; closes popup
-     - Headers: COOP `unsafe-none`; minimal inline‑allowed CSP for the callback page only
+     - Resends multiple times (0ms/100ms/200ms) for reliability
+     - Auto-closes after 3s or on ACK receipt
+     - CSP hash: `'sha256-JFhqF0yfRgpFN2RwYzspNEyLD5yXJR1Db1HXPPvAnAA='`
 
 - Verify (prod, after login):
   - `await CMS.getToken().then(Boolean) === true`
@@ -94,8 +98,11 @@ This document records how our Decap CMS integration complies with current specs,
 - Removed `public/admin/boot.js`, `debug.js`, `diagnose.js` (runtime injection scripts with HMR guards and cache-busting)
 - Replaced with single static `public/admin/index.html` with direct `<script src="/vendor/decap/decap-cms.js">`
 - Archived old files to `_archive/admin-migration-2025-10-09/`
-- **October 2025 OAuth fix**: Added `base_url` to config.yml to prevent Netlify API fallback
-- **October 2025 production fix**: Disabled debug-oauth.js (MIME type error - file not copied to dist)
+- **October 2025 OAuth fix #1**: Added `base_url` to config.yml to prevent Netlify API fallback
+- **October 2025 OAuth fix #2**: Disabled debug-oauth.js (MIME type error - file not copied to dist)
+- **October 2025 OAuth fix #3**: Added `/admin/oauth-callback.html` (two-callback architecture)
+  - `/api/callback` now redirects to `/admin/oauth-callback` with token in hash
+  - This is the proper Decap CMS OAuth pattern (server callback + client popup callback)
 
 **Why:**
 - Eliminates React double-mount/"removeChild" errors from multiple init paths
