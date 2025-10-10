@@ -8,8 +8,7 @@ This document records how our Decap CMS integration complies with current specs,
 - Single `<script>` tag loading `/vendor/decap/decap-cms.js`
 - No manual `CMS.init()` call - auto-init only
 - Rationale: Single static HTML page with one bundle prevents React double-mount and `removeChild` crashes. Per [Decap install docs](https://decapcms.org/docs/install-decap-cms/).
-- Verify (console):
-  - `Array.from(document.scripts).map(s=>s.src).filter(s=>/decap-cms/i.test(s)).length === 1`
+- Verify (console): `Array.from(document.scripts).map(s=>s.src).filter(s=>/decap-cms/i.test(s)).length === 1`
 
 ## Config Discovery (Spec: Configuration Options)
 
@@ -26,9 +25,7 @@ This document records how our Decap CMS integration complies with current specs,
 - Mode: Auto‑init (default). We do not call `CMS.init()` anywhere.
 - Implementation: Single `<script>` in `public/admin/index.html` loads bundle; Decap auto-inits from config link.
 - Why: Mixing manual init + auto init causes double render and React `removeChild` crashes.
-- Verify (console):
-  - `Array.from(document.scripts).filter(s=>/decap-cms\.js/.test(s.src)).length === 1`
-  - Search all scripts for "CMS.init" - should return 0 results
+- Verify (console): `Array.from(document.scripts).filter(s=>/decap-cms\.js/.test(s.src)).length === 1` and searching all scripts for "CMS.init" returns 0 results
 
 ## GitHub Backend Configuration (Spec: GitHub Backend)
 
@@ -41,7 +38,7 @@ This document records how our Decap CMS integration complies with current specs,
     branch: main
     auth_endpoint: /api/auth
   ```
-- Rationale: Uses on-site OAuth via Pages Functions. `base_url` + `auth_endpoint` pattern per [Decap GitHub backend docs](https://decapcms.org/docs/github-backend/). Works in production and in local dev with `wrangler pages dev` (functions share same origin as admin).
+- Rationale: Uses on-site OAuth via Pages Functions with same-origin `auth_endpoint`. Works in production and in local dev with `wrangler pages dev` (functions share the same origin as admin).
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 

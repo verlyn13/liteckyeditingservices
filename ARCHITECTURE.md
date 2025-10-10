@@ -43,7 +43,7 @@ Contact Submission (Queued)
 3. Queue Consumer Worker receives batch, sends via SendGrid, and `ack`s on success or `retry`s on failure
 
 CMS Authentication (Current - On-Site OAuth, 2025 Spec-Aligned)
-1. `/admin` is served by an Astro page that injects a single Decap bundle and includes **spec-required** config discovery: `<link href="/admin/config.yml" type="text/yaml" rel="cms-config-url">`
+1. `/admin` is served by a static HTML page (`public/admin/index.html`) with a single Decap bundle and **spec-required** config discovery: `<link href="/admin/config.yml" type="text/yaml" rel="cms-config-url">`
 2. Decap **auto-initializes** from the vendored bundle (no manual `CMS.init()` call) — eliminates double-mount errors
 3. `config.yml` specifies `backend: { name: github, repo: ..., auth_endpoint: /api/auth }` (same-origin OAuth via Pages Functions)
 4. On login, Decap opens popup to `https://www.liteckyeditingservices.com/api/auth` (GitHub OAuth start)

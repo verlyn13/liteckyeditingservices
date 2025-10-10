@@ -33,10 +33,9 @@
 - All security headers E2E tests passing (15/15)
 
 **Recent Progress - October 9, 2025**:
-  - ✅ **BREAKING: Admin Rewrite to Static HTML**: Complete rewrite of Decap CMS admin to single static HTML page with on-site OAuth
-    - Replaced `src/pages/admin/index.astro` (Astro framework page) with static `public/admin/index.html` (direct `<script>` tag, no runtime injection)
-    - Removed runtime boot scripts (`boot.js`, `debug.js`, `diagnose.js`) - archived to `_archive/admin-migration-2025-10-09/`
-    - Uses `base_url` + `auth_endpoint` in `config.yml` per Decap GitHub backend spec
+  - ✅ **Admin on Static HTML**: Decap CMS admin served via `public/admin/index.html` with single bundle + auto-init
+    - Archived previous Astro admin and runtime boot scripts to `_archive/admin-migration-2025-10-09/`
+    - Uses same-origin `auth_endpoint: /api/auth` (no `base_url`) in `config.yml`
     - **Why**: Eliminates React double-mount/"removeChild" errors from multiple init paths; follows Decap install docs (static HTML, single bundle, auto-init from config link)
     - **Spec compliance**: Auto-init mode only (no `CMS.init()`), config discovery via `<link type="text/yaml" rel="cms-config-url">`
     - **Local testing**: `npx wrangler pages dev dist --env-file=.dev.vars` serves localhost:8788 with admin + Pages Functions on one origin
