@@ -1,7 +1,7 @@
 # PROJECT STATUS - Litecky Editing Services
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 9, 2025 (current)
+**Last Updated**: October 10, 2025 (current)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment)
@@ -11,7 +11,7 @@
 ## 📊 EXECUTIVE SUMMARY
 
 **Status**: ✅ **MIGRATION COMPLETE** - Git-connected deployment live; CI green with blocking visuals.
-**Auth Hardening**: 🟡 In progress — diagnostics + logging shipped; PKCE upgrade planned next.
+**Auth Hardening**: 🟢 Completed — PKCE-only flow enforced; canonical Decap message; pinned bundle; clearer errors.
 
 ### ✅ SUCCESSFUL MIGRATION (October 5, 2025)
 
@@ -37,7 +37,8 @@
   - 🔧 **Acceptance Hardening**: String‑only callback message (canonical `authorization:github:success:`); callback retry tuning (10× @ 100ms).
   - 🔧 **Config Discovery Endpoint**: Added `/api/config.yml` (mirrors `/admin/config.yml`) and pointed admin `<link rel="cms-config-url">` to `/api/config.yml`. Set `auth_endpoint: api/auth` to mirror docs' append semantics.
   - 🔧 **Deep Diagnostics**: External diagnostics (no inline), storage write tracer, pre/post state sweeps, `window.open(/api/auth)` probe, `__dumpUser()` and `__forceAccept()` shim.
-  - 🔧 **PKCE Wiring**: Added client PKCE helper (`pkce-login.js`), switched callback to post code-only, added `/api/exchange-token` to swap `{ code, verifier }` for `{ token }` server-side. `/api/auth` now honors `client_state` and PKCE params.
+  - 🔧 **PKCE Wiring**: Added client PKCE helper (`pkce-login.js`), switched callback to post code-only, added `/api/exchange-token` to swap `{ code, verifier }` for `{ token }` server-side. `/api/auth` now honors `state` (and legacy `client_state`) and PKCE params.
+  - ✅ **PKCE-Only Enforcement**: Capture-phase interception prevents Decap’s internal handler; single popup/name; re-entry guard; badge. Auth prefers client `state`; `/api/exchange-token` returns upstream error details. CI gate ensures exactly one self-hosted Decap bundle.
   - 🔧 **Token Exchange Fix**: `/api/exchange-token` now uses `application/x-www-form-urlencoded` for GitHub’s token endpoint (JSON body returned 400).
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
 
