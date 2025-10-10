@@ -72,7 +72,8 @@
   - 🚧 **In Progress**: Migrating Decap OAuth from external Worker to on-site Cloudflare Pages Functions (`/api/auth`, `/api/callback`) to simplify origins and harden popup handoff
   - 🔧 **Dev UX**: Added `<link rel="cms-config-url" href="/admin/config.yml">` to ensure Decap loads config.yml correctly in dev/preview
   - 🔧 **Dev UX**: Guarded admin boot loader to prevent duplicate Decap initialization under HMR (avoids React removeChild errors)
-  - 🔧 **OAuth State Echo**: /api/auth now honors Decap-provided `state` and opener origin; /api/callback posts Decap-compatible payload including `token_type:"bearer"` and `state` (string + object formats) with resend+ACK
+  - 🔧 **OAuth State Echo**: /api/auth now honors Decap-provided `state` and opener origin; /api/callback posts Decap-compatible payload including `token_type:"bearer"` and `state` (string + object formats) with robust resend loop and ACK; opener origin cookie fallback added
+  - 🔧 **Same-Origin Config**: `public/admin/config.yml` simplified to `auth_endpoint: /api/auth` (no `base_url`) for seamless local (wrangler pages dev) and production behavior
   - 🔧 **Admin Boot**: Removed explicit `CMS.init` call; Decap auto-initializes from `<link rel="cms-config-url">` to avoid double render and React removeChild errors
   - ✅ **OAuth Origin + Headers**: OAuth worker posts token back to the opener origin captured at /auth (supports apex and www) and now sets COOP/CSP on callback to ensure popup → opener postMessage is allowed; fixes "Authenticated successfully" but no editor UI.
 
