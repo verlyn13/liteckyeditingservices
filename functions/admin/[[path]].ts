@@ -33,10 +33,8 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 	);
 
 	// -- CSP: self-hosted Decap with GitHub API direct access ------------
-	// Hash for inline script in /admin/oauth-callback.html page (OAuth postMessage handshake)
-	// This hash is computed from the exact script content including whitespace
-	const oauthCallbackScriptHash =
-		"'sha256-PDMtGDfBsO9ZxKnfZlAj0HwihdlIruXKZOzRElc1oSk='";
+	// Hash for debug listener in admin/index.html (browser-reported)
+	const debugListenerHash = "'sha256-7QABwjQQSmGVJbGBRzoLFPHLevIvlo/JR3nLf/9wfHA='";
 
 	const csp = [
 		"default-src 'self'",
@@ -44,8 +42,8 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 		"img-src 'self' data: blob: https:",
 		"font-src 'self' data:",
 		// Self-hosted bundle (no inline) + Turnstile + Decap requires unsafe-eval for AJV codegen
-		// OAuth callback page requires specific inline script hash for postMessage handshake
-		`script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com ${oauthCallbackScriptHash}`,
+		// Admin page has inline debug listener for OAuth troubleshooting
+		`script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com ${debugListenerHash}`,
 		// Direct-to-GitHub (not proxying yet)
 		"connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
 		"frame-src 'self' https://challenges.cloudflare.com",

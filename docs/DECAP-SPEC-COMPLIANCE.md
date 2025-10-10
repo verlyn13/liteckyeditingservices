@@ -136,3 +136,4 @@ When bumping:
   2) Login with GitHub; wait for popup to close.
   3) Confirm token: `await CMS.getToken().then(Boolean)` — should be `true`
   4) Optional collections check: `await CMS.getBackend().then(Boolean)` — should be `true`
+Minor CSP hash update for debug logging
