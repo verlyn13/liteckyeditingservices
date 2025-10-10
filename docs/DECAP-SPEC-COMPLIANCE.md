@@ -29,18 +29,23 @@ This document records how our Decap CMS integration complies with current specs,
 
 ## GitHub Backend Configuration (Spec: GitHub Backend)
 
-- File: `public/admin/config.yml`
-- Backend block:
+- File: `functions/admin/config.yml.ts` (dynamic Pages Function)
+- Backend block (generated):
   ```yml
   backend:
     name: github
     repo: verlyn13/liteckyeditingservices
     branch: main
-    base_url: https://www.liteckyeditingservices.com
+    base_url: ${origin}  # Dynamically set to request origin
     auth_endpoint: /api/auth
   ```
-- Rationale: Uses on-site OAuth via Pages Functions with same-origin `auth_endpoint`. **IMPORTANT**: `base_url` is required to prevent Decap from falling back to Netlify's OAuth proxy (api.netlify.com). The `base_url` tells Decap where to resolve the `auth_endpoint`, resulting in correct OAuth flow: `https://www.liteckyeditingservices.com/api/auth` instead of `https://api.netlify.com/api/auth`.
-- Works in production and in local dev with `wrangler pages dev` (functions share the same origin as admin).
+- Rationale: **CRITICAL**: When using external/self-hosted OAuth handlers, `base_url` is **required** for Decap to enter "external-auth" mode. Without it, Decap won't attach the postMessage listener that processes `authorization:github:success:` messages, even if the messages arrive correctly.
+- Dynamic config ensures both dev (`http://127.0.0.1:8788`) and prod (`https://www.liteckyeditingservices.com`) get correct `base_url` without environment-specific files.
+- References:
+  - [Decap Backends Overview](https://decapcms.org/docs/backends-overview/) - GitHub + OAuth proxy requires `base_url` and `auth_endpoint`
+  - [Cloud.gov Decap docs](https://docs.cloud.gov/pages/using-pages/getting-started-with-netlify-cms/) - Authoritative example showing both fields
+  - [vencax OAuth provider](https://github.com/vencax/netlify-cms-github-oauth-provider) - Requires `base_url` in CMS config
+- Served via Pages Function at `/admin/config.yml` (no static file).
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 
@@ -98,18 +103,24 @@ This document records how our Decap CMS integration complies with current specs,
 - Removed `public/admin/boot.js`, `debug.js`, `diagnose.js` (runtime injection scripts with HMR guards and cache-busting)
 - Replaced with single static `public/admin/index.html` with direct `<script src="/vendor/decap/decap-cms.js">`
 - Archived old files to `_archive/admin-migration-2025-10-09/`
-- **October 2025 OAuth fix #1**: Added `base_url` to config.yml to prevent Netlify API fallback
-- **October 2025 OAuth fix #2**: Disabled debug-oauth.js (MIME type error - file not copied to dist)
-- **October 2025 OAuth fix #3**: Added `/admin/oauth-callback.html` (two-callback architecture)
-  - `/api/callback` now redirects to `/admin/oauth-callback` with token in hash
-  - This is the proper Decap CMS OAuth pattern (server callback + client popup callback)
+- **October 2025 OAuth fix #1**: Disabled debug-oauth.js (MIME type error - file not copied to dist)
+- **October 2025 OAuth fix #2**: Changed `/api/callback` to return HTML directly (not redirect to separate page)
+  - Maintains popup window context for postMessage to work
+  - Sends both string and object message formats for compatibility
+- **October 2025 OAuth fix #3**: Added debug postMessage listener to diagnose message delivery
+  - Confirmed messages arriving but Decap not processing them
+- **October 2025 OAuth fix #4 (CRITICAL)**: Created dynamic config.yml Pages Function
+  - `base_url` is **required** for external OAuth to work
+  - Without it, Decap doesn't enter "external-auth" mode and ignores postMessage
+  - Dynamic config ensures correct origin in both dev and prod
+  - Archived static `public/admin/config.yml` to `config.yml.static-archive`
 
 **Why:**
 - Eliminates React double-mount/"removeChild" errors from multiple init paths
-- Simplifies local dev: `wrangler pages dev` serves admin + Pages Functions on one origin (localhost:8788)
+- Simplifies local dev: `wrangler pages dev` serves admin + Pages Functions on one origin
 - Follows Decap install docs exactly (static HTML, single bundle, auto-init from config link)
-- `base_url` + `auth_endpoint` ensures OAuth goes to our domain, not api.netlify.com
-- Removing debug-oauth.js prevents console errors in production (file wasn't being deployed)
+- `base_url` + `auth_endpoint` tells Decap to use external OAuth and listen for postMessage events
+- Dynamic config prevents env-specific configuration drift
 
 ## References
 - [Decap CMS: Install](https://decapcms.org/docs/install-decap-cms/) - Single bundle, auto-init
