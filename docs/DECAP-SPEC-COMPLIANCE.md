@@ -44,24 +44,24 @@ This document records how our Decap CMS integration complies with current specs,
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 
-- Files: `functions/api/auth.ts`, `functions/api/callback.ts`, `public/admin/oauth-callback.html`
-- Flow (TWO-callback architecture):
+- Files: `functions/api/auth.ts`, `functions/api/callback.ts`
+- Flow (server-side OAuth with popup postMessage):
   1) `/api/auth` (server-side, same origin as `/admin`)
      - Honors Decap `state` and `site_id`/`origin` (opener)
      - Persists state in HttpOnly cookie
      - Redirects to GitHub authorize (includes `redirect_uri`, `scope`, `state`, and carries `decap_origin`)
-  2) `/api/callback` (server-side, GitHub redirect target)
+  2) `/api/callback` (server-side, GitHub redirect target - RETURNS HTML)
      - Validates state cookie
      - Exchanges code for access token
-     - Redirects to `/admin/oauth-callback` with token in URL hash fragment
-  3) `/admin/oauth-callback` (client-side HTML popup page)
-     - Parses token from URL hash (client-side only, never logged)
+     - **Returns HTML with inline postMessage script** (not a redirect)
+     - The popup window IS this page - it posts message to its opener
+     - Token embedded server-side in HTML (never in URL)
      - Posts success message to opener in both formats:
        - String: `authorization:github:success:` + JSON.stringify({ token, provider:'github', token_type:'bearer', state })
        - Object: `{ type:'authorization:github:success', data:{ token, provider:'github', token_type:'bearer', state } }`
      - Resends multiple times (0ms/100ms/200ms) for reliability
-     - Auto-closes after 3s or on ACK receipt
-     - CSP hash: `'sha256-PDMtGDfBsO9ZxKnfZlAj0HwihdlIruXKZOzRElc1oSk='` (browser-computed)
+     - Auto-closes after 3s
+     - CSP: Allows 'unsafe-inline' (this response only, not admin pages)
 
 - Verify (prod, after login):
   - `await CMS.getToken().then(Boolean) === true`
