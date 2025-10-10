@@ -199,13 +199,7 @@ Verify state is being passed correctly:
 
 ### If Message Format Issue
 
-Try sending ONLY string format (some Decap versions reject object):
-
-```javascript
-// In /api/callback.ts, only send stringMessage
-window.opener.postMessage(strMsg, target);
-// Remove: window.opener.postMessage(objMsg, target);
-```
+We send both formats from the callback for maximum compatibility. The canonical format is the string beginning with `authorization:github:success:`. No change needed in current code.
 
 ### If Window.opener Issue
 
@@ -234,30 +228,18 @@ const payload = 'authorization:github:success:' + JSON.stringify({
 window.postMessage(payload, window.location.origin);
 ```
 
-### Workaround 3: Use Worker OAuth (Alternative)
+### Workaround 3: External Worker OAuth (Legacy)
 
-There's a deployed Worker at `https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev` that could be used instead.
-
-Update config.yml:
-```yaml
-backend:
-  name: github
-  repo: verlyn13/liteckyeditingservices
-  branch: main
-  base_url: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev
-  auth_endpoint: /auth
-```
-
-**Note**: This worker redirects back to `/admin/oauth-callback.html` instead of returning HTML directly.
+An external OAuth worker was previously used but is now decommissioned. Production uses on‑site Pages Functions at `/api/auth` and `/api/callback`.
 
 ## Files Modified This Session
 
-1. `public/admin/config.yml` - Added base_url
-2. `public/admin/index.html` - Disabled debug-oauth.js, added debug listener
-3. `functions/api/callback.ts` - Returns HTML with postMessage (not redirect)
-4. `functions/admin/[[path]].ts` - Updated CSP hash for debug listener
-5. `docs/DECAP-SPEC-COMPLIANCE.md` - Updated OAuth flow documentation
-6. `docs/troubleshooting/DECAP-OAUTH-DEBUG.md` - Created debugging guide
+1. `public/admin/index.html` - Added debug listener (no inline init)
+2. `functions/admin/config.yml.ts` - Dynamic config (`base_url` + `auth_endpoint`)
+3. `functions/api/auth.ts` - Echo Decap `state`/`origin`, set cookies
+4. `functions/api/callback.ts` - HTML with postMessage; COOP + inline CSP; clears cookies
+5. `functions/admin/[[path]].ts` - Admin CSP/COOP (single source of truth)
+6. `docs/DECAP-SPEC-COMPLIANCE.md` - Implementation spec updated
 
 ## Related Documentation
 

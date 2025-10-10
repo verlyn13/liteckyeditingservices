@@ -44,24 +44,14 @@ SENDGRID_TO=<email>               # gopass: development/sendgrid/email-to
 
 ## 🔧 Cloudflare Workers Configuration
 
-### 1. OAuth Worker (Decap CMS Authentication)
-**Worker Name**: `litecky-decap-oauth`
-**URL**: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev
-**Purpose**: GitHub OAuth proxy for Decap CMS admin authentication
+### 1. Decap OAuth (On-Site Pages Functions)
+OAuth now runs on Pages Functions at the production origin. The external OAuth worker is decommissioned.
 
-#### Configuration (`workers/decap-oauth/wrangler.toml`)
-```toml
-name = "litecky-decap-oauth"
-main = "src/index.ts"
-compatibility_date = "2025-09-30"
-workers_dev = true
-```
-
-#### Secrets
-```bash
-GITHUB_CLIENT_ID=<oauth-app-id>       # gopass: github/oauth-apps/litecky-decap-cms/client-id
-GITHUB_CLIENT_SECRET=<secret>          # gopass: github/oauth-apps/litecky-decap-cms/client-secret
-```
+- Start: `/api/auth` — generates/echoes state, sets cookies, redirects to GitHub
+- Callback: `/api/callback` — validates state, exchanges code→token, posts token to opener, clears cookies
+- Config: `/admin/config.yml` — dynamic YAML with `base_url` and `auth_endpoint`
+- Admin wrapper: `/admin/*` — CSP/COOP headers applied in `functions/admin/[[path]].ts`
+- Env vars (Pages): `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
 
 ### 2. Queue Consumer Worker (Email Processing)
 **Worker Name**: `litecky-queue-consumer`
@@ -171,15 +161,17 @@ Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), m
 
 #### Admin Headers (`/admin/*`) — set by `functions/admin/[[path]].ts`
 ```
-Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://unpkg.com https://cdn.jsdelivr.net https://identity.netlify.com; style-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https:; font-src 'self' data: https://unpkg.com https://cdn.jsdelivr.net; connect-src 'self' https://challenges.cloudflare.com https://api.github.com https://github.com https://api.netlify.com https://unpkg.com https://cdn.jsdelivr.net https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev; frame-src 'self' https://challenges.cloudflare.com; child-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://github.com; frame-ancestors 'self';
-Cache-Control: no-store
+content-security-policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com 'sha256-7QABwjQQSmGVJbGBRzoLFPHLevIvlo/JR3nLf/9wfHA='; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev; frame-src 'self' https://challenges.cloudflare.com; child-src 'self' blob:; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'none'; object-src 'none'; form-action 'self' https://github.com
+x-frame-options: SAMEORIGIN
+referrer-policy: strict-origin-when-cross-origin
+permissions-policy: camera=(), microphone=(), geolocation=(), usb=(), payment=()
+cross-origin-opener-policy: unsafe-none
 ```
 
-**Key Admin CSP Notes**:
-- `unsafe-eval`: Required for Decap CMS
-- `frame-src 'self'`: Allows admin preview iframe
-- OAuth worker in `connect-src`: Required for CMS authentication
-- Admin CSP is authored and enforced in a Pages Function to prevent duplicate/merged CSP headers from `_headers`
+**Notes**:
+- Self-hosted Decap bundle; no third‑party script CDNs used.
+- `'unsafe-eval'` required by Decap.
+- COOP left as `unsafe-none` to preserve popup `window.opener`.
 
 ### Turnstile Configuration
 - **Widget ID**: `litecky-editing-production`

@@ -35,15 +35,14 @@
 **Recent Progress - October 9, 2025**:
   - ✅ **Admin on Static HTML**: Decap CMS admin served via `public/admin/index.html` with single bundle + auto-init
     - Archived previous Astro admin and runtime boot scripts to `_archive/admin-migration-2025-10-09/`
-    - Uses same-origin `auth_endpoint: /api/auth` (no `base_url`) in `config.yml`
+    - Config served dynamically at `/admin/config.yml` with `base_url` and `auth_endpoint`
     - **Why**: Eliminates React double-mount/"removeChild" errors from multiple init paths; follows Decap install docs (static HTML, single bundle, auto-init from config link)
     - **Spec compliance**: Auto-init mode only (no `CMS.init()`), config discovery via `<link type="text/yaml" rel="cms-config-url">`
-    - **Local testing**: `npx wrangler pages dev dist --env-file=.dev.vars` serves localhost:8788 with admin + Pages Functions on one origin
-  - ✅ **OAuth Debug Logging**: Added external `public/admin/debug-oauth.js` to monitor postMessage events during OAuth flow
-    - CSP-compliant external script (no inline scripts)
-    - Logs auth-related messages only (filters by 'authorization' keyword)
+    - **Local testing**: `pnpm build && npx wrangler pages dev` serves localhost:8788 with admin + Pages Functions on one origin
+  - ✅ **OAuth Debug Logging**: Added inline debug listener in `public/admin/index.html` (hash-allowed by CSP) to monitor postMessage events during OAuth flow
+    - Logs auth-related messages (string/object) and origin
     - Loaded before Decap bundle for early listener attachment
-    - Helps troubleshoot token handoff between popup and admin window
+    - Aids troubleshooting of popup → opener token handoff
   - ✅ **Documentation Alignment Audit**: Completed comprehensive docs-to-code alignment across 14 files (ARCHITECTURE.md, CLOUDFLARE.md, DEPLOYMENT.md, ENVIRONMENT.md, and all migration/config docs)
   - ✅ **Decap Spec Compliance**: Created comprehensive `docs/DECAP-SPEC-COMPLIANCE.md` with migration notes, verification commands, and 2025 best practices
   - ✅ **SendGrid Standardization**: Unified variable naming to `SENDGRID_FROM` across all docs and scripts; documented DNS verification procedures
@@ -60,7 +59,7 @@
 **Recent Progress - October 8, 2025**:
   - ✅ **Hardened OAuth Popup Handoff**: Implemented October 2025 best practices for reliable Decap CMS authentication
   - ✅ **Canonical Origin**: Added `public/_redirects` to redirect apex → www (301) for consistent OAuth flow
-  - ✅ **No Inline Scripts**: Extracted admin boot to `public/admin/boot.js`; removed `'unsafe-inline'` from admin CSP
+  - ✅ **CSP Hash for Inline Debug**: Admin CSP includes a script hash to allow the small inline debug listener; Decap bundle remains self-hosted
   - ✅ **COOP Headers**: Set `Cross-Origin-Opener-Policy: unsafe-none` on admin + OAuth worker endpoints
   - ✅ **Enhanced Security Headers**: Added X-Frame-Options, Referrer-Policy, Permissions-Policy to admin
   - ✅ **CI Header Validation**: Post-deploy workflow now enforces COOP/COEP/CSP requirements
@@ -79,7 +78,7 @@
   - 🔧 **OAuth State Echo**: /api/auth now honors Decap-provided `state` and opener origin; /api/callback posts Decap-compatible payload including `token_type:"bearer"` and `state` (string + object formats) with robust resend loop and ACK; opener origin cookie fallback added
   - 🔧 **Same-Origin Config**: `public/admin/config.yml` simplified to `auth_endpoint: /api/auth` (no `base_url`) for seamless local (wrangler pages dev) and production behavior
   - 🔧 **Admin Boot**: Removed explicit `CMS.init` call; Decap auto-initializes from `<link rel="cms-config-url">` to avoid double render and React removeChild errors
-  - ✅ **OAuth Origin + Headers**: OAuth worker posts token back to the opener origin captured at /auth (supports apex and www) and now sets COOP/CSP on callback to ensure popup → opener postMessage is allowed; fixes "Authenticated successfully" but no editor UI.
+  - ✅ **OAuth Origin + Headers**: On-site Pages Functions (`/api/auth`, `/api/callback`) set COOP/CSP and post back to the opener origin with Decap‑compatible payloads; fixes "Authenticated successfully" but no editor UI.
 
 **Recent Progress - October 6, 2025**:
   - ✅ **Visual Baselines (Linux)**: Seeded from main; stored under `tests/e2e/__screenshots__/...`
@@ -276,12 +275,7 @@
 - ⏳ Dynamic templates in SendGrid dashboard (optional enhancement)
 
 **Cloudflare Workers**:
-- ✅ **OAuth Worker** (Decap CMS authentication):
-  - ✅ Deployed to: `litecky-decap-oauth.jeffreyverlynjohnson.workers.dev`
-  - ✅ GitHub OAuth App configured (Client ID: Ov23liSZ2HMczMWe4CDt)
-  - ✅ Credentials stored in gopass
-  - ✅ wrangler.toml configured
-  - ⏳ Custom domain setup pending (cms-auth.liteckyeditingservices.com)
+- ⛔ **OAuth Worker (Legacy)**: Decommissioned in favor of on‑site Pages Functions at `/api/auth` and `/api/callback`.
 
 - ✅ **Queue Consumer Worker**:
   - ✅ Deployed to: `litecky-queue-consumer.jeffreyverlynjohnson.workers.dev`
@@ -298,9 +292,9 @@
 **Decap CMS**:
 - ✅ **Version**: 3.8.3 (upgraded from broken 3.3.3)
 - ✅ Admin interface: `public/admin/index.html`
-- ✅ Configuration: `public/admin/config.yml`
+- ✅ Configuration: dynamic at `/admin/config.yml` (served by `functions/admin/config.yml.ts`)
 - ✅ GitHub backend configured
-- ✅ OAuth worker deployed and functional
+- ✅ OAuth via Pages Functions (on‑site)
 - ✅ Collections defined: pages, services, testimonials, FAQ
 
 **Content Collections**:
@@ -472,9 +466,8 @@
 
 #### 2.2 Deploy Workers ✅
 
-- [x] OAuth worker deployed (litecky-decap-oauth.jeffreyverlynjohnson.workers.dev)
 - [x] Queue consumer worker deployed (litecky-queue-consumer.jeffreyverlynjohnson.workers.dev)
-- [x] Test worker endpoints (API returning 202/enqueued)
+- [x] Test worker endpoints (queue consumer tail logs OK)
 
 **Completed**: October 2, 2025
 
@@ -551,35 +544,9 @@ fish scripts/cf-dns-manage.fish
 
 ---
 
-### Phase 5: CMS Custom Domain Setup 🔄
+### Phase 5: [Legacy] CMS Custom Domain (Not Applicable)
 
-#### 5.1 Configure OAuth Worker Custom Domain
-
-```bash
-# Add custom route in Cloudflare dashboard:
-# cms-auth.liteckyeditingservices.com -> litecky-decap-oauth worker
-```
-
-DNS Record:
-```
-cms-auth.liteckyeditingservices.com  CNAME  litecky-decap-oauth.jeffreyverlynjohnson.workers.dev
-```
-
-Update Decap CMS config (`public/admin/config.yml`):
-```yaml
-backend:
-  name: github
-  repo: verlyn13/liteckyeditingservices
-  branch: main
-  base_url: https://cms-auth.liteckyeditingservices.com
-  auth_endpoint: /auth
-```
-
-- [ ] Add DNS CNAME record for cms-auth subdomain
-- [ ] Configure custom domain in Workers dashboard
-- [ ] Update `public/admin/config.yml` with custom domain
-- [ ] Update GitHub OAuth callback URL
-- [ ] Test CMS authentication
+External OAuth worker has been decommissioned. CMS uses origin‑local Pages Functions; no separate OAuth subdomain is required.
 
 ---
 
@@ -845,7 +812,6 @@ All packages using `latest` specifier for automatic updates within semver constr
 - **Production Site**: https://liteckyeditingservices.com
 - **Cloudflare Dashboard**: https://dash.cloudflare.com/
 - **SendGrid Dashboard**: https://app.sendgrid.com/
-- **OAuth Worker**: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev
 - **Queue Consumer**: https://litecky-queue-consumer.jeffreyverlynjohnson.workers.dev
 
 **Queue Details**:

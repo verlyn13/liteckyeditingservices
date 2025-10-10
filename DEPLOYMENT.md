@@ -1,13 +1,12 @@
 # Deployment Guide (Cloudflare Pages + Workers)
 
-This project deploys to Cloudflare Pages (site) and Cloudflare Workers (Decap OAuth and Queue consumer for async email processing).
+This project deploys to Cloudflare Pages (site) and Cloudflare Workers (Queue consumer for async email processing). Decap CMS OAuth now runs on Pages Functions at the production origin.
 
-**Current Status** (October 5, 2025):
+**Current Status** (October 10, 2025):
 - ✅ **Git-Connected Deployment Active** - Automatic deployment on push to main
 - ✅ **Project Name**: `liteckyeditingservices` (Cloudflare Pages)
 - ✅ Site deployed to Cloudflare Pages
 - ✅ Queue consumer worker deployed
-- ✅ OAuth worker deployed
 - ✅ DNS migration complete (production domain live)
 
 ## Deployment Mode: Git-Connected (Automatic)
@@ -102,19 +101,22 @@ Rollback
 
 ## Deploy Workers
 
-### CMS OAuth (Current - On-Site Pages Functions)
-Uses on-site Pages Functions at `/api/auth` and `/api/callback`. Admin served as static HTML (`public/admin/index.html`), functions deployed automatically with Pages. No custom OAuth subdomain or external worker required.
+### CMS OAuth (On-Site Pages Functions)
+Uses on-site Pages Functions at `/api/auth` and `/api/callback`. Admin is a static HTML shell (`public/admin/index.html`). Functions deploy automatically with Pages. No external OAuth worker is required.
 
 **Configuration**: Pages → Settings → Environment variables
 - `GITHUB_CLIENT_ID` (secret)
 - `GITHUB_CLIENT_SECRET` (secret)
 
-**CMS Config**: `public/admin/config.yml` → `base_url: https://www.liteckyeditingservices.com`, `auth_endpoint: /api/auth`
+**CMS Config**: Served dynamically by `functions/admin/config.yml.ts` at path `/admin/config.yml` with:
+- `backend.base_url: <request origin>` (e.g., `https://www.liteckyeditingservices.com`)
+- `backend.auth_endpoint: /api/auth`
+Headers: `Content-Type: text/yaml; charset=utf-8`, `Cache-Control: no-store`
 
-**Local Testing**: Use `npx wrangler pages dev dist --env-file=.dev.vars` (after `pnpm build`) to serve admin + Pages Functions on one origin (localhost:8788) for OAuth testing. See CLOUDFLARE.md § Local Development.
+**Local Testing**: Use `npx wrangler pages dev` (after `pnpm build`) to serve `./dist` + Pages Functions on one origin (http://127.0.0.1:8788) for OAuth testing. `.dev.vars` is loaded automatically. See CLOUDFLARE.md § Local Development.
 
 ### Legacy OAuth Worker (Decommissioned Oct 2025)
-External worker `litecky-decap-oauth` is no longer used. Legacy deployment instructions moved to `_archive/DEPLOYMENT-legacy-oauth.md`.
+External worker `litecky-decap-oauth` is no longer used. Legacy instructions are archived. CSP may still include its URL for troubleshooting, but production uses on-site `/api/auth` + `/api/callback`.
 
 Queue Consumer Worker ✅ **DEPLOYED**
 ```bash
@@ -144,6 +146,38 @@ pnpm wrangler secret put SENDGRID_TO --cwd workers/queue-consumer
 - If migrating from another host, update DNS records to point to Cloudflare Pages
 - Verify HTTPS certificates and propagation
 
+### Apex → WWW Redirect (Required for OAuth)
+
+**CRITICAL**: Decap CMS OAuth requires a canonical origin. Configure Cloudflare to redirect apex → www at the zone level.
+
+**Why**: OAuth callbacks must use a single origin (`https://www.liteckyeditingservices.com`). `_redirects` files cannot handle cross-host redirects reliably.
+
+**Setup via Cloudflare Dashboard**:
+
+1. Log in to Cloudflare → Select your zone (`liteckyeditingservices.com`)
+2. Navigate to **Rules** → **Redirect Rules**
+3. Click **Create rule**
+4. Configure redirect:
+   - **Rule name**: `Apex to WWW`
+   - **When incoming requests match**:
+     - Field: `Hostname`
+     - Operator: `equals`
+     - Value: `liteckyeditingservices.com`
+   - **Then**:
+     - Type: `Dynamic`
+     - Expression: `concat("https://www.", http.host, http.request.uri.path)`
+     - Status code: `301` (Permanent Redirect)
+     - Preserve query string: ✅ Enabled
+5. Click **Deploy**
+
+**Verify**:
+```bash
+curl -sI https://liteckyeditingservices.com | grep -i location
+# Expected: Location: https://www.liteckyeditingservices.com/
+```
+
+**CLI Helper**: See `scripts/cloudflare-redirect-setup.sh` for API-based setup
+
 ## Post-Deployment Validation
 
 ```bash
@@ -156,7 +190,7 @@ pnpm test:a11y       # Accessibility checks
 
 ### Admin Cache Purge (After CMS Changes)
 
-When updating admin boot scripts, initialization logic, or Decap bundle versions, purge Cloudflare Pages cache to prevent stale asset issues:
+When updating the admin shell or Decap bundle, purge Cloudflare Pages cache to prevent stale assets:
 
 **Option 1: Via Cloudflare Dashboard**
 1. Pages → `liteckyeditingservices` → Deployments
@@ -173,20 +207,17 @@ git commit --allow-empty -m "chore: purge admin cache"
 git push origin main
 ```
 
-**Why this matters**: Cached `/admin/*` assets (especially boot scripts) can cause:
-- Double-initialization errors (React "removeChild" crashes)
-- Stale OAuth flow configurations
+**Why this matters**: Cached `/admin/*` assets can cause:
+- Stale OAuth flow behavior
 - Outdated security headers
 
 **When to purge**:
-- After changing `public/admin/boot.js` or bundle loading logic
-- After updating `src/pages/admin/index.astro`
-- After modifying `/admin/config.yml` authentication settings
-- When switching between manual and auto-initialization modes
+- After replacing `/vendor/decap/decap-cms.js`
+- After editing `public/admin/index.html`
+- After changing `functions/admin/config.yml.ts` or `functions/admin/[[path]].ts`
 
 ## Troubleshooting
 
 - Endpoint returns `accepted-no-email`: Check Pages env vars for SendGrid/Turnstile
 - OAuth login fails: Re-check worker secrets and GitHub OAuth app settings
 - Email not delivered: See `docs/playbooks/email-issues.md`
-

@@ -39,14 +39,18 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		}
 
 		// Compute current origin from this request (works in dev & prod)
-		const origin = `${url.protocol}//${url.host}`;
+		// Prefer explicit origin provided by Decap (it includes the admin opener origin)
+		const decapOriginParam = url.searchParams.get("origin");
+		const origin = decapOriginParam || `${url.protocol}//${url.host}`;
 		const isHttps = url.protocol === "https:";
 		const secure = isHttps ? "; Secure" : "";
 		console.log("[/api/auth] Computed origin:", origin);
 
-		// Generate CSRF state
-		const state = crypto.randomUUID();
-		console.log("[/api/auth] Generated state:", state);
+		// Use Decap-provided OAuth state if present; otherwise generate one
+		// Decap validates the exact state value on postMessage, so we must echo it back
+		const decapStateParam = url.searchParams.get("state");
+		const state = decapStateParam || crypto.randomUUID();
+		console.log("[/api/auth] Using state:", state, decapStateParam ? "(from Decap)" : "(generated)");
 
 		// Prefer Decap-provided scope; default to repo
 		const scope = url.searchParams.get("scope") || "repo";

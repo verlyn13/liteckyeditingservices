@@ -12,18 +12,16 @@
 2. Decap opens popup to /api/auth
 3. /api/auth redirects to GitHub OAuth
 4. GitHub redirects back to /api/callback with code
-5. /api/callback exchanges code for token
-6. /api/callback redirects to /admin/oauth-callback#token=xxx
-7. /admin/oauth-callback parses token from hash
-8. /admin/oauth-callback posts message to window.opener
-9. /admin/ (opener) should receive message and load editor
+5. /api/callback validates state and exchanges code for token
+6. /api/callback RETURNS HTML (popup page) with inline script
+7. Popup posts success message(s) to window.opener and auto‑closes
+8. /admin/ (opener) receives message and loads editor
 ```
 
 ### Implementation Files
 - **Admin page**: `public/admin/index.html` (static HTML)
-- **Config**: `public/admin/config.yml` (base_url + auth_endpoint)
+- **Config**: `functions/admin/config.yml.ts` → `/admin/config.yml` (base_url + auth_endpoint)
 - **Auth shim**: `public/admin/decap-auth-shim.js` (optional, disabled by default)
-- **OAuth callback**: `public/admin/oauth-callback.html` (popup page)
 - **Server auth start**: `functions/api/auth.ts`
 - **Server callback**: `functions/api/callback.ts`
 - **Admin security headers**: `functions/admin/[[path]].ts`
@@ -42,10 +40,10 @@ backend:
 
 **Why base_url?** Prevents fallback to Netlify OAuth proxy (api.netlify.com)
 
-### CSP Hash
-- **File**: `functions/admin/[[path]].ts:39`
-- **Hash**: `sha256-PDMtGDfBsO9ZxKnfZlAj0HwihdlIruXKZOzRElc1oSk=`
-- **Purpose**: Allows inline script in `/admin/oauth-callback.html`
+### Callback CSP
+- `/api/callback` response sets `Content-Security-Policy: default-src 'none'; script-src 'unsafe-inline'; ...` to allow its tiny inline postMessage script.
+### Admin CSP hash
+- `functions/admin/[[path]].ts` includes a script hash to allow the small inline debug listener in `public/admin/index.html`.
 
 ### Message Format
 OAuth callback sends TWO formats for compatibility:
@@ -99,22 +97,21 @@ OAuth callback sends TWO formats for compatibility:
 
 **To enable**: Visit `/admin/?auth_shim=1`
 
-### Issue #3: Debug Script Missing
-**File**: `public/admin/debug-oauth.js`
-**Status**: Commented out in index.html (line 15)
-**Reason**: MIME type error in production (404 returns HTML)
+### Issue #3: Debug Listener
+**File**: Inline in `public/admin/index.html`
+**Status**: Allowed by CSP hash in `functions/admin/[[path]].ts`
+**Purpose**: Logs postMessage events (string and object) and origins before Decap loads
 
 ## Diagnostic Steps
 
 ### Step 1: Verify OAuth Callback Executes
 Open browser DevTools console before logging in.
 
-**Expected logs from oauth-callback.html**:
+**Expected logs from /api/callback page (popup console)**:
 ```
-[OAuth Callback] Sending messages to opener
-[OAuth Callback] String message: authorization:github:success:{"provider":"github",...
-[OAuth Callback] Object message: {type: 'authorization:github:success', data: {...}}
-[OAuth Callback] Messages posted to opener
+[Callback] Sending messages to opener
+[Callback] Messages sent
+[Callback] Closing popup
 ```
 
 **If missing**: Script failed to execute (CSP violation)

@@ -31,8 +31,11 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps
 
-      - name: Run CMS UI presence check
+      - name: Run CMS admin UI presence
         run: pnpm test:cms:prod
+
+      - name: Run CMS config + callback header checks
+        run: pnpm test:cms:headers:prod
 
       - name: Upload Playwright report
         if: always()
@@ -41,4 +44,3 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
-

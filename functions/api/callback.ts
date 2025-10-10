@@ -39,6 +39,40 @@ function parseCookies(h: string | null): Record<string, string> {
 export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 	try {
 		const reqUrl = new URL(ctx.request.url);
+
+		// Diagnostic mode: return a minimal HTML shell with the same
+		// security headers as a successful callback, without posting tokens.
+		if (reqUrl.searchParams.get("diag") === "1") {
+			const html = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Callback Diagnostics</title>
+</head>
+<body>
+  <p>Diagnostic callback page. Headers mirror successful OAuth callback.</p>
+</body>
+</html>`;
+
+			const isHttps = reqUrl.protocol === "https:";
+			const secure = isHttps ? "; Secure" : "";
+			return new Response(html, {
+				headers: {
+					"Content-Type": "text/html; charset=utf-8",
+					"Cache-Control": "no-store",
+					"Set-Cookie": [
+						`decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+						`decap_opener_origin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+					].join(", "),
+					"Cross-Origin-Opener-Policy": "unsafe-none",
+					"Content-Security-Policy":
+						"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
+				},
+			});
+		}
+
 		const code = reqUrl.searchParams.get("code") ?? "";
 		const state = reqUrl.searchParams.get("state") ?? "";
 

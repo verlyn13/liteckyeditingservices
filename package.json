@@ -24,6 +24,8 @@
 		"test:visual:update": "playwright test tests/e2e/visual.spec.ts --update-snapshots",
 		"test:cms": "playwright test tests/e2e/cms.spec.ts",
 		"test:cms:prod": "BASE_URL=https://www.liteckyeditingservices.com playwright test tests/e2e/cms.spec.ts",
+		"test:cms:headers": "playwright test tests/e2e/cms-config-and-callback.spec.ts",
+		"test:cms:headers:prod": "BASE_URL=https://www.liteckyeditingservices.com playwright test tests/e2e/cms-config-and-callback.spec.ts",
 		"smoke:url": "bash scripts/deploy/preview-smoke.sh",
 		"smoke:prod": "bash scripts/deploy/preview-smoke.sh https://www.liteckyeditingservices.com",
 		"test:a11y": "node tests/a11y/check.js",

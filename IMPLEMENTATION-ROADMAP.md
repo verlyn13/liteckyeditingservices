@@ -275,16 +275,15 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
   - ✅ Sample content files present
 
 9. **Decap CMS Setup** ✅
-  - ✅ public/admin/index.html - CMS admin interface
-  - ✅ public/admin/config.yml - CMS configuration
-  - ✅ GitHub OAuth App created
-  - ✅ OAuth Worker deployed (https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev)
+  - ✅ public/admin/index.html - CMS admin interface (single bundle)
+  - ✅ functions/admin/config.yml.ts → `/admin/config.yml` (dynamic `base_url` + `auth_endpoint`)
+  - ✅ GitHub OAuth App(s) created (dev + prod)
+  - ✅ On‑site OAuth via Pages Functions (`/api/auth`, `/api/callback`)
 
 ### Phase 4: Backend Services ✅ COMPLETE
 **All backend services deployed and operational**
 
 10. **Cloudflare Workers** ✅
-    - ✅ Decap OAuth proxy worker (litecky-decap-oauth) - CMS authentication
     - ✅ Contact form handler (Pages Function /api/contact) - Queue producer
     - ✅ Queue consumer worker (litecky-queue-consumer) - Async email processing
 
@@ -319,7 +318,6 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 - ✅ Store credentials in gopass (all keys secured)
 
 #### Phase 5.3: Workers Deployment ✅
-- ✅ Deploy OAuth Worker (litecky-decap-oauth)
 - ✅ Deploy Queue Consumer (litecky-queue-consumer)
 - N/A Cron Worker (not required for current functionality)
 
@@ -361,8 +359,8 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 ## ✅ All Critical Blockers Resolved
 
 1. ✅ **Code Quality Setup**: Biome, ESLint, Prettier, tests (Vitest/Playwright/pa11y)
-2. ✅ **CMS Integration**: Decap admin, OAuth worker, content collections
-3. ✅ **Backend Services**: OAuth Worker, Queue Consumer, Contact API
+2. ✅ **CMS Integration**: Decap admin, on‑site OAuth (Pages Functions), content collections
+3. ✅ **Backend Services**: Queue Consumer, Contact API
 4. ✅ **Infrastructure**: D1/R2/KV/Queues all created and operational
 5. ✅ **DNS Migration**: Custom domain live in production
 

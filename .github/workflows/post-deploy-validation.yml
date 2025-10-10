@@ -88,6 +88,10 @@ jobs:
           BASE_URL=$BASE_URL pnpm test:smoke
           pnpm test:cms:prod
 
+      - name: Production CMS header tests
+        run: |
+          pnpm test:cms:headers:prod
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4

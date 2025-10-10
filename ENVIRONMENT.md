@@ -13,8 +13,9 @@
 | **Workers** |
 | `DISPATCH_NAMESPACE` | production | staging | staging | Variable | No |
 | `WORKERS_SUBDOMAIN` | Set after first deploy | Same | localhost | Variable | No |
-| `OAUTH_GITHUB_CLIENT_ID` | Production ID | Preview ID | Test ID | Variable | Yes |
-| `OAUTH_GITHUB_CLIENT_SECRET` | Via wrangler secret | Via wrangler secret | Test secret | Secret | Yes |
+| **OAuth (Pages Functions)** |
+| `GITHUB_CLIENT_ID` | Production ID | Preview ID | Dev ID | Variable | Yes |
+| `GITHUB_CLIENT_SECRET` | Via wrangler secret | Via wrangler secret | Dev secret | Secret | Yes |
 | **Turnstile** |
 | `PUBLIC_TURNSTILE_SITE_KEY` | 0x4AAAAAAB27CNFPS0wEzPP5 | Same | 1x00000000000000000000AA | Public | Yes |
 | `TURNSTILE_SECRET_KEY` | Via wrangler secret | Via wrangler secret | 2x0000000000000000000000000000000AA | Secret | Yes |
@@ -66,6 +67,8 @@ EMAIL_FROM=hello@liteckyeditingservices.com
 EMAIL_TO=ahnie@liteckyeditingservices.com
 SENDGRID_DOMAIN_ID=54920324
 # SENDGRID_FORCE_SEND=true  # Uncomment to send real emails in dev
+GITHUB_CLIENT_ID=iv_DEV_CLIENT_ID
+GITHUB_CLIENT_SECRET=dev_client_secret
 ```
 
 #### Gopass Organization
@@ -75,12 +78,13 @@ Credentials are stored in the following gopass paths:
 - `development/sendgrid/*` - SendGrid configuration
 - `github/oauth/litecky-editing/*` - GitHub OAuth credentials
 
-### Worker Secrets
+### Pages Functions Secrets (OAuth)
+
+Set in Cloudflare Pages → Project → Settings → Variables and Secrets:
 
 ```bash
-cd workers/decap-oauth
-wrangler secret put GITHUB_OAUTH_ID
-wrangler secret put GITHUB_OAUTH_SECRET
+GITHUB_CLIENT_ID
+GITHUB_CLIENT_SECRET
 ```
 
 ### GitHub Actions Secrets
@@ -112,12 +116,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ```
 
-### Workers
+### Pages Functions
 ```typescript
-export default {
-  async fetch(request: Request, env: Env) {
-    const clientId = env.GITHUB_OAUTH_ID;
-  }
+export const onRequestGet: PagesFunction<Env> = async (ctx) => {
+  const clientId = ctx.env.GITHUB_CLIENT_ID;
 };
 ```
 
@@ -202,14 +204,13 @@ Set the following in Pages (Project → Settings → Environment variables):
 
 These enable `/api/contact` to send emails. If not set, the endpoint still accepts requests but responds with `accepted-no-email`.
 
-### Cloudflare Worker: Decap OAuth Proxy
+### Decap OAuth (Pages Functions)
 
-Worker: `workers/decap-oauth`
+OAuth runs at the site origin via Pages Functions. No external OAuth worker is required.
 
-- GITHUB_OAUTH_ID — GitHub OAuth App Client ID (secret)
-- GITHUB_OAUTH_SECRET — GitHub OAuth App Client Secret (secret)
-
-Configure a custom domain (e.g., `cms-auth.liteckyeditingservices.com`) and set Decap CMS `base_url` to that domain with `auth_endpoint: /auth`.
+- Set `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` in Pages (Production and Preview)
+- Dev credentials live in `.dev.vars`
+- Config (`/admin/config.yml`) sets `backend.base_url` to the current origin and `auth_endpoint: /api/auth`
 
 ### Future Queues and Storage (planned)
 
