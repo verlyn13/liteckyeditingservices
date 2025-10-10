@@ -2,8 +2,7 @@ backend:
   name: github
   repo: verlyn13/liteckyeditingservices
   branch: main
-  base_url: https://www.liteckyeditingservices.com
-  auth_endpoint: /api/auth
+  auth_endpoint: /api/auth  # same-origin OAuth; no base_url needed
 
 publish_mode: editorial_workflow
 

@@ -42,11 +42,11 @@ Contact Submission (Queued)
 2. Pages Function detects a queue producer binding and enqueues `{ kind: "contact", data }`
 3. Queue Consumer Worker receives batch, sends via SendGrid, and `ack`s on success or `retry`s on failure
 
-CMS Authentication (Current - On-Site, Spec-Aligned)
-1. `/admin` serves Decap CMS with **spec-required** config discovery: `<link href="/admin/config.yml" type="text/yaml" rel="cms-config-url">`
-2. Decap **auto-initializes** from the vendored bundle (no manual `CMS.init()` call, per official defaults)
-3. `config.yml` specifies `backend: { name: github, repo: ..., base_url: https://www.liteckyeditingservices.com, auth_endpoint: /api/auth }`
-4. On login, Decap opens popup to `/api/auth` (GitHub OAuth start)
+CMS Authentication (Current - Same-Origin OAuth, 2025 Spec-Aligned)
+1. `/admin` serves static HTML (`public/admin/index.html`) with single Decap bundle and **spec-required** config discovery: `<link href="/admin/config.yml" type="text/yaml" rel="cms-config-url">`
+2. Decap **auto-initializes** from the single vendored bundle (no manual `CMS.init()` call, per official defaults) - eliminates double-mount errors
+3. `config.yml` specifies `backend: { name: github, repo: ..., auth_endpoint: /api/auth }` (no `base_url` - same-origin OAuth works in both dev and prod)
+4. On login, Decap opens popup to `/api/auth` (GitHub OAuth start) on the **same origin** as `/admin`
 5. Pages Function `/api/auth` sets state cookie and redirects to GitHub authorize
 6. GitHub redirects to `/api/callback` with authorization code
 7. Pages Function `/api/callback`:
@@ -57,10 +57,12 @@ CMS Authentication (Current - On-Site, Spec-Aligned)
    - Waits for `authorization:ack` from Decap, then closes popup
 8. Decap receives token and completes authentication
 
-**Spec Compliance**:
+**Spec Compliance & 2025 Best Practices**:
+- Single static HTML admin page with one bundle (per [Decap install docs](https://decapcms.org/docs/install-decap-cms/)) - prevents React double-mount errors
 - Config discovery via `<link type="text/yaml" rel="cms-config-url">` (per [Decap docs](https://decapcms.org/docs/configuration-options/))
 - Auto-init mode (default behavior, per [Decap docs](https://decapcms.org/docs/manual-initialization/))
-- GitHub backend with OAuth provider (required per [GitHub backend docs](https://decapcms.org/docs/github-backend/))
+- Same-origin OAuth (no `base_url`) works in dev (`wrangler pages dev`) and prod (per [Cloudflare Pages local dev docs](https://developers.cloudflare.com/pages/functions/local-development/))
+- GitHub backend with same-origin OAuth provider (per [GitHub backend docs](https://decapcms.org/docs/github-backend/))
 - Success message format matches [community OAuth provider standard](https://github.com/vencax/netlify-cms-github-oauth-provider)
 
 ## Configuration

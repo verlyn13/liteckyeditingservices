@@ -99,6 +99,23 @@ See `docs/playbooks/email-issues.md` for troubleshooting email delivery problems
 
 ## 🔧 Common Operations
 
+### Local Development
+
+**For UI-only development** (no OAuth):
+```bash
+pnpm dev  # Astro dev server at localhost:4321
+```
+
+**For full OAuth testing** (same-origin admin + functions):
+```bash
+pnpm build                    # Build static output to ./dist
+npx wrangler pages dev        # Serves ./dist + /functions on one origin
+# Visit the URL Wrangler prints (e.g., http://127.0.0.1:8788)
+# Navigate to /admin for CMS with working OAuth
+```
+
+> **Why `wrangler pages dev` for OAuth?** Decap CMS requires same-origin for state validation. `wrangler pages dev` serves static assets and Pages Functions on one origin, matching production behavior. See [Cloudflare Docs: Local Development](https://developers.cloudflare.com/pages/functions/local-development/).
+
 ### Deploy Site (Pages)
 ```bash
 # Automatic via GitHub push to main
