@@ -11,8 +11,25 @@
   </head>
   <body>
     <!-- Debug: Capture all postMessage events BEFORE Decap loads -->
-    <!-- DISABLED: debug-oauth.js causes MIME type error in production (404 served as HTML) -->
-    <!-- <script src="/admin/debug-oauth.js"></script> -->
+    <script>
+      // Debug listener - logs ALL postMessage events
+      window.addEventListener('message', function(event) {
+        console.log('[ADMIN DEBUG] postMessage received:', {
+          origin: event.origin,
+          data: event.data,
+          type: typeof event.data,
+          timestamp: new Date().toISOString()
+        });
+
+        // Check if it's an OAuth message
+        if (typeof event.data === 'string' && event.data.includes('authorization')) {
+          console.log('[ADMIN DEBUG] ✅ OAuth message detected!');
+        } else if (event.data && typeof event.data === 'object' && event.data.type && event.data.type.includes('authorization')) {
+          console.log('[ADMIN DEBUG] ✅ OAuth object message detected!');
+        }
+      }, false);
+      console.log('[ADMIN DEBUG] PostMessage listener registered');
+    </script>
     <!-- Optional shim: enable with ?auth_shim=1 to re-emit canonical success string from admin window -->
     <script src="/admin/decap-auth-shim.js"></script>
     <!-- Exactly one bundle; Decap auto-inits from config link (no manual CMS.init()) -->
