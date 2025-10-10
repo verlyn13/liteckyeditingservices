@@ -377,6 +377,39 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
    - ✅ 20 tests across 5 browsers configured
    - 🟡 Run full test suite against production domain
    - 🟡 Expand test coverage for edge cases
+
+### Phase 8: Auth Hardening & PKCE 🟡 PLANNED/NOW
+
+Objective: Make Decap OAuth handoff deterministic, observable, and aligned with GitHub’s 2025 recommendations (PKCE), without weakening CSP.
+
+Completed (Oct 10, 2025)
+- ✅ Dynamic config discovery at `/api/config.yml` with `backend.base_url` + `auth_endpoint: api/auth`
+- ✅ String‑only callback message (canonical `authorization:github:success:`)
+- ✅ Callback retry tuning (10× @ 100ms, then close)
+- ✅ Correlation IDs + structured JSON logs across `/api/auth` and `/api/callback`
+- ✅ Diagnostics: external (no inline), pre/post state sweeps, storage write tracer, `window.open(/api/auth)` probe, `__dumpUser()`
+- ✅ Safety shim: `__forceAccept()` to verify acceptance path if Decap didn’t write state (diagnostic‑only)
+
+Planned (Oct 11–13, 2025)
+- [ ] PKCE client helper (`public/admin/pkce-login.js`):
+  - Generate `code_verifier` (sessionStorage only) + `code_challenge` (S256)
+  - Pre‑write Decap state key in localStorage before opening popup
+  - Open `/api/auth?code_challenge=…&code_challenge_method=S256&client_state=…`
+- [ ] `/api/auth` to honor `client_state` + pass through PKCE params
+- [ ] `/api/callback` to post `code` (not token) to opener (string‑only)
+- [ ] New `/api/exchange-token` to swap { code, verifier } → { token } server‑side
+- [ ] Emit success string with token from admin to Decap after exchange (compat bridge)
+- [ ] Pin a single self‑hosted Decap bundle (app/core aligned); purge `/admin/*` on bump
+
+Acceptance Criteria
+- PRE‑POPUP state exists (diagnostics log) and `STATE CHECK` shows `match: true`
+- `/api/exchange-token` returns `{ token }` and `__dumpUser()` shows a non‑null user
+- Zero CSP violations on `/admin` (no inline) and strict callback CSP applied only on `/api/callback`
+
+CI Gates
+- Header tests for `/admin` and `/api/callback?diag=1`
+- Repo‑side media paths check (public/uploads exists; config emits expected values)
+- (Planned) Decap bundle pin check (single exact version in `/admin/vendor`)
    - 🟡 Add visual regression testing
 
 2. **Performance Optimization**

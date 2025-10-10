@@ -11,6 +11,7 @@
 ## 📊 EXECUTIVE SUMMARY
 
 **Status**: ✅ **MIGRATION COMPLETE** - Git-connected deployment live; CI green with blocking visuals.
+**Auth Hardening**: 🟡 In progress — diagnostics + logging shipped; PKCE upgrade planned next.
 
 ### ✅ SUCCESSFUL MIGRATION (October 5, 2025)
 
@@ -31,6 +32,12 @@
 - Admin panel functional at /admin/ (GitHub OAuth end-to-end)
 - Automatic builds triggered by Git commits
 - All security headers E2E tests passing (15/15)
+
+**Recent Progress - October 10, 2025**:
+  - 🔧 **Acceptance Hardening**: String‑only callback message (canonical `authorization:github:success:`); callback retry tuning (10× @ 100ms).
+  - 🔧 **Config Discovery Endpoint**: Added `/api/config.yml` (mirrors `/admin/config.yml`) and pointed admin `<link rel="cms-config-url">` to `/api/config.yml`. Set `auth_endpoint: api/auth` to mirror docs' append semantics.
+  - 🔧 **Deep Diagnostics**: External diagnostics (no inline), storage write tracer, pre/post state sweeps, `window.open(/api/auth)` probe, `__dumpUser()` and `__forceAccept()` shim.
+  - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
 
 **Recent Progress - October 9, 2025**:
   - ✅ **Admin on Static HTML**: Decap CMS admin served via `public/admin/index.html` with single bundle + auto-init

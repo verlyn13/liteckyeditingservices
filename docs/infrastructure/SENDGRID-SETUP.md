@@ -25,9 +25,18 @@ SPF: v=spf1 include:_spf.google.com include:sendgrid.net ~all
 DMARC: v=DMARC1; p=none; rua=mailto:dmarc@liteckyeditingservices.com; aspf=s; adkim=s
 ```
 
-### SendGrid Authentication Records (em subdomain)
+### SendGrid Authentication Records
 All records must be set to **DNS-only** (gray cloud) in Cloudflare:
 
+**Root Domain Records:**
+```
+54920324.liteckyeditingservices.com → sendgrid.net
+em1041.liteckyeditingservices.com → u54920324.wl075.sendgrid.net
+s1._domainkey.liteckyeditingservices.com → s1.domainkey.u54920324.wl075.sendgrid.net
+s2._domainkey.liteckyeditingservices.com → s2.domainkey.u54920324.wl075.sendgrid.net
+```
+
+**Transactional Subdomain Records (em.liteckyeditingservices.com):**
 ```
 url1796.em.liteckyeditingservices.com → sendgrid.net
 54920324.em.liteckyeditingservices.com → sendgrid.net
@@ -72,7 +81,9 @@ All emails include categories for tracking:
 
 ## Development Configuration
 
-### Environment Variables (`.dev.vars`)
+### Environment Variables
+
+**Local Development (`.dev.vars`):**
 ```bash
 # SendGrid Configuration
 SENDGRID_API_KEY=SG.xxxxxxxxxxxxx
@@ -82,6 +93,15 @@ SENDGRID_DOMAIN_ID=54920324
 
 # Force real sends in dev (default: sandbox mode)
 # SENDGRID_FORCE_SEND=true
+```
+
+**Cloudflare Pages (Production):**
+Set these as environment variables in Cloudflare Pages dashboard:
+```bash
+SENDGRID_API_KEY  # Secret (encrypted)
+EMAIL_FROM        # Plain text: hello@liteckyeditingservices.com
+EMAIL_TO          # Plain text: admin@liteckyeditingservices.com
+SENDGRID_DOMAIN_ID # Plain text: 54920324
 ```
 
 ### Testing

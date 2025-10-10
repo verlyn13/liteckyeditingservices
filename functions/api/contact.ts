@@ -9,8 +9,8 @@ interface Env {
 		send: (msg: unknown) => Promise<void>;
 	};
 	SENDGRID_API_KEY?: string;
-	SENDGRID_TO?: string;
-	SENDGRID_FROM?: string;
+	EMAIL_TO?: string;
+	EMAIL_FROM?: string;
 }
 
 export const onRequestOptions: PagesFunction<
@@ -55,8 +55,8 @@ export const onRequestPost: PagesFunction<Env> = async ({
 
 		// Otherwise, if SendGrid env vars are present, attempt to send an email directly
 		const apiKey = env.SENDGRID_API_KEY;
-		const to = env.SENDGRID_TO;
-		const from = env.SENDGRID_FROM;
+		const to = env.EMAIL_TO;
+		const from = env.EMAIL_FROM;
 
 		if (apiKey && to && from) {
 			const payload = {

@@ -12,10 +12,17 @@ This directory contains all Cloudflare infrastructure documentation and configur
 ## Files
 
 ### Status Reports
-- **CLOUDFLARE-STATUS.md** - Current domain configuration and API audit results
 - **CLOUDFLARE-ANALYSIS.md** - Analysis of DNS, SSL/TLS, and deployment requirements
 - **CLOUDFLARE-MANAGEMENT.md** - Complete management guide with commands and procedures
 - **BROWSER-AUTOMATION-SETUP.md** - Browser automation configuration for testing
+- **DNS-CONFIGURATION.md** - Current DNS records and email configuration
+- **SENDGRID-SETUP.md** - Complete SendGrid email configuration (root + em subdomain)
+
+### Monitoring Documentation
+- **UPTIME-MONITORING.md** - External uptime monitoring setup (UptimeRobot/Pingdom)
+- **ERROR-ALERTING.md** - Cloudflare error monitoring with Workers
+- **QUEUE-HEALTH.md** - Queue health monitoring implementation
+- **CLOUDFLARE-CUSTOM-RULE-CI.md** - CI/CD custom rule configuration
 
 ### Backups
 - **dns-backup-*.json** - DNS configuration backups (timestamped)

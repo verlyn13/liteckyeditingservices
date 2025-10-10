@@ -1,9 +1,10 @@
 # DOCUMENTATION MASTER INDEX
 ## Complete Documentation Organization & Status
 
-Last Updated: October 5, 2025 (post-Git migration + CSP fix)
+Last Updated: October 10, 2025 (Documentation cleanup + accuracy fixes)
 Documentation Read: 100% (15/15 files analyzed)
 Deployment Status: ✅ LIVE with Git-Connected Deployment (migrated October 5, 2025)
+Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
 
 ---
 
@@ -54,11 +55,11 @@ Deployment Status: ✅ LIVE with Git-Connected Deployment (migrated October 5, 2
 | `CLOUDFLARE-DEPLOYMENT-WORKFLOW.md` | Root | ✅ Created | 6-phase deployment workflow with tracking |
 | `CLOUDFLARE-DEPLOYMENT-DIRECTIVE.md` | Root | ✅ Created | Deployment instructions and troubleshooting |
 | `CLOUDFLARE-WORKERS-SETUP.md` | Root | ✅ Created | Workers and Workers for Platforms setup |
-| `docs/infrastructure/README.md` | Infrastructure | ✅ Created | Overview and quick reference |
-| `docs/infrastructure/CLOUDFLARE-STATUS.md` | Infrastructure | ✅ Created | Current domain audit results |
+| `docs/infrastructure/README.md` | Infrastructure | ✅ Updated | Overview and quick reference |
 | `docs/infrastructure/CLOUDFLARE-ANALYSIS.md` | Infrastructure | ✅ Created | DNS and deployment analysis |
 | `docs/infrastructure/CLOUDFLARE-MANAGEMENT.md` | Infrastructure | ✅ Created | Complete management guide |
 | `docs/infrastructure/DNS-CONFIGURATION.md` | Infrastructure | ✅ Created | Current DNS, email (MX/SPF/DKIM/DMARC), and verification |
+| `docs/infrastructure/SENDGRID-SETUP.md` | Infrastructure | ✅ Updated | Complete SendGrid configuration (root + em subdomain) |
 | `scripts/cloudflare-audit.fish` | Scripts | ✅ Created | Domain audit tool |
 | `scripts/cf-dns-manage.fish` | Scripts | ✅ Created | DNS management tool |
 | `scripts/cf-pages-deploy.fish` | Scripts | ✅ Created | Pages deployment helper |
@@ -256,14 +257,22 @@ liteckyeditingservices/
 - `docs/infrastructure/ERROR-ALERTING.md` - Error monitoring implementation
 - `docs/infrastructure/QUEUE-HEALTH.md` - Queue health monitoring
 - `docs/infrastructure/DNS-CONFIGURATION.md` - DNS records and verification commands
-- `docs/PHASE-7-PROGRESS.md` - Week 1 progress tracking
-- `docs/PHASE-7-SESSION-SUMMARY.md` - Detailed session summary
 - `scripts/deploy/sync-pages-secrets-from-gopass.sh` - Pages secrets automation
 - `scripts/deploy/sync-worker-secrets-from-gopass.sh` - Worker secrets automation
 
+### ✅ Documentation Cleanup (October 10, 2025)
+1. **Fixed Code Inconsistencies** - ✅ Updated `/functions/api/contact.ts` to use `EMAIL_FROM/TO` consistently
+2. **Updated SendGrid Docs** - ✅ Corrected DNS records to match actual Cloudflare configuration
+3. **Archived Duplicates** - ✅ Moved outdated/duplicate docs to `/_archive/`:
+   - `sendgrid-setup/SENDGRID-CONFIGURATION-INITIAL.md` (outdated SendGrid doc)
+   - `phase-7/week-1/` (3 duplicate Phase 7 progress docs)
+   - `planning/next-steps-backlog-2025-10-04.md` (temporary backlog)
+   - `cloudflare-status/CLOUDFLARE-STATUS-2025-09-23.md` (outdated status)
+4. **Reorganized Structure** - ✅ Moved `SENDGRID-SETUP.md` to `/docs/infrastructure/`
+5. **Created Archive READMEs** - ✅ Added context for all archived documentation
+
 ### 🔄 Next Steps (Phase 7: Week 2 - October 6-12, 2025)
-1. **Cleanup** - Remove old `litecky-editing-services` project after 48 hours (Oct 7)
-2. **Implement Monitoring** - UptimeRobot + error/queue Workers (5 hours)
-3. **Performance Optimization** - Image optimization, code-splitting, caching strategies
-4. **A11y Sweep** - WCAG 2.1 AA compliance check for all 7 pages
-5. **SEO Enhancement** - Meta descriptions and Open Graph images for all pages
+1. **Implement Monitoring** - UptimeRobot + error/queue Workers (5 hours)
+2. **Performance Optimization** - Image optimization, code-splitting, caching strategies
+3. **A11y Sweep** - WCAG 2.1 AA compliance check for all 7 pages
+4. **SEO Enhancement** - Meta descriptions and Open Graph images for all pages

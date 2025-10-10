@@ -74,6 +74,14 @@ Cache guidance
   - `public/admin/index.html`
   - `functions/admin/config.yml.ts` or `functions/admin/[[path]].ts`
 
-Notes
-- Canonical success string: `authorization:github:success:...` (we also send object format)
-- `functions/api/auth.ts` honors Decap `state` and `origin`; `functions/api/callback.ts` clears cookies
+Current Implementation
+- String‑only callback success message with token (canonical format)
+- Dynamic config at `/api/config.yml` with `backend.base_url` + `auth_endpoint: api/auth`
+- External diagnostics (no inline): state sweeps, storage write tracer, window.open probe, `__dumpUser()`
+
+Planned Upgrade: PKCE Flow (Oct 11–13)
+- Add `public/admin/pkce-login.js` to generate `code_verifier`/`code_challenge` (S256) and pre‑write state before popup
+- `/api/auth` to honor `client_state` and pass PKCE params to GitHub authorize
+- `/api/callback` to post `code` (not token) string to opener (compat mode)
+- New `/api/exchange-token` to swap `{ code, verifier }` → `{ token }` server‑side
+- After exchange, emit canonical success string with token to Decap
