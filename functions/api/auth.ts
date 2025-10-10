@@ -44,28 +44,30 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		}
 
 		// Compute current origin from this request (works in dev & prod)
-		// Prefer explicit origin provided by Decap (it includes the admin opener origin)
-		const decapOriginParam = url.searchParams.get("origin");
-		const origin = decapOriginParam || `${url.protocol}//${url.host}`;
+		const origin = `${url.protocol}//${url.host}`;
 		const isHttps = url.protocol === "https:";
 		const secure = isHttps ? "; Secure" : "";
 		console.log(JSON.stringify({ evt: "oauth_origin", id: traceId, origin }));
 
-		// Use Decap-provided OAuth state if present; otherwise generate one
-		// Decap validates the exact state value on postMessage, so we must echo it back
-		const decapStateParam = url.searchParams.get("state");
-		const state = decapStateParam || crypto.randomUUID();
+		// PKCE params and optional client-provided state
+		const codeChallenge = url.searchParams.get("code_challenge") ?? "";
+		const codeChallengeMethod =
+			url.searchParams.get("code_challenge_method") ?? "";
+		const clientState = url.searchParams.get("client_state") ?? "";
+
+		// Use client_state if present so LS and cookie match
+		const state = clientState || crypto.randomUUID();
 		console.log(
 			JSON.stringify({
 				evt: "oauth_state_set",
 				id: traceId,
-				fromDecap: !!decapStateParam,
+				fromClient: !!clientState,
 				statePreview: `${state.slice(0, 8)}...`,
 			}),
 		);
 
-		// Prefer Decap-provided scope; default to repo
-		const scope = url.searchParams.get("scope") || "repo";
+		// Scope
+		const scope = url.searchParams.get("scope") || "repo read:user";
 		console.log(JSON.stringify({ evt: "oauth_scope", id: traceId, scope }));
 
 		const redirectUri = `${origin}/api/callback`;
@@ -78,6 +80,10 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		authorize.searchParams.set("redirect_uri", redirectUri);
 		authorize.searchParams.set("scope", scope);
 		authorize.searchParams.set("state", state);
+		if (codeChallenge && codeChallengeMethod) {
+			authorize.searchParams.set("code_challenge", codeChallenge);
+			authorize.searchParams.set("code_challenge_method", codeChallengeMethod);
+		}
 
 		console.log(
 			JSON.stringify({
@@ -95,6 +101,8 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 				redirect: authorize.toString(),
 				state,
 				scope,
+				code_challenge: codeChallenge ? "present" : "absent",
+				code_challenge_method: codeChallengeMethod || null,
 			};
 			return new Response(JSON.stringify(body, null, 2), {
 				headers: {
@@ -104,10 +112,9 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			});
 		}
 
-		// Set state cookie for later verification + carry opener origin for callback postMessage
+		// Set state cookie for later verification
 		const cookies = [
-			`decap_oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
-			`decap_opener_origin=${encodeURIComponent(origin)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
+			`oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
 			`oauth_trace=${traceId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
 		];
 
