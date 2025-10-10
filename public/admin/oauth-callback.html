@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Authenticating…</title>
+  </head>
+  <body>
+    <p>Authenticating, please wait...</p>
+    <script>
+      (function() {
+        // Check if this window was opened by another window
+        if (!window.opener) {
+          document.body.innerHTML = '<p style="color:red;">Error: This page should be opened in a popup.</p>';
+          return;
+        }
+
+        try {
+          // Use URLSearchParams to safely parse the hash
+          const params = new URLSearchParams(window.location.hash.substring(1));
+          const token = params.get('token');
+          const provider = params.get('provider') || 'github';
+          const tokenType = params.get('token_type') || 'bearer';
+          const state = params.get('state');
+
+          if (!token) {
+            throw new Error('Authentication token not found in URL hash.');
+          }
+
+          // **This is the EXACT message format Decap CMS expects**
+          // Both string and object formats for maximum compatibility
+          const messageData = {
+            provider: provider,
+            token_type: tokenType,
+            token: token
+          };
+
+          if (state) {
+            messageData.state = state;
+          }
+
+          const stringMessage = 'authorization:' + provider + ':success:' + JSON.stringify(messageData);
+          const objectMessage = {
+            type: 'authorization:' + provider + ':success',
+            data: messageData
+          };
+
+          console.log('[OAuth Callback] Sending messages to opener');
+          console.log('[OAuth Callback] String message:', stringMessage.substring(0, 100) + '...');
+          console.log('[OAuth Callback] Object message:', objectMessage);
+
+          // Send both formats to maximize compatibility
+          // Some versions of Decap expect string, others expect object
+          function sendMessages() {
+            try {
+              if (window.opener && !window.opener.closed) {
+                window.opener.postMessage(stringMessage, window.location.origin);
+                window.opener.postMessage(objectMessage, window.location.origin);
+                console.log('[OAuth Callback] Messages posted to opener');
+              }
+            } catch (e) {
+              console.error('[OAuth Callback] Error posting message:', e);
+            }
+          }
+
+          // Send immediately
+          sendMessages();
+
+          // Resend after 100ms (in case opener wasn't ready)
+          setTimeout(sendMessages, 100);
+
+          // Resend after 200ms (belt and suspenders)
+          setTimeout(sendMessages, 200);
+
+          // Listen for ACK and close popup
+          function onAck(e) {
+            if (e.data === 'authorization:ack' || (e.data && e.data.type === 'authorization:ack')) {
+              console.log('[OAuth Callback] Received ACK from opener');
+              window.removeEventListener('message', onAck);
+              setTimeout(function() {
+                console.log('[OAuth Callback] Closing popup');
+                window.close();
+              }, 50);
+            }
+          }
+          window.addEventListener('message', onAck);
+
+          // Auto-close after 3s if no ACK received
+          setTimeout(function() {
+            console.log('[OAuth Callback] Auto-closing popup (timeout)');
+            document.body.innerHTML = '<p>Authentication successful. You may close this window.</p>';
+            setTimeout(function() { window.close(); }, 500);
+          }, 3000);
+
+        } catch (err) {
+          console.error('[OAuth Callback] Error:', err);
+          // Let the opener know something went wrong
+          setTimeout(function() {
+            try {
+              const errorMessage = 'authorization:github:error:' + JSON.stringify({ message: err.message });
+              window.opener.postMessage(errorMessage, window.location.origin);
+            } catch (e) {
+              console.error('[OAuth Callback] Failed to send error message:', e);
+            }
+          }, 100);
+          document.body.innerHTML = '<p style="color:red;">Error: ' + err.message + '</p>';
+        }
+      })();
+    </script>
+  </body>
+</html>

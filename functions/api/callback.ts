@@ -131,27 +131,23 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			tokenPreview: `${token.slice(0, 8)}...`,
 		});
 
-		// Post success message to opener (Decap 3.8.x compatible), then close
-		const targetOrigin = openerOrigin || reqUrl.origin;
-		const strPayload =
-			"authorization:github:success:" +
-			JSON.stringify({
-				token,
-				provider: "github",
-				token_type: tokenType || "bearer",
-				state,
-			});
-		const objPayload = {
-			type: "authorization:github:success",
-			data: {
-				token,
-				provider: "github",
-				token_type: tokenType || "bearer",
-				state,
-			},
-		};
+		// Redirect to the OAuth callback page with token in URL hash
+		// This allows the /admin/oauth-callback.html page to post the message to the opener
+		const callbackUrl = new URL("/admin/oauth-callback", reqUrl.origin);
+		const hashParams = new URLSearchParams({
+			token,
+			provider: "github",
+			token_type: tokenType || "bearer",
+		});
 
-		const html = `<!doctype html><html><body><script>(function(){\n  var target=${JSON.stringify(targetOrigin)};\n  var s=${JSON.stringify(strPayload)};\n  var o=${JSON.stringify(objPayload)};\n  var attempts=0;\n  function send(){ attempts++; try{ if(window.opener){ window.opener.postMessage(s, target); window.opener.postMessage(o, target); } }catch(e){} if(attempts<20){ setTimeout(send,100); } else { setTimeout(function(){ window.close(); }, 50); } }\n  send();\n})();</script><p>You may close this window.</p></body></html>`;
+		if (state) {
+			hashParams.set("state", state);
+		}
+
+		// Use hash fragment so token doesn't appear in server logs
+		callbackUrl.hash = hashParams.toString();
+
+		console.log("[/api/callback] Redirecting to OAuth callback page");
 
 		const isHttps = reqUrl.protocol === "https:";
 		const secure = isHttps ? "; Secure" : "";
@@ -160,14 +156,12 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			`decap_opener_origin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
 		];
 
-		return new Response(html, {
+		return new Response(null, {
+			status: 302,
 			headers: {
-				"Content-Type": "text/html; charset=utf-8",
-				"Cache-Control": "no-store",
+				Location: callbackUrl.toString(),
 				"Set-Cookie": clearCookies.join(", "),
 				"Cross-Origin-Opener-Policy": "unsafe-none",
-				"Content-Security-Policy":
-					"default-src 'none'; script-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
 			},
 		});
 	} catch (error) {
