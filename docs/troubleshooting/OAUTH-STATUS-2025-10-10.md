@@ -265,16 +265,45 @@ backend:
 - `docs/troubleshooting/DECAP-OAUTH-DEBUG.md` - Comprehensive debugging guide
 - `workers/decap-oauth/src/index.ts` - Alternative Worker implementation
 
-## Action Items
+## Resolution (October 10, 2025)
 
-- [ ] Wait for commit `9d5eb129` to deploy
-- [ ] Test OAuth flow with console open
-- [ ] Check for debug listener postMessage logs
-- [ ] Based on results, implement one of the proposed solutions above
-- [ ] Document findings and update this status file
+### Root Cause Identified
+
+Debug listener confirmed postMessage events were arriving correctly, but Decap wasn't processing them.
+
+**Issue**: Missing `base_url` in config.yml prevented Decap from entering "external-auth" mode.
+
+Without `base_url`, Decap doesn't attach the postMessage listener that processes `authorization:github:success:` messages, even though the messages arrive.
+
+### Fix Implemented
+
+**Commit**: `49f48e5b` - fix(cms): implement dynamic config.yml with base_url for OAuth
+
+Created `functions/admin/config.yml.ts` (Pages Function) that:
+- Dynamically generates config.yml with `base_url` set to request origin
+- Works in both dev (`http://127.0.0.1:8788`) and prod (`https://www.liteckyeditingservices.com`)
+- Prevents environment-specific configuration drift
+
+**Key insight**: The Decap docs for GitHub + external OAuth handler require **both** `base_url` AND `auth_endpoint`. This is not optional for external OAuth to work.
+
+### References
+
+- [Decap Backends Overview](https://decapcms.org/docs/backends-overview/) - Requires base_url for OAuth proxy
+- [Cloud.gov Decap docs](https://docs.cloud.gov/pages/using-pages/getting-started-with-netlify-cms/) - Shows both fields required
+- [vencax OAuth provider](https://github.com/vencax/netlify-cms-github-oauth-provider) - Standard implementation
+
+### Action Items
+
+- [x] Wait for commit `9d5eb129` to deploy
+- [x] Test OAuth flow with console open
+- [x] Check for debug listener postMessage logs - ✅ Messages arriving correctly
+- [x] Identified root cause - missing base_url
+- [x] Implement dynamic config.yml with base_url
+- [ ] Test OAuth flow after deployment of commit `49f48e5b`
+- [ ] Verify Decap transitions to editor successfully
 
 ---
 
-**Last Updated**: 2025-10-10
-**Status**: Awaiting deployment and diagnostic test results
-**Next Review**: After deployment completes
+**Last Updated**: 2025-10-10 (Post-fix)
+**Status**: Fix deployed, awaiting production test
+**Next Review**: After Cloudflare Pages deploys commit `49f48e5b`
