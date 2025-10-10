@@ -34,8 +34,9 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
 	// -- CSP: self-hosted Decap with GitHub API direct access ------------
 	// Hash for inline script in /admin/oauth-callback.html page (OAuth postMessage handshake)
+	// This hash is computed from the exact script content including whitespace
 	const oauthCallbackScriptHash =
-		"'sha256-JFhqF0yfRgpFN2RwYzspNEyLD5yXJR1Db1HXPPvAnAA='";
+		"'sha256-PDMtGDfBsO9ZxKnfZlAj0HwihdlIruXKZOzRElc1oSk='";
 
 	const csp = [
 		"default-src 'self'",
