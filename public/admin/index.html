@@ -12,39 +12,8 @@
   <body>
     <!-- Non-production banner (self-hosted script; safe under admin CSP) -->
     <script src="/admin/preview-banner.js"></script>
-    <!-- Debug: Capture all postMessage events BEFORE Decap loads -->
-    <script>
-      // Debug listener - logs ALL postMessage events
-      window.addEventListener('message', function(event) {
-        console.log('[ADMIN DEBUG] postMessage received:', {
-          origin: event.origin,
-          data: event.data,
-          type: typeof event.data,
-          timestamp: new Date().toISOString()
-        });
-
-        // Check if it's an OAuth message
-        if (typeof event.data === 'string' && event.data.includes('authorization')) {
-          console.log('[ADMIN DEBUG] ✅ OAuth message detected!');
-          // State diagnostics: compare Decap expected state with message state
-          try {
-            const msg = event.data;
-            const PREFIX = 'authorization:github:success:';
-            if (msg.startsWith(PREFIX)) {
-              const payload = JSON.parse(msg.slice(PREFIX.length));
-              const keys = Object.keys(localStorage).filter(k => /cms-auth:state$/i.test(k));
-              const states = keys.reduce((o,k)=>{o[k]=localStorage.getItem(k); return o;},{});
-              const expected = states['netlify-cms-auth:state'] || states['decap-cms-auth:state'] || null;
-              const match = expected && payload && payload.state && expected === payload.state;
-              console.log('[ADMIN DEBUG] STATE CHECK', { expected, messageState: payload.state, match });
-            }
-          } catch {}
-        } else if (event.data && typeof event.data === 'object' && event.data.type && event.data.type.includes('authorization')) {
-          console.log('[ADMIN DEBUG] ✅ OAuth object message detected!');
-        }
-      }, false);
-      console.log('[ADMIN DEBUG] PostMessage listener registered');
-    </script>
+    <!-- Diagnostics: externalized to satisfy admin CSP (no inline scripts) -->
+    <script src="/admin/diagnostics.js" defer></script>
     <!-- Optional shim: enable with ?auth_shim=1 to re-emit canonical success string from admin window -->
     <script src="/admin/decap-auth-shim.js"></script>
     <!-- Exactly one bundle; Decap auto-inits from config link (no manual CMS.init()) -->
