@@ -86,34 +86,68 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		const cookies = parseCookies(cookie);
 		const wantState = cookies.decap_oauth_state ?? "";
 		const openerOrigin = decodeURIComponent(cookies.decap_opener_origin ?? "");
+		const traceId = cookies.oauth_trace || crypto.randomUUID();
 
-		console.log("[/api/callback] Cookie state:", {
-			wantState: `${wantState.slice(0, 8)}...`,
-			openerOrigin,
-			stateMatch: state === wantState,
-		});
+		console.log(
+			JSON.stringify({
+				evt: "oauth_callback_begin",
+				id: traceId,
+				url: reqUrl.toString(),
+				hasCode: !!code,
+				statePreview: `${state.slice(0, 8)}...`,
+			}),
+		);
+
+		console.log(
+			JSON.stringify({
+				evt: "oauth_callback_cookies",
+				id: traceId,
+				wantStatePreview: `${wantState.slice(0, 8)}...`,
+				openerOrigin,
+				stateMatch: state === wantState,
+			}),
+		);
 
 		// Basic CSRF/state check
 		if (!code || !state || !wantState || state !== wantState) {
-			console.error("[/api/callback] State validation failed:", {
-				hasCode: !!code,
-				hasState: !!state,
-				hasWantState: !!wantState,
-				stateMatch: state === wantState,
+			try {
+				console.error(
+					JSON.stringify({
+						evt: "oauth_state_invalid",
+						id: traceId,
+						hasCode: !!code,
+						hasState: !!state,
+						hasWantState: !!wantState,
+						stateMatch: state === wantState,
+					}),
+				);
+			} catch {}
+			const html = `<!doctype html><meta charset="utf-8"><title>Authentication Error</title>
+<div style="font-family:system-ui;padding:16px;color:#b00020">
+  <h2 style="margin:0 0 8px;">Invalid OAuth state</h2>
+  <div>Request ID: ${traceId}</div>
+  <div>Please close this window and try again.</div>
+</div>`;
+			return new Response(html, {
+				status: 400,
+				headers: {
+					"Content-Type": "text/html; charset=utf-8",
+					"Cache-Control": "no-store",
+				},
 			});
-			return new Response(
-				`Invalid OAuth state. Code: ${!!code}, State: ${!!state}, Cookie state: ${!!wantState}, Match: ${state === wantState}`,
-				{ status: 400 },
-			);
 		}
 
 		const clientId = ctx.env.GITHUB_CLIENT_ID;
 		const clientSecret = ctx.env.GITHUB_CLIENT_SECRET;
 
-		console.log("[/api/callback] GitHub credentials:", {
-			clientId: clientId ? "present" : "MISSING",
-			clientSecret: clientSecret ? "present" : "MISSING",
-		});
+		console.log(
+			JSON.stringify({
+				evt: "oauth_credentials",
+				id: traceId,
+				clientId: clientId ? "present" : "MISSING",
+				clientSecret: clientSecret ? "present" : "MISSING",
+			}),
+		);
 
 		if (!clientId || !clientSecret) {
 			console.error("[/api/callback] Missing GitHub credentials");
@@ -121,7 +155,9 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		}
 
 		// Exchange code → access_token
-		console.log("[/api/callback] Exchanging code for token...");
+		console.log(
+			JSON.stringify({ evt: "oauth_token_exchange_begin", id: traceId }),
+		);
 		const tokenRes = await fetch(
 			"https://github.com/login/oauth/access_token",
 			{
@@ -141,15 +177,40 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			},
 		);
 
-		console.log("[/api/callback] Token response:", {
-			status: tokenRes.status,
-			ok: tokenRes.ok,
-		});
+		console.log(
+			JSON.stringify({
+				evt: "oauth_token_response",
+				id: traceId,
+				status: tokenRes.status,
+				ok: tokenRes.ok,
+			}),
+		);
 
 		if (!tokenRes.ok) {
 			const t = await tokenRes.text();
-			console.error("[/api/callback] Token exchange failed:", t);
-			return new Response(`Token exchange failed: ${t}`, { status: 502 });
+			try {
+				console.error(
+					JSON.stringify({
+						evt: "oauth_token_exchange_error",
+						id: traceId,
+						status: tokenRes.status,
+						bodyPreview: t.slice(0, 256),
+					}),
+				);
+			} catch {}
+			const html = `<!doctype html><meta charset="utf-8"><title>Authentication Error</title>
+<div style="font-family:system-ui;padding:16px;color:#b00020">
+  <h2 style="margin:0 0 8px;">Authentication Failed</h2>
+  <div>Request ID: ${traceId}</div>
+  <div>Token exchange failed. Please close this window and try again.</div>
+</div>`;
+			return new Response(html, {
+				status: 502,
+				headers: {
+					"Content-Type": "text/html; charset=utf-8",
+					"Cache-Control": "no-store",
+				},
+			});
 		}
 
 		const tokenData = (await tokenRes.json()) as {
@@ -159,38 +220,41 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		const token = tokenData.access_token || "";
 		const tokenType = tokenData.token_type || "bearer";
 
-		console.log("[/api/callback] Token received:", {
-			hasToken: !!token,
-			tokenType,
-			tokenPreview: `${token.slice(0, 8)}...`,
-		});
+		console.log(
+			JSON.stringify({
+				evt: "oauth_token_ok",
+				id: traceId,
+				hasToken: !!token,
+				tokenType,
+				tokenPreview: `${token.slice(0, 4)}...`,
+			}),
+		);
 
 		// Return HTML that posts message to opener window (Decap CMS)
 		// This page IS the popup window that Decap opened, so window.opener points to /admin/
 		const targetOrigin = openerOrigin || reqUrl.origin;
 
 		// Prepare message data in Decap CMS format
-		const messageData: {
-			token: string;
-			provider: string;
-			token_type: string;
-			state?: string;
-		} = {
-			token,
+		// CRITICAL: Field order MUST match working examples: token, token_type, provider, state
+		// Decap CMS 3.x parses the JSON string and order matters for some versions
+		const messageData = {
+			token: token,
+			token_type: "bearer",
 			provider: "github",
-			token_type: tokenType || "bearer",
-		};
-		if (state) {
-			messageData.state = state;
-		}
-
-		const stringMessage = `authorization:github:success:${JSON.stringify(messageData)}`;
-		const objectMessage = {
-			type: "authorization:github:success",
-			data: messageData,
+			state: state,
 		};
 
-		console.log("[/api/callback] Preparing postMessage HTML for opener");
+    // Canonical string format (Decap 3.x standard)
+    const stringMessage = `authorization:github:success:${JSON.stringify(messageData)}`;
+    // Object format (also supported by Decap)
+    const objectMessage = {
+      type: "authorization:github:success",
+      data: messageData,
+    };
+
+		console.log(
+			JSON.stringify({ evt: "oauth_render_callback_html", id: traceId }),
+		);
 
 		// HTML with inline script to post message and close window
 		// This script runs in the popup window that Decap opened
@@ -215,14 +279,14 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
       const strMsg = ${JSON.stringify(stringMessage)};
       const objMsg = ${JSON.stringify(objectMessage)};
 
-      console.log('[Callback] Sending messages to opener');
+      console.log('[Callback] Sending messages to opener; id=${traceId}');
 
       function send() {
         try {
           if (window.opener && !window.opener.closed) {
             window.opener.postMessage(strMsg, target);
             window.opener.postMessage(objMsg, target);
-            console.log('[Callback] Messages sent');
+            console.log('[Callback] Messages sent; id=${traceId}');
           }
         } catch (e) {
           console.error('[Callback] Error:', e);
@@ -235,10 +299,13 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
       setTimeout(send, 100);
       // Retry after 200ms
       setTimeout(send, 200);
+      // Retry after 500ms and 1000ms for robustness
+      setTimeout(send, 500);
+      setTimeout(send, 1000);
 
       // Auto-close after 3 seconds
       setTimeout(function() {
-        console.log('[Callback] Closing popup');
+        console.log('[Callback] Closing popup; id=${traceId}');
         window.close();
       }, 3000);
     })();
@@ -265,7 +332,11 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			},
 		});
 	} catch (error) {
-		console.error("[/api/callback] Unhandled error:", error);
-		return new Response(`OAuth callback error: ${error}`, { status: 500 });
+		try {
+			console.error(
+				JSON.stringify({ evt: "oauth_callback_error", error: String(error) }),
+			);
+		} catch {}
+		return new Response("OAuth callback error", { status: 500 });
 	}
 };

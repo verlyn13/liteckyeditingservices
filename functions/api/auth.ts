@@ -28,10 +28,15 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		const url = new URL(ctx.request.url);
 		const clientId = ctx.env.GITHUB_CLIENT_ID;
 
-		console.log("[/api/auth] Request received:", {
-			url: url.toString(),
-			clientId: clientId ? "present" : "MISSING",
-		});
+		const traceId = crypto.randomUUID();
+		console.log(
+			JSON.stringify({
+				evt: "oauth_auth_begin",
+				id: traceId,
+				url: url.toString(),
+				clientId: clientId ? "present" : "MISSING",
+			}),
+		);
 
 		if (!clientId) {
 			console.error("[/api/auth] ERROR: Missing GITHUB_CLIENT_ID");
@@ -44,24 +49,29 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		const origin = decapOriginParam || `${url.protocol}//${url.host}`;
 		const isHttps = url.protocol === "https:";
 		const secure = isHttps ? "; Secure" : "";
-		console.log("[/api/auth] Computed origin:", origin);
+		console.log(JSON.stringify({ evt: "oauth_origin", id: traceId, origin }));
 
 		// Use Decap-provided OAuth state if present; otherwise generate one
 		// Decap validates the exact state value on postMessage, so we must echo it back
 		const decapStateParam = url.searchParams.get("state");
 		const state = decapStateParam || crypto.randomUUID();
 		console.log(
-			"[/api/auth] Using state:",
-			state,
-			decapStateParam ? "(from Decap)" : "(generated)",
+			JSON.stringify({
+				evt: "oauth_state_set",
+				id: traceId,
+				fromDecap: !!decapStateParam,
+				statePreview: `${state.slice(0, 8)}...`,
+			}),
 		);
 
 		// Prefer Decap-provided scope; default to repo
 		const scope = url.searchParams.get("scope") || "repo";
-		console.log("[/api/auth] Using scope:", scope);
+		console.log(JSON.stringify({ evt: "oauth_scope", id: traceId, scope }));
 
 		const redirectUri = `${origin}/api/callback`;
-		console.log("[/api/auth] Redirect URI:", redirectUri);
+		console.log(
+			JSON.stringify({ evt: "oauth_redirect_uri", id: traceId, redirectUri }),
+		);
 
 		const authorize = new URL("https://github.com/login/oauth/authorize");
 		authorize.searchParams.set("client_id", clientId);
@@ -69,12 +79,36 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		authorize.searchParams.set("scope", scope);
 		authorize.searchParams.set("state", state);
 
-		console.log("[/api/auth] Redirecting to GitHub:", authorize.toString());
+		console.log(
+			JSON.stringify({
+				evt: "oauth_auth_redirect",
+				id: traceId,
+				locationPreview: `${authorize.toString().slice(0, 128)}...`,
+			}),
+		);
+
+		// Optional diagnostics: no redirect, return summary JSON
+		if (url.searchParams.get("dry_run") === "1") {
+			const body = {
+				id: traceId,
+				origin,
+				redirect: authorize.toString(),
+				state,
+				scope,
+			};
+			return new Response(JSON.stringify(body, null, 2), {
+				headers: {
+					"Content-Type": "application/json; charset=utf-8",
+					"Cache-Control": "no-store",
+				},
+			});
+		}
 
 		// Set state cookie for later verification + carry opener origin for callback postMessage
 		const cookies = [
 			`decap_oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
 			`decap_opener_origin=${encodeURIComponent(origin)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
+			`oauth_trace=${traceId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
 		];
 
 		return new Response(null, {
@@ -87,7 +121,11 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			},
 		});
 	} catch (error) {
-		console.error("[/api/auth] Unhandled error:", error);
+		try {
+			console.error(
+				JSON.stringify({ evt: "oauth_auth_error", error: String(error) }),
+			);
+		} catch {}
 		return new Response(`OAuth start error: ${error}`, { status: 500 });
 	}
 };

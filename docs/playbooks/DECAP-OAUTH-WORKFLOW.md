@@ -63,6 +63,11 @@ Diagnostics
 - Callback header check: `GET /api/callback?diag=1` → returns HTML with the same COOP/CSP/no‑store headers used on successful OAuth handoff
 - Preview banner: auto‑visible on non‑production hosts via `public/admin/preview-banner.js`
 
+Logging and correlation
+- Correlation cookie: `oauth_trace` is set in `/api/auth` and echoed in `/api/callback` logs as `id`.
+- Structured logs: Functions emit single‑line JSON with `evt` and `id` (e.g., `oauth_auth_begin`, `oauth_state_set`, `oauth_token_response`, `oauth_render_callback_html`).
+- Dry runs: `/api/auth?dry_run=1` returns a JSON summary (origin, state preview, redirect URL) without redirecting, for quick `redirect_uri` validation.
+
 Cache guidance
 - Purge after changes to:
   - `/vendor/decap/decap-cms.js`

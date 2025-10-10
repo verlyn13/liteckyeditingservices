@@ -30,7 +30,15 @@ type PagesFunction<Env> = (
 export const onRequestGet: PagesFunction<Env> = async (context) => {
 	const origin = new URL(context.request.url).origin;
 
-	console.log("[/admin/config.yml] Generating config for origin:", origin);
+	try {
+		console.log(
+			JSON.stringify({
+				evt: "cms_config_emit",
+				origin,
+				path: "/admin/config.yml",
+			}),
+		);
+	} catch {}
 
 	// CRITICAL: base_url must match the origin where OAuth handlers live
 	// This tells Decap to use "external auth" mode and listen for postMessage
