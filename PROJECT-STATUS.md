@@ -61,6 +61,7 @@
   - ✅ **Canonical Origin**: Added `public/_redirects` to redirect apex → www (301) for consistent OAuth flow
   - ✅ **CSP Hash for Inline Debug**: Admin CSP includes a script hash to allow the small inline debug listener; Decap bundle remains self-hosted
   - 🔧 **Admin Diagnostics CSP Fix** (Oct 10): Externalized inline diagnostics to `/admin/diagnostics.js` (no inline script required); avoids CSP hash drift while preserving strict admin CSP.
+  - 🔧 **Deep Diagnostics** (Oct 10): Added storage write tracer, state sweeps, `window.open(/api/auth)` probe and `__forceAccept()` shim to pinpoint state handling and unblock acceptance if Decap didn't write state.
   - ✅ **COOP Headers**: Set `Cross-Origin-Opener-Policy: unsafe-none` on admin + OAuth worker endpoints
   - ✅ **Enhanced Security Headers**: Added X-Frame-Options, Referrer-Policy, Permissions-Policy to admin
   - ✅ **CI Header Validation**: Post-deploy workflow now enforces COOP/COEP/CSP requirements
