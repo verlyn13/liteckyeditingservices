@@ -146,16 +146,19 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
                 data: { token, provider: 'github', token_type: tokenType || 'bearer', state },
             };
 
-            const html = `<!doctype html><html><body><script>(function(){\n  var target=${JSON.stringify(targetOrigin)};\n  var s=${JSON.stringify(strPayload)};\n  var o=${JSON.stringify(objPayload)};\n  var attempts=0;\n  function send(){ attempts++; try{ if(window.opener){ window.opener.postMessage(s, target); window.opener.postMessage(o, target); } }catch(e){} if(attempts<10){ setTimeout(send,100); } else { setTimeout(function(){ window.close(); }, 50); } }\n  send();\n})();</script><p>You may close this window.</p></body></html>`;
+            const html = `<!doctype html><html><body><script>(function(){\n  var target=${JSON.stringify(targetOrigin)};\n  var s=${JSON.stringify(strPayload)};\n  var o=${JSON.stringify(objPayload)};\n  var attempts=0;\n  function send(){ attempts++; try{ if(window.opener){ window.opener.postMessage(s, target); window.opener.postMessage(o, target); } }catch(e){} if(attempts<20){ setTimeout(send,100); } else { setTimeout(function(){ window.close(); }, 50); } }\n  send();\n})();</script><p>You may close this window.</p></body></html>`;
 
+            const isHttps = reqUrl.protocol === "https:";
+            const secure = isHttps ? "; Secure" : "";
             const clearCookies = [
-                "decap_oauth_state=; Path=/; Max-Age=0; SameSite=Lax",
-                "decap_opener_origin=; Path=/; Max-Age=0; SameSite=Lax",
+                "decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0" + secure,
+                "decap_opener_origin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0" + secure,
             ];
 
             return new Response(html, {
                 headers: {
                     "Content-Type": "text/html; charset=utf-8",
+                    "Cache-Control": "no-store",
                     "Set-Cookie": clearCookies.join(", "),
                     "Cross-Origin-Opener-Policy": "unsafe-none",
                     "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",

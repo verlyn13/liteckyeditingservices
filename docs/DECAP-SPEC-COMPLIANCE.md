@@ -39,7 +39,6 @@ This document records how our Decap CMS integration complies with current specs,
     name: github
     repo: verlyn13/liteckyeditingservices
     branch: main
-    base_url: https://www.liteckyeditingservices.com
     auth_endpoint: /api/auth
   ```
 - Rationale: Uses on-site OAuth via Pages Functions. `base_url` + `auth_endpoint` pattern per [Decap GitHub backend docs](https://decapcms.org/docs/github-backend/). Works in production and in local dev with `wrangler pages dev` (functions share same origin as admin).
@@ -111,3 +110,21 @@ This document records how our Decap CMS integration complies with current specs,
 - [Decap CMS: GitHub Backend](https://decapcms.org/docs/github-backend/) - `auth_endpoint` (with or without `base_url`)
 - [Cloudflare Pages: Local Development](https://developers.cloudflare.com/pages/functions/local-development/) - `wrangler pages dev` for same-origin testing
 - [Community OAuth Provider Standard](https://github.com/vencax/netlify-cms-github-oauth-provider) - Success message formats
+
+---
+
+## Decap bundle pin (stability note)
+
+Pinned to: decap-cms 3.8.4 as a single vendored file at `/vendor/decap/decap-cms.js`.
+
+When bumping:
+1) Replace the vendored file (or update a versioned CDN URL if you switch to CDN).
+2) Run the smoke test below.
+3) Purge Pages cache for `/admin/*` and `/vendor/decap/*`.
+
+### Smoke test (console)
+- Open `/admin`, then:
+  1) Before login: `localStorage.getItem('netlify-cms-auth:state')` — copy value
+  2) Login with GitHub; wait for popup to close.
+  3) Confirm token: `await CMS.getToken().then(Boolean)` — should be `true`
+  4) Optional collections check: `await CMS.getBackend().then(Boolean)` — should be `true`
