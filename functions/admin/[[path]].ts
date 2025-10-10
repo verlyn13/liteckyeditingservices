@@ -34,7 +34,8 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
 	// -- CSP: self-hosted Decap with GitHub API direct access ------------
 	// Hash for debug listener in admin/index.html (browser-reported)
-	const debugListenerHash = "'sha256-7QABwjQQSmGVJbGBRzoLFPHLevIvlo/JR3nLf/9wfHA='";
+	const debugListenerHash =
+		"'sha256-7QABwjQQSmGVJbGBRzoLFPHLevIvlo/JR3nLf/9wfHA='";
 
 	const csp = [
 		"default-src 'self'",
