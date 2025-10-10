@@ -58,6 +58,25 @@
 
 		console.log("[ADMIN DEBUG] Diagnostics listener registered");
 
+		// Log state immediately after clicking Decap's login button (pre‑popup)
+		document.addEventListener("click", (e) => {
+			try {
+				const t = e.target;
+				const text = (t && (t.closest("button")?.textContent || ""))
+					.trim()
+					.toLowerCase();
+				if (text.includes("github")) {
+					setTimeout(() => {
+						const expected =
+							localStorage.getItem("netlify-cms-auth:state") ||
+							localStorage.getItem("decap-cms-auth:state") ||
+							null;
+						console.log("[ADMIN DEBUG] PRE-POPUP STATE", { expected });
+					}, 0);
+				}
+			} catch {}
+		});
+
 		// Helper: dump Decap user state
 		window.__dumpUser = () => {
 			const store = window.CMS?.getStore?.();

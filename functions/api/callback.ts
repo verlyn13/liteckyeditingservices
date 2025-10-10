@@ -275,32 +275,24 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 
       console.log('[Callback] Sending messages to opener; id=${traceId}');
 
-      function send() {
+      // Send every 100ms up to 10 tries, then close
+      var tries = 0;
+      var timer = setInterval(function() {
         try {
           if (window.opener && !window.opener.closed) {
             window.opener.postMessage(strMsg, target);
-            console.log('[Callback] Messages sent; id=${traceId}');
+            console.log('[Callback] Messages sent; id=${traceId}; try=' + tries);
           }
         } catch (e) {
           console.error('[Callback] Error:', e);
         }
-      }
-
-      // Send immediately
-      send();
-      // Retry after 100ms
-      setTimeout(send, 100);
-      // Retry after 200ms
-      setTimeout(send, 200);
-      // Retry after 500ms and 1000ms for robustness
-      setTimeout(send, 500);
-      setTimeout(send, 1000);
-
-      // Auto-close after 3 seconds
-      setTimeout(function() {
-        console.log('[Callback] Closing popup; id=${traceId}');
-        window.close();
-      }, 3000);
+        tries++;
+        if (tries >= 10) {
+          clearInterval(timer);
+          console.log('[Callback] Closing popup; id=${traceId}');
+          window.close();
+        }
+      }, 100);
     })();
   </script>
 </body>
