@@ -37,82 +37,132 @@ function parseCookies(h: string | null): Record<string, string> {
 }
 
 export const onRequestGet: PagesFunction<Env> = async (ctx) => {
-	const url = new URL(ctx.request.url);
-	const state = url.searchParams.get("state");
-	const code = url.searchParams.get("code");
-	const decapOrigin = url.searchParams.get("decap_origin");
+	try {
+		const reqUrl = new URL(ctx.request.url);
+		const code = reqUrl.searchParams.get("code") ?? "";
+		const state = reqUrl.searchParams.get("state") ?? "";
 
-	const cookies = parseCookies(ctx.request.headers.get("Cookie"));
-	const expectedState = cookies.decap_oauth_state;
-	if (!state || !expectedState || state !== expectedState) {
-		return new Response("Invalid OAuth state", { status: 400 });
+		console.log("[/api/callback] Request received:", {
+			url: reqUrl.toString(),
+			hasCode: !!code,
+			state: state.slice(0, 8) + "...",
+		});
+
+		const cookie = ctx.request.headers.get("Cookie") || "";
+		const cookies = parseCookies(cookie);
+		const wantState = cookies.decap_oauth_state ?? "";
+		const openerOrigin = decodeURIComponent(
+			cookies.decap_opener_origin ?? "",
+		);
+
+		console.log("[/api/callback] Cookie state:", {
+			wantState: wantState.slice(0, 8) + "...",
+			openerOrigin,
+			stateMatch: state === wantState,
+		});
+
+		// Basic CSRF/state check
+		if (!code || !state || !wantState || state !== wantState) {
+			console.error("[/api/callback] State validation failed:", {
+				hasCode: !!code,
+				hasState: !!state,
+				hasWantState: !!wantState,
+				stateMatch: state === wantState,
+			});
+			return new Response(
+				`Invalid OAuth state. Code: ${!!code}, State: ${!!state}, Cookie state: ${!!wantState}, Match: ${state === wantState}`,
+				{ status: 400 },
+			);
+		}
+
+		const clientId = ctx.env.GITHUB_CLIENT_ID;
+		const clientSecret = ctx.env.GITHUB_CLIENT_SECRET;
+
+		console.log("[/api/callback] GitHub credentials:", {
+			clientId: clientId ? "present" : "MISSING",
+			clientSecret: clientSecret ? "present" : "MISSING",
+		});
+
+		if (!clientId || !clientSecret) {
+			console.error("[/api/callback] Missing GitHub credentials");
+			return new Response("Missing GitHub credentials", { status: 500 });
+		}
+
+		// Exchange code → access_token
+		console.log("[/api/callback] Exchanging code for token...");
+		const tokenRes = await fetch(
+			"https://github.com/login/oauth/access_token",
+			{
+				method: "POST",
+				headers: {
+					Accept: "application/json",
+					"Content-Type": "application/x-www-form-urlencoded",
+				},
+				body: new URLSearchParams({
+					client_id: clientId,
+					client_secret: clientSecret,
+					code,
+					// redirect_uri must match what we used in /api/auth:
+					redirect_uri: `${reqUrl.origin}/api/callback`,
+					state,
+				}),
+			},
+		);
+
+		console.log("[/api/callback] Token response:", {
+			status: tokenRes.status,
+			ok: tokenRes.ok,
+		});
+
+		if (!tokenRes.ok) {
+			const t = await tokenRes.text();
+			console.error("[/api/callback] Token exchange failed:", t);
+			return new Response(`Token exchange failed: ${t}`, { status: 502 });
+		}
+
+		const tokenData = (await tokenRes.json()) as {
+			access_token?: string;
+			token_type?: string;
+		};
+		const token = tokenData.access_token || "";
+		const tokenType = tokenData.token_type || "bearer";
+
+		console.log("[/api/callback] Token received:", {
+			hasToken: !!token,
+			tokenType,
+			tokenPreview: token.slice(0, 8) + "...",
+		});
+
+            // Post success message to opener (Decap 3.8.x compatible), then close
+            const targetOrigin = openerOrigin || reqUrl.origin;
+            const strPayload = 'authorization:github:success:' + JSON.stringify({
+                token,
+                provider: 'github',
+                token_type: tokenType || 'bearer',
+                state,
+            });
+            const objPayload = {
+                type: 'authorization:github:success',
+                data: { token, provider: 'github', token_type: tokenType || 'bearer', state },
+            };
+
+            const html = `<!doctype html><html><body><script>(function(){\n  var target=${JSON.stringify(targetOrigin)};\n  var s=${JSON.stringify(strPayload)};\n  var o=${JSON.stringify(objPayload)};\n  var attempts=0;\n  function send(){ attempts++; try{ if(window.opener){ window.opener.postMessage(s, target); window.opener.postMessage(o, target); } }catch(e){} if(attempts<10){ setTimeout(send,100); } else { setTimeout(function(){ window.close(); }, 50); } }\n  send();\n})();</script><p>You may close this window.</p></body></html>`;
+
+            const clearCookies = [
+                "decap_oauth_state=; Path=/; Max-Age=0; SameSite=Lax",
+                "decap_opener_origin=; Path=/; Max-Age=0; SameSite=Lax",
+            ];
+
+            return new Response(html, {
+                headers: {
+                    "Content-Type": "text/html; charset=utf-8",
+                    "Set-Cookie": clearCookies.join(", "),
+                    "Cross-Origin-Opener-Policy": "unsafe-none",
+                    "Content-Security-Policy": "default-src 'none'; script-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
+                },
+            });
+	} catch (error) {
+		console.error("[/api/callback] Unhandled error:", error);
+		return new Response(`OAuth callback error: ${error}`, { status: 500 });
 	}
-	if (!code) return new Response("Missing code", { status: 400 });
-
-	const clientId = ctx.env.GITHUB_CLIENT_ID;
-	const clientSecret = ctx.env.GITHUB_CLIENT_SECRET;
-	if (!clientId || !clientSecret)
-		return new Response("Missing GitHub credentials", { status: 500 });
-
-	// Exchange code -> access_token
-	const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
-		method: "POST",
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			client_id: clientId,
-			client_secret: clientSecret,
-			code,
-			redirect_uri: `${url.origin}/api/callback`,
-			state,
-		}),
-	});
-
-	if (!tokenRes.ok) {
-		const t = await tokenRes.text();
-		return new Response(`Token exchange failed: ${t}`, { status: 502 });
-	}
-
-	const tokenData = (await tokenRes.json()) as { access_token?: string };
-	const token = tokenData.access_token || "";
-
-	// Determine target origin
-	const targets = Array.from(
-		new Set([decapOrigin, url.origin].filter(Boolean) as string[]),
-	);
-
-	// HTML that posts token to opener and closes. Use string + object message formats Decap accepts.
-	const html = `<!doctype html><html><body><script>(function(){\n  var t=${JSON.stringify(
-		token,
-	)}; var state=${JSON.stringify(state)}; var targets=${JSON.stringify(
-		targets,
-	)};\n  var payload='authorization:github:success:'+JSON.stringify({token:t, provider:'github', token_type:'bearer', state:state});\n  function send(){ try{ for(var i=0;i<targets.length;i++){ window.opener && window.opener.postMessage(payload, targets[i]); } }catch(e){} }\n  // resend a few times to avoid timing races\n  send(); setTimeout(send,120); setTimeout(send,300);\n  // also send object-style message accepted by Decap\n  var objMsg={ type:'authorization:github:success', data:{ token:t, provider:'github', token_type:'bearer', state:state } };\n  function sendObj(){ try{ for(var i=0;i<targets.length;i++){ window.opener && window.opener.postMessage(objMsg, targets[i]); } }catch(e){} }\n  sendObj(); setTimeout(sendObj,140);\n  // wait for ack then close; otherwise close after fail-safe\n  function onAck(ev){ if(targets.indexOf(ev.origin)>-1 && ev.data==='authorization:ack'){ window.removeEventListener('message', onAck); setTimeout(function(){ window.close(); }, 50); } }\n  window.addEventListener('message', onAck);\n  setTimeout(function(){ window.close(); }, 2500);\n})();</script><p>You may close this window.</p></body></html>`;
-
-	const clearState = [
-		"decap_oauth_state=; Max-Age=0",
-		"Path=/",
-		"HttpOnly",
-		"Secure",
-		"SameSite=Lax",
-	].join("; ");
-
-	return new Response(html, {
-		headers: {
-			"Content-Type": "text/html; charset=utf-8",
-			"Set-Cookie": clearState,
-			// Allow popup → opener postMessage handshake
-			"Cross-Origin-Opener-Policy": "unsafe-none",
-			// Minimal CSP that allows the inline script above
-			"Content-Security-Policy": [
-				"default-src 'self'",
-				"script-src 'self' 'unsafe-inline'",
-				"style-src 'self' 'unsafe-inline'",
-				"img-src 'self' data:",
-				"base-uri 'none'",
-				"object-src 'none'",
-			].join("; "),
-		},
-	});
 };
