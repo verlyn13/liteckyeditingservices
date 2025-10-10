@@ -244,13 +244,8 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			state: state,
 		};
 
-    // Canonical string format (Decap 3.x standard)
-    const stringMessage = `authorization:github:success:${JSON.stringify(messageData)}`;
-    // Object format (also supported by Decap)
-    const objectMessage = {
-      type: "authorization:github:success",
-      data: messageData,
-    };
+		// Canonical string format (Decap 3.x standard)
+		const stringMessage = `authorization:github:success:${JSON.stringify(messageData)}`;
 
 		console.log(
 			JSON.stringify({ evt: "oauth_render_callback_html", id: traceId }),
@@ -277,7 +272,6 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 
       const target = ${JSON.stringify(targetOrigin)};
       const strMsg = ${JSON.stringify(stringMessage)};
-      const objMsg = ${JSON.stringify(objectMessage)};
 
       console.log('[Callback] Sending messages to opener; id=${traceId}');
 
@@ -285,7 +279,6 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
         try {
           if (window.opener && !window.opener.closed) {
             window.opener.postMessage(strMsg, target);
-            window.opener.postMessage(objMsg, target);
             console.log('[Callback] Messages sent; id=${traceId}');
           }
         } catch (e) {

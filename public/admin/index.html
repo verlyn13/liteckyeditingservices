@@ -26,6 +26,19 @@
         // Check if it's an OAuth message
         if (typeof event.data === 'string' && event.data.includes('authorization')) {
           console.log('[ADMIN DEBUG] ✅ OAuth message detected!');
+          // State diagnostics: compare Decap expected state with message state
+          try {
+            const msg = event.data;
+            const PREFIX = 'authorization:github:success:';
+            if (msg.startsWith(PREFIX)) {
+              const payload = JSON.parse(msg.slice(PREFIX.length));
+              const keys = Object.keys(localStorage).filter(k => /cms-auth:state$/i.test(k));
+              const states = keys.reduce((o,k)=>{o[k]=localStorage.getItem(k); return o;},{});
+              const expected = states['netlify-cms-auth:state'] || states['decap-cms-auth:state'] || null;
+              const match = expected && payload && payload.state && expected === payload.state;
+              console.log('[ADMIN DEBUG] STATE CHECK', { expected, messageState: payload.state, match });
+            }
+          } catch {}
         } else if (event.data && typeof event.data === 'object' && event.data.type && event.data.type.includes('authorization')) {
           console.log('[ADMIN DEBUG] ✅ OAuth object message detected!');
         }
