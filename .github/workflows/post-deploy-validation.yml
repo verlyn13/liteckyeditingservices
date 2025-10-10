@@ -92,6 +92,10 @@ jobs:
         run: |
           pnpm test:cms:headers:prod
 
+      - name: Media paths sanity (repo-side)
+        run: |
+          node tests/media-paths-check.mjs
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
