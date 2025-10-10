@@ -6,6 +6,7 @@ dist/
 .output/
 .vercel/
 .netlify/
+.wrangler/
 
 # vendored CMS assets (built at build time)
 public/vendor/
