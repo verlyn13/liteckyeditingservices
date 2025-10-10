@@ -28,13 +28,13 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 	try {
 		const url = new URL(ctx.request.url);
 		const origin = `${url.protocol}//${url.host}`;
-    const body = (await ctx.request.json().catch(() => ({}))) as {
-      code?: string;
-      verifier?: string;
-    };
-    const code = body.code || '';
-    const verifier = body.verifier || '';
-    if (!code || !verifier) {
+		const body = (await ctx.request.json().catch(() => ({}))) as {
+			code?: string;
+			verifier?: string;
+		};
+		const code = body.code || "";
+		const verifier = body.verifier || "";
+		if (!code || !verifier) {
 			return new Response(
 				JSON.stringify({ error: "missing_code_or_verifier" }),
 				{
@@ -59,8 +59,10 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 			}),
 		});
 
-    const data = (await res.json().catch(() => ({}))) as { access_token?: string };
-    if (!res.ok || !data?.access_token) {
+		const data = (await res.json().catch(() => ({}))) as {
+			access_token?: string;
+		};
+		if (!res.ok || !data?.access_token) {
 			return new Response(
 				JSON.stringify({ error: "token_exchange_failed", details: data }),
 				{

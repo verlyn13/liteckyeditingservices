@@ -84,8 +84,8 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 
 		const cookie = ctx.request.headers.get("Cookie") || "";
 		const cookies = parseCookies(cookie);
-		const wantState = cookies.decap_oauth_state ?? "";
-		const openerOrigin = decodeURIComponent(cookies.decap_opener_origin ?? "");
+			const wantState = cookies.oauth_state || cookies.decap_oauth_state || "";
+			const openerOrigin = ""; // not used; target derived from reqUrl.origin
 		const traceId = cookies.oauth_trace || crypto.randomUUID();
 
 		console.log(
@@ -211,10 +211,11 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 
 		const isHttps = reqUrl.protocol === "https:";
 		const secure = isHttps ? "; Secure" : "";
-		const clearCookies = [
-			`decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
-			`decap_opener_origin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
-		];
+			const clearCookies = [
+				`oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+				`decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+				`oauth_trace=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+			];
 
 		return new Response(html, {
 			headers: {

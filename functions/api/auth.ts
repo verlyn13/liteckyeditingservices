@@ -113,10 +113,13 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		}
 
 		// Set state cookie for later verification
-		const cookies = [
-			`oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
-			`oauth_trace=${traceId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
-		];
+        const cookies = [
+            // New name (preferred)
+            `oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
+            // Back-compat for earlier attempts
+            `decap_oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
+            `oauth_trace=${traceId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
+        ];
 
 		return new Response(null, {
 			status: 302,
