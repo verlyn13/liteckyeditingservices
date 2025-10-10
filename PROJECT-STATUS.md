@@ -39,6 +39,11 @@
     - **Why**: Eliminates React double-mount/"removeChild" errors from multiple init paths; follows Decap install docs (static HTML, single bundle, auto-init from config link)
     - **Spec compliance**: Auto-init mode only (no `CMS.init()`), config discovery via `<link type="text/yaml" rel="cms-config-url">`
     - **Local testing**: `npx wrangler pages dev dist --env-file=.dev.vars` serves localhost:8788 with admin + Pages Functions on one origin
+  - ✅ **OAuth Debug Logging**: Added external `public/admin/debug-oauth.js` to monitor postMessage events during OAuth flow
+    - CSP-compliant external script (no inline scripts)
+    - Logs auth-related messages only (filters by 'authorization' keyword)
+    - Loaded before Decap bundle for early listener attachment
+    - Helps troubleshoot token handoff between popup and admin window
   - ✅ **Documentation Alignment Audit**: Completed comprehensive docs-to-code alignment across 14 files (ARCHITECTURE.md, CLOUDFLARE.md, DEPLOYMENT.md, ENVIRONMENT.md, and all migration/config docs)
   - ✅ **Decap Spec Compliance**: Created comprehensive `docs/DECAP-SPEC-COMPLIANCE.md` with migration notes, verification commands, and 2025 best practices
   - ✅ **SendGrid Standardization**: Unified variable naming to `SENDGRID_FROM` across all docs and scripts; documented DNS verification procedures
