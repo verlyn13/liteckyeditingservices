@@ -61,7 +61,7 @@ This document records how our Decap CMS integration complies with current specs,
        - Object: `{ type:'authorization:github:success', data:{ token, provider:'github', token_type:'bearer', state } }`
      - Resends multiple times (0ms/100ms/200ms) for reliability
      - Auto-closes after 3s or on ACK receipt
-     - CSP hash: `'sha256-JFhqF0yfRgpFN2RwYzspNEyLD5yXJR1Db1HXPPvAnAA='`
+     - CSP hash: `'sha256-PDMtGDfBsO9ZxKnfZlAj0HwihdlIruXKZOzRElc1oSk='` (browser-computed)
 
 - Verify (prod, after login):
   - `await CMS.getToken().then(Boolean) === true`
