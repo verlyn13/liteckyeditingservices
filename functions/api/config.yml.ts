@@ -6,27 +6,31 @@
 type Env = Record<string, never>;
 
 interface EventContext<Env> {
-  request: Request;
-  env: Env;
-  params: Record<string, string>;
-  waitUntil: (promise: Promise<unknown>) => void;
-  next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-  data: Record<string, unknown>;
+	request: Request;
+	env: Env;
+	params: Record<string, string>;
+	waitUntil: (promise: Promise<unknown>) => void;
+	next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
+	data: Record<string, unknown>;
 }
 
 type PagesFunction<Env> = (
-  context: EventContext<Env>,
+	context: EventContext<Env>,
 ) => Response | Promise<Response>;
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
-  const origin = new URL(context.request.url).origin;
-  try {
-    console.log(
-      JSON.stringify({ evt: "cms_config_emit", origin, path: "/api/config.yml" }),
-    );
-  } catch {}
+	const origin = new URL(context.request.url).origin;
+	try {
+		console.log(
+			JSON.stringify({
+				evt: "cms_config_emit",
+				origin,
+				path: "/api/config.yml",
+			}),
+		);
+	} catch {}
 
-  const yaml = `backend:
+	const yaml = `backend:
   name: github
   repo: verlyn13/liteckyeditingservices
   branch: main
@@ -127,12 +131,11 @@ collections:
       - { label: "Detailed Answer", name: "body", widget: "markdown", required: true }
 `;
 
-  return new Response(yaml, {
-    headers: {
-      "Content-Type": "text/yaml; charset=utf-8",
-      "Cache-Control": "no-store",
-      "X-Config-Origin": origin,
-    },
-  });
+	return new Response(yaml, {
+		headers: {
+			"Content-Type": "text/yaml; charset=utf-8",
+			"Cache-Control": "no-store",
+			"X-Config-Origin": origin,
+		},
+	});
 };
-

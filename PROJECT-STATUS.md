@@ -81,6 +81,8 @@
   - 🔧 **Admin Boot**: Removed explicit `CMS.init` call; Decap auto-initializes from `<link rel="cms-config-url">` to avoid double render and React removeChild errors
   - ✅ **OAuth Origin + Headers**: On-site Pages Functions (`/api/auth`, `/api/callback`) set COOP/CSP and post back to the opener origin with Decap‑compatible payloads; fixes "Authenticated successfully" but no editor UI.
   - 🔧 **Acceptance Hardening** (Oct 10): Switched callback to string‑only `authorization:github:success:` postMessage for maximum Decap compatibility, and enhanced admin diagnostics to compare localStorage state with message state.
+  - 🔧 **Config Discovery Endpoint** (Oct 10): Added `/api/config.yml` (mirrors `/admin/config.yml`) and pointed admin `<link rel="cms-config-url">` to `/api/config.yml`.
+  - 🔧 **Callback Retry Tuning** (Oct 10): Post message every 100ms up to 10 tries, then auto-close.
 
 **Recent Progress - October 6, 2025**:
   - ✅ **Visual Baselines (Linux)**: Seeded from main; stored under `tests/e2e/__screenshots__/...`
