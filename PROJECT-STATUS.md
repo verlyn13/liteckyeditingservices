@@ -33,9 +33,15 @@
 - All security headers E2E tests passing (15/15)
 
 **Recent Progress - October 9, 2025**:
+  - ✅ **BREAKING: Same-Origin OAuth Migration**: Complete rewrite of Decap CMS admin to single static HTML page (`public/admin/index.html`) with same-origin OAuth
+    - Replaced `src/pages/admin/index.astro` (Astro framework page) with static `public/admin/index.html` (single bundle, no framework overhead)
+    - Removed cache-busting boot scripts (`boot.js`, `debug.js`, `diagnose.js`) - archived to `_archive/admin-migration-2025-10-09/`
+    - Updated `config.yml`: removed `base_url`, using `auth_endpoint: /api/auth` only (same-origin works in dev + prod)
+    - **Why**: Eliminates React double-mount/"removeChild" errors; simplifies local dev (`wrangler pages dev` serves admin + functions on one origin)
+    - **Spec compliance**: Follows Decap install docs exactly (static HTML, single bundle, auto-init from config link)
+    - **Local testing**: `npx wrangler pages dev dist --env-file=.dev.vars` serves localhost:8788 with working OAuth
   - ✅ **Documentation Alignment Audit**: Completed comprehensive docs-to-code alignment across 14 files (ARCHITECTURE.md, CLOUDFLARE.md, DEPLOYMENT.md, ENVIRONMENT.md, and all migration/config docs)
-  - ✅ **Decap Spec Compliance**: Added spec-required `type="text/yaml"` to config link; created comprehensive `docs/DECAP-SPEC-COMPLIANCE.md` with verification commands
-  - ✅ **Cache-Busting Fix**: Added version query parameters to admin scripts (`/admin/boot.js?v=2025-10-09-spec-aligned`) to force browser reload and prevent double-initialization errors from stale cached scripts
+  - ✅ **Decap Spec Compliance**: Created comprehensive `docs/DECAP-SPEC-COMPLIANCE.md` with migration notes, verification commands, and 2025 best practices
   - ✅ **SendGrid Standardization**: Unified variable naming to `SENDGRID_FROM` across all docs and scripts; documented DNS verification procedures
   - ✅ **pnpm Version Pin**: Fixed `.mise.toml` to pin exact pnpm 10.17.1 (was "latest")
   - ✅ **Pages Subdomain Canonicalization**: Fixed all references from `litecky-editing-services.pages.dev` to `liteckyeditingservices.pages.dev`
