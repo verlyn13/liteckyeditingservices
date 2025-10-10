@@ -37,6 +37,7 @@
   - 🔧 **Acceptance Hardening**: String‑only callback message (canonical `authorization:github:success:`); callback retry tuning (10× @ 100ms).
   - 🔧 **Config Discovery Endpoint**: Added `/api/config.yml` (mirrors `/admin/config.yml`) and pointed admin `<link rel="cms-config-url">` to `/api/config.yml`. Set `auth_endpoint: api/auth` to mirror docs' append semantics.
   - 🔧 **Deep Diagnostics**: External diagnostics (no inline), storage write tracer, pre/post state sweeps, `window.open(/api/auth)` probe, `__dumpUser()` and `__forceAccept()` shim.
+  - 🔧 **PKCE Wiring**: Added client PKCE helper (`pkce-login.js`), switched callback to post code-only, added `/api/exchange-token` to swap `{ code, verifier }` for `{ token }` server-side. `/api/auth` now honors `client_state` and PKCE params.
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
 
 **Recent Progress - October 9, 2025**:
