@@ -62,8 +62,10 @@
 		const u = new URL("/api/auth", location.origin);
 		u.searchParams.set("code_challenge", challenge);
 		u.searchParams.set("code_challenge_method", "S256");
-		// Use standard `state` param so GitHub echoes it back unchanged
-		u.searchParams.set("state", state);
+			// Use standard `state` param so GitHub echoes it back unchanged.
+			// Also include legacy `client_state` for back-compat while Functions propagate.
+			u.searchParams.set("state", state);
+			u.searchParams.set("client_state", state);
 		window.open(u.toString(), "decap-oauth", "popup,width=600,height=800");
 	}
 
