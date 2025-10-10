@@ -215,6 +215,7 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			`oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
 			`decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
 			`oauth_trace=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+			`oauth_inflight=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
 		];
 
 		return new Response(html, {

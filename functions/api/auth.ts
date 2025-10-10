@@ -50,10 +50,20 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		console.log(JSON.stringify({ evt: "oauth_origin", id: traceId, origin }));
 
 		// PKCE params and optional client-provided state
+
 		const codeChallenge = url.searchParams.get("code_challenge") ?? "";
 		const codeChallengeMethod =
 			url.searchParams.get("code_challenge_method") ?? "";
-		const clientState = url.searchParams.get("client_state") ?? "";
+		// Accept both `state` (preferred) and legacy `client_state`
+		const stateParam = url.searchParams.get("state") ?? "";
+		const clientStateLegacy = url.searchParams.get("client_state") ?? "";
+		const clientState = stateParam || clientStateLegacy || "";
+
+		// Prefer PKCE; warn (for now) when absent. Can be tightened to 400 later.
+		const usingPkce = !!(codeChallenge && codeChallengeMethod === "S256");
+		if (!usingPkce) {
+			console.warn("[oauth] auth without PKCE; proceeding for compatibility");
+		}
 
 		// Use client_state if present so LS and cookie match
 		const state = clientState || crypto.randomUUID();
@@ -119,6 +129,8 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			// Back-compat for earlier attempts
 			`decap_oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
 			`oauth_trace=${traceId}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
+			// Replay guard (advisory)
+			`oauth_inflight=1; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
 		];
 
 		return new Response(null, {

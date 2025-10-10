@@ -59,16 +59,21 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 			}),
 		});
 
-		const data = (await res.json().catch(() => ({}))) as {
+		type TokenResponse = {
 			access_token?: string;
+			error?: string;
+			error_description?: string;
 		};
+		const data = (await res.json().catch(() => ({}))) as TokenResponse;
 		if (!res.ok || !data?.access_token) {
 			return new Response(
-				JSON.stringify({ error: "token_exchange_failed", details: data }),
-				{
-					status: 400,
-					headers: { "Content-Type": "application/json; charset=utf-8" },
-				},
+				JSON.stringify({
+					error: data?.error || "token_exchange_failed",
+					description: data?.error_description || null,
+					hint: "Likely PKCE verifier mismatch if error=invalid_grant",
+					status: res.status,
+				}),
+				{ status: 400, headers: { "Content-Type": "application/json" } },
 			);
 		}
 

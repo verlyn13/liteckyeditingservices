@@ -1,4 +1,5 @@
 (() => {
+	// Keep existing PKCE helpers
 	const STATE_KEYS = [
 		"netlify-cms-auth:state",
 		"decap-cms-auth:state",
@@ -34,6 +35,22 @@
 		} catch {}
 	}
 
+	const LOGIN_SELECTORS = [
+		'[data-testid="login-button"]',
+		".Login-button",
+		'button[aria-label="Login with GitHub"]',
+		"button",
+	];
+
+	// Global guard to avoid double-run
+	if (window.__decapPkceActive) return;
+	window.__decapPkceActive = true;
+
+	function looksLikeLogin(el) {
+		const txt = (el.textContent || "").toLowerCase();
+		return /\blogin\b/.test(txt) || /\bgithub\b/.test(txt);
+	}
+
 	async function startLogin() {
 		const verifier = genVerifier(96);
 		sessionStorage.setItem("pkce_code_verifier", verifier);
@@ -45,40 +62,78 @@
 		const u = new URL("/api/auth", location.origin);
 		u.searchParams.set("code_challenge", challenge);
 		u.searchParams.set("code_challenge_method", "S256");
-		u.searchParams.set("client_state", state);
+		// Use standard `state` param so GitHub echoes it back unchanged
+		u.searchParams.set("state", state);
 		window.open(u.toString(), "decap-oauth", "popup,width=600,height=800");
 	}
 
-	function bind() {
-		// Heuristic: bind to Decap login button
-		const btn = document.querySelector(
-			'[data-testid="login-button"], .Login-button, button',
-		);
-		if (btn && !btn.__pkceBound) {
-			btn.__pkceBound = true;
-			btn.addEventListener(
+	async function startLoginOnce(e, btn) {
+		if (e) {
+			e.preventDefault();
+			e.stopImmediatePropagation();
+			e.stopPropagation();
+		}
+		if (btn) btn.setAttribute("data-pkce-active", "true");
+		try {
+			await startLogin();
+		} catch (err) {
+			console.error(err);
+		}
+	}
+
+	function wireLogin() {
+		// Remove previous bindings and (re)bind with capture
+		LOGIN_SELECTORS.forEach((sel) => {
+			document.querySelectorAll(sel).forEach((btn) => {
+				if (!looksLikeLogin(btn)) return;
+				if (btn.__pkceCapture) return;
+
+				// Mark and add a small visual badge to indicate ownership
+				btn.__pkceCapture = true;
+				btn.classList.add("pkce-login-bound");
+				if (!btn.querySelector(".pkce-badge")) {
+					const b = document.createElement("span");
+					b.className = "pkce-badge";
+					b.textContent = "PKCE";
+					b.style.cssText = "margin-left:.5rem;font-size:.75em;opacity:.7";
+					btn.appendChild(b);
+				}
+
+				// Capture-phase listener blocks Decap’s own click handler
+				btn.addEventListener("click", (e) => startLoginOnce(e, btn), {
+					capture: true,
+				});
+			});
+		});
+
+		// Global capture fallback to enforce PKCE if a stray element slips through
+		if (!window.__pkceGlobalCapture) {
+			window.__pkceGlobalCapture = true;
+			document.addEventListener(
 				"click",
 				(e) => {
-					e.preventDefault();
-					startLogin().catch(console.error);
+					const t =
+						e.target &&
+						(e.target.closest("button, a, [role=button]") || e.target);
+					if (!t) return;
+					if (!looksLikeLogin(t)) return;
+					startLoginOnce(e, t);
 				},
 				{ capture: true },
 			);
 		}
 	}
 
-	const obs = new MutationObserver(() => bind());
-	obs.observe(document.documentElement, { subtree: true, childList: true });
-	if (
-		document.readyState === "complete" ||
-		document.readyState === "interactive"
-	)
-		bind();
-	else addEventListener("DOMContentLoaded", bind);
+	const mo = new MutationObserver(wireLogin);
+	mo.observe(document.documentElement, { subtree: true, childList: true });
+	if (document.readyState !== "loading") wireLogin();
+	else addEventListener("DOMContentLoaded", wireLogin);
 
 	// Listen for callback code; exchange token; emit canonical success string
+	let completed = false;
 	window.addEventListener("message", async (event) => {
 		try {
+			if (completed) return;
 			if (event.origin !== location.origin) return;
 			const s = String(event.data || "");
 			if (!s.startsWith("authorization:github:success:")) return;
@@ -107,6 +162,9 @@
 				null;
 			const message = `authorization:github:success:${JSON.stringify({ token: data.token, provider: "github", state: expected })}`;
 			window.postMessage(message, location.origin);
+			// Single completion guard + cleanup
+			completed = true;
+			sessionStorage.removeItem("pkce_code_verifier");
 		} catch (e) {
 			console.error("[PKCE] Error", e);
 		}
