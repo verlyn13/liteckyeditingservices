@@ -50,7 +50,11 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		// Decap validates the exact state value on postMessage, so we must echo it back
 		const decapStateParam = url.searchParams.get("state");
 		const state = decapStateParam || crypto.randomUUID();
-		console.log("[/api/auth] Using state:", state, decapStateParam ? "(from Decap)" : "(generated)");
+		console.log(
+			"[/api/auth] Using state:",
+			state,
+			decapStateParam ? "(from Decap)" : "(generated)",
+		);
 
 		// Prefer Decap-provided scope; default to repo
 		const scope = url.searchParams.get("scope") || "repo";
