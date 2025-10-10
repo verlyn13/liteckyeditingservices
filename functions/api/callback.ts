@@ -131,23 +131,86 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			tokenPreview: `${token.slice(0, 8)}...`,
 		});
 
-		// Redirect to the OAuth callback page with token in URL hash
-		// This allows the /admin/oauth-callback.html page to post the message to the opener
-		const callbackUrl = new URL("/admin/oauth-callback", reqUrl.origin);
-		const hashParams = new URLSearchParams({
+		// Return HTML that posts message to opener window (Decap CMS)
+		// This page IS the popup window that Decap opened, so window.opener points to /admin/
+		const targetOrigin = openerOrigin || reqUrl.origin;
+
+		// Prepare message data in Decap CMS format
+		const messageData: {
+			token: string;
+			provider: string;
+			token_type: string;
+			state?: string;
+		} = {
 			token,
 			provider: "github",
 			token_type: tokenType || "bearer",
-		});
-
+		};
 		if (state) {
-			hashParams.set("state", state);
+			messageData.state = state;
 		}
 
-		// Use hash fragment so token doesn't appear in server logs
-		callbackUrl.hash = hashParams.toString();
+		const stringMessage = `authorization:github:success:${JSON.stringify(messageData)}`;
+		const objectMessage = {
+			type: "authorization:github:success",
+			data: messageData,
+		};
 
-		console.log("[/api/callback] Redirecting to OAuth callback page");
+		console.log("[/api/callback] Preparing postMessage HTML for opener");
+
+		// HTML with inline script to post message and close window
+		// This script runs in the popup window that Decap opened
+		const html = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Authenticating…</title>
+</head>
+<body>
+  <p>Authentication successful. Closing window...</p>
+  <script>
+    (function() {
+      if (!window.opener) {
+        document.body.innerHTML = '<p style="color:red;">Error: No opener window found.</p>';
+        return;
+      }
+
+      const target = ${JSON.stringify(targetOrigin)};
+      const strMsg = ${JSON.stringify(stringMessage)};
+      const objMsg = ${JSON.stringify(objectMessage)};
+
+      console.log('[Callback] Sending messages to opener');
+
+      function send() {
+        try {
+          if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(strMsg, target);
+            window.opener.postMessage(objMsg, target);
+            console.log('[Callback] Messages sent');
+          }
+        } catch (e) {
+          console.error('[Callback] Error:', e);
+        }
+      }
+
+      // Send immediately
+      send();
+      // Retry after 100ms
+      setTimeout(send, 100);
+      // Retry after 200ms
+      setTimeout(send, 200);
+
+      // Auto-close after 3 seconds
+      setTimeout(function() {
+        console.log('[Callback] Closing popup');
+        window.close();
+      }, 3000);
+    })();
+  </script>
+</body>
+</html>`;
 
 		const isHttps = reqUrl.protocol === "https:";
 		const secure = isHttps ? "; Secure" : "";
@@ -156,12 +219,15 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			`decap_opener_origin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
 		];
 
-		return new Response(null, {
-			status: 302,
+		return new Response(html, {
 			headers: {
-				Location: callbackUrl.toString(),
+				"Content-Type": "text/html; charset=utf-8",
+				"Cache-Control": "no-store",
 				"Set-Cookie": clearCookies.join(", "),
 				"Cross-Origin-Opener-Policy": "unsafe-none",
+				// Allow inline script in THIS response only
+				"Content-Security-Policy":
+					"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
 			},
 		});
 	} catch (error) {
