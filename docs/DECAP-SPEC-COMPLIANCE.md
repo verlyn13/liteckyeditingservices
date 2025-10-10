@@ -36,9 +36,11 @@ This document records how our Decap CMS integration complies with current specs,
     name: github
     repo: verlyn13/liteckyeditingservices
     branch: main
+    base_url: https://www.liteckyeditingservices.com
     auth_endpoint: /api/auth
   ```
-- Rationale: Uses on-site OAuth via Pages Functions with same-origin `auth_endpoint`. Works in production and in local dev with `wrangler pages dev` (functions share the same origin as admin).
+- Rationale: Uses on-site OAuth via Pages Functions with same-origin `auth_endpoint`. **IMPORTANT**: `base_url` is required to prevent Decap from falling back to Netlify's OAuth proxy (api.netlify.com). The `base_url` tells Decap where to resolve the `auth_endpoint`, resulting in correct OAuth flow: `https://www.liteckyeditingservices.com/api/auth` instead of `https://api.netlify.com/api/auth`.
+- Works in production and in local dev with `wrangler pages dev` (functions share the same origin as admin).
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 
@@ -92,13 +94,15 @@ This document records how our Decap CMS integration complies with current specs,
 - Removed `public/admin/boot.js`, `debug.js`, `diagnose.js` (runtime injection scripts with HMR guards and cache-busting)
 - Replaced with single static `public/admin/index.html` with direct `<script src="/vendor/decap/decap-cms.js">`
 - Archived old files to `_archive/admin-migration-2025-10-09/`
-- Kept `base_url` + `auth_endpoint` in config.yml per Decap GitHub backend spec
+- **October 2025 OAuth fix**: Added `base_url` to config.yml to prevent Netlify API fallback
+- **October 2025 production fix**: Disabled debug-oauth.js (MIME type error - file not copied to dist)
 
 **Why:**
 - Eliminates React double-mount/"removeChild" errors from multiple init paths
 - Simplifies local dev: `wrangler pages dev` serves admin + Pages Functions on one origin (localhost:8788)
 - Follows Decap install docs exactly (static HTML, single bundle, auto-init from config link)
-- Same static HTML works in dev and prod; `base_url` points to production OAuth origin
+- `base_url` + `auth_endpoint` ensures OAuth goes to our domain, not api.netlify.com
+- Removing debug-oauth.js prevents console errors in production (file wasn't being deployed)
 
 ## References
 - [Decap CMS: Install](https://decapcms.org/docs/install-decap-cms/) - Single bundle, auto-init
