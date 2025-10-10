@@ -79,6 +79,7 @@
   - 🔧 **Same-Origin Config**: `public/admin/config.yml` simplified to `auth_endpoint: /api/auth` (no `base_url`) for seamless local (wrangler pages dev) and production behavior
   - 🔧 **Admin Boot**: Removed explicit `CMS.init` call; Decap auto-initializes from `<link rel="cms-config-url">` to avoid double render and React removeChild errors
   - ✅ **OAuth Origin + Headers**: On-site Pages Functions (`/api/auth`, `/api/callback`) set COOP/CSP and post back to the opener origin with Decap‑compatible payloads; fixes "Authenticated successfully" but no editor UI.
+  - 🔧 **Acceptance Hardening** (Oct 10): Switched callback to string‑only `authorization:github:success:` postMessage for maximum Decap compatibility, and enhanced admin diagnostics to compare localStorage state with message state.
 
 **Recent Progress - October 6, 2025**:
   - ✅ **Visual Baselines (Linux)**: Seeded from main; stored under `tests/e2e/__screenshots__/...`
