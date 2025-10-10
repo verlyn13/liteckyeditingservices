@@ -24,9 +24,9 @@ type PagesFunction<Env = unknown> = (
 ) => Response | Promise<Response>;
 
 export const onRequestGet: PagesFunction<Env> = async (ctx) => {
-    try {
-        const url = new URL(ctx.request.url);
-        const clientId = ctx.env.GITHUB_CLIENT_ID;
+	try {
+		const url = new URL(ctx.request.url);
+		const clientId = ctx.env.GITHUB_CLIENT_ID;
 
 		console.log("[/api/auth] Request received:", {
 			url: url.toString(),
@@ -38,10 +38,10 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			return new Response("Missing GITHUB_CLIENT_ID", { status: 500 });
 		}
 
-        // Compute current origin from this request (works in dev & prod)
-        const origin = `${url.protocol}//${url.host}`;
-        const isHttps = url.protocol === "https:";
-        const secure = isHttps ? "; Secure" : "";
+		// Compute current origin from this request (works in dev & prod)
+		const origin = `${url.protocol}//${url.host}`;
+		const isHttps = url.protocol === "https:";
+		const secure = isHttps ? "; Secure" : "";
 		console.log("[/api/auth] Computed origin:", origin);
 
 		// Generate CSRF state
@@ -63,22 +63,22 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 
 		console.log("[/api/auth] Redirecting to GitHub:", authorize.toString());
 
-        // Set state cookie for later verification + carry opener origin for callback postMessage
-        const cookies = [
-            `decap_oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
-            `decap_opener_origin=${encodeURIComponent(origin)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
-        ];
+		// Set state cookie for later verification + carry opener origin for callback postMessage
+		const cookies = [
+			`decap_oauth_state=${state}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
+			`decap_opener_origin=${encodeURIComponent(origin)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=600${secure}`,
+		];
 
 		return new Response(null, {
 			status: 302,
 			headers: {
 				Location: authorize.toString(),
-                "Set-Cookie": cookies.join(", "),
-                // Keep popup ↔ opener relationship intact
-                "Cross-Origin-Opener-Policy": "unsafe-none",
-            },
-        });
-    } catch (error) {
+				"Set-Cookie": cookies.join(", "),
+				// Keep popup ↔ opener relationship intact
+				"Cross-Origin-Opener-Policy": "unsafe-none",
+			},
+		});
+	} catch (error) {
 		console.error("[/api/auth] Unhandled error:", error);
 		return new Response(`OAuth start error: ${error}`, { status: 500 });
 	}
