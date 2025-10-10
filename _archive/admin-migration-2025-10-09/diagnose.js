@@ -20,7 +20,7 @@ async function diagnoseCMS() {
 		const token = await window.CMS.getToken?.();
 		console.log("2. Token stored:", !!token);
 		if (token) {
-			console.log("   Token preview:", token.slice(0, 8) + "…");
+			console.log("   Token preview:", `${token.slice(0, 8)}…`);
 		} else {
 			console.error("❌ No token stored - message not processed by Decap");
 		}

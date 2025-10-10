@@ -26,7 +26,7 @@ function getCookie(request: Request, name: string): string | undefined {
 	return found?.split("=")[1];
 }
 
-function htmlPostMessage(
+function _htmlPostMessage(
 	token: string,
 	state: string,
 	openerOrigin?: string,

@@ -4,7 +4,7 @@ import path from "node:path";
 
 const root = process.cwd();
 // Optional CLI: `node scripts/vendor-decap.mjs --version 3.9.4`
-const argVersionIndex = process.argv.findIndex((a) => a === "--version");
+const argVersionIndex = process.argv.indexOf("--version");
 const overrideVersion =
 	argVersionIndex > -1 ? process.argv[argVersionIndex + 1] : undefined;
 

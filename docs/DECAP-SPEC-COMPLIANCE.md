@@ -30,7 +30,7 @@ This document records how our Decap CMS integration complies with current specs,
   - `Array.from(document.scripts).filter(s=>/decap-cms\.js/.test(s.src)).length === 1`
   - Search all scripts for "CMS.init" - should return 0 results
 
-## GitHub Backend Configuration (Spec: GitHub Backend - Same-Origin OAuth)
+## GitHub Backend Configuration (Spec: GitHub Backend)
 
 - File: `public/admin/config.yml`
 - Backend block:
@@ -39,9 +39,10 @@ This document records how our Decap CMS integration complies with current specs,
     name: github
     repo: verlyn13/liteckyeditingservices
     branch: main
-    auth_endpoint: /api/auth  # same-origin OAuth; no base_url needed
+    base_url: https://www.liteckyeditingservices.com
+    auth_endpoint: /api/auth
   ```
-- Rationale: Same-origin OAuth works in both dev (`wrangler pages dev`) and prod. No `base_url` needed when admin and OAuth are on the same origin. Per [Decap GitHub backend docs](https://decapcms.org/docs/github-backend/).
+- Rationale: Uses on-site OAuth via Pages Functions. `base_url` + `auth_endpoint` pattern per [Decap GitHub backend docs](https://decapcms.org/docs/github-backend/). Works in production and in local dev with `wrangler pages dev` (functions share same origin as admin).
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 
@@ -91,17 +92,17 @@ This document records how our Decap CMS integration complies with current specs,
 ## Migration Notes (October 2025)
 
 **Changes from previous implementation:**
-- Removed `src/pages/admin/index.astro` (Astro page with framework overhead)
-- Removed `public/admin/boot.js` (external boot script with HMR guards)
-- Removed `base_url` from `config.yml` (not needed for same-origin OAuth)
-- Replaced with single static `public/admin/index.html` with one bundle
+- Removed `src/pages/admin/index.astro` (Astro framework page with dynamic initialization)
+- Removed `public/admin/boot.js`, `debug.js`, `diagnose.js` (runtime injection scripts with HMR guards and cache-busting)
+- Replaced with single static `public/admin/index.html` with direct `<script src="/vendor/decap/decap-cms.js">`
 - Archived old files to `_archive/admin-migration-2025-10-09/`
+- Kept `base_url` + `auth_endpoint` in config.yml per Decap GitHub backend spec
 
 **Why:**
 - Eliminates React double-mount/"removeChild" errors from multiple init paths
-- Simplifies local dev (one command: `wrangler pages dev` for full OAuth testing)
-- Follows Decap install docs exactly (static HTML, single bundle, auto-init)
-- Same config works in dev and prod (no environment-specific `base_url`)
+- Simplifies local dev: `wrangler pages dev` serves admin + Pages Functions on one origin (localhost:8788)
+- Follows Decap install docs exactly (static HTML, single bundle, auto-init from config link)
+- Same static HTML works in dev and prod; `base_url` points to production OAuth origin
 
 ## References
 - [Decap CMS: Install](https://decapcms.org/docs/install-decap-cms/) - Single bundle, auto-init

@@ -102,16 +102,16 @@ Rollback
 
 ## Deploy Workers
 
-### CMS OAuth (Current - Same-Origin Pages Functions)
-Uses same-origin Pages Functions at `/api/auth` and `/api/callback` for both local and production. No custom OAuth subdomain or external worker required.
+### CMS OAuth (Current - On-Site Pages Functions)
+Uses on-site Pages Functions at `/api/auth` and `/api/callback`. Admin served as static HTML (`public/admin/index.html`), functions deployed automatically with Pages. No custom OAuth subdomain or external worker required.
 
 **Configuration**: Pages → Settings → Environment variables
 - `GITHUB_CLIENT_ID` (secret)
 - `GITHUB_CLIENT_SECRET` (secret)
 
-**CMS Config**: `public/admin/config.yml` → `auth_endpoint: /api/auth` (no `base_url` - same-origin OAuth)
+**CMS Config**: `public/admin/config.yml` → `base_url: https://www.liteckyeditingservices.com`, `auth_endpoint: /api/auth`
 
-**Local Testing**: Use `npx wrangler pages dev` (after `pnpm build`) to serve `/admin` and `/api/*` on one origin for OAuth testing. See CLOUDFLARE.md § Local Development.
+**Local Testing**: Use `npx wrangler pages dev dist --env-file=.dev.vars` (after `pnpm build`) to serve admin + Pages Functions on one origin (localhost:8788) for OAuth testing. See CLOUDFLARE.md § Local Development.
 
 ### Legacy OAuth Worker (Decommissioned Oct 2025)
 External worker `litecky-decap-oauth` is no longer used. Legacy deployment instructions moved to `_archive/DEPLOYMENT-legacy-oauth.md`.

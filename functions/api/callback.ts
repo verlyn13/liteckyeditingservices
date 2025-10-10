@@ -43,7 +43,7 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 	const decapOrigin = url.searchParams.get("decap_origin");
 
 	const cookies = parseCookies(ctx.request.headers.get("Cookie"));
-	const expectedState = cookies["decap_oauth_state"];
+	const expectedState = cookies.decap_oauth_state;
 	if (!state || !expectedState || state !== expectedState) {
 		return new Response("Invalid OAuth state", { status: 400 });
 	}
