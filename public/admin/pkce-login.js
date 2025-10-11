@@ -175,11 +175,11 @@
 	else addEventListener("load", neuterDecapAuthorizer);
 
 	// On successful PKCE exchange, persist user and flip UI deterministically
-	async function onPkceSuccess(finalToken, state) {
+	async function onPkceSuccess(finalToken, _state) {
 		const userObj = {
 			token: finalToken,
 			backendName: "github",
-			login: "github",
+			login: true,
 			isGuest: false,
 		};
 		try {
@@ -204,7 +204,10 @@
 					try {
 						window.__dumpUser?.();
 					} catch {}
-				}, 0);
+					try {
+						location.reload();
+					} catch {}
+				}, 100);
 				return;
 			} catch (e) {
 				console.warn("[PKCE] Store dispatch failed; reloading", e);
