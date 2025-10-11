@@ -42,32 +42,33 @@
 		"button",
 	];
 
-	// Global guard to avoid double-run
-	if (window.__decapPkceActive) return;
-	window.__decapPkceActive = true;
+  // Global guard to avoid double-run
+  if (window.__decapPkceActive) return;
+  window.__decapPkceActive = true;
 
 	function looksLikeLogin(el) {
 		const txt = (el.textContent || "").toLowerCase();
 		return /\blogin\b/.test(txt) || /\bgithub\b/.test(txt);
 	}
 
-	async function startLogin() {
-		const verifier = genVerifier(96);
-		sessionStorage.setItem("pkce_code_verifier", verifier);
-		const challenge = await sha256ToB64Url(verifier);
+  async function startLogin() {
+    const verifier = genVerifier(96);
+    sessionStorage.setItem("pkce_code_verifier", verifier);
+    const challenge = await sha256ToB64Url(verifier);
 
 		const state = crypto.randomUUID();
 		setDecapState(state);
 
-		const u = new URL("/api/auth", location.origin);
-		u.searchParams.set("code_challenge", challenge);
-		u.searchParams.set("code_challenge_method", "S256");
-			// Use standard `state` param so GitHub echoes it back unchanged.
-			// Also include legacy `client_state` for back-compat while Functions propagate.
-			u.searchParams.set("state", state);
-			u.searchParams.set("client_state", state);
-		window.open(u.toString(), "decap-oauth", "popup,width=600,height=800");
-	}
+    const u = new URL("/api/auth", location.origin);
+    u.searchParams.set("code_challenge", challenge);
+    u.searchParams.set("code_challenge_method", "S256");
+    // Use standard `state` param so GitHub echoes it back unchanged.
+    // Also include legacy `client_state` for back-compat while Functions propagate.
+    u.searchParams.set("state", state);
+    u.searchParams.set("client_state", state);
+    const openFn = window.__origOpen || window.open;
+    openFn.call(window, u.toString(), "decap-oauth", "popup,width=600,height=800");
+  }
 
 	async function startLoginOnce(e, btn) {
 		if (e) {
@@ -83,7 +84,7 @@
 		}
 	}
 
-	function wireLogin() {
+  function wireLogin() {
 		// Remove previous bindings and (re)bind with capture
 		LOGIN_SELECTORS.forEach((sel) => {
 			document.querySelectorAll(sel).forEach((btn) => {
@@ -124,12 +125,35 @@
 				{ capture: true },
 			);
 		}
-	}
+  }
 
-	const mo = new MutationObserver(wireLogin);
-	mo.observe(document.documentElement, { subtree: true, childList: true });
-	if (document.readyState !== "loading") wireLogin();
-	else addEventListener("DOMContentLoaded", wireLogin);
+  const mo = new MutationObserver(wireLogin);
+  mo.observe(document.documentElement, { subtree: true, childList: true });
+  if (document.readyState !== "loading") wireLogin();
+  else addEventListener("DOMContentLoaded", wireLogin);
+
+  // Intercept any programmatic window.open to /api/auth (Decap internal flow) and short-circuit to our PKCE flow
+  if (!window.__pkceOpenIntercepted) {
+    window.__pkceOpenIntercepted = true;
+    try {
+      const origOpen = window.open;
+      window.__origOpen = origOpen;
+      window.open = function (url, name, specs) {
+        try {
+          const href = typeof url === 'string' ? url : (url && url.toString()) || '';
+          if (/\/api\/auth(\?|$)/.test(href)) {
+            // Use our PKCE path instead of Decap's
+            startLoginOnce(undefined, undefined);
+            // Ensure a window exists with the expected name so callers don't break
+            return origOpen.call(window, 'about:blank', name || 'decap-oauth', specs || 'popup,width=600,height=800');
+          }
+        } catch (_) {}
+        return origOpen.apply(window, arguments);
+      };
+    } catch (e) {
+      console.error('[PKCE] Failed to intercept window.open', e);
+    }
+  }
 
 	// Listen for callback code; exchange token; emit canonical success string
 	let completed = false;
