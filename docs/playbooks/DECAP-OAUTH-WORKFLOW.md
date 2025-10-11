@@ -5,12 +5,16 @@ Last updated: 2025-10-10
 This runbook verifies and fixes the Decap CMS OAuth handoff on Cloudflare Pages. It matches the current code paths and headers in this repo.
 
 Key files
-- `public/admin/index.html` — Admin shell; single Decap bundle; debug listener
+- `public/admin/index.html` — Admin shell; loads pkce-boot first, then Decap bundle
+- `public/admin/pkce-boot.js` — Early shim; wraps window.open/location before Decap
+- `public/admin/pkce-login.js` — PKCE login handler; state-gated exchange; neuters Decap authorizer
+- `public/admin/diagnostics.js` — External diagnostics (no inline scripts for CSP)
 - `public/admin/preview-banner.js` — Non‑production banner (pages.dev and local)
 - `functions/admin/config.yml.ts` — Dynamic config with `base_url` and `auth_endpoint`
 - `functions/admin/[[path]].ts` — Admin CSP/COOP headers
-- `functions/api/auth.ts` — Starts OAuth; echoes Decap `state`/`origin`; sets cookies
-- `functions/api/callback.ts` — Validates state; exchanges token; posts success message; clears cookies
+- `functions/api/auth.ts` — Starts OAuth; honors client state; passes PKCE params to GitHub
+- `functions/api/callback.ts` — Validates state; posts authorization code to opener
+- `functions/api/exchange-token.ts` — Exchanges code + verifier for access token
 - `functions/api/cms-health.ts` — JSON health summary (origin, endpoints, expected Decap)
 
 Production one‑pass (10 minutes)
@@ -74,14 +78,29 @@ Cache guidance
   - `public/admin/index.html`
   - `functions/admin/config.yml.ts` or `functions/admin/[[path]].ts`
 
-Current Implementation
-- String‑only callback success message with token (canonical format)
+Current Implementation (PKCE-Only - October 10, 2025)
+✅ **PKCE Flow Enforced**:
+- `public/admin/pkce-boot.js` - Early boot shim (loads before Decap):
+  - Wraps `window.open`, `location.assign/replace` before Decap mounts
+  - Intercepts any `/api/auth` calls, prevents Decap's internal authorizer
+  - Preserves real opener as `window.__realWindowOpen` for PKCE popup
+- `public/admin/pkce-login.js` - PKCE login handler:
+  - Generates `code_verifier`/`code_challenge` (S256) and pre-writes state
+  - Uses `__realWindowOpen` to launch popup with PKCE params
+  - State-gated exchange: only processes codes matching `sessionStorage['oauth_state']`
+  - Neuters Decap's OAuth authorizer after CMS mounts (belt and suspenders)
+  - Capture-phase click listener blocks Decap's login handler
+  - Visual "PKCE" badge on login button
+- `/api/auth` - Honors client `state` and passes PKCE params to GitHub
+- `/api/callback` - Posts authorization `code` (not token) to opener
+- `/api/exchange-token` - Swaps `{ code, verifier }` → `{ token }` server-side
+- After exchange, emits canonical success string with token to Decap
+- String‑only callback success message (canonical format)
 - Dynamic config at `/api/config.yml` with `backend.base_url` + `auth_endpoint: api/auth`
 - External diagnostics (no inline): state sweeps, storage write tracer, window.open probe, `__dumpUser()`
 
-Planned Upgrade: PKCE Flow (Oct 11–13)
-- Add `public/admin/pkce-login.js` to generate `code_verifier`/`code_challenge` (S256) and pre‑write state before popup
-- `/api/auth` to honor `client_state` and pass PKCE params to GitHub authorize
-- `/api/callback` to post `code` (not token) string to opener (compat mode)
-- New `/api/exchange-token` to swap `{ code, verifier }` → `{ token }` server‑side
-- After exchange, emit canonical success string with token to Decap
+**Single Flow Enforcement**:
+- No "Invalid OAuth state" popup errors
+- No repeated `/api/exchange-token` 400s
+- Only one `/api/auth` request with state + S256 PKCE
+- Code exchange only runs for messages with matching session state
