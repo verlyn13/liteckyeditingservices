@@ -256,9 +256,18 @@
 				try {
 					window.__pkcePopup?.postMessage("authorization:ack", location.origin);
 				} catch {}
-				try {
-					await onPkceSuccess(payload.token, expected);
-				} catch {}
+				if (typeof window.__acceptAndFlipFromToken === "function") {
+					try {
+						await window.__acceptAndFlipFromToken({
+							token: payload.token,
+							state: expected,
+						});
+					} catch {}
+				} else {
+					try {
+						await onPkceSuccess(payload.token, expected);
+					} catch {}
+				}
 				return;
 			}
 
@@ -291,9 +300,18 @@
 			try {
 				window.__pkcePopup?.postMessage("authorization:ack", location.origin);
 			} catch {}
-			try {
-				await onPkceSuccess(accessToken, expected);
-			} catch {}
+			if (typeof window.__acceptAndFlipFromToken === "function") {
+				try {
+					await window.__acceptAndFlipFromToken({
+						token: accessToken,
+						state: expected,
+					});
+				} catch {}
+			} else {
+				try {
+					await onPkceSuccess(accessToken, expected);
+				} catch {}
+			}
 			completed = true;
 			try {
 				sessionStorage.removeItem("pkce_code_verifier");
