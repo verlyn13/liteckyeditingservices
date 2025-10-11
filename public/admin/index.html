@@ -11,11 +11,11 @@
   </head>
   <body>
     <!-- Diagnostics first for visibility during boot -->
-    <script src="/admin/diagnostics.js"></script>
+    <script src="/admin/diagnostics.v2.js"></script>
     <!-- Wrap window.open and navigation before Decap initializes -->
     <script src="/admin/pkce-boot.js"></script>
     <!-- PKCE launcher + acceptance must be available before Decap boot -->
-    <script src="/admin/pkce-login.js"></script>
+    <script src="/admin/pkce-login.v3.js"></script>
     <!-- Exactly one bundle; Decap auto-inits from config link (no manual CMS.init()) -->
     <script src="/vendor/decap/decap-cms.js" defer></script>
     <!-- Optional shim: enable with ?auth_shim=1 to re-emit canonical success string from admin window -->
