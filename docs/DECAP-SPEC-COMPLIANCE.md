@@ -14,7 +14,7 @@ This document records how our Decap CMS integration complies with current specs,
 
 - File: `public/admin/index.html`
 - Link element:
-  - `<link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />`
+  - `<link href="/api/config.yml" type="text/yaml" rel="cms-config-url" />`
 - Rationale: Decap discovers YAML config via a link with `rel="cms-config-url"` and `type="text/yaml"`.
 - Verify (console):
   - `const link = document.querySelector('link[rel="cms-config-url"]');`
@@ -29,7 +29,7 @@ This document records how our Decap CMS integration complies with current specs,
 
 ## GitHub Backend Configuration (Spec: GitHub Backend)
 
-- File: `functions/admin/config.yml.ts` (dynamic Pages Function)
+- File: `functions/api/config.yml.ts` (dynamic Pages Function)
 - Backend block (generated):
   ```yml
   backend:
@@ -49,28 +49,23 @@ This document records how our Decap CMS integration complies with current specs,
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 
-- Files: `functions/api/auth.ts`, `functions/api/callback.ts`
-- Flow (server-side OAuth with popup postMessage):
+- Files: `functions/api/auth.ts`, `functions/api/callback.ts`, `functions/api/exchange-token.ts`
+- Flow (split exchange with popup postMessage):
   1) `/api/auth` (server-side, same origin as `/admin`)
-     - Honors Decap `state` and `site_id`/`origin` (opener)
-     - Persists state in HttpOnly cookie
-     - Redirects to GitHub authorize (includes `redirect_uri`, `scope`, `state`, and carries `decap_origin`)
-  2) `/api/callback` (server-side, GitHub redirect target - RETURNS HTML)
-     - Validates state cookie
-     - Exchanges code for access token
-     - **Returns HTML with inline postMessage script** (not a redirect)
-     - The popup window IS this page - it posts message to its opener
-     - Token embedded server-side in HTML (never in URL)
-     - Posts success message to opener in both formats:
-       - String: `authorization:github:success:` + JSON.stringify({ token, provider:'github', token_type:'bearer', state })
-       - Object: `{ type:'authorization:github:success', data:{ token, provider:'github', token_type:'bearer', state } }`
-     - Resends multiple times (0ms/100ms/200ms) for reliability
-     - Auto-closes after 3s
-     - CSP: Allows 'unsafe-inline' (this response only, not admin pages)
+     - Honors client-provided `state` and PKCE params; persists `state` in HttpOnly cookie
+     - Redirects to GitHub authorize with `redirect_uri`, `scope`, `state`, and `code_challenge`
+  2) `/api/callback` (server-side; RETURNS HTML)
+     - Validates `state` and posts the authorization `code` (not token) to the opener via `postMessage`
+     - COOP: `unsafe-none`; CSP: inline allowed for this tiny handoff HTML only
+  3) Admin window receives `{ code, state }`, verifies `state` matches its session, and calls `/api/exchange-token` with `{ code, verifier }`.
+  4) `/api/exchange-token` (server-side)
+     - Exchanges code+verifier with GitHub; responds JSON containing both `access_token` and `token` for compatibility
+  5) Admin re-emits the canonical Decap success string with the token, persists the user to `localStorage` under both keys, and dispatches store actions (or reloads) so the UI flips reliably without the Decap authorizer.
 
 - Verify (prod, after login):
   - `await CMS.getToken().then(Boolean) === true`
-  - `await CMS.getBackend().then(b=>b?.listCollections?.())` resolves (or clear 401/403 if scopes needed)
+  - `localStorage.getItem('decap-cms-user')` or `'netlify-cms-user'` is present
+  - Page is on the editor, not the login screen
 
 ## Local Development (2025 Best Practice)
 
