@@ -1,7 +1,7 @@
 # PROJECT STATUS - Litecky Editing Services
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 11, 2025 (Sentry integration complete)
+**Last Updated**: October 11, 2025 (Admin CMS bundle build complete)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment)
@@ -34,6 +34,26 @@
 - All security headers E2E tests passing (15/15)
 
 **Recent Progress - October 11, 2025**:
+  - ✅ **Admin CMS NPM Bundle Build Pipeline**: Complete build system for self-hosted Decap CMS bundle
+    - Created 3-stage build process: YAML config generation → esbuild bundle → content hashing
+    - Configured esbuild with ES2024 target, browser platform, and Node.js builtin exclusion
+    - Implemented content-based hashing (`cms.<hash>.js`) for immutable caching (max-age=31536000)
+    - Auto-updates HTML references and `_headers` cache rules via `scripts/build-cms-hash.mjs`
+    - Fixed config path resolution in `build-cms-config.mjs` (proper relative paths)
+    - Updated validator (`scripts/validate/decap-bundle.mjs`) to accept hashed bundle filenames
+    - Removed vendor bundle references; admin now loads only `/admin/cms.<hash>.js`
+  - ✅ **Admin Navigation Hard Flip**: Fixed OAuth callback navigation to force editor load
+    - Implemented cache-busted navigation with `?flip=<state>&t=<timestamp>` query parameters
+    - Changed from `location.replace()` to `location.assign()` to defeat router no-op
+    - Added 150ms setTimeout guard to force reload if router swallows navigation
+    - Updated `public/admin/accept-login.js` with robust `navigateToEditor()` function
+    - Eliminates need for manual page refresh after OAuth success
+  - ✅ **Infisical → Cloudflare CI Workflow**: Complete secret sync automation
+    - Created GitHub Actions workflow (`infisical-to-cloudflare.yml`) with dry-run support
+    - Successfully synced 7 production secrets to Cloudflare Pages environment
+    - Verified with `wrangler pages secret list` (all secrets present)
+    - Created setup scripts (`setup-github-secrets.sh`) for GitHub secrets/variables
+    - Documented in `docs/INFISICAL-CI-SYNC.md` with troubleshooting guide
   - ✅ **Sentry Error Tracking**: Complete frontend error tracking and monitoring implementation
     - Installed @sentry/browser and @sentry/astro SDK packages
     - Created core configuration in `src/lib/sentry.ts` with privacy-first defaults
