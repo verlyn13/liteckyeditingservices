@@ -114,11 +114,23 @@
 		return false;
 	}
 
-	async function navigateToEditor() {
+	async function navigateToEditor(state = "pkce") {
 		try {
-			const url = `${location.origin}/admin/#/`;
-			log("navigating to editor", { url });
-			location.replace(url);
+			// Cache-busted, hash-changing hard nav to defeat "same URL" no-op
+			const base = "/admin/#/";
+			const url = `${base}?flip=${encodeURIComponent(state)}&t=${Date.now()}`;
+			log("navigating to editor (hard flip)", { url });
+			location.assign(url);
+
+			// Final guard to force transition even if router swallows it
+			setTimeout(() => {
+				if (!/[\?&]flip=/.test(location.href)) {
+					log("router no-op detected, forcing reload");
+					location.replace(
+						`/admin/#/?flip=${encodeURIComponent(state)}&t=${Date.now()}`,
+					);
+				}
+			}, 150);
 		} catch (e) {
 			error("navigation failed", String(e));
 			location.href = "/admin/#/";
@@ -144,7 +156,7 @@
 
 			// Always navigate for a clean boot (avoids router timing races)
 			await sleep(0);
-			await navigateToEditor();
+			await navigateToEditor(state);
 
 			// Optional post-nav verification with a short backoff
 			const ok = await verifyHydration({ attempts: 6, delayMs: 250 });

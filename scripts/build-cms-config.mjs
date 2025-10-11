@@ -6,7 +6,7 @@ import YAML from 'yaml';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const root = path.resolve(__dirname, '..', '..');
+const root = path.resolve(__dirname, '..');
 
 const srcYaml = path.join(root, 'config', 'cms.config.yml');
 const outTs = path.join(root, 'src', 'admin', 'cms-config.ts');

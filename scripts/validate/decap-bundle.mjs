@@ -24,12 +24,12 @@ while ((m = scriptSrcRegex.exec(html)) !== null) {
 }
 
 const decapRefs = matches.filter((src) => /decap-cms(\.min)?\.js/i.test(src));
-const npmCmsRefs = matches.filter((src) => /\/admin\/cms\.js/i.test(src));
+const npmCmsRefs = matches.filter((src) => /\/admin\/cms(\.[a-f0-9]{8})?\.js/i.test(src));
 
 if (npmCmsRefs.length === 1 && decapRefs.length === 0) {
   console.log('✅ NPM decap-cms-app delivery detected:', npmCmsRefs[0]);
 } else if (npmCmsRefs.length === 0 && decapRefs.length === 0) {
-  console.error('❌ No admin CMS bundle referenced (expected /admin/cms.js).');
+  console.error('❌ No admin CMS bundle referenced (expected /admin/cms.js or /admin/cms.<hash>.js).');
   hasError = true;
 } else {
   console.error('❌ Found legacy decap-cms references. Admin must use /admin/cms.js only:');
