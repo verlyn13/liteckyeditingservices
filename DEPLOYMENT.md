@@ -212,9 +212,17 @@ git push origin main
 - Outdated security headers
 
 **When to purge**:
-- After building `/admin/cms.js`
+- After building `/admin/cms.<hash>.js`
 - After editing `public/admin/index.html`
 - After changing `functions/admin/config.yml.ts` or `functions/admin/[[path]].ts`
+
+### Admin CMS Rollback (Hashed)
+
+If a rollback is needed:
+1. Note the previous hashed filename from the prior deploy (e.g., `cms.abc12345.js`).
+2. Update `public/admin/index.html` to reference the previous hash (or re-run the hash step with the prior file pre-copied).
+3. Purge CDN cache for `/admin/*`.
+4. Verify `/admin` loads and `window.CMS` initializes.
 
 ## Troubleshooting
 

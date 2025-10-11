@@ -7,10 +7,10 @@
 		"dev": "astro dev",
 		"dev:env": "bash ./scripts/dev-with-env.sh",
 		"start": "astro dev",
-    "build:cms-config": "node scripts/build-cms-config.mjs",
-    "build:cms": "node scripts/build-cms.mjs",
-    "build:cms-hash": "node scripts/build-cms-hash.mjs",
-    "build": "pnpm build:cms-config && pnpm build:cms && pnpm build:cms-hash && astro build",
+		"build:cms-config": "node scripts/build-cms-config.mjs",
+		"build:cms": "node scripts/build-cms.mjs",
+		"build:cms-hash": "node scripts/build-cms-hash.mjs",
+		"build": "pnpm build:cms-config && pnpm build:cms && pnpm build:cms-hash && astro build",
 		"build:check": "pnpm build:cms && astro check && astro build",
 		"preview": "astro preview",
 		"astro": "astro",
@@ -52,7 +52,7 @@
 		"precommit": "pnpm run validate:all",
 		"prepush": "pnpm run gate:docs"
 	},
-  "dependencies": {
+	"dependencies": {
 		"@astrojs/sitemap": "latest",
 		"@astrojs/svelte": "latest",
 		"@fontsource-variable/inter": "latest",
@@ -63,10 +63,10 @@
 		"astro": "latest",
 		"sharp": "latest",
 		"svelte": "latest",
-		"decap-cms-app": "latest",
-		"react": "latest",
-    "react-dom": "latest",
-    "yaml": "latest",
+		"decap-cms-app": "3.8.4",
+		"react": "18.2.0",
+		"react-dom": "18.2.0",
+		"yaml": "latest",
 		"tailwindcss": "latest"
 	},
 	"devDependencies": {
@@ -109,5 +109,11 @@
 		"node": ">=24 <25",
 		"pnpm": ">=10.16.0"
 	},
-	"packageManager": "pnpm@10.17.1"
+	"packageManager": "pnpm@10.17.1",
+	"pnpm": {
+		"overrides": {
+			"react": "18.2.0",
+			"react-dom": "18.2.0"
+		}
+	}
 }

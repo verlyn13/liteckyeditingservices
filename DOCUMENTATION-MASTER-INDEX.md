@@ -1,7 +1,7 @@
 # DOCUMENTATION MASTER INDEX
 ## Complete Documentation Organization & Status
 
-Last Updated: October 11, 2025 (Admin CSP hardened; Decap npm migration planned)
+Last Updated: October 11, 2025 (Admin npm delivery + ES2025 bundling; Infisical CI sync)
 Documentation Read: 100% (15/15 files analyzed)
 Deployment Status: ✅ LIVE with Git-Connected Deployment (migrated October 5, 2025)
 Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
@@ -68,11 +68,14 @@ Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
 - `SECRETS.md` – Secrets inventory and rotation procedures
 - `secrets/PRODUCTION_KEYS.md` – Canonical list of prod keys (PUBLIC vs Secrets)
 
-### 5. DECISIONS & PLAYBOOKS (Admin CMS Delivery)
+### 5. DECISIONS & PLAYBOOKS (Admin CMS & Secrets)
 | Document | Purpose | Status |
 |----------|---------|--------|
 | `docs/decisions/ADR-002-decap-delivery-npm-app.md` | Decision to migrate from CDN bundle to decap-cms-app (npm) | ✅ Added |
 | `docs/playbooks/DECAP-NPM-MIGRATION.md` | Step-by-step migration plan, build strategy, CSP, tests, rollback | ✅ Added |
+| `docs/INFISICAL-QUICKSTART.md` | Production secrets SoT quickstart | ✅ Added |
+| `docs/INFISICAL-CI-SYNC.md` | CI workflow guide for Infisical → Cloudflare | ✅ Added |
+| `docs/playbooks/ADMIN-ACCESS.md` | Configure Cloudflare Access for /admin/* | ✅ Added |
 
 | Document | Location | Status | Purpose |
 |----------|----------|--------|---------|

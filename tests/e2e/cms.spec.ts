@@ -5,7 +5,7 @@ const isProd =
 	!/localhost|127\.0\.0\.1/i.test(process.env.BASE_URL);
 
 test("CMS admin route is accessible", async ({ page }) => {
-	// Contract test: /admin/ should return 200 and load cms.js (npm)
+	// Contract test: /admin/ should return 200 and load hashed cms bundle (npm)
 	const response = await page.goto("/admin/");
 
 	// Admin route should be accessible
@@ -14,7 +14,8 @@ test("CMS admin route is accessible", async ({ page }) => {
 	// Verify it contains the Decap CMS script reference (self-hosted)
 	if (response?.status() === 200) {
 		const content = await page.content();
-		expect(content).toContain("/admin/cms.js");
+		const hasHashed = /\/admin\/cms\.[a-f0-9]{8}\.js/.test(content);
+		expect(hasHashed).toBe(true);
 		expect(content).toContain("Content Manager");
 	}
 });
@@ -70,13 +71,21 @@ test("CMS script loads without CSP violations", async ({ page }) => {
 	expect(cspViolations).toHaveLength(0);
 });
 
-test("CMS bundle is served with sane caching", async ({ request }) => {
+test("CMS bundle is served with immutable caching", async ({
+	request,
+	page,
+}) => {
 	test.skip(!isProd, "Prod-only static asset header assertion");
-	const response = await request.get("/admin/cms.js");
+	const resp = await page.goto("/admin/");
+	if (!resp) throw new Error("Failed to load /admin/");
+	const html = await resp.text();
+	const m = html.match(/\/admin\/cms\.[a-f0-9]{8}\.js/);
+	expect(m).not.toBeNull();
+	const response = await request.get(m![0]);
 	expect(response.status()).toBe(200);
 	const cacheControl = response.headers()["cache-control"] || "";
-	// We do not require immutable here; ensure at least it's cacheable or explicitly controlled
-	expect(cacheControl.length >= 0).toBe(true);
+	expect(cacheControl).toContain("immutable");
+	expect(cacheControl).toMatch(/max-age=31536000/);
 });
 
 test("Admin headers allow OAuth popup handoff (October 2025 hardened)", async ({

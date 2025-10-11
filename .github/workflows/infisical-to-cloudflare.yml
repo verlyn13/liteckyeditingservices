@@ -4,140 +4,72 @@ on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Print actions without applying'
-        required: false
-        default: 'false'
+        description: 'Dry run (do not apply changes)'
+        type: boolean
+        default: true
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
 
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Infisical CLI
-        run: |
-          set -e
-          curl -sSL https://github.com/Infisical/cli/releases/download/v0.43.6/cli_0.43.6_linux_amd64.tar.gz \
-            | tar -xz
-          sudo mv infisical /usr/local/bin/
-          infisical --version
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-
-      - name: Install pnpm
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.17.1
+          version: 9
 
-      - name: Install Wrangler
-        run: pnpm add -g wrangler@latest
+      - name: Install Infisical CLI
+        run: curl -sSfL https://cli.infisical.com/install.sh | sh
 
-      - name: Export Infisical prod as JSON
+      - name: Export prod secrets from Infisical
         env:
-          INFISICAL_API_URL: ${{ secrets.INFISICAL_API_URL }}
           INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
+          INFISICAL_PROJECT_ID: ${{ vars.INFISICAL_PROJECT_ID }}
+          INFISICAL_ENV: ${{ vars.INFISICAL_ENV }}
+          INFISICAL_API_URL: ${{ secrets.INFISICAL_API_URL }}
         run: |
-          set -euo pipefail
-          infisical export \
-            --token "${INFISICAL_TOKEN}" \
-            --projectId "${{ vars.INFISICAL_PROJECT_ID }}" \
-            --env "${{ vars.INFISICAL_ENV || 'prod' }}" \
-            --format json > secrets.json
-          echo "Exported $(jq 'length' secrets.json) secrets from Infisical"
-
-      - name: Split to public.env and secrets.env
-        id: split
-        run: |
-          set -euo pipefail
-          jq -r '.[] | select(.key | startswith("PUBLIC_")) | "\(.key)=\(.value)"' secrets.json > public.env
-          jq -r '.[] | select(.key | startswith("PUBLIC_") | not) | "\(.key)=\(.value)"' secrets.json > secrets.env
-          PUBLIC_COUNT=$(wc -l < public.env)
-          SECRET_COUNT=$(wc -l < secrets.env)
-          echo "public_count=$PUBLIC_COUNT" >> $GITHUB_OUTPUT
-          echo "secret_count=$SECRET_COUNT" >> $GITHUB_OUTPUT
-          echo "Split into $PUBLIC_COUNT public vars and $SECRET_COUNT secrets"
-
-      - name: Dry-run summary
-        if: ${{ inputs.dry_run == 'true' }}
-        run: |
-          echo "=== PUBLIC VARIABLES (would be set) ==="
-          cut -d= -f1 public.env | sort
-          echo ""
-          echo "=== SECRETS (would be set) ==="
-          cut -d= -f1 secrets.env | sort
-          echo ""
-          echo "Dry run complete. Use 'dry_run=false' to apply."
-
-      - name: Mask all values
-        if: ${{ inputs.dry_run != 'true' }}
-        run: |
-          set -euo pipefail
-          # Mask all values to prevent accidental logging
+          mkdir -p .out
+          ~/.infisical/bin/infisical export \
+            --projectId "$INFISICAL_PROJECT_ID" \
+            --env "${INFISICAL_ENV:-production}" \
+            --format dotenv \
+            --include-imports \
+            > .out/prod.secrets.env
+          # Split PUBLIC_ variables
+          grep -E '^PUBLIC_' .out/prod.secrets.env > .out/prod.public.env || true
+          # Mask values
           while IFS='=' read -r k v; do
-            [ -z "$k" ] && continue
-            echo "::add-mask::$v"
-          done < public.env
-          while IFS='=' read -r k v; do
-            [ -z "$k" ] && continue
-            echo "::add-mask::$v"
-          done < secrets.env
+            [ -z "$k" ] && continue; echo "::add-mask::$v"; done < .out/prod.secrets.env
 
-      - name: Apply public environment variables (Pages Production)
-        if: ${{ inputs.dry_run != 'true' }}
+      - name: Prepare Cloudflare env files
+        run: |
+          chmod +x scripts/secrets/cloudflare_prepare_from_infisical.sh
+          ./scripts/secrets/cloudflare_prepare_from_infisical.sh .out/prod.secrets.env .out/prod.public.env
+
+      - name: Sync to Cloudflare Pages (Production)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          PROJECT: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+          CF_PAGES_PROJECT: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+          DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          set -euo pipefail
-          echo "Setting public variables for Pages project: $PROJECT"
-          COUNT=0
+          echo "Dry run: ${DRY_RUN}"
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Skipping apply per dry_run=true"; exit 0; fi
+          # Variables (PUBLIC_*)
           while IFS='=' read -r k v; do
             [ -z "$k" ] && continue
-            # Use wrangler pages deployment tail for variables (not secrets)
-            # Note: Cloudflare Pages doesn't have a direct CLI for env vars yet
-            # This will need to be done via API or dashboard for now
-            echo "Would set: $k (value masked)"
-            COUNT=$((COUNT + 1))
-          done < public.env
-          echo "Processed $COUNT public variables"
-          echo "⚠️  Note: Public environment variables must be set via Cloudflare Dashboard"
-          echo "    Go to: Pages → $PROJECT → Settings → Environment variables"
-
-      - name: Apply secrets (Pages Production)
-        if: ${{ inputs.dry_run != 'true' }}
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          PROJECT: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
-        run: |
-          set -euo pipefail
-          echo "Setting secrets for Pages project: $PROJECT"
-          COUNT=0
-          while IFS='=' read -r k v; do
+            npx wrangler pages project variable put "$CF_PAGES_PROJECT" "$k" --value "$v"
+          done < .out/prod.public.env
+          # Secrets (non-PUBLIC)
+          grep -vE '^PUBLIC_' .out/prod.secrets.env | while IFS='=' read -r k v; do
             [ -z "$k" ] && continue
-            printf '%s' "$v" | wrangler pages secret put "$k" --project-name "$PROJECT"
-            echo "✅ Set secret: $k"
-            COUNT=$((COUNT + 1))
-          done < secrets.env
-          echo "Successfully set $COUNT secrets"
+            echo -n "$v" | npx wrangler pages project secret put "$CF_PAGES_PROJECT" "$k" --quiet
+          done
 
-      - name: Summary
-        if: ${{ inputs.dry_run != 'true' }}
-        run: |
-          echo "========================================"
-          echo "Infisical → Cloudflare Sync Complete"
-          echo "========================================"
-          echo "Public variables: ${{ steps.split.outputs.public_count }}"
-          echo "Secrets set: ${{ steps.split.outputs.secret_count }}"
-          echo ""
-          echo "⚠️  Manual step required:"
-          echo "Set public environment variables via Cloudflare Dashboard:"
-          echo "Pages → liteckyeditingservices → Settings → Environment variables → Production"
-          echo ""
-          echo "Public variables to set:"
-          cut -d= -f1 public.env | sort
