@@ -10,6 +10,10 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
+    <script>
+      // Flight recorder: mark HTML parse start for admin
+      try { window.__sentry?.addBreadcrumb?.({ category: 'diag', message: 'admin:html-start', level: 'info' }); } catch {}
+    </script>
     <!-- Sentry error tracking for admin -->
     <script>
       // Pass environment variables to sentry-admin.js
