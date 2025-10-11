@@ -190,6 +190,14 @@
 			console.warn("[PKCE] Failed to write user to localStorage", e);
 		}
 
+		// Clear one-time client state before navigating
+		try {
+			sessionStorage.removeItem("pkce_code_verifier");
+		} catch {}
+		try {
+			sessionStorage.removeItem("oauth_state");
+		} catch {}
+
 		const store = window.CMS?.getStore?.();
 		if (store) {
 			try {
@@ -205,9 +213,9 @@
 					try {
 						window.__dumpUser?.();
 					} catch {}
-					// Simple, robust flip: let Decap hydrate from localStorage
+					// Hard-navigate to editor root for deterministic hydration
 					try {
-						location.reload();
+						location.replace(new URL("/admin/#/", location.origin).href);
 					} catch {}
 				}, 50);
 				return;
@@ -216,9 +224,9 @@
 			}
 		}
 
-		// Fallback: force a reload so Decap boots with the stored user
+		// Fallback: force a fresh boot into editor route
 		try {
-			location.reload();
+			location.replace(new URL("/admin/#/", location.origin).href);
 		} catch {}
 	}
 
@@ -306,7 +314,9 @@
 			} catch {}
 			// Single completion guard + cleanup
 			completed = true;
-			sessionStorage.removeItem("pkce_code_verifier");
+			try {
+				sessionStorage.removeItem("pkce_code_verifier");
+			} catch {}
 			try {
 				sessionStorage.removeItem("oauth_state");
 			} catch {}
