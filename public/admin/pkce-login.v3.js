@@ -16,16 +16,16 @@
 			S?.addBreadcrumb?.({ category: "auth", message, level: "info", data });
 		} catch {}
 	};
-		const cap = (error, ctx) => {
-			try {
-				S?.captureException?.(error, { extra: ctx || {} });
-			} catch {}
-		};
-		// Tag build/commit for correlation in Sentry
+	const cap = (error, ctx) => {
 		try {
-			S?.setTag?.("accept_build", "2025-10-11T18:07:02Z");
-			S?.setTag?.("accept_commit", "a9da9273");
+			S?.captureException?.(error, { extra: ctx || {} });
 		} catch {}
+	};
+	// Tag build/commit for correlation in Sentry
+	try {
+		S?.setTag?.("accept_build", "2025-10-11T18:07:02Z");
+		S?.setTag?.("accept_commit", "a9da9273");
+	} catch {}
 	const STATE_KEYS = [
 		"netlify-cms-auth:state",
 		"decap-cms-auth:state",

@@ -4,7 +4,13 @@
 	try {
 		// Carry over existing diagnostics listener if present
 		console.log("[ADMIN DEBUG] diagnostics.v2 loaded");
-		try { window.Sentry?.addBreadcrumb?.({ category: 'diag', message: 'admin:diagnostics-loaded', level: 'info' }); } catch {}
+		try {
+			window.Sentry?.addBreadcrumb?.({
+				category: "diag",
+				message: "admin:diagnostics-loaded",
+				level: "info",
+			});
+		} catch {}
 
 		// Rescue acceptance (idempotent)
 		if (!window.__decapRescueArmed) {
