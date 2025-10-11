@@ -205,16 +205,20 @@
 						window.__dumpUser?.();
 					} catch {}
 					try {
-						location.reload();
+						location.replace("/admin/#/");
 					} catch {}
-				}, 100);
+				}, 50);
 				return;
 			} catch (e) {
 				console.warn("[PKCE] Store dispatch failed; reloading", e);
 			}
 		}
 
-		location.reload();
+		try {
+			location.replace("/admin/#/");
+		} catch {
+			location.reload();
+		}
 	}
 
 	// Listen for callback code; exchange token; emit canonical success string
