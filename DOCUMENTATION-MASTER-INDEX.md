@@ -1,7 +1,7 @@
 # DOCUMENTATION MASTER INDEX
 ## Complete Documentation Organization & Status
 
-Last Updated: October 10, 2025 (Documentation cleanup + accuracy fixes)
+Last Updated: October 11, 2025 (Sentry integration complete)
 Documentation Read: 100% (15/15 files analyzed)
 Deployment Status: ✅ LIVE with Git-Connected Deployment (migrated October 5, 2025)
 Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
@@ -45,6 +45,20 @@ Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
 | `docs/onboarding.md` | Developer setup | ✅ Created | ✅ Yes (lines 1023-1239) |
 | `docs/playbooks/email-issues.md` | Email troubleshooting | ✅ Created | ✅ Yes (lines 1242-1406) |
 | `.github/CODEOWNERS` | Code ownership | ✅ Created | ✅ Yes (lines 1409-1430) |
+
+### 3.1 ERROR TRACKING & MONITORING (Sentry)
+**Purpose**: Frontend error tracking, performance monitoring, and structured logging
+
+| Document | Purpose | Status | Cross-References |
+|----------|---------|--------|------------------|
+| `docs/SENTRY-README.md` | Quick reference & getting started | ✅ Created | ENVIRONMENT.md (lines 198-246) |
+| `docs/SENTRY-SETUP.md` | Complete setup guide (14 sections) | ✅ Created | .env.example (lines 22-26) |
+| `docs/SENTRY-INTEGRATIONS.md` | Integration reference & examples | ✅ Created | src/lib/sentry.ts |
+| `src/lib/sentry.ts` | Core configuration & helpers | ✅ Created | BaseLayout.astro |
+| `src/scripts/sentry-init.ts` | Client-side initialization | ✅ Created | sentry.ts |
+| `public/admin/sentry-admin.js` | Admin/CMS instrumentation | ✅ Created | admin/index.html |
+| `src/pages/test-sentry.astro` | Interactive test page (dev only) | ✅ Created | SENTRY-README.md |
+| `tests/sentry-integration.spec.ts` | Objective Playwright tests | ✅ Created | SENTRY-SETUP.md |
 
 ### 4. INFRASTRUCTURE DOCUMENTATION (How to Deploy)
 **Purpose**: Cloudflare configuration and management
@@ -259,6 +273,32 @@ liteckyeditingservices/
 - `docs/infrastructure/DNS-CONFIGURATION.md` - DNS records and verification commands
 - `scripts/deploy/sync-pages-secrets-from-gopass.sh` - Pages secrets automation
 - `scripts/deploy/sync-worker-secrets-from-gopass.sh` - Worker secrets automation
+
+### ✅ Sentry Error Tracking Integration (October 11, 2025)
+1. **Sentry SDK Installed** - ✅ @sentry/browser and @sentry/astro (latest versions)
+2. **Core Configuration** - ✅ `src/lib/sentry.ts` with privacy-first defaults
+3. **Client Initialization** - ✅ `src/scripts/sentry-init.ts` loads early in page lifecycle
+4. **Admin Instrumentation** - ✅ `public/admin/sentry-admin.js` tracks OAuth and CMS events
+5. **Test Page** - ✅ `src/pages/test-sentry.astro` for interactive testing
+6. **Objective Tests** - ✅ `tests/sentry-integration.spec.ts` with 17 Playwright tests
+7. **Environment Variables** - ✅ Added PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_ENVIRONMENT, PUBLIC_SENTRY_RELEASE
+8. **Documentation** - ✅ Three-tier docs (README, SETUP, INTEGRATIONS) with cross-references
+
+**Documentation Created**:
+- `docs/SENTRY-README.md` - Quick reference guide with quick start and troubleshooting
+- `docs/SENTRY-SETUP.md` - Complete 14-section setup guide with examples
+- `docs/SENTRY-INTEGRATIONS.md` - Detailed integration reference with all options
+- `.env.example` - Updated with Sentry variables and inline guidance
+- `ENVIRONMENT.md` - Updated with Sentry configuration section (lines 198-246)
+
+**Test Coverage**:
+- SDK loading verification (main site + admin area)
+- Configuration validation (DSN, environment, integrations, sampling rates)
+- Exception capture testing
+- Structured logging availability
+- Browser extension error filtering
+- Performance impact validation
+- Test page interactive buttons (errors, spans, logs, user context)
 
 ### ✅ Documentation Cleanup (October 10, 2025)
 1. **Fixed Code Inconsistencies** - ✅ Updated `/functions/api/contact.ts` to use `EMAIL_FROM/TO` consistently

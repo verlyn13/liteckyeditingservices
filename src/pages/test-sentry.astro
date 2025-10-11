@@ -1,0 +1,291 @@
+---
+/**
+ * Sentry Test Page
+ * Visit /test-sentry to verify Sentry integration
+ * This page intentionally throws errors to test error tracking
+ */
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Only available in development
+if (!import.meta.env.DEV) {
+  return Astro.redirect('/');
+}
+---
+
+<BaseLayout title="Sentry Test" noindex={true}>
+  <main id="main" class="container mx-auto px-4 py-16">
+    <h1 class="text-4xl font-bold mb-8">Sentry Integration Test</h1>
+
+    <div class="space-y-6 max-w-2xl">
+      <section class="border border-gray-300 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Error Tracking</h2>
+        <p class="mb-4 text-gray-700">
+          Test Sentry's error capturing capabilities by throwing different types of errors.
+        </p>
+        <div class="space-y-2">
+          <button
+            id="test-error"
+            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 w-full text-left"
+          >
+            Throw Error
+          </button>
+          <button
+            id="test-exception"
+            class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 w-full text-left"
+          >
+            Capture Exception
+          </button>
+          <button
+            id="test-message"
+            class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 w-full text-left"
+          >
+            Capture Message
+          </button>
+        </div>
+      </section>
+
+      <section class="border border-gray-300 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Performance Tracking</h2>
+        <p class="mb-4 text-gray-700">
+          Test performance monitoring by creating custom spans.
+        </p>
+        <div class="space-y-2">
+          <button
+            id="test-span"
+            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 w-full text-left"
+          >
+            Create Custom Span
+          </button>
+          <button
+            id="test-api-call"
+            class="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 w-full text-left"
+          >
+            Simulate API Call
+          </button>
+        </div>
+      </section>
+
+      <section class="border border-gray-300 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">Structured Logging</h2>
+        <p class="mb-4 text-gray-700">
+          Test Sentry's logging integration at different severity levels.
+        </p>
+        <div class="space-y-2">
+          <button
+            id="test-log-debug"
+            class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 w-full text-left"
+          >
+            Debug Log
+          </button>
+          <button
+            id="test-log-info"
+            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 w-full text-left"
+          >
+            Info Log
+          </button>
+          <button
+            id="test-log-warn"
+            class="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 w-full text-left"
+          >
+            Warning Log
+          </button>
+          <button
+            id="test-log-error"
+            class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 w-full text-left"
+          >
+            Error Log
+          </button>
+        </div>
+      </section>
+
+      <section class="border border-gray-300 rounded-lg p-6">
+        <h2 class="text-2xl font-semibold mb-4">User Context</h2>
+        <p class="mb-4 text-gray-700">
+          Test user context tracking for better error attribution.
+        </p>
+        <div class="space-y-2">
+          <button
+            id="test-set-user"
+            class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 w-full text-left"
+          >
+            Set User Context
+          </button>
+          <button
+            id="test-clear-user"
+            class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 w-full text-left"
+          >
+            Clear User Context
+          </button>
+        </div>
+      </section>
+
+      <section class="border border-gray-300 rounded-lg p-6 bg-green-50">
+        <h2 class="text-2xl font-semibold mb-4">Results</h2>
+        <p class="mb-4 text-gray-700">
+          Check your Sentry dashboard to see captured events. It may take a few seconds for events to appear.
+        </p>
+        <a
+          href="https://sentry.io/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-block px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800"
+        >
+          Open Sentry Dashboard →
+        </a>
+      </section>
+
+      <section class="border border-gray-300 rounded-lg p-6 bg-blue-50">
+        <h2 class="text-2xl font-semibold mb-4">Debug Info</h2>
+        <pre id="debug-info" class="bg-white p-4 rounded border border-gray-200 text-sm overflow-x-auto">
+Loading...
+        </pre>
+      </section>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  import * as Sentry from '@sentry/browser';
+  import { logger, startSpan, setUser, addBreadcrumb, captureException } from '@/lib/sentry';
+
+  // Display debug info
+  const debugInfo = document.getElementById('debug-info');
+  if (debugInfo) {
+    const info = {
+      sentryLoaded: !!window.__sentry,
+      dsn: import.meta.env.PUBLIC_SENTRY_DSN?.slice(0, 30) + '...',
+      environment: import.meta.env.PUBLIC_SENTRY_ENVIRONMENT,
+      release: import.meta.env.PUBLIC_SENTRY_RELEASE,
+      clientId: Sentry.getClient()?.getOptions().dsn,
+    };
+    debugInfo.textContent = JSON.stringify(info, null, 2);
+  }
+
+  // Error tracking tests
+  document.getElementById('test-error')?.addEventListener('click', () => {
+    console.log('[Test] Throwing error...');
+    throw new Error('Sentry test error - thrown from test page');
+  });
+
+  document.getElementById('test-exception')?.addEventListener('click', () => {
+    console.log('[Test] Capturing exception...');
+    const error = new Error('Sentry test exception - captured manually');
+    captureException(error, {
+      testType: 'manual_exception',
+      timestamp: Date.now(),
+    });
+    alert('Exception captured! Check Sentry dashboard.');
+  });
+
+  document.getElementById('test-message')?.addEventListener('click', () => {
+    console.log('[Test] Capturing message...');
+    Sentry.captureMessage('Sentry test message - info level', 'info');
+    alert('Message captured! Check Sentry dashboard.');
+  });
+
+  // Performance tracking tests
+  document.getElementById('test-span')?.addEventListener('click', () => {
+    console.log('[Test] Creating custom span...');
+    startSpan(
+      {
+        op: 'test.operation',
+        name: 'Sentry Test Span',
+        attributes: {
+          testType: 'performance',
+          duration: 1000,
+        },
+      },
+      () => {
+        // Simulate work
+        const start = Date.now();
+        while (Date.now() - start < 100) {
+          // Busy wait for 100ms
+        }
+      }
+    );
+    alert('Span created! Check Sentry performance monitoring.');
+  });
+
+  document.getElementById('test-api-call')?.addEventListener('click', async () => {
+    console.log('[Test] Simulating API call...');
+    await startSpan(
+      {
+        op: 'http.client',
+        name: 'GET /api/test',
+        attributes: {
+          method: 'GET',
+          url: '/api/test',
+        },
+      },
+      async () => {
+        // Simulate async work
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        addBreadcrumb({
+          message: 'API call completed',
+          level: 'info',
+          category: 'http',
+          data: {
+            status: 200,
+            duration: 500,
+          },
+        });
+      }
+    );
+    alert('API call span created! Check Sentry performance monitoring.');
+  });
+
+  // Logging tests
+  document.getElementById('test-log-debug')?.addEventListener('click', () => {
+    console.log('[Test] Debug log...');
+    logger.debug(logger.fmt`Debug log test at ${new Date().toISOString()}`);
+    alert('Debug log sent! Check Sentry logs.');
+  });
+
+  document.getElementById('test-log-info')?.addEventListener('click', () => {
+    console.log('[Test] Info log...');
+    logger.info('Info log test', {
+      testType: 'logging',
+      level: 'info',
+      timestamp: Date.now(),
+    });
+    alert('Info log sent! Check Sentry logs.');
+  });
+
+  document.getElementById('test-log-warn')?.addEventListener('click', () => {
+    console.log('[Test] Warning log...');
+    logger.warn('Warning log test', {
+      testType: 'logging',
+      level: 'warning',
+      reason: 'Test warning message',
+    });
+    alert('Warning log sent! Check Sentry logs.');
+  });
+
+  document.getElementById('test-log-error')?.addEventListener('click', () => {
+    console.log('[Test] Error log...');
+    logger.error('Error log test', {
+      testType: 'logging',
+      level: 'error',
+      errorCode: 'TEST_ERROR',
+    });
+    alert('Error log sent! Check Sentry logs.');
+  });
+
+  // User context tests
+  document.getElementById('test-set-user')?.addEventListener('click', () => {
+    console.log('[Test] Setting user context...');
+    setUser({
+      id: 'test-user-123',
+      email: 'test@example.com',
+      username: 'testuser',
+    });
+    alert('User context set! Future events will include this user info.');
+  });
+
+  document.getElementById('test-clear-user')?.addEventListener('click', () => {
+    console.log('[Test] Clearing user context...');
+    setUser(null);
+    alert('User context cleared! Future events will not include user info.');
+  });
+</script>

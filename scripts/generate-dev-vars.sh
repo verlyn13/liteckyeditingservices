@@ -71,6 +71,23 @@ echo "" >> .dev.vars
 
 cat >> .dev.vars << 'EOF'
 
+# Sentry (client-side; DSN is non-secret)
+PUBLIC_SENTRY_DSN=
+PUBLIC_SENTRY_ENVIRONMENT=development
+PUBLIC_SENTRY_RELEASE=1.0.0
+
+# Sentry build-time (sensitive: pulled from gopass)
+SENTRY_ORG=happy-patterns-llc
+SENTRY_PROJECT=javascript-astro
+EOF
+
+# Build-time Sentry auth token from gopass (if available)
+echo -n "SENTRY_AUTH_TOKEN=" >> .dev.vars
+(gopass show -o sentry/happy-patterns-llc/auth-token 2>/dev/null || echo "# Missing sentry/happy-patterns-llc/auth-token") >> .dev.vars
+echo "" >> .dev.vars
+
+cat >> .dev.vars << 'EOF'
+
 # Force SendGrid to actually send emails in dev (bypasses sandbox mode)
 # Uncomment to send real emails during testing
 # SENDGRID_FORCE_SEND=true
@@ -83,6 +100,7 @@ echo "📋 Credentials loaded from gopass:"
 echo "   • GitHub OAuth: github/litecky/oauth/*"
 echo "   • Turnstile keys: development/turnstile/*"
 echo "   • SendGrid config: development/sendgrid/*"
+echo "   • Sentry tokens: sentry/happy-patterns-llc/*"
 echo ""
 
 # Check if any credentials are missing

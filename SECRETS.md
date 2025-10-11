@@ -36,6 +36,7 @@ Reference: ENVIRONMENT.md for full variable matrix and usage.
   - github/litecky/oauth/* (GitHub OAuth for Decap CMS)
   - development/turnstile/* (Turnstile test keys)
   - development/sendgrid/* (SendGrid test config)
+  - sentry/happy-patterns-llc/* (Sentry tokens; org-token, personal-token, auth-token)
   - cloudflare/litecky/turnstile/* (Turnstile production keys)
   - sendgrid/api-keys/liteckyeditingservices-* (SendGrid production)
   - cloudflare/account/*, cloudflare/api-tokens/* (Cloudflare API access)
@@ -70,6 +71,25 @@ GitHub OAuth (Pages Functions /api/auth, /api/callback)
    ```
 4. Validate login at https://www.liteckyeditingservices.com/admin/
 
+Sentry Tokens (Astro integration — source maps)
+1. Store tokens in gopass (organization slug `happy-patterns-llc`):
+   ```bash
+   gopass insert -f sentry/happy-patterns-llc/org-token
+   gopass insert -f sentry/happy-patterns-llc/personal-token
+   # Use org token for build-time upload
+   gopass insert -f sentry/happy-patterns-llc/auth-token
+   ```
+2. Sync build secret to Cloudflare Pages:
+   ```bash
+   gopass show -o sentry/happy-patterns-llc/auth-token | \
+     pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices
+   ```
+3. Set non-secret vars (Pages → Environment variables):
+   ```
+   SENTRY_ORG=happy-patterns-llc
+   SENTRY_PROJECT=javascript-astro
+   ```
+
 Cloudflare API Token (CI)
 1. Create new token (Pages:Edit, Workers:Edit as needed)
 2. Update GitHub Actions secret `CLOUDFLARE_API_TOKEN`
@@ -83,4 +103,3 @@ If you suspect compromise:
 - Temporarily disable email sending by clearing `SENDGRID_API_KEY` in Preview environment to reduce risk while investigating
 - Review Cloudflare Pages/Workers logs and GitHub Actions logs
 - Document incident and follow up with tighter scopes/permissions
-

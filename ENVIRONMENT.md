@@ -35,6 +35,10 @@
 | **System** |
 | `ENVIRONMENT` | `production` | `preview` | `development` | Variable | Yes |
 | `DEBUG` | - | `true` | `true` | Variable | No |
+| **Error Tracking (Sentry)** |
+| `PUBLIC_SENTRY_DSN` | Production DSN | Production DSN | Dev DSN | Variable | No |
+| `PUBLIC_SENTRY_ENVIRONMENT` | `production` | `preview` | `development` | Variable | No |
+| `PUBLIC_SENTRY_RELEASE` | `$CF_PAGES_COMMIT_SHA` | `$CF_PAGES_COMMIT_SHA` | `1.0.0` | Variable | No |
 
 ## Setting Environment Variables
 
@@ -191,9 +195,64 @@ These are safe for development use only:
 | `TURNSTILE_TEST_SITE_KEY` | `1x00000000000000000000AA` | Always passes |
 | `TURNSTILE_TEST_SECRET_KEY` | `2x0000000000000000000000000000000AA` | Validates test tokens |
 
+## Sentry Error Tracking
+
+### Configuration
+Sentry is configured in `src/lib/sentry.ts` and automatically initialized in `src/layouts/BaseLayout.astro`.
+
+**Environment Variables:**
+- `PUBLIC_SENTRY_DSN` - Data Source Name from Sentry project settings
+- `PUBLIC_SENTRY_ENVIRONMENT` - Environment identifier (production/preview/development)
+- `PUBLIC_SENTRY_RELEASE` - Version/commit for tracking regressions
+ - `SENTRY_ORG` - Organization slug for source maps upload (Astro integration)
+ - `SENTRY_PROJECT` - Project slug for source maps upload (Astro integration)
+ - `SENTRY_AUTH_TOKEN` - Auth token for source maps upload (sensitive; set in CI via gopass)
+
+**Getting Your DSN:**
+1. Sign up at https://sentry.io/
+2. Create a project (Platform: Browser JavaScript)
+3. Go to Settings → Projects → [Your Project] → Client Keys (DSN)
+4. Copy the DSN value
+
+**Local Development:**
+```bash
+# .dev.vars or .env
+PUBLIC_SENTRY_DSN=https://examplePublicKey@o0.ingest.sentry.io/0
+PUBLIC_SENTRY_ENVIRONMENT=development
+PUBLIC_SENTRY_RELEASE=1.0.0
+```
+
+**Cloudflare Pages:**
+```
+Production:
+  PUBLIC_SENTRY_DSN=https://...@o0.ingest.sentry.io/0
+  PUBLIC_SENTRY_ENVIRONMENT=production
+  PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
+  SENTRY_ORG=happy-patterns-llc
+  SENTRY_PROJECT=javascript-astro
+  SENTRY_AUTH_TOKEN=sntrys_... (set as secret)
+
+Preview:
+  PUBLIC_SENTRY_DSN=https://...@o0.ingest.sentry.io/0
+  PUBLIC_SENTRY_ENVIRONMENT=preview
+  PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
+  SENTRY_ORG=happy-patterns-llc
+  SENTRY_PROJECT=javascript-astro
+  SENTRY_AUTH_TOKEN=sntrys_... (set as secret)
+```
+
+**Testing:**
+Visit `/test-sentry` in development to verify integration.
+
+**Documentation:**
+- Complete setup guide: [docs/SENTRY-SETUP.md](./docs/SENTRY-SETUP.md)
+- Integration reference: [docs/SENTRY-INTEGRATIONS.md](./docs/SENTRY-INTEGRATIONS.md)
+- Quick reference: [docs/SENTRY-README.md](./docs/SENTRY-README.md)
+
 ## Related Documentation
 - [docs/onboarding.md](./docs/onboarding.md) - Developer setup
 - [_archive/secrets-env-setup.md](./_archive/secrets-env-setup.md) - Advanced secret management
+- [docs/SENTRY-README.md](./docs/SENTRY-README.md) - Sentry quick reference
 ### Cloudflare Pages (Site)
 
 Set the following in Pages (Project → Settings → Environment variables):

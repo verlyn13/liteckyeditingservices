@@ -10,6 +10,15 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
+    <!-- Sentry error tracking for admin -->
+    <script>
+      // Pass environment variables to sentry-admin.js
+      window.SENTRY_DSN = import.meta.env?.PUBLIC_SENTRY_DSN;
+      window.SENTRY_ENVIRONMENT = import.meta.env?.PUBLIC_SENTRY_ENVIRONMENT;
+      window.SENTRY_RELEASE = import.meta.env?.PUBLIC_SENTRY_RELEASE;
+    </script>
+    <script src="/admin/sentry-admin.js"></script>
+
     <!-- Diagnostics first for visibility during boot -->
     <script src="/admin/diagnostics.v2.js"></script>
     <!-- Wrap window.open and navigation before Decap initializes -->
