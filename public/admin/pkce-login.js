@@ -179,7 +179,8 @@
 		const userObj = {
 			token: finalToken,
 			backendName: "github",
-			login: true,
+			// Use explicit provider string; some reducers expect a string value
+			login: "github",
 			isGuest: false,
 		};
 		try {
@@ -204,8 +205,9 @@
 					try {
 						window.__dumpUser?.();
 					} catch {}
+					// Simple, robust flip: let Decap hydrate from localStorage
 					try {
-						location.replace("/admin/#/");
+						location.reload();
 					} catch {}
 				}, 50);
 				return;
@@ -214,11 +216,10 @@
 			}
 		}
 
+		// Fallback: force a reload so Decap boots with the stored user
 		try {
-			location.replace("/admin/#/");
-		} catch {
 			location.reload();
-		}
+		} catch {}
 	}
 
 	// Listen for callback code; exchange token; emit canonical success string
@@ -247,6 +248,8 @@
 			}
 			// If token is already present (server-side exchange), finalize immediately
 			if (payload.token) {
+				// Guard immediately to avoid handling our own re-emit below
+				completed = true;
 				const expected =
 					localStorage.getItem("netlify-cms-auth:state") ||
 					localStorage.getItem("decap-cms-auth:state") ||
@@ -260,7 +263,6 @@
 				try {
 					await onPkceSuccess(payload.token, expected);
 				} catch {}
-				completed = true;
 				sessionStorage.removeItem("pkce_code_verifier");
 				try {
 					sessionStorage.removeItem("oauth_state");
