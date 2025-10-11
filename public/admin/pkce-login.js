@@ -70,12 +70,15 @@
 			sessionStorage.setItem("oauth_state", state);
 		} catch {}
 		const openFn = window.__realWindowOpen || window.open;
-		openFn.call(
+		const win = openFn.call(
 			window,
 			u.toString(),
 			"decap-oauth",
 			"popup,width=600,height=800",
 		);
+		try {
+			window.__pkcePopup = win;
+		} catch {}
 	}
 
 	async function startLoginOnce(e, btn) {
@@ -167,6 +170,7 @@
 
 	// Listen for callback code; exchange token; emit canonical success string
 	let completed = false;
+	let exchanging = false;
 	window.addEventListener("message", async (event) => {
 		try {
 			if (completed) return;
@@ -189,6 +193,8 @@
 				return;
 			}
 			if (!payload.code) return; // only handle code messages here
+			if (exchanging) return; // avoid duplicate exchanges from repeated messages
+			exchanging = true;
 
 			const verifier = sessionStorage.getItem("pkce_code_verifier");
 			if (!verifier) return console.error("[PKCE] Missing verifier");
@@ -199,8 +205,10 @@
 				body: JSON.stringify({ code: payload.code, verifier }),
 			});
 			const data = await r.json().catch(() => ({}));
-			if (!data || !data.token)
+			if (!data || !data.token) {
+				exchanging = false;
 				return console.error("[PKCE] No token in exchange response");
+			}
 
 			// Emit canonical success string with token for Decap acceptance
 			const expected =
@@ -210,11 +218,21 @@
 				null;
 			const message = `authorization:github:success:${JSON.stringify({ token: data.token, provider: "github", state: expected })}`;
 			window.postMessage(message, location.origin);
+			// ACK the popup so it stops resending
+			try {
+				window.__pkcePopup &&
+					window.__pkcePopup.postMessage("authorization:ack", location.origin);
+			} catch {}
 			// Single completion guard + cleanup
 			completed = true;
 			sessionStorage.removeItem("pkce_code_verifier");
+			try {
+				sessionStorage.removeItem("oauth_state");
+			} catch {}
+			exchanging = false;
 		} catch (e) {
 			console.error("[PKCE] Error", e);
+			exchanging = false;
 		}
 	});
 })();
