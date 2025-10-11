@@ -7,8 +7,9 @@
 		"dev": "astro dev",
 		"dev:env": "bash ./scripts/dev-with-env.sh",
 		"start": "astro dev",
-		"cms:vendor": "node scripts/vendor-decap.mjs",
-		"build": "pnpm cms:vendor && astro build",
+    "cms:vendor": "node scripts/vendor-decap.mjs",
+    "build:cms": "node scripts/build-cms.mjs",
+    "build": "pnpm build:cms && pnpm cms:vendor && astro build",
 		"build:check": "pnpm cms:vendor && astro check && astro build",
 		"preview": "astro preview",
 		"astro": "astro",
@@ -50,7 +51,7 @@
 		"precommit": "pnpm run validate:all",
 		"prepush": "pnpm run gate:docs"
 	},
-	"dependencies": {
+  "dependencies": {
 		"@astrojs/sitemap": "latest",
 		"@astrojs/svelte": "latest",
 		"@fontsource-variable/inter": "latest",
@@ -60,10 +61,13 @@
 		"@sentry/browser": "latest",
 		"astro": "latest",
 		"sharp": "latest",
-		"svelte": "latest",
+    "svelte": "latest",
+    "decap-cms-app": "latest",
+    "react": "latest",
+    "react-dom": "latest",
 		"tailwindcss": "latest"
 	},
-	"devDependencies": {
+  "devDependencies": {
 		"@astrojs/check": "latest",
 		"@biomejs/biome": "latest",
 		"@cloudflare/workers-types": "latest",
@@ -79,7 +83,8 @@
 		"@vitest/ui": "latest",
 		"autoprefixer": "latest",
 		"decap-cms": "3.8.4",
-		"eslint": "latest",
+    "eslint": "latest",
+    "esbuild": "latest",
 		"eslint-plugin-astro": "latest",
 		"eslint-plugin-svelte": "latest",
 		"globals": "latest",

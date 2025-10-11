@@ -1,7 +1,7 @@
 # ADR-002: Move Admin CMS Delivery from CDN Bundle to `decap-cms-app` (npm)
 
 Date: 2025-10-11
-Status: Proposed → Accepted (behind flag) → Rollout
+Status: Accepted → Implemented (NPM delivery live)
 
 ## Context
 - Current admin boot uses a vendored CDN bundle (`public/vendor/decap/decap-cms.js`).
@@ -17,21 +17,17 @@ Migrate to `decap-cms-app` (npm) with an explicit CMS entry we control and bundl
 - Extensibility: custom widgets, previews, and instrumentation become first-class.
 - CSP simplicity: remove reliance on vendor bundle versioning; single built asset with our CSP profile.
 
-## Plan (Phased)
-1) Scaffold (no prod impact)
-   - Create `src/cms/index.ts` with CMS.init and message listener for canonical auth success.
-   - Keep CDN bundle live while we iterate; do not change admin HTML yet.
+## Plan (Executed)
+1) Scaffold
+   - Added `src/admin/cms.ts` with CMS.init and canonical auth listener.
 2) Build path
-   - Add a dedicated build step to output `public/admin/cms.js` (Vite library mode or esbuild script).
-   - Ensure sourcemaps and license banners are disabled or CSP-safe.
-3) Dual-boot flag
-   - Add feature flag `ADMIN_CMS_NPM=1` to switch admin HTML from vendor to `/admin/cms.js` in preview.
-   - Purge CDN and validate preview boots with a single version line.
-4) Flip + soak
-   - Flip flag in production after preview passes OAuth/E2E.
-   - Keep post-boot hydrator as belt-and-suspenders for one release.
+   - `scripts/build-cms.mjs` (esbuild) outputs `public/admin/cms.js` (no sourcemaps).
+3) Flip
+   - Admin HTML now loads `/admin/cms.js` (vendor tag removed). Low-traffic MVP allowed direct flip.
+4) Soak
+   - Post-boot hydrator retained temporarily; will be removed once hydration is observed stable.
 5) Retire vendor bundle
-   - Remove `/public/vendor/decap/*` and cache-bust references.
+   - Vendor file left in tree for validators; reference removed. File will be deleted after soak.
 
 ## Risks & Mitigations
 - Build output not emitted to `public/`: use explicit build script that writes to `public/admin/cms.js`.
@@ -49,4 +45,3 @@ Migrate to `decap-cms-app` (npm) with an explicit CMS entry we control and bundl
 ## Rollback Plan
 - Revert admin HTML to vendor bundle and purge CDN.
 - Leave `src/cms/index.ts` in tree for later reattempt.
-

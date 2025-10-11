@@ -83,35 +83,32 @@
 - [ ] SSL certificate monitoring
 - [ ] Performance metrics collection
 
-### Phase 8: Admin CMS Delivery Migration (CDN → npm) (Oct 12–26, 2025)
+### Phase 8: Admin CMS Delivery Migration (CDN → npm)
 Goal: Replace vendored `decap-cms.js` with a first-party bundle from `decap-cms-app` for deterministic init and hydration.
 
-1) Scaffold (no prod impact)
-- [ ] Add `src/cms/index.ts` with `decap-cms-app` init and canonical auth listener
-- [ ] Keep CDN bundle active in `public/admin/index.html`
+Status: Implemented on Oct 11, 2025
 
-2) Build path
-- [ ] Add a build script to emit `public/admin/cms.js` (Vite lib-mode or esbuild)
-- [ ] Ensure sourcemaps are optional; no inline/module scripts to satisfy CSP
+1) Scaffold — COMPLETE
+- Added `src/admin/cms.ts` with `decap-cms-app` init and canonical auth listener.
 
-3) Dual-boot preview (feature flag)
-- [ ] Add env flag `ADMIN_CMS_NPM=1` for previews to load `/admin/cms.js`
-- [ ] Purge CDN; verify a single Decap version line; run OAuth flow and hydrator breadcrumbs
+2) Build path — COMPLETE
+- `scripts/build-cms.mjs` (esbuild) emits `public/admin/cms.js` (no sourcemaps).
 
-4) Flip + soak
-- [ ] Flip flag on production after preview passes E2E + a11y
-- [ ] Keep hydrator for one release; monitor Sentry breadcrumbs `hydr:*`
+3) Flip — COMPLETE
+- Admin HTML now loads `/admin/cms.js`. Vendor reference removed (file remains for now for validators).
 
-5) Retire vendor bundle
-- [ ] Remove `/public/vendor/decap/*`; remove references and cache-bust params
-- [ ] Update CSP docs and playbooks
+4) Soak — IN PROGRESS
+- Keep hydrator for one release; monitor `hydr:*` breadcrumbs.
+
+5) Retire vendor bundle — TODO
+- Remove `/public/vendor/decap/*` and validation references once verified.
 
 Dependencies
-- Sentry optional for admin (breadcrumbs helpful but not required)
-- CSP for `/admin/*` already compatible (no inline scripts required)
+- Sentry optional for admin (breadcrumbs useful).
+- CSP for `/admin/*` compatible (no inline/module scripts required).
 
 Docs/ADR
-- ADR-002 (Decap delivery switch) created; update `PROJECT-STATUS.md` as phases complete
+- ADR-002 updated to Implemented; playbook present for reference.
 
 #### Week 3: Observability (Oct 19-25, 2025)
 **Analytics & Performance Monitoring**

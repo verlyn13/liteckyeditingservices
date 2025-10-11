@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>Content Manager</title>
-    <!-- Decap config discovery: spec-required attributes -->
-    <link href="/api/config.yml" type="text/yaml" rel="cms-config-url" />
+    <!-- Config is now provided via npm app (CMS.init); config link removed to avoid double init. -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
@@ -24,8 +23,8 @@
     <script src="/admin/accept-login.js"></script>
     <!-- PKCE launcher + acceptance must be available before Decap boot -->
     <script src="/admin/pkce-login.v3.js"></script>
-    <!-- Exactly one bundle; Decap auto-inits from config link (no manual CMS.init()) -->
-    <script src="/vendor/decap/decap-cms.js?v=7cf7fae0" defer></script>
+    <!-- NPM delivery of Decap CMS app (replaces vendor bundle) -->
+    <script src="/admin/cms.js" defer></script>
     <!-- Post-boot hydrator: ensures Decap hydrates LS user if acceptance already ran -->
     <script src="/admin/post-boot-hydrator.js" defer></script>
     <!-- Optional shim: enable with ?auth_shim=1 to re-emit canonical success string from admin window -->

@@ -24,9 +24,12 @@ while ((m = scriptSrcRegex.exec(html)) !== null) {
 }
 
 const decapRefs = matches.filter((src) => /decap-cms(\.min)?\.js/i.test(src));
+const npmCmsRefs = matches.filter((src) => /\/admin\/cms\.js$/i.test(src));
 
-if (decapRefs.length === 0) {
-  console.error('❌ No decap-cms bundle referenced in public/admin/index.html');
+if (npmCmsRefs.length === 1) {
+  console.log('✅ NPM decap-cms-app delivery detected:', npmCmsRefs[0]);
+} else if (decapRefs.length === 0) {
+  console.error('❌ No decap-cms or npm cms.js referenced in public/admin/index.html');
   hasError = true;
 } else if (decapRefs.length > 1) {
   console.error('❌ Multiple decap-cms bundle references found:');
@@ -49,4 +52,3 @@ if (decapRefs.length === 0) {
 }
 
 process.exit(hasError ? 1 : 0);
-
