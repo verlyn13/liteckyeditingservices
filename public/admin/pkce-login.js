@@ -205,7 +205,8 @@
 				body: JSON.stringify({ code: payload.code, verifier }),
 			});
 			const data = await r.json().catch(() => ({}));
-			if (!data || !data.token) {
+			const accessToken = data && (data.access_token || data.token);
+			if (!accessToken) {
 				exchanging = false;
 				return console.error("[PKCE] No token in exchange response");
 			}
@@ -216,7 +217,7 @@
 				localStorage.getItem("decap-cms-auth:state") ||
 				payload.state ||
 				null;
-			const message = `authorization:github:success:${JSON.stringify({ token: data.token, provider: "github", state: expected })}`;
+			const message = `authorization:github:success:${JSON.stringify({ token: accessToken, provider: "github", state: expected })}`;
 			window.postMessage(message, location.origin);
 			// ACK the popup so it stops resending
 			try {
