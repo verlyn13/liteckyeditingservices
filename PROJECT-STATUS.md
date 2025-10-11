@@ -45,6 +45,7 @@
   - 🔒 **State-Gated Exchange**: Login script now exchanges codes only when `payload.state === sessionStorage['oauth_state']`, eliminating stray 400s from foreign flows.
   - ✅ **Single-Exchange + ACK**: Guard ensures only one code exchange runs; admin now stores popup ref and sends `authorization:ack` back to the callback to stop repeated code posts.
   - 🌐 **CORS Hardening**: `/api/exchange-token` now implements an `OPTIONS` handler and mirrors `Access-Control-Allow-Origin` on `POST` per Cloudflare Pages 2025 guidance to avoid silent preflight issues.
+  - 🔁 **Token JSON Compatibility**: `/api/exchange-token` returns both `access_token` and `token` fields; admin accepts either and re-emits the canonical Decap token string to maximize compatibility across scripts.
   - 🔧 **Token Exchange Fix**: `/api/exchange-token` now uses `application/x-www-form-urlencoded` for GitHub’s token endpoint (JSON body returned 400).
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
 
