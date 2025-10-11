@@ -228,14 +228,36 @@
 			);
 			if (!payload) return;
 
-			// Ignore code messages that aren't ours
+			// Ignore messages that aren't ours
 			const myState = sessionStorage.getItem("oauth_state") || "";
 			if (
-				payload.code &&
+				(payload.code || payload.token) &&
 				payload.state &&
 				myState &&
 				payload.state !== myState
 			) {
+				return;
+			}
+			// If token is already present (server-side exchange), finalize immediately
+			if (payload.token) {
+				const expected =
+					localStorage.getItem("netlify-cms-auth:state") ||
+					localStorage.getItem("decap-cms-auth:state") ||
+					payload.state ||
+					null;
+				const message = `authorization:github:success:${JSON.stringify({ token: payload.token, provider: "github", state: expected })}`;
+				window.postMessage(message, location.origin);
+				try {
+					window.__pkcePopup?.postMessage("authorization:ack", location.origin);
+				} catch {}
+				try {
+					await onPkceSuccess(payload.token, expected);
+				} catch {}
+				completed = true;
+				sessionStorage.removeItem("pkce_code_verifier");
+				try {
+					sessionStorage.removeItem("oauth_state");
+				} catch {}
 				return;
 			}
 			if (!payload.code) return; // only handle code messages here
