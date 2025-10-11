@@ -41,6 +41,12 @@ pnpm dev
 # Click buttons to test error tracking, performance, and logging
 ```
 
+Admin (Decap) integration
+
+- The admin panel uses a classic (non-ESM) initializer at `public/admin/sentry-admin.js` to avoid CSP/module constraints.
+- Provide DSN via `<meta name="sentry-dsn" content="…">` in `public/admin/index.html` or via `window.SENTRY_DSN` from an external script.
+- If loading the SDK from the CDN in admin, ensure `/admin/*` CSP allows `https://browser.sentry-cdn.com` (script-src). The Pages Function for `/admin/*` includes this host.
+
 ### 4. Verify in Sentry Dashboard
 
 Go to https://sentry.io/ and check:

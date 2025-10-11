@@ -119,7 +119,7 @@ This loads `src/scripts/sentry-init.ts`, which calls `initSentry()`.
 Sentry loads via CDN for the admin area:
 
 ```html
-<script src="/admin/sentry-admin.js"></script>
+<script src="/admin/sentry-admin.js" defer></script>
 ```
 
 This provides:
@@ -538,7 +538,7 @@ Fits in: Free tier ✅
 ### Project-Specific Files
 - Main config: `src/lib/sentry.ts`
 - Client init: `src/scripts/sentry-init.ts`
-- Admin init: `public/admin/sentry-admin.js`
+- Admin init: `public/admin/sentry-admin.js` (classic IIFE; DSN via `<meta name="sentry-dsn">` or `window.SENTRY_DSN`; CDN host allowed in `/admin/*` CSP)
 - Base layout: `src/layouts/BaseLayout.astro`
 
 ---

@@ -5,7 +5,7 @@ This document records how our Decap CMS integration complies with current specs,
 ## Admin Page (Spec: Install Decap CMS)
 
 - File: `public/admin/index.html` (static HTML, no framework)
-- Single `<script>` tag loading `/vendor/decap/decap-cms.js`
+- Single `<script>` tag loading `/vendor/decap/decap-cms.js?v=<commit>` (cache‑busted)
 - No manual `CMS.init()` call - auto-init only
 - Rationale: Single static HTML page with one bundle prevents React double-mount and `removeChild` crashes. Per [Decap install docs](https://decapcms.org/docs/install-decap-cms/).
 - Verify (console): `Array.from(document.scripts).map(s=>s.src).filter(s=>/decap-cms/i.test(s)).length === 1`
@@ -18,7 +18,7 @@ This document records how our Decap CMS integration complies with current specs,
 - Rationale: Decap discovers YAML config via a link with `rel="cms-config-url"` and `type="text/yaml"`.
 - Verify (console):
   - `const link = document.querySelector('link[rel="cms-config-url"]');`
-  - `link && link.href.endsWith('/admin/config.yml') && link.type === 'text/yaml'`
+  - `link && /\/api\/config.yml$/.test(link.href) && link.type === 'text/yaml'`
 
 ## Initialization Mode (Spec: Manual Initialization)
 
@@ -80,7 +80,7 @@ This document records how our Decap CMS integration complies with current specs,
 ## Security Headers
 
 - `/admin/*` (Pages Function):
-  - CSP: no third‑party script hosts; `script-src 'self' 'unsafe-eval'` only; `connect-src` includes GitHub endpoints
+  - CSP: `script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com https://browser.sentry-cdn.com` (Sentry CDN optional); `connect-src` includes GitHub endpoints
   - COOP: `unsafe-none`; COEP: not set
 - `/api/callback` (Function response):
   - Inline‑allowed CSP (tiny handoff script); COOP: `unsafe-none`

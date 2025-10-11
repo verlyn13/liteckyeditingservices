@@ -1,7 +1,7 @@
 # DOCUMENTATION MASTER INDEX
 ## Complete Documentation Organization & Status
 
-Last Updated: October 11, 2025 (Sentry integration complete)
+Last Updated: October 11, 2025 (Admin CSP hardened; Decap npm migration planned)
 Documentation Read: 100% (15/15 files analyzed)
 Deployment Status: ✅ LIVE with Git-Connected Deployment (migrated October 5, 2025)
 Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
@@ -20,6 +20,7 @@ Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
 | `cloudflare-deployment.md` | 1310 | ✅ READ | Cloudflare infrastructure | Monorepo, Workers, D1, R2, Queues |
 | `deployment-config.md` | 500 | ✅ READ | Deployment configuration | DNS, OAuth, SendGrid, env vars |
 | `decap-cms-setup.md` | 750 | ⚠️ PARTIAL | CMS configuration | Content collections, admin UI |
+| `DECAP-SPEC-COMPLIANCE.md` | — | ✅ Updated | Current self-hosted setup (single bundle, dynamic config) |
 
 ### 2. QUALITY & OPERATIONS (How to Build)
 **Purpose**: Standards, tools, and procedures
@@ -56,12 +57,18 @@ Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
 | `docs/SENTRY-INTEGRATIONS.md` | Integration reference & examples | ✅ Created | src/lib/sentry.ts |
 | `src/lib/sentry.ts` | Core configuration & helpers | ✅ Created | BaseLayout.astro |
 | `src/scripts/sentry-init.ts` | Client-side initialization | ✅ Created | sentry.ts |
-| `public/admin/sentry-admin.js` | Admin/CMS instrumentation | ✅ Created | admin/index.html |
+| `public/admin/sentry-admin.js` | Admin/CMS instrumentation (classic) | ✅ Created | admin/index.html; CSP allows Sentry CDN |
 | `src/pages/test-sentry.astro` | Interactive test page (dev only) | ✅ Created | SENTRY-README.md |
 | `tests/sentry-integration.spec.ts` | Objective Playwright tests | ✅ Created | SENTRY-SETUP.md |
 
 ### 4. INFRASTRUCTURE DOCUMENTATION (How to Deploy)
 **Purpose**: Cloudflare configuration and management
+
+### 5. DECISIONS & PLAYBOOKS (Admin CMS Delivery)
+| Document | Purpose | Status |
+|----------|---------|--------|
+| `docs/decisions/ADR-002-decap-delivery-npm-app.md` | Decision to migrate from CDN bundle to decap-cms-app (npm) | ✅ Added |
+| `docs/playbooks/DECAP-NPM-MIGRATION.md` | Step-by-step migration plan, build strategy, CSP, tests, rollback | ✅ Added |
 
 | Document | Location | Status | Purpose |
 |----------|----------|--------|---------|

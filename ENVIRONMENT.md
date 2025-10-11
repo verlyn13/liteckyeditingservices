@@ -39,6 +39,8 @@
 | `PUBLIC_SENTRY_DSN` | Production DSN | Production DSN | Dev DSN | Variable | No |
 | `PUBLIC_SENTRY_ENVIRONMENT` | `production` | `preview` | `development` | Variable | No |
 | `PUBLIC_SENTRY_RELEASE` | `$CF_PAGES_COMMIT_SHA` | `$CF_PAGES_COMMIT_SHA` | `1.0.0` | Variable | No |
+| **Admin Feature Flags** |
+| `ADMIN_CMS_NPM` | `0` (off) | `1` (preview flip) | `0` (off) | Variable | No |
 
 ## Setting Environment Variables
 
@@ -153,6 +155,7 @@ interface Env {
 - `*_KEY/*_SECRET` - Sensitive values
 - `*_ID` - Identifiers
 - `USE_*` - Feature flags
+  - e.g., `ADMIN_CMS_NPM=1` enables the npm-based admin bundle during migration
 
 ### Security
 - Never log secret values
