@@ -24,10 +24,24 @@ type PagesFunction<Env = unknown> = (
 	) => Promise<Response>,
 ) => Response | Promise<Response>;
 
+export const onRequestOptions: PagesFunction<Env> = async (ctx) => {
+  const url = new URL(ctx.request.url);
+  const origin = `${url.protocol}//${url.host}`;
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": origin,
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "content-type",
+      Vary: "Origin",
+    },
+  });
+};
+
 export const onRequestPost: PagesFunction<Env> = async (ctx) => {
-	try {
-		const url = new URL(ctx.request.url);
-		const origin = `${url.protocol}//${url.host}`;
+  try {
+    const url = new URL(ctx.request.url);
+    const origin = `${url.protocol}//${url.host}`;
 		const body = (await ctx.request.json().catch(() => ({}))) as {
 			code?: string;
 			verifier?: string;
@@ -77,19 +91,21 @@ export const onRequestPost: PagesFunction<Env> = async (ctx) => {
 			);
 		}
 
-		return new Response(JSON.stringify({ token: data.access_token }), {
-			headers: {
-				"Content-Type": "application/json; charset=utf-8",
-				"Cache-Control": "no-store",
-			},
-		});
-	} catch (e) {
-		return new Response(
-			JSON.stringify({ error: "exchange_unexpected", message: String(e) }),
-			{
-				status: 500,
-				headers: { "Content-Type": "application/json; charset=utf-8" },
-			},
-		);
-	}
+    return new Response(JSON.stringify({ token: data.access_token }), {
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+        "Access-Control-Allow-Origin": origin,
+        Vary: "Origin",
+      },
+    });
+  } catch (e) {
+    return new Response(
+      JSON.stringify({ error: "exchange_unexpected", message: String(e) }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+      },
+    );
+  }
 };
