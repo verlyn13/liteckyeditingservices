@@ -6,9 +6,8 @@ await build({
   outfile: 'public/admin/cms.js',
   bundle: true,
   format: 'iife',
-  target: ['es2019'],
+  target: ['es2025'],
   sourcemap: false,
   minify: true,
 });
 console.log('[build] cms -> public/admin/cms.js');
-

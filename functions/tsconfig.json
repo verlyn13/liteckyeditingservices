@@ -1,8 +1,8 @@
 {
 	"compilerOptions": {
-		"target": "ES2022",
-		"module": "ESNext",
-		"lib": ["es2022"],
+    "target": "ES2024",
+    "module": "ESNext",
+    "lib": ["esnext"],
 		"moduleResolution": "Bundler",
 		"types": ["@cloudflare/workers-types"],
 		"strict": true,

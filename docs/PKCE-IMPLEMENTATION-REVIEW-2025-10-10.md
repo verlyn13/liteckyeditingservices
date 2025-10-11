@@ -120,7 +120,7 @@
 **Quality Check**:
 - ✅ **Script Load Order** (critical for PKCE):
   1. `pkce-boot.js` (line 14) - **FIRST** (no defer)
-  2. `decap-cms.js` (line 16) - defer
+  2. `cms.js` (npm bundle) - defer
   3. `pkce-login.js` (line 18) - defer
   4. `diagnostics.js` (line 20) - defer
   5. `decap-auth-shim.js` (line 22) - defer (optional)
@@ -129,7 +129,7 @@
   - Correct MIME type: `type="text/yaml"`
   - Spec-compliant attributes
 - ✅ **No Inline Scripts**: CSP-compliant (all external)
-- ✅ **Single Decap Bundle**: `/vendor/decap/decap-cms.js` only
+- ✅ **Single Admin Bundle**: `/admin/cms.js`
 
 **Code Quality**: Excellent
 - Clean, minimal HTML

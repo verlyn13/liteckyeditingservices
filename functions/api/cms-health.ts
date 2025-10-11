@@ -37,8 +37,8 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 		authEndpoint: `${origin}/api/auth`,
 		callbackEndpoint: `${origin}/api/callback`,
 		decap: {
-			expectedVersion: "3.8.4",
-			bundleURL: `${origin}/vendor/decap/decap-cms.js`,
+			delivery: "npm-app",
+			bundleURL: `${origin}/admin/cms.js`,
 		},
 		notes: [
 			"base_url in /admin/config.yml must equal origin",

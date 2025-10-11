@@ -212,7 +212,7 @@ git push origin main
 - Outdated security headers
 
 **When to purge**:
-- After replacing `/vendor/decap/decap-cms.js`
+- After building `/admin/cms.js`
 - After editing `public/admin/index.html`
 - After changing `functions/admin/config.yml.ts` or `functions/admin/[[path]].ts`
 

@@ -24,31 +24,17 @@ while ((m = scriptSrcRegex.exec(html)) !== null) {
 }
 
 const decapRefs = matches.filter((src) => /decap-cms(\.min)?\.js/i.test(src));
-const npmCmsRefs = matches.filter((src) => /\/admin\/cms\.js$/i.test(src));
+const npmCmsRefs = matches.filter((src) => /\/admin\/cms\.js/i.test(src));
 
-if (npmCmsRefs.length === 1) {
+if (npmCmsRefs.length === 1 && decapRefs.length === 0) {
   console.log('✅ NPM decap-cms-app delivery detected:', npmCmsRefs[0]);
-} else if (decapRefs.length === 0) {
-  console.error('❌ No decap-cms or npm cms.js referenced in public/admin/index.html');
-  hasError = true;
-} else if (decapRefs.length > 1) {
-  console.error('❌ Multiple decap-cms bundle references found:');
-  for (const ref of decapRefs) console.error('   - ' + ref);
+} else if (npmCmsRefs.length === 0 && decapRefs.length === 0) {
+  console.error('❌ No admin CMS bundle referenced (expected /admin/cms.js).');
   hasError = true;
 } else {
-  const ref = decapRefs[0];
-  // Disallow CDN or wildcard versions
-  const cdn = /(unpkg\.com|jsdelivr\.net|cdn\.)/i.test(ref) || /^https?:\/\//i.test(ref);
-  const expected = '/vendor/decap/decap-cms.js';
-  if (cdn) {
-    console.error('❌ decap-cms bundle must be self-hosted, not CDN: ' + ref);
-    hasError = true;
-  } else if (!ref.startsWith(expected)) {
-    console.error(`❌ decap-cms bundle must be ${expected}; found: ${ref}`);
-    hasError = true;
-  } else {
-    console.log('✅ Single self-hosted decap-cms bundle pinned:', ref);
-  }
+  console.error('❌ Found legacy decap-cms references. Admin must use /admin/cms.js only:');
+  for (const ref of decapRefs) console.error('   - ' + ref);
+  hasError = true;
 }
 
 process.exit(hasError ? 1 : 0);

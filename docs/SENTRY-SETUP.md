@@ -466,7 +466,7 @@ Add to your build script:
 
 ```bash
 # package.json
-"build": "export PUBLIC_SENTRY_RELEASE=$(git rev-parse --short HEAD) && pnpm cms:vendor && astro build"
+"build": "export PUBLIC_SENTRY_RELEASE=$(git rev-parse --short HEAD) && pnpm build:cms && astro build"
 ```
 
 ### Cloudflare Pages Environment

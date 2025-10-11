@@ -20,7 +20,7 @@ Owner: Web Platform
 Recommended (A) for speed:
 - Create `scripts/build/cms-build.mjs`:
   - Programmatic esbuild bundle `src/cms/index.ts` to `public/admin/cms.js`.
-  - `sourcemap:false`, `minify:true`, `target:['es2020']`, `platform:'browser'`.
+  - `sourcemap:false`, `minify:true`, `target:['es2025']`, `platform:'browser'`.
 - Add `"cms:build": "node scripts/build/cms-build.mjs"` and run it before `astro build`.
 
 ## Auth & Hydration Flow (npm path)
@@ -58,4 +58,3 @@ Recommended (A) for speed:
 - Admin boots with a single Decap version line.
 - After OAuth, editor view loads with a token present (`CMS.getToken()` not null).
 - No CSP violations in console; no ESM/import.meta errors.
-

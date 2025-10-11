@@ -67,6 +67,10 @@ SSL/TLS: Full
 - **Storage**: gopass at `cloudflare/api-tokens/initial-project-setup-master`
 - **Permissions**: Zone, DNS, SSL/TLS, Firewall, Workers, Pages (all read/write)
 
+### Secrets Source of Truth (Production)
+- Infisical workspace: `liteckyeditingservices`
+- Quickstart: `docs/INFISICAL-QUICKSTART.md` (seed → verify → prepare)
+
 ## Deployment Workflow
 
 ### Prerequisites (Workers Plan)

@@ -103,6 +103,33 @@ Status: Implemented on Oct 11, 2025
 5) Retire vendor bundle — TODO
 - Remove `/public/vendor/decap/*` and validation references once verified.
 
+### Phase 9: Secrets Orchestration via Infisical (Production SoT)
+Goal: Use Infisical as the source of truth for production/preview secrets and automate sync to Cloudflare Pages and Workers.
+
+Status: In progress
+
+1) Scripts — COMPLETE
+- scripts/secrets/infisical_seed_prod_from_gopass.sh
+- scripts/secrets/infisical_pull_prod.sh
+- scripts/secrets/cloudflare_prepare_from_infisical.sh
+
+2) Documentation — COMPLETE
+- docs/INFISICAL-QUICKSTART.md
+- SECRETS.md (inventory + rotation)
+- DOCUMENTATION-MASTER-INDEX.md (indexed)
+
+3) CI integration — TODO
+- Add GitHub Actions workflow to:
+  - infisical export (projectId + env)
+  - prepare public.env + secrets.env
+  - wrangler pages secret put for Secrets
+  - wrangler pages project variable set for public vars
+  - workers secret sync (if applicable)
+
+4) Source of truth — COMPLETE
+- Local dev stays on gopass → .dev.vars
+- Production/Preview managed in Infisical
+
 Dependencies
 - Sentry optional for admin (breadcrumbs useful).
 - CSP for `/admin/*` compatible (no inline/module scripts required).

@@ -61,8 +61,12 @@ Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
 | `src/pages/test-sentry.astro` | Interactive test page (dev only) | ✅ Created | SENTRY-README.md |
 | `tests/sentry-integration.spec.ts` | Objective Playwright tests | ✅ Created | SENTRY-SETUP.md |
 
-### 4. INFRASTRUCTURE DOCUMENTATION (How to Deploy)
-**Purpose**: Cloudflare configuration and management
+### 4. INFRASTRUCTURE & SECRETS
+**Purpose**: Cloudflare configuration and Infisical secrets
+
+- `docs/INFISICAL-QUICKSTART.md` – Production secrets workflow (seed → verify → prepare)
+- `SECRETS.md` – Secrets inventory and rotation procedures
+- `secrets/PRODUCTION_KEYS.md` – Canonical list of prod keys (PUBLIC vs Secrets)
 
 ### 5. DECISIONS & PLAYBOOKS (Admin CMS Delivery)
 | Document | Purpose | Status |

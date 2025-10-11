@@ -4,7 +4,7 @@ Date: 2025-10-11
 Status: Accepted → Implemented (NPM delivery live)
 
 ## Context
-- Current admin boot uses a vendored CDN bundle (`public/vendor/decap/decap-cms.js`).
+- Previously, admin boot used a vendored bundle (`public/vendor/decap/decap-cms.js`).
 - We’ve observed mixed-version boots (core/app banner) causing unreliable LS hydration after OAuth.
 - We added a post-boot hydrator to nudge hydration safely, but we still depend on timing of Decap’s auto-init path.
 

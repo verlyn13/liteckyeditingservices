@@ -190,6 +190,10 @@ pnpm wrangler login
 - `TURNSTILE_SECRET_KEY` (secret)
 - `PUBLIC_TURNSTILE_SITE_KEY`: `0x4AAAAAAB27CNFPS0wEzPP5`
 
+Tip: Generate current values from Infisical
+- Follow `docs/INFISICAL-QUICKSTART.md` to produce `secrets/public.env` and `secrets/secrets.env`
+- Upload their contents to Cloudflare Pages → liteckyeditingservices → Production
+
 ### Worker Environment
 Queue consumer has same SendGrid variables as secrets.
 

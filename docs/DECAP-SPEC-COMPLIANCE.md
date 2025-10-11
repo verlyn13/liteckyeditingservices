@@ -5,27 +5,21 @@ This document records how our Decap CMS integration complies with current specs,
 ## Admin Page (Spec: Install Decap CMS)
 
 - File: `public/admin/index.html` (static HTML, no framework)
-- Single `<script>` tag loading `/vendor/decap/decap-cms.js?v=<commit>` (cache‑busted)
-- No manual `CMS.init()` call - auto-init only
-- Rationale: Single static HTML page with one bundle prevents React double-mount and `removeChild` crashes. Per [Decap install docs](https://decapcms.org/docs/install-decap-cms/).
-- Verify (console): `Array.from(document.scripts).map(s=>s.src).filter(s=>/decap-cms/i.test(s)).length === 1`
+- Single `<script>` tag loading `/admin/cms.js`
+- Manual initialization via `decap-cms-app` (`CMS.init({ config })`)
+- Rationale: First‑party bundle provides deterministic init, stable hydration, and extensibility. Avoids mixed vendor bundles.
+- Verify (console): `Array.from(document.scripts).map(s=>s.src).some(src=>/\/admin\/cms\.js/.test(src)) === true`
 
-## Config Discovery (Spec: Configuration Options)
+## Configuration
 
-- File: `public/admin/index.html`
-- Link element:
-  - `<link href="/api/config.yml" type="text/yaml" rel="cms-config-url" />`
-- Rationale: Decap discovers YAML config via a link with `rel="cms-config-url"` and `type="text/yaml"`.
-- Verify (console):
-  - `const link = document.querySelector('link[rel="cms-config-url"]');`
-  - `link && /\/api\/config.yml$/.test(link.href) && link.type === 'text/yaml'`
+- Admin uses inline config within `src/admin/cms.ts` (`CMS.init({ config })`).
+- Pages Function still serves `/admin/config.yml` and `/api/config.yml` for tooling/diagnostics; admin does not rely on the link element.
 
-## Initialization Mode (Spec: Manual Initialization)
+## Initialization Mode (Manual)
 
-- Mode: Auto‑init (default). We do not call `CMS.init()` anywhere.
-- Implementation: Single `<script>` in `public/admin/index.html` loads bundle; Decap auto-inits from config link.
-- Why: Mixing manual init + auto init causes double render and React `removeChild` crashes.
-- Verify (console): `Array.from(document.scripts).filter(s=>/decap-cms\.js/.test(s.src)).length === 1` and searching all scripts for "CMS.init" returns 0 results
+- Mode: Manual init via `decap-cms-app`.
+- Implementation: Single `<script>` in `public/admin/index.html` loads `/admin/cms.js`; `CMS.init()` runs inside.
+- Verify (console): `typeof window.CMS !== 'undefined'` after load
 
 ## GitHub Backend Configuration (Spec: GitHub Backend)
 
@@ -95,7 +89,7 @@ This document records how our Decap CMS integration complies with current specs,
 **Changes from previous implementation:**
 - Removed `src/pages/admin/index.astro` (Astro framework page with dynamic initialization)
 - Removed `public/admin/boot.js`, `debug.js`, `diagnose.js` (runtime injection scripts with HMR guards and cache-busting)
-- Replaced with single static `public/admin/index.html` with direct `<script src="/vendor/decap/decap-cms.js">`
+- Replaced vendor bundle with first‑party `/admin/cms.js` built via esbuild (no sourcemaps)
 - Archived old files to `_archive/admin-migration-2025-10-09/`
 - **October 2025 OAuth fix #1**: Disabled debug-oauth.js (MIME type error - file not copied to dist)
 - **October 2025 OAuth fix #2**: Changed `/api/callback` to return HTML directly (not redirect to separate page)
@@ -126,14 +120,14 @@ This document records how our Decap CMS integration complies with current specs,
 
 ---
 
-## Decap bundle pin (stability note)
+## Admin bundle (stability note)
 
-Pinned to: decap-cms 3.8.4 as a single vendored file at `/vendor/decap/decap-cms.js`.
+Admin bundle: `/admin/cms.js` (built from `src/admin/cms.ts`).
 
-When bumping:
-1) Replace the vendored file (or update a versioned CDN URL if you switch to CDN).
-2) Run the smoke test below.
-3) Purge Pages cache for `/admin/*` and `/vendor/decap/*`.
+When updating Decap:
+1) Update decap-cms-app dependency.
+2) Rebuild cms: `pnpm build:cms`.
+3) Purge Pages cache for `/admin/*`.
 
 ### Smoke test (console)
 - Open `/admin`, then:

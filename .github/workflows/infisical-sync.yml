@@ -1,0 +1,62 @@
+name: Infisical → Cloudflare (Admin/Pages)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  sync-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install Infisical CLI
+        run: curl -sSfL https://cli.infisical.com/install.sh | sh
+
+      - name: Export secrets from Infisical (prod)
+        env:
+          INFISICAL_TOKEN: ${{ secrets.INFISICAL_TOKEN }}
+          INFISICAL_PROJECT_ID: ${{ secrets.INFISICAL_PROJECT_ID }}
+        run: |
+          mkdir -p .out
+          ~/.infisical/bin/infisical export \
+            --projectId "$INFISICAL_PROJECT_ID" \
+            --env production \
+            --format dotenv \
+            --include-imports \
+            > .out/prod.secrets.env
+          grep -E '^PUBLIC_' .out/prod.secrets.env > .out/prod.public.env || true
+
+      - name: Prepare Cloudflare env files
+        run: |
+          chmod +x scripts/secrets/cloudflare_prepare_from_infisical.sh
+          ./scripts/secrets/cloudflare_prepare_from_infisical.sh .out/prod.secrets.env .out/prod.public.env
+
+      - name: Push to Cloudflare Pages variables/secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_PAGES_PROJECT: ${{ secrets.CF_PAGES_PROJECT }}
+        run: |
+          # Variables (PUBLIC_*)
+          while IFS='=' read -r k v; do
+            [ -z "$k" ] && continue
+            npx wrangler pages project variable put "$CF_PAGES_PROJECT" "$k" --value "$v"
+          done < .out/prod.public.env
+
+          # Secrets (non-PUBLIC)
+          grep -vE '^PUBLIC_' .out/prod.secrets.env | while IFS='=' read -r k v; do
+            [ -z "$k" ] && continue
+            echo -n "$v" | npx wrangler pages project secret put "$CF_PAGES_PROJECT" "$k" --quiet
+          done
+

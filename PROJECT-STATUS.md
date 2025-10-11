@@ -74,7 +74,8 @@
   - 🧩 **Admin Script Order** (Oct 11): Admin now loads `diagnostics.js`, `pkce-boot.js`, and `pkce-login.js` before the single self-hosted Decap bundle to ensure interceptors and acceptance logic are active at boot.
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
   - 🚚 **Decap Delivery Switched (Oct 11)**: Replaced vendor bundle with npm-delivered `decap-cms-app`. Admin now loads `/admin/cms.js` built via esbuild (`scripts/build-cms.mjs`). CSP remains scoped to `/admin/*`. Post-boot hydrator retained temporarily; remove after confirming stable hydration.
-  - 🧹 **Single Decap Bundle + Cache Bust** (Oct 11): Ensured only one Decap bundle is served and added a cache-busting query to `public/admin/index.html` (`decap-cms.js?v=7cf7fae0`) to defeat stale caches while we iterate. Purge `/admin/*` on CDN after deploy to avoid mixed versions.
+  - 🔐 **Secrets Orchestration (Infisical)**: Scripts added for prod SoT (`infisical_seed_prod_from_gopass.sh`, `infisical_pull_prod.sh`, `cloudflare_prepare_from_infisical.sh`), with Quickstart doc. Next step: CI workflow to export from Infisical and sync to Cloudflare Pages/Workers.
+  - 🧹 **Admin Bundle Stabilization** (Oct 11): Admin now uses a single first‑party bundle `/admin/cms.js` built from `decap-cms-app`. Purge `/admin/*` on CDN after deploy to avoid stale caches.
   - 🛡️ **Admin CSP** (Oct 11): Added scoped CSP for `/admin/*` in `public/_headers` allowing only required hosts: GitHub APIs, Cloudflare Turnstile, and optional Sentry CDN; removed inline scripts to comply.
 
 **Recent Progress - October 9, 2025**:

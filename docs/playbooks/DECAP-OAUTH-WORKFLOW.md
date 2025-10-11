@@ -5,12 +5,12 @@ Last updated: 2025-10-10
 This runbook verifies and fixes the Decap CMS OAuth handoff on Cloudflare Pages. It matches the current code paths and headers in this repo.
 
 Key files
-- `public/admin/index.html` — Admin shell; loads pkce-boot first, then Decap bundle
+- `public/admin/index.html` — Admin shell; loads helpers then `/admin/cms.js`
 - `public/admin/pkce-boot.js` — Early shim; wraps window.open/location before Decap
 - `public/admin/pkce-login.js` — PKCE login handler; state-gated exchange; neuters Decap authorizer
 - `public/admin/diagnostics.js` — External diagnostics (no inline scripts for CSP)
 - `public/admin/preview-banner.js` — Non‑production banner (pages.dev and local)
-- `functions/api/config.yml.ts` — Dynamic config with `base_url` and `auth_endpoint`
+- `functions/api/config.yml.ts` — Dynamic config (kept for tooling); admin uses inline config
 - `functions/admin/[[path]].ts` — Admin CSP/COOP headers
 - `functions/api/auth.ts` — Starts OAuth; honors client state; passes PKCE params to GitHub
 - `functions/api/callback.ts` — Validates state; posts authorization code to opener
@@ -29,10 +29,10 @@ Production one‑pass (10 minutes)
   - `backend.base_url: https://www.liteckyeditingservices.com`
   - `backend.auth_endpoint: /api/auth`
 
-3) Single Decap bundle + version sanity
+3) Admin bundle sanity
 - On `/admin` console:
-  - `Array.from(document.scripts).filter(s=>/decap-cms/i.test(s.src)).length` → `1`
-  - Banners show consistent Decap version from `/vendor/decap/decap-cms.js`
+  - `Array.from(document.scripts).some(s=>/\/admin\/cms\.js/.test(s.src))` → `true`
+  - `typeof window.CMS !== 'undefined'` after load
 
 4) OAuth start
 - Click Login → verify `/api/auth` 302 to GitHub; HttpOnly cookie `decap_oauth_state` set (Secure on HTTPS)
@@ -56,7 +56,7 @@ Production one‑pass (10 minutes)
 If any step fails → map to fix
 - Host/callback mismatch → update OAuth App; enforce apex→www redirect
 - Missing base_url/auth_endpoint → ensure function‑served config; keep `no-store`
-- Multiple/mixed bundles → keep one vendored bundle; purge `/admin/*` and `/vendor/decap/*`
+- Multiple/mixed bundles → not applicable (single first‑party bundle)
 - No opener → ensure COOP `unsafe-none` on callback
 - CSP violations → admin CSP allows `'unsafe-eval'`; callback CSP allows inline
 - State/cookie issues → `/api/auth` must echo Decap `state`; cookie attributes as in code
@@ -78,7 +78,7 @@ Logging and correlation
 
 Cache guidance
 - Purge after changes to:
-  - `/vendor/decap/decap-cms.js`
+- `/admin/cms.js`
   - `public/admin/index.html`
   - `functions/admin/config.yml.ts` or `functions/admin/[[path]].ts`
 

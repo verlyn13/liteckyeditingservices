@@ -2,6 +2,8 @@
 
 This document lists secrets used by the project, where they live, and how to rotate them. Do not commit secret values.
 
+> For a step-by-step operational guide (seed → verify → prepare), see `docs/INFISICAL-QUICKSTART.md`.
+
 ## Inventory
 
 Cloudflare Pages (site + Functions)

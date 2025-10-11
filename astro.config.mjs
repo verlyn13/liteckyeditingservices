@@ -46,6 +46,7 @@ export default defineConfig({
 			},
 		},
 		build: {
+			target: "es2025",
 			cssCodeSplit: true,
 			rollupOptions: {
 				output: {
