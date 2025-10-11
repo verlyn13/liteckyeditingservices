@@ -5,6 +5,20 @@
 
 import { expect, test } from "@playwright/test";
 
+type AdminWindow = Window & {
+	__sentry?: {
+		logger?: unknown;
+		getClient?: () =>
+			| { getOptions?: () => Record<string, unknown> }
+			| undefined;
+		captureException?: (e: unknown) => void;
+		addBreadcrumb?: (...args: unknown[]) => void;
+		startSpan?: (opts: unknown, cb: () => void) => void;
+		setUser?: (user: unknown) => void;
+	};
+	__sentryAdmin?: unknown;
+};
+
 const BASE_URL = process.env.BASE_URL || "http://localhost:4321";
 
 test.describe("Sentry Integration", () => {
@@ -13,7 +27,8 @@ test.describe("Sentry Integration", () => {
 
 		// Check if Sentry is loaded
 		const sentryLoaded = await page.evaluate(() => {
-			return typeof (window as any).__sentry !== "undefined";
+			const w = window as unknown as AdminWindow;
+			return typeof w.__sentry !== "undefined";
 		});
 
 		expect(sentryLoaded).toBe(true);
@@ -23,22 +38,24 @@ test.describe("Sentry Integration", () => {
 		await page.goto(BASE_URL);
 
 		const config = await page.evaluate(() => {
-			const sentry = (window as any).__sentry;
+			const w = window as unknown as AdminWindow;
+			const sentry = w.__sentry as
+				| { getClient?: () => { getOptions?: () => Record<string, unknown> } }
+				| undefined;
 			if (!sentry) return null;
 
-			const client = sentry.getClient();
-			if (!client) return null;
+            const client = sentry.getClient?.();
+            if (!client) return null;
 
-			const options = client.getOptions();
-			return {
-				hasDsn: !!options.dsn,
-				environment: options.environment,
-				hasIntegrations:
-					!!options.integrations && options.integrations.length > 0,
-				enableLogs: options.enableLogs,
-				tracesSampleRate: options.tracesSampleRate,
-			};
-		});
+            const options = client.getOptions?.() as Record<string, unknown>;
+            return {
+                hasDsn: !!options.dsn,
+                environment: options.environment as string | undefined,
+                hasIntegrations: Array.isArray(options.integrations) && options.integrations.length > 0,
+                enableLogs: options.enableLogs as boolean | undefined,
+                tracesSampleRate: options.tracesSampleRate as number | undefined,
+            };
+        });
 
 		expect(config).not.toBeNull();
 		expect(config?.hasDsn).toBe(true);
@@ -48,7 +65,7 @@ test.describe("Sentry Integration", () => {
 
 	test("should capture exceptions", async ({ page }) => {
 		// Listen for Sentry requests
-		const sentryRequests: any[] = [];
+		const sentryRequests: Array<{ url: string; method: string }> = [];
 		await page.route("**/*ingest.sentry.io/**", (route) => {
 			sentryRequests.push({
 				url: route.request().url(),
@@ -61,9 +78,12 @@ test.describe("Sentry Integration", () => {
 
 		// Trigger an error
 		await page.evaluate(() => {
-			const sentry = (window as any).__sentry;
+			const w = window as unknown as AdminWindow;
+			const sentry = w.__sentry as
+				| { captureException?: (e: unknown) => void }
+				| undefined;
 			if (sentry) {
-				sentry.captureException(new Error("Test error from Playwright"));
+				sentry.captureException?.(new Error("Test error from Playwright"));
 			}
 		});
 
@@ -72,9 +92,13 @@ test.describe("Sentry Integration", () => {
 
 		// Verify error was sent (if DSN is configured)
 		const hasDsn = await page.evaluate(() => {
-			const sentry = (window as any).__sentry;
-			const client = sentry?.getClient();
-			return !!client?.getOptions().dsn;
+			const w = window as unknown as AdminWindow;
+			const sentry = w.__sentry as
+				| { getClient?: () => { getOptions?: () => { dsn?: unknown } } }
+				| undefined;
+			const client = sentry?.getClient?.();
+			const opts = client?.getOptions?.();
+			return !!(opts && opts.dsn);
 		});
 
 		if (hasDsn) {
@@ -89,7 +113,8 @@ test.describe("Sentry Integration", () => {
 		await page.waitForTimeout(2000);
 
 		const adminSentryLoaded = await page.evaluate(() => {
-			return typeof (window as any).__sentryAdmin !== "undefined";
+			const w = window as unknown as AdminWindow;
+			return typeof w.__sentryAdmin !== "undefined";
 		});
 
 		expect(adminSentryLoaded).toBe(true);
@@ -99,8 +124,9 @@ test.describe("Sentry Integration", () => {
 		await page.goto(BASE_URL);
 
 		const hasLogger = await page.evaluate(() => {
-			const sentry = (window as any).__sentry;
-			return sentry && typeof sentry.logger !== "undefined";
+			const w = window as unknown as AdminWindow;
+			const sentry = w.__sentry as { logger?: unknown } | undefined;
+			return !!(sentry && typeof sentry.logger !== "undefined");
 		});
 
 		expect(hasLogger).toBe(true);
@@ -110,12 +136,15 @@ test.describe("Sentry Integration", () => {
 		await page.goto(BASE_URL);
 
 		const beforeSendFilters = await page.evaluate(() => {
-			const sentry = (window as any).__sentry;
+			const w = window as unknown as AdminWindow;
+			const sentry = w.__sentry as
+				| { getClient?: () => { getOptions?: () => { beforeSend?: unknown } } }
+				| undefined;
 			if (!sentry) return false;
 
 			// Test that beforeSend is configured
-			const client = sentry.getClient();
-			const options = client?.getOptions();
+			const client = sentry.getClient?.();
+			const options = client?.getOptions?.();
 			return typeof options?.beforeSend === "function";
 		});
 
@@ -272,19 +301,22 @@ test.describe("Sentry Configuration Validation", () => {
 		await page.goto(BASE_URL);
 
 		const sampling = await page.evaluate(() => {
-			const sentry = (window as any).__sentry;
+			const w = window as unknown as AdminWindow;
+			const sentry = w.__sentry as
+				| { getClient?: () => { getOptions?: () => Record<string, unknown> } }
+				| undefined;
 			if (!sentry) return null;
 
-			const client = sentry.getClient();
-			if (!client) return null;
+            const client = sentry.getClient?.();
+            if (!client) return null;
 
-			const options = client.getOptions();
-			return {
-				tracesSampleRate: options.tracesSampleRate,
-				replaysSessionSampleRate: options.replaysSessionSampleRate,
-				replaysOnErrorSampleRate: options.replaysOnErrorSampleRate,
-			};
-		});
+            const options = client.getOptions?.() as Record<string, unknown>;
+            return {
+                tracesSampleRate: options.tracesSampleRate as number | undefined,
+                replaysSessionSampleRate: options.replaysSessionSampleRate as number | undefined,
+                replaysOnErrorSampleRate: options.replaysOnErrorSampleRate as number | undefined,
+            };
+        });
 
 		expect(sampling).not.toBeNull();
 		expect(sampling?.tracesSampleRate).toBeGreaterThanOrEqual(0);
@@ -295,17 +327,27 @@ test.describe("Sentry Configuration Validation", () => {
 		await page.goto(BASE_URL);
 
 		const privacy = await page.evaluate(() => {
-			const sentry = (window as any).__sentry;
+			const w = window as unknown as AdminWindow;
+			const sentry = w.__sentry as
+				| {
+						getClient?: () => {
+							getOptions?: () => {
+								integrations?: Array<{ name?: string }>;
+								beforeSend?: unknown;
+							};
+						};
+				  }
+				| undefined;
 			if (!sentry) return null;
 
-			const client = sentry.getClient();
-			if (!client) return null;
+            const client = sentry.getClient?.();
+            if (!client) return null;
 
-			const options = client.getOptions();
+            const options = client.getOptions?.() as { integrations?: Array<{ name?: string }>; beforeSend?: unknown };
 
 			// Check if replay integration has privacy settings
 			const replayIntegration = options.integrations?.find(
-				(i: any) => i.name === "Replay",
+				(i: { name?: string }) => i.name === "Replay",
 			);
 
 			return {
@@ -330,7 +372,7 @@ test.describe("Sentry Performance", () => {
 	});
 
 	test("should load Sentry script efficiently", async ({ page }) => {
-		const resourceTimings: any[] = [];
+        const resourceTimings: Array<{ url: string; status: number }> = [];
 
 		page.on("response", (response) => {
 			const url = response.url();

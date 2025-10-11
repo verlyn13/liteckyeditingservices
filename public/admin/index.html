@@ -10,18 +10,11 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
-    <script>
-      // Flight recorder: mark HTML parse start for admin
-      try { window.__sentry?.addBreadcrumb?.({ category: 'diag', message: 'admin:html-start', level: 'info' }); } catch {}
-    </script>
-    <!-- Sentry error tracking for admin -->
-    <script>
-      // Pass environment variables to sentry-admin.js
-      window.SENTRY_DSN = import.meta.env?.PUBLIC_SENTRY_DSN;
-      window.SENTRY_ENVIRONMENT = import.meta.env?.PUBLIC_SENTRY_ENVIRONMENT;
-      window.SENTRY_RELEASE = import.meta.env?.PUBLIC_SENTRY_RELEASE;
-    </script>
-    <script src="/admin/sentry-admin.js"></script>
+    <!-- Sentry admin (classic, CSP-safe) -->
+    <script src="/admin/sentry-admin.js" defer></script>
+
+    <!-- Earliest breadcrumb without inline script (CSP-safe) -->
+    <script src="/admin/html-start.js" defer></script>
 
     <!-- Diagnostics first for visibility during boot -->
     <script src="/admin/diagnostics.v2.js"></script>

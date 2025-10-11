@@ -1,18 +1,253 @@
-/**
- * Sentry instrumentation for /admin (Decap CMS)
- * Tracks OAuth flows, login attempts, and CMS interactions
- */
-
+// Classic (non-ESM) Sentry instrumentation for /admin
+// - Avoids import.meta and inline scripts (CSP-safe)
 (() => {
-	// Import Sentry from CDN for admin (avoid bundler complexity)
-	const SENTRY_DSN = window.SENTRY_DSN || import.meta?.env?.PUBLIC_SENTRY_DSN;
+	function readMeta(name) {
+		try {
+			return document.querySelector('meta[name="' + name + '"]')?.content || "";
+		} catch {
+			return "";
+		}
+	}
 
-	if (!SENTRY_DSN) {
-		console.warn("[Sentry Admin] DSN not configured; skipping initialization");
+	const cfg = {
+		dsn: readMeta("sentry-dsn") || window.SENTRY_DSN || "",
+		environment:
+			readMeta("sentry-environment") ||
+			window.SENTRY_ENVIRONMENT ||
+			(location.hostname === "localhost" ? "development" : "production"),
+		release: readMeta("sentry-release") || window.SENTRY_RELEASE || undefined,
+	};
+
+	if (!cfg.dsn) {
+		try {
+			console.warn(
+				"[Sentry Admin] DSN not configured; skipping initialization",
+			);
+		} catch {}
 		return;
 	}
 
-	// Load Sentry SDK
+	function initSentry() {
+		if (!window.Sentry) {
+			try {
+				console.error("[Sentry Admin] Failed to load Sentry SDK");
+			} catch {}
+			return;
+		}
+		const Sentry = window.Sentry;
+		try {
+			Sentry.init({
+				dsn: cfg.dsn,
+				environment: cfg.environment,
+				release: cfg.release,
+				tracesSampleRate: 0.2,
+				integrations: [
+					Sentry.browserTracingIntegration({ enableInp: true }),
+					Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true }),
+					Sentry.httpClientIntegration({
+						failedRequestStatusCodes: [400, 599],
+					}),
+				],
+				replaysSessionSampleRate: 0.1,
+				replaysOnErrorSampleRate: 1.0,
+				beforeSend: (event) => {
+					try {
+						const error =
+							event &&
+							event.exception &&
+							event.exception.values &&
+							event.exception.values[0];
+						const frames =
+							(error && error.stacktrace && error.stacktrace.frames) || [];
+						for (let i = 0; i < frames.length; i++) {
+							const f = frames[i].filename || "";
+							if (
+								f.indexOf("chrome-extension://") !== -1 ||
+								f.indexOf("moz-extension://") !== -1
+							)
+								return null;
+						}
+					} catch {}
+					return event;
+				},
+			});
+			window.__sentry = Sentry; // expose for other admin scripts
+			try {
+				console.log("[Sentry Admin] Initialized");
+			} catch {}
+		} catch (e) {
+			try {
+				console.warn("[Sentry Admin] init error", e);
+			} catch {}
+		}
+
+		instrumentOAuthFlow();
+		instrumentCMSInteractions();
+		window.__sentryAdmin = Sentry;
+	}
+
+	function instrumentOAuthFlow() {
+		const logger = (window.Sentry && window.Sentry.logger) || console;
+		document.addEventListener(
+			"click",
+			(e) => {
+				const btn =
+					e.target &&
+					e.target.closest &&
+					e.target.closest("button, [role=button]");
+				if (!btn) return;
+				const text = (btn.textContent || "").toLowerCase();
+				if (text.indexOf("login") !== -1 || text.indexOf("github") !== -1) {
+					try {
+						window.Sentry &&
+							window.Sentry.startSpan &&
+							window.Sentry.startSpan(
+								{ op: "ui.click", name: "Admin Login Click" },
+								() => {
+									try {
+										logger.info &&
+											logger.info("Login button clicked", {
+												buttonText: (btn.textContent || "").trim(),
+											});
+									} catch {}
+									try {
+										window.Sentry.addBreadcrumb &&
+											window.Sentry.addBreadcrumb({
+												category: "auth",
+												message: "Login initiated",
+												level: "info",
+											});
+									} catch {}
+								},
+							);
+					} catch {}
+				}
+			},
+			{ capture: true },
+		);
+
+		window.addEventListener("message", (ev) => {
+			if (ev.origin !== location.origin) return;
+			if (
+				typeof ev.data === "string" &&
+				ev.data.indexOf("authorization:github:") === 0
+			) {
+				const isSuccess = ev.data.indexOf(":success:") !== -1;
+				try {
+					window.Sentry &&
+						window.Sentry.startSpan &&
+						window.Sentry.startSpan(
+							{
+								op: "auth.oauth",
+								name: isSuccess
+									? "OAuth Success Message Received"
+									: "OAuth Message Received",
+							},
+							() => {
+								const level = isSuccess ? "info" : "warning";
+								try {
+									logger[level] &&
+										logger[level]("OAuth callback message received", {
+											messageType: isSuccess ? "success" : "other",
+										});
+								} catch {}
+								try {
+									window.Sentry.addBreadcrumb &&
+										window.Sentry.addBreadcrumb({
+											category: "auth",
+											message: "OAuth " + (isSuccess ? "success" : "message"),
+											level: level,
+										});
+								} catch {}
+							},
+						);
+				} catch {}
+			}
+		});
+		var originalSetItem = Storage.prototype.setItem;
+		Storage.prototype.setItem = function (key, value) {
+			try {
+				if (
+					key.indexOf("cms-user") !== -1 ||
+					key.indexOf("auth:state") !== -1
+				) {
+					window.Sentry &&
+						window.Sentry.addBreadcrumb &&
+						window.Sentry.addBreadcrumb({
+							category: "storage",
+							message: "localStorage.setItem: " + key,
+							level: "debug",
+							data: { key: key, valueLength: value && value.length },
+						});
+				}
+			} catch {}
+			return originalSetItem.call(this, key, value);
+		};
+	}
+
+	function instrumentCMSInteractions() {
+		const checkCMS = setInterval(() => {
+			if (!window.CMS) return;
+			clearInterval(checkCMS);
+			const logger = (window.Sentry && window.Sentry.logger) || console;
+			try {
+				const store = window.CMS.getStore && window.CMS.getStore();
+				if (store) {
+					let previousState = store.getState();
+					store.subscribe(() => {
+						const currentState = store.getState();
+						if (previousState.auth !== currentState.auth) {
+							const user = currentState.auth && currentState.auth.user;
+							if (user) {
+								try {
+									window.Sentry &&
+										window.Sentry.setUser &&
+										window.Sentry.setUser({
+											id: user.login || "unknown",
+											username: user.login,
+										});
+								} catch {}
+								try {
+									logger.info &&
+										logger.info("CMS user authenticated", {
+											backend: user.backendName,
+										});
+								} catch {}
+							} else {
+								try {
+									window.Sentry &&
+										window.Sentry.setUser &&
+										window.Sentry.setUser(null);
+								} catch {}
+								try {
+									logger.info && logger.info("CMS user logged out");
+								} catch {}
+							}
+						}
+						previousState = currentState;
+					});
+					try {
+						logger.info && logger.info("CMS store instrumentation active");
+					} catch {}
+				}
+			} catch (e) {
+				try {
+					window.Sentry &&
+						window.Sentry.captureException &&
+						window.Sentry.captureException(e, {
+							tags: { component: "cms-instrumentation" },
+						});
+				} catch {}
+			}
+		}, 100);
+		setTimeout(() => {
+			try {
+				clearInterval(checkCMS);
+			} catch {}
+		}, 10000);
+	}
+
+	// Load Sentry SDK (bundled tracing+replay) from CDN
 	const script = document.createElement("script");
 	script.src =
 		"https://browser.sentry-cdn.com/8.48.0/bundle.tracing.replay.min.js";
@@ -21,195 +256,4 @@
 	script.crossOrigin = "anonymous";
 	script.onload = initSentry;
 	document.head.appendChild(script);
-
-	function initSentry() {
-		if (!window.Sentry) {
-			console.error("[Sentry Admin] Failed to load Sentry SDK");
-			return;
-		}
-
-		const Sentry = window.Sentry;
-
-		Sentry.init({
-			dsn: SENTRY_DSN,
-			environment:
-				window.SENTRY_ENVIRONMENT ||
-				(location.hostname === "localhost" ? "development" : "production"),
-			release: window.SENTRY_RELEASE,
-
-			// Moderate tracing for admin (less traffic than main site)
-			tracesSampleRate: 0.2,
-
-			integrations: [
-				Sentry.browserTracingIntegration({
-					enableInp: true,
-				}),
-				Sentry.replayIntegration({
-					maskAllText: true,
-					blockAllMedia: true,
-				}),
-				Sentry.httpClientIntegration({
-					failedRequestStatusCodes: [400, 599],
-				}),
-			],
-
-			replaysSessionSampleRate: 0.1,
-			replaysOnErrorSampleRate: 1.0,
-
-			beforeSend(event) {
-				// Filter browser extension errors
-				const error = event.exception?.values?.[0];
-				if (
-					error?.stacktrace?.frames?.some(
-						(frame) =>
-							frame.filename?.includes("chrome-extension://") ||
-							frame.filename?.includes("moz-extension://"),
-					)
-				) {
-					return null;
-				}
-				return event;
-			},
-		});
-
-		console.log("[Sentry Admin] Initialized");
-
-		// Instrument OAuth flow
-		instrumentOAuthFlow();
-
-		// Instrument CMS interactions
-		instrumentCMSInteractions();
-
-		// Expose for debugging
-		window.__sentryAdmin = Sentry;
-	}
-
-	function instrumentOAuthFlow() {
-		const { logger } = window.Sentry;
-
-		// Track login button clicks
-		document.addEventListener(
-			"click",
-			(e) => {
-				const btn = e.target.closest("button, [role=button]");
-				if (!btn) return;
-				const text = (btn.textContent || "").toLowerCase();
-				if (text.includes("login") || text.includes("github")) {
-					window.Sentry.startSpan(
-						{
-							op: "ui.click",
-							name: "Admin Login Click",
-						},
-						() => {
-							logger.info("Login button clicked", {
-								buttonText: btn.textContent?.trim(),
-							});
-							window.Sentry.addBreadcrumb({
-								category: "auth",
-								message: "Login initiated",
-								level: "info",
-							});
-						},
-					);
-				}
-			},
-			{ capture: true },
-		);
-
-		// Track OAuth messages
-		window.addEventListener("message", (ev) => {
-			if (ev.origin !== location.origin) return;
-			if (
-				typeof ev.data === "string" &&
-				ev.data.startsWith("authorization:github:")
-			) {
-				const isSuccess = ev.data.includes(":success:");
-				window.Sentry.startSpan(
-					{
-						op: "auth.oauth",
-						name: isSuccess
-							? "OAuth Success Message Received"
-							: "OAuth Message Received",
-					},
-					() => {
-						const level = isSuccess ? "info" : "warning";
-						logger[level]("OAuth callback message received", {
-							messageType: isSuccess ? "success" : "other",
-						});
-						window.Sentry.addBreadcrumb({
-							category: "auth",
-							message: `OAuth ${isSuccess ? "success" : "message"}`,
-							level,
-						});
-					},
-				);
-			}
-		});
-
-		// Track localStorage changes (user persistence)
-		const originalSetItem = Storage.prototype.setItem;
-		Storage.prototype.setItem = function (key, value) {
-			if (key.includes("cms-user") || key.includes("auth:state")) {
-				window.Sentry?.addBreadcrumb({
-					category: "storage",
-					message: `localStorage.setItem: ${key}`,
-					level: "debug",
-					data: {
-						key,
-						valueLength: value?.length,
-					},
-				});
-			}
-			return originalSetItem.call(this, key, value);
-		};
-	}
-
-	function instrumentCMSInteractions() {
-		// Wait for CMS to load
-		const checkCMS = setInterval(() => {
-			if (!window.CMS) return;
-			clearInterval(checkCMS);
-
-			const { logger } = window.Sentry;
-
-			try {
-				// Track CMS state changes via Redux store
-				const store = window.CMS.getStore?.();
-				if (store) {
-					let previousState = store.getState();
-					store.subscribe(() => {
-						const currentState = store.getState();
-
-						// Track auth state changes
-						if (previousState.auth !== currentState.auth) {
-							const user = currentState.auth?.user;
-							if (user) {
-								window.Sentry.setUser({
-									id: user.login || "unknown",
-									username: user.login,
-								});
-								logger.info("CMS user authenticated", {
-									backend: user.backendName,
-								});
-							} else {
-								window.Sentry.setUser(null);
-								logger.info("CMS user logged out");
-							}
-						}
-
-						previousState = currentState;
-					});
-
-					logger.info("CMS store instrumentation active");
-				}
-			} catch (e) {
-				window.Sentry.captureException(e, {
-					tags: { component: "cms-instrumentation" },
-				});
-			}
-		}, 100);
-
-		// Timeout after 10 seconds
-		setTimeout(() => clearInterval(checkCMS), 10000);
-	}
 })();
