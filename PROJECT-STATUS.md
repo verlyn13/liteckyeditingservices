@@ -47,7 +47,8 @@
   - 🌐 **CORS Hardening**: `/api/exchange-token` now implements an `OPTIONS` handler and mirrors `Access-Control-Allow-Origin` on `POST` per Cloudflare Pages 2025 guidance to avoid silent preflight issues.
   - 🔁 **Token JSON Compatibility**: `/api/exchange-token` returns both `access_token` and `token` fields; admin accepts either and re-emits the canonical Decap token string to maximize compatibility across scripts.
   - 🔓 **Authorizer-Independent Flip**: On PKCE success, admin now writes the user to both `netlify-cms-user` and `decap-cms-user` in localStorage and dispatches legacy store actions when available; otherwise reloads to hydrate. This makes the UI flip reliable even with Decap’s authorizer disabled.
-  - 🔁 **Server-side Exchange Primary**: `/api/callback` now exchanges `code+verifier` server-side using a short-lived cookie, posts `{ token, state }` to opener, and clears cookies; admin handles token messages directly and force-reloads after dispatch to ensure UI flip. Falls back to client exchange only if needed.
+  - 🔁 **Server-side Exchange Primary**: `/api/callback` now exchanges `code+verifier` server-side using a short-lived cookie, posts `{ token, state }` to opener, and clears cookies; admin handles token messages directly and reloads after dispatch to ensure UI flip. Falls back to client exchange only if needed.
+  - 🧩 **PKCE Acceptance Tweak** (Oct 11): Persist user with `login: "github"` and prefer a full `location.reload()` after dispatch. This mirrors the previously working behavior and avoids fragile hash routing during hydration.
   - 🔧 **Token Exchange Fix**: `/api/exchange-token` now uses `application/x-www-form-urlencoded` for GitHub’s token endpoint (JSON body returned 400).
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
 
