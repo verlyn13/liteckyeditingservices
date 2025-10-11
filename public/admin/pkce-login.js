@@ -69,6 +69,12 @@
 		try {
 			sessionStorage.setItem("oauth_state", state);
 		} catch {}
+		// Also set a short-lived cookie so the server-side callback can exchange the code
+		try {
+			const isHttps = location.protocol === "https:";
+			const secure = isHttps ? "; Secure" : "";
+			document.cookie = `oauth_pkce_verifier=${encodeURIComponent(verifier)}; Path=/; SameSite=Lax; Max-Age=600${secure}`;
+		} catch {}
 		const openFn = window.__realWindowOpen || window.open;
 		const win = openFn.call(
 			window,

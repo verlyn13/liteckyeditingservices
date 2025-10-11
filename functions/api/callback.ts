@@ -154,9 +154,41 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			return new Response("Missing GitHub credentials", { status: 500 });
 		}
 
-		// Return HTML that posts CODE (PKCE flow) to opener window (Decap CMS)
+		// Try server-side exchange using PKCE verifier cookie; fallback to code message
+		const verifierCookie =
+			cookies.oauth_pkce_verifier || cookies.pkce_verifier || "";
+		let token: string | null = null;
+		if (verifierCookie) {
+			try {
+				const res = await fetch("https://github.com/login/oauth/access_token", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/x-www-form-urlencoded",
+						Accept: "application/json",
+					},
+					body: new URLSearchParams({
+						client_id: clientId,
+						client_secret: clientSecret,
+						code,
+						code_verifier: decodeURIComponent(verifierCookie),
+						redirect_uri: `${reqUrl.origin}/api/callback`,
+					}),
+				});
+				const data = (await res.json().catch(() => ({}))) as Record<
+					string,
+					unknown
+				>;
+				const at = (data as any)?.access_token;
+				if (res.ok && at) token = String(at);
+			} catch (e) {
+				console.warn("[/api/callback] server-side exchange failed", e);
+			}
+		}
+
 		const targetOrigin = reqUrl.origin;
-		const stringMessage = `authorization:github:success:${JSON.stringify({ code, state })}`;
+		const stringMessage = token
+			? `authorization:github:success:${JSON.stringify({ token, state })}`
+			: `authorization:github:success:${JSON.stringify({ code, state })}`;
 
 		console.log(
 			JSON.stringify({ evt: "oauth_render_callback_html", id: traceId }),
@@ -216,6 +248,7 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 			`decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
 			`oauth_trace=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
 			`oauth_inflight=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+			`oauth_pkce_verifier=; Path=/; SameSite=Lax; Max-Age=0${secure}`,
 		];
 
 		return new Response(html, {

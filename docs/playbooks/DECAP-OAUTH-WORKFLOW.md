@@ -38,16 +38,18 @@ Production one‑pass (10 minutes)
 - Click Login → verify `/api/auth` 302 to GitHub; HttpOnly cookie `decap_oauth_state` set (Secure on HTTPS)
 - Pre‑login console: `localStorage.getItem('netlify-cms-auth:state')` present
 
-5) Callback handoff (split exchange)
+5) Callback handoff (server-side exchange with fallback)
 - Popup Network → open `/api/callback` response
-- Expect headers:
+  - If `oauth_pkce_verifier` cookie present: server exchanges code→token
+  - Else: callback posts `{ code, state }` and admin will use `/api/exchange-token`
+  - Expect headers:
   - `Cross-Origin-Opener-Policy: unsafe-none`
   - `Content-Security-Policy: default-src 'none'; script-src 'unsafe-inline'; ...`
   - `Cache-Control: no-store`
-- Body: inline script posts an authorization code to opener origin
+- Body: inline script posts a token (or code as fallback) to opener origin
 
 6) Acceptance
-- Admin exchanges `{ code, verifier }` at `/api/exchange-token` and receives `{ access_token, token }`
+- Admin receives `{ token }` (or exchanges `{ code, verifier }` as fallback)
 - Admin persists the user to localStorage and dispatches store actions (or reloads) so UI flips
 - In `/admin` console: `await CMS.getToken().then(Boolean)` → `true`
 

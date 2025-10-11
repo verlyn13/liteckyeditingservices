@@ -49,18 +49,17 @@ This document records how our Decap CMS integration complies with current specs,
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 
-- Files: `functions/api/auth.ts`, `functions/api/callback.ts`, `functions/api/exchange-token.ts`
-- Flow (split exchange with popup postMessage):
+- Files: `functions/api/auth.ts`, `functions/api/callback.ts` (primary), `functions/api/exchange-token.ts` (fallback/compat)
+- Flow (server-side exchange with fallback):
   1) `/api/auth` (server-side, same origin as `/admin`)
      - Honors client-provided `state` and PKCE params; persists `state` in HttpOnly cookie
      - Redirects to GitHub authorize with `redirect_uri`, `scope`, `state`, and `code_challenge`
   2) `/api/callback` (server-side; RETURNS HTML)
-     - Validates `state` and posts the authorization `code` (not token) to the opener via `postMessage`
-     - COOP: `unsafe-none`; CSP: inline allowed for this tiny handoff HTML only
-  3) Admin window receives `{ code, state }`, verifies `state` matches its session, and calls `/api/exchange-token` with `{ code, verifier }`.
-  4) `/api/exchange-token` (server-side)
-     - Exchanges code+verifier with GitHub; responds JSON containing both `access_token` and `token` for compatibility
-  5) Admin re-emits the canonical Decap success string with the token, persists the user to `localStorage` under both keys, and dispatches store actions (or reloads) so the UI flips reliably without the Decap authorizer.
+     - Validates `state` and reads a short-lived cookie `oauth_pkce_verifier` set by the admin prior to opening the popup
+     - Exchanges `code` + `verifier` with GitHub server-side
+     - Posts canonical success string with `{ token, state }` to opener; COOP: `unsafe-none`; CSP: inline allowed for this tiny handoff HTML only
+     - Fallback: if no verifier cookie present, posts `{ code, state }` and admin will use `/api/exchange-token`
+  3) Admin re-emits the canonical success string (when needed), persists the user under both keys, and dispatches store actions (or reloads) so UI flips reliably without the Decap authorizer.
 
 - Verify (prod, after login):
   - `await CMS.getToken().then(Boolean) === true`
