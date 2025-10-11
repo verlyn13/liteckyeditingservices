@@ -43,6 +43,7 @@
   - 🛡️ **Open Intercept**: Admin now intercepts any programmatic `window.open('/api/auth')` and routes through the PKCE launcher to prevent competing Decap flows from generating a mismatched `state`.
   - 🚀 **Early Boot Shim**: Added `public/admin/pkce-boot.js` and loaded it before Decap so any references to `window.open` and `location.assign/replace` point to our wrappers. Real `window.open` is preserved as `__realWindowOpen` for our popup.
   - 🔒 **State-Gated Exchange**: Login script now exchanges codes only when `payload.state === sessionStorage['oauth_state']`, eliminating stray 400s from foreign flows.
+  - ✅ **Single-Exchange + ACK**: Guard ensures only one code exchange runs; admin now stores popup ref and sends `authorization:ack` back to the callback to stop repeated code posts.
   - 🔧 **Token Exchange Fix**: `/api/exchange-token` now uses `application/x-www-form-urlencoded` for GitHub’s token endpoint (JSON body returned 400).
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
 
