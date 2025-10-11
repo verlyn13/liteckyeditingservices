@@ -168,6 +168,46 @@
 	if (document.readyState === "complete") neuterDecapAuthorizer();
 	else addEventListener("load", neuterDecapAuthorizer);
 
+	// On successful PKCE exchange, persist user and flip UI deterministically
+	async function onPkceSuccess(finalToken, state) {
+		const userObj = {
+			token: finalToken,
+			backendName: "github",
+			login: "github",
+			isGuest: false,
+		};
+		try {
+			localStorage.setItem("netlify-cms-user", JSON.stringify(userObj));
+			localStorage.setItem("decap-cms-user", JSON.stringify(userObj));
+		} catch (e) {
+			console.warn("[PKCE] Failed to write user to localStorage", e);
+		}
+
+		const store = window.CMS?.getStore?.();
+		if (store) {
+			try {
+				const tryDispatch = (type) =>
+					store.dispatch({ type, payload: userObj });
+				try {
+					tryDispatch("OAUTH_AUTHORIZE_SUCCESS");
+				} catch {}
+				try {
+					tryDispatch("LOGIN_SUCCESS");
+				} catch {}
+				setTimeout(() => {
+					try {
+						window.__dumpUser?.();
+					} catch {}
+				}, 0);
+				return;
+			} catch (e) {
+				console.warn("[PKCE] Store dispatch failed; reloading", e);
+			}
+		}
+
+		location.reload();
+	}
+
 	// Listen for callback code; exchange token; emit canonical success string
 	let completed = false;
 	let exchanging = false;
@@ -221,8 +261,11 @@
 			window.postMessage(message, location.origin);
 			// ACK the popup so it stops resending
 			try {
-				window.__pkcePopup &&
-					window.__pkcePopup.postMessage("authorization:ack", location.origin);
+				window.__pkcePopup?.postMessage("authorization:ack", location.origin);
+			} catch {}
+			// Persist user and flip UI deterministically
+			try {
+				await onPkceSuccess(accessToken, expected);
 			} catch {}
 			// Single completion guard + cleanup
 			completed = true;
