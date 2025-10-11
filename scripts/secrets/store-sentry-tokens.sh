@@ -31,6 +31,6 @@ echo "  • sentry/${ORG_SLUG}/auth-token (for SENTRY_AUTH_TOKEN)"
 
 echo ""
 echo "Next: add to Cloudflare Pages secrets (build env):"
-echo "  gopass show -o sentry/${ORG_SLUG}/auth-token | \"
+echo "  gopass show -o sentry/${ORG_SLUG}/auth-token | \\"
 echo "    pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices"
 

@@ -151,11 +151,11 @@ export function captureException(
  * Helper to create custom spans for performance tracking
  */
 export function startSpan<T>(
-    options: { op: string; name: string; attributes?: SpanAttributes },
-    callback: () => T | Promise<T>,
+	options: { op: string; name: string; attributes?: SpanAttributes },
+	callback: () => T | Promise<T>,
 ): T | Promise<T> {
-    // Avoid tight coupling to internal SpanAttribute types; omit attributes for safety.
-    return Sentry.startSpan({ op: options.op, name: options.name }, callback);
+	// Avoid tight coupling to internal SpanAttribute types; omit attributes for safety.
+	return Sentry.startSpan({ op: options.op, name: options.name }, callback);
 }
 
 /**

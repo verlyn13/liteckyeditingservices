@@ -17,8 +17,22 @@
 						if (!ev.data.startsWith(prefix)) return;
 						if (window.__decapRescueDone) return;
 
-						const payload = JSON.parse(ev.data.slice(prefix.length));
-						if (!payload?.token) return;
+					const payload = JSON.parse(ev.data.slice(prefix.length));
+					if (!payload?.token) return;
+
+					// Breadcrumb in Sentry (if present)
+					try {
+						window.Sentry?.addBreadcrumb({
+							category: "diag",
+							message: "postMessage",
+							level: "info",
+							data: {
+								haveToken: true,
+								haveCode: false,
+								state: payload?.state || null,
+							},
+						});
+					} catch {}
 
 						const hasUser = !!(
 							localStorage.getItem("decap-cms-user") ||
@@ -35,10 +49,12 @@
 						localStorage.setItem("decap-cms-user", JSON.stringify(u));
 						localStorage.setItem("netlify-cms-user", JSON.stringify(u));
 						window.__decapRescueDone = true;
-						console.log("[RESCUE] user persisted; navigating to editor");
-						location.replace("/admin/#/");
+					console.log("[RESCUE] user persisted; navigating to editor");
+					try { window.Sentry?.addBreadcrumb({ category: "auth", message: "oauth:navigate-editor", level: "info", data: { href: "/admin/#/" } }); } catch {}
+					location.replace("/admin/#/");
 					} catch (e) {
-						console.log("[RESCUE] error parsing token message", e);
+					console.log("[RESCUE] error parsing token message", e);
+					try { window.Sentry?.captureException?.(e, { extra: { phase: "diag-rescue" } }); } catch {}
 					}
 				},
 				{ passive: true },

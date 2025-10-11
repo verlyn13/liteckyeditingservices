@@ -9,6 +9,14 @@
 // Source: public/admin/pkce-login.js at the time of creation.
 ("use strict");
 (() => {
+	// Sentry helpers (no-ops if Sentry is not present)
+	const S = (typeof window !== "undefined" && window.Sentry) || null;
+	const bc = (message, data) => {
+		try { S?.addBreadcrumb?.({ category: "auth", message, level: "info", data }); } catch {}
+	};
+	const cap = (error, ctx) => {
+		try { S?.captureException?.(error, { extra: ctx || {} }); } catch {}
+	};
 	const STATE_KEYS = [
 		"netlify-cms-auth:state",
 		"decap-cms-auth:state",
@@ -66,6 +74,8 @@
 
 		const state = crypto.randomUUID();
 		setDecapState(state);
+		try { S?.setTag?.("oauth_state", state); } catch {}
+		bc("oauth:startLogin", { state });
 
 		const u = new URL("/api/auth", location.origin);
 		u.searchParams.set("code_challenge", challenge);
@@ -87,9 +97,8 @@
 			"decap-oauth",
 			"popup,width=600,height=800",
 		);
-		try {
-			window.__pkcePopup = win;
-		} catch {}
+		try { window.__pkcePopup = win; } catch {}
+		bc("oauth:popup-opened");
 	}
 
 	async function startLoginOnce(e, btn) {
@@ -209,8 +218,9 @@
 						window.__dumpUser?.();
 					} catch {}
 					try {
+						bc("oauth:navigate-editor", { href: "/admin/#/" });
 						location.replace(new URL("/admin/#/", location.origin).href);
-					} catch {}
+					} catch (e) { cap(e, { phase: "navigate-editor" }); }
 				}, 50);
 				return;
 			} catch (e) {
@@ -218,8 +228,9 @@
 			}
 		}
 		try {
+			bc("oauth:navigate-editor", { href: "/admin/#/" });
 			location.replace(new URL("/admin/#/", location.origin).href);
-		} catch {}
+		} catch (e) { cap(e, { phase: "navigate-editor" }); }
 	}
 
 	let completed = false;
@@ -244,6 +255,10 @@
 			)
 				return;
 
+			const stateMatch = payload?.state && myState ? payload.state === myState : true;
+			try { if (payload?.state) S?.setTag?.("oauth_state", payload.state); } catch {}
+			bc("oauth:message", { haveToken: Boolean(payload?.token), haveCode: Boolean(payload?.code), stateMatch });
+
 			if (payload.token) {
 				completed = true;
 				const expected =
@@ -256,17 +271,12 @@
 				try {
 					window.__pkcePopup?.postMessage("authorization:ack", location.origin);
 				} catch {}
+				bc("oauth:ack-sent");
+				bc("oauth:accept-token", { state: expected, tokenPreview: String(payload.token).slice(0,6) + "…" });
 				if (typeof window.__acceptAndFlipFromToken === "function") {
-					try {
-						await window.__acceptAndFlipFromToken({
-							token: payload.token,
-							state: expected,
-						});
-					} catch {}
+					try { await window.__acceptAndFlipFromToken({ token: payload.token, state: expected }); } catch (e) { cap(e, { phase: "acceptAndFlipFromToken" }); }
 				} else {
-					try {
-						await onPkceSuccess(payload.token, expected);
-					} catch {}
+					try { await onPkceSuccess(payload.token, expected); } catch (e) { cap(e, { phase: "onPkceSuccess" }); }
 				}
 				return;
 			}
@@ -283,12 +293,15 @@
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ code: payload.code, verifier }),
 			});
-			const data = await r.json().catch(() => ({}));
+			const data = await r.json().catch((e) => { cap(e, { phase: "exchange-token:parse" }); return ({}); });
 			const accessToken = data && (data.access_token || data.token);
 			if (!accessToken) {
 				exchanging = false;
+				cap(new Error("No token in exchange response"), { phase: "exchange-token", status: r?.status });
 				return console.error("[PKCE] No token in exchange response");
 			}
+
+			bc("oauth:exchange-ok", { state: payload?.state || null });
 
 			const expected =
 				localStorage.getItem("netlify-cms-auth:state") ||
@@ -301,16 +314,9 @@
 				window.__pkcePopup?.postMessage("authorization:ack", location.origin);
 			} catch {}
 			if (typeof window.__acceptAndFlipFromToken === "function") {
-				try {
-					await window.__acceptAndFlipFromToken({
-						token: accessToken,
-						state: expected,
-					});
-				} catch {}
+				try { await window.__acceptAndFlipFromToken({ token: accessToken, state: expected }); } catch (e) { cap(e, { phase: "acceptAndFlipFromToken:exchange" }); }
 			} else {
-				try {
-					await onPkceSuccess(accessToken, expected);
-				} catch {}
+				try { await onPkceSuccess(accessToken, expected); } catch (e) { cap(e, { phase: "onPkceSuccess:exchange" }); }
 			}
 			completed = true;
 			try {
