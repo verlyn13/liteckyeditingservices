@@ -44,18 +44,20 @@ test.describe("Sentry Integration", () => {
 				| undefined;
 			if (!sentry) return null;
 
-            const client = sentry.getClient?.();
-            if (!client) return null;
+			const client = sentry.getClient?.();
+			if (!client) return null;
 
-            const options = client.getOptions?.() as Record<string, unknown>;
-            return {
-                hasDsn: !!options.dsn,
-                environment: options.environment as string | undefined,
-                hasIntegrations: Array.isArray(options.integrations) && options.integrations.length > 0,
-                enableLogs: options.enableLogs as boolean | undefined,
-                tracesSampleRate: options.tracesSampleRate as number | undefined,
-            };
-        });
+			const options = client.getOptions?.() as Record<string, unknown>;
+			return {
+				hasDsn: !!options.dsn,
+				environment: options.environment as string | undefined,
+				hasIntegrations:
+					Array.isArray(options.integrations) &&
+					options.integrations.length > 0,
+				enableLogs: options.enableLogs as boolean | undefined,
+				tracesSampleRate: options.tracesSampleRate as number | undefined,
+			};
+		});
 
 		expect(config).not.toBeNull();
 		expect(config?.hasDsn).toBe(true);
@@ -307,16 +309,20 @@ test.describe("Sentry Configuration Validation", () => {
 				| undefined;
 			if (!sentry) return null;
 
-            const client = sentry.getClient?.();
-            if (!client) return null;
+			const client = sentry.getClient?.();
+			if (!client) return null;
 
-            const options = client.getOptions?.() as Record<string, unknown>;
-            return {
-                tracesSampleRate: options.tracesSampleRate as number | undefined,
-                replaysSessionSampleRate: options.replaysSessionSampleRate as number | undefined,
-                replaysOnErrorSampleRate: options.replaysOnErrorSampleRate as number | undefined,
-            };
-        });
+			const options = client.getOptions?.() as Record<string, unknown>;
+			return {
+				tracesSampleRate: options.tracesSampleRate as number | undefined,
+				replaysSessionSampleRate: options.replaysSessionSampleRate as
+					| number
+					| undefined,
+				replaysOnErrorSampleRate: options.replaysOnErrorSampleRate as
+					| number
+					| undefined,
+			};
+		});
 
 		expect(sampling).not.toBeNull();
 		expect(sampling?.tracesSampleRate).toBeGreaterThanOrEqual(0);
@@ -340,10 +346,13 @@ test.describe("Sentry Configuration Validation", () => {
 				| undefined;
 			if (!sentry) return null;
 
-            const client = sentry.getClient?.();
-            if (!client) return null;
+			const client = sentry.getClient?.();
+			if (!client) return null;
 
-            const options = client.getOptions?.() as { integrations?: Array<{ name?: string }>; beforeSend?: unknown };
+			const options = client.getOptions?.() as {
+				integrations?: Array<{ name?: string }>;
+				beforeSend?: unknown;
+			};
 
 			// Check if replay integration has privacy settings
 			const replayIntegration = options.integrations?.find(
@@ -372,7 +381,7 @@ test.describe("Sentry Performance", () => {
 	});
 
 	test("should load Sentry script efficiently", async ({ page }) => {
-        const resourceTimings: Array<{ url: string; status: number }> = [];
+		const resourceTimings: Array<{ url: string; status: number }> = [];
 
 		page.on("response", (response) => {
 			const url = response.url();
