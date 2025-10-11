@@ -10,14 +10,14 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
-    <!-- Must load before Decap to wrap authorizer launch vectors -->
+    <!-- Diagnostics first for visibility during boot -->
+    <script src="/admin/diagnostics.js"></script>
+    <!-- Wrap window.open and navigation before Decap initializes -->
     <script src="/admin/pkce-boot.js"></script>
+    <!-- PKCE launcher + acceptance must be available before Decap boot -->
+    <script src="/admin/pkce-login.js"></script>
     <!-- Exactly one bundle; Decap auto-inits from config link (no manual CMS.init()) -->
     <script src="/vendor/decap/decap-cms.js" defer></script>
-    <!-- PKCE login wiring and diagnostics -->
-    <script src="/admin/pkce-login.js" defer></script>
-    <!-- Diagnostics: externalized to satisfy admin CSP (no inline scripts) -->
-    <script src="/admin/diagnostics.js" defer></script>
     <!-- Optional shim: enable with ?auth_shim=1 to re-emit canonical success string from admin window -->
     <script src="/admin/decap-auth-shim.js" defer></script>
   </body>

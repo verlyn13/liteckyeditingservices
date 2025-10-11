@@ -50,6 +50,7 @@
   - 🔁 **Server-side Exchange Primary**: `/api/callback` now exchanges `code+verifier` server-side using a short-lived cookie, posts `{ token, state }` to opener, and clears cookies; admin handles token messages directly and reloads after dispatch to ensure UI flip. Falls back to client exchange only if needed.
   - 🧩 **PKCE Acceptance Tweak** (Oct 11): Persist user with `login: "github"`, clear PKCE temp state, and hard-navigate to `/admin/#/` via `location.replace` after (optional) dispatch. This forces a clean Decap boot that reliably hydrates the stored user.
   - 🔧 **Token Exchange Fix**: `/api/exchange-token` now uses `application/x-www-form-urlencoded` for GitHub’s token endpoint (JSON body returned 400).
+  - 🧩 **Admin Script Order** (Oct 11): Admin now loads `diagnostics.js`, `pkce-boot.js`, and `pkce-login.js` before the single self-hosted Decap bundle to ensure interceptors and acceptance logic are active at boot.
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
 
 **Recent Progress - October 9, 2025**:
