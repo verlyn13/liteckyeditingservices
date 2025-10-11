@@ -83,6 +83,36 @@
 - [ ] SSL certificate monitoring
 - [ ] Performance metrics collection
 
+### Phase 8: Admin CMS Delivery Migration (CDN → npm) (Oct 12–26, 2025)
+Goal: Replace vendored `decap-cms.js` with a first-party bundle from `decap-cms-app` for deterministic init and hydration.
+
+1) Scaffold (no prod impact)
+- [ ] Add `src/cms/index.ts` with `decap-cms-app` init and canonical auth listener
+- [ ] Keep CDN bundle active in `public/admin/index.html`
+
+2) Build path
+- [ ] Add a build script to emit `public/admin/cms.js` (Vite lib-mode or esbuild)
+- [ ] Ensure sourcemaps are optional; no inline/module scripts to satisfy CSP
+
+3) Dual-boot preview (feature flag)
+- [ ] Add env flag `ADMIN_CMS_NPM=1` for previews to load `/admin/cms.js`
+- [ ] Purge CDN; verify a single Decap version line; run OAuth flow and hydrator breadcrumbs
+
+4) Flip + soak
+- [ ] Flip flag on production after preview passes E2E + a11y
+- [ ] Keep hydrator for one release; monitor Sentry breadcrumbs `hydr:*`
+
+5) Retire vendor bundle
+- [ ] Remove `/public/vendor/decap/*`; remove references and cache-bust params
+- [ ] Update CSP docs and playbooks
+
+Dependencies
+- Sentry optional for admin (breadcrumbs helpful but not required)
+- CSP for `/admin/*` already compatible (no inline scripts required)
+
+Docs/ADR
+- ADR-002 (Decap delivery switch) created; update `PROJECT-STATUS.md` as phases complete
+
 #### Week 3: Observability (Oct 19-25, 2025)
 **Analytics & Performance Monitoring**
 
