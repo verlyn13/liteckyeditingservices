@@ -41,6 +41,8 @@
   - ✅ **PKCE-Only Enforcement**: Capture-phase interception prevents Decap’s internal handler; single popup/name; re-entry guard; badge. Auth prefers client `state`; `/api/exchange-token` returns upstream error details. CI gate ensures exactly one self-hosted Decap bundle.
   - 🔁 **Back-compat Fallback**: During function rollout, admin sends both `state` and `client_state` to `/api/auth` to ensure compatibility with older deployments. This will be removed after propagation is confirmed.
   - 🛡️ **Open Intercept**: Admin now intercepts any programmatic `window.open('/api/auth')` and routes through the PKCE launcher to prevent competing Decap flows from generating a mismatched `state`.
+  - 🚀 **Early Boot Shim**: Added `public/admin/pkce-boot.js` and loaded it before Decap so any references to `window.open` and `location.assign/replace` point to our wrappers. Real `window.open` is preserved as `__realWindowOpen` for our popup.
+  - 🔒 **State-Gated Exchange**: Login script now exchanges codes only when `payload.state === sessionStorage['oauth_state']`, eliminating stray 400s from foreign flows.
   - 🔧 **Token Exchange Fix**: `/api/exchange-token` now uses `application/x-www-form-urlencoded` for GitHub’s token endpoint (JSON body returned 400).
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
 
