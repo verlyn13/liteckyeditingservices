@@ -73,6 +73,8 @@
   - 🔧 **Token Exchange Fix**: `/api/exchange-token` now uses `application/x-www-form-urlencoded` for GitHub’s token endpoint (JSON body returned 400).
   - 🧩 **Admin Script Order** (Oct 11): Admin now loads `diagnostics.js`, `pkce-boot.js`, and `pkce-login.js` before the single self-hosted Decap bundle to ensure interceptors and acceptance logic are active at boot.
   - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
+  - 🧹 **Single Decap Bundle + Cache Bust** (Oct 11): Ensured only one Decap bundle is served and added a cache-busting query to `public/admin/index.html` (`decap-cms.js?v=7cf7fae0`) to defeat stale caches while we iterate. Purge `/admin/*` on CDN after deploy to avoid mixed versions.
+  - 🛡️ **Admin CSP** (Oct 11): Added scoped CSP for `/admin/*` in `public/_headers` allowing only required hosts: GitHub APIs, Cloudflare Turnstile, and optional Sentry CDN; removed inline scripts to comply.
 
 **Recent Progress - October 9, 2025**:
   - ✅ **Admin on Static HTML**: Decap CMS admin served via `public/admin/index.html` with single bundle + auto-init

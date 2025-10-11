@@ -22,8 +22,8 @@ Successfully deployed Litecky Editing Services to Cloudflare Pages with complete
   - SendGrid credentials configured (API_KEY, FROM, TO)
 
 ### 3. Cloudflare Pages Deployment
-- **Production URL**: https://b9ee6806.litecky-editing-services.pages.dev
-- **Branch Alias**: https://chore-upgrade-20250930.litecky-editing-services.pages.dev
+- **Production URL**: https://b9ee6806.liteckyeditingservices.pages.dev
+- **Branch Alias**: https://chore-upgrade-20250930.liteckyeditingservices.pages.dev
 - **Environment Variables Configured**:
   - SENDGRID_API_KEY
   - SENDGRID_FROM

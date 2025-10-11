@@ -1,7 +1,7 @@
 # Post-Deployment Validation Report
 **Date**: October 2, 2025
 **Deployment**: Production (Cloudflare Pages)
-**URL**: https://b9ee6806.litecky-editing-services.pages.dev
+**URL**: https://b9ee6806.liteckyeditingservices.pages.dev
 
 ## Executive Summary
 
@@ -21,7 +21,7 @@
 **Production URL Accessibility**:
 ```
 ✅ PASS - HTTP 200 OK
-URL: https://b9ee6806.litecky-editing-services.pages.dev
+URL: https://b9ee6806.liteckyeditingservices.pages.dev
 Response Time: <1s
 HTTPS: Yes
 Server: Cloudflare

@@ -502,14 +502,14 @@ pnpm build:site
 
 # Deploy with Wrangler
 wrangler pages deploy apps/site/dist \
-  --project-name=litecky-editing \
+  --project-name=liteckyeditingservices \
   --branch=main
 ```
 
 #### Rollback
 Option 1: Via Dashboard
 1. Go to Cloudflare Dashboard
-2. Pages → litecky-editing → Deployments
+2. Pages → liteckyeditingservices → Deployments
 3. Find previous good deployment
 4. Click "Rollback"
 
@@ -1301,10 +1301,10 @@ curl -X POST https://api.sendgrid.com/v3/mail/send \
 **Fix**:
 ```bash
 # Verify API key
-wrangler pages secret list --project-name=litecky-editing
+wrangler pages secret list --project-name=liteckyeditingservices
 
 # Update if needed
-wrangler pages secret put SENDGRID_API_KEY --project-name=litecky-editing
+wrangler pages secret put SENDGRID_API_KEY --project-name=liteckyeditingservices
 ```
 
 ### Authentication Failures

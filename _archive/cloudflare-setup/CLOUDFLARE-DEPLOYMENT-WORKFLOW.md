@@ -134,8 +134,8 @@ wrangler deploy
 #### 4.1 Initial Pages Setup ✅
 ```bash
 # COMPLETED:
-wrangler pages project create litecky-editing-services --production-branch main
-# Site deployed to: https://c9bfafd5.litecky-editing-services.pages.dev
+wrangler pages project create liteckyeditingservices --production-branch main
+# Site deployed to: https://c9bfafd5.liteckyeditingservices.pages.dev
 ```
 
 #### 4.2 Configure Environment Variables ⏳
@@ -157,16 +157,16 @@ wrangler pages secret put SENDGRID_API_KEY
 ./scripts/cf-dns-manage.fish delete www
 
 # Add Pages CNAME
-./scripts/cf-dns-manage.fish add CNAME @ litecky-editing-services.pages.dev
+./scripts/cf-dns-manage.fish add CNAME @ liteckyeditingservices.pages.dev
 ```
 
 #### 4.4 Deploy Site ✅
 ```bash
 # COMPLETED:
 pnpm build
-wrangler pages deploy dist --project-name=litecky-editing-services
-# Initial deployment: https://c9bfafd5.litecky-editing-services.pages.dev
-# With Turnstile: https://22910e05.litecky-editing-services.pages.dev
+wrangler pages deploy dist --project-name=liteckyeditingservices
+# Initial deployment: https://c9bfafd5.liteckyeditingservices.pages.dev
+# With Turnstile: https://22910e05.liteckyeditingservices.pages.dev
 ```
 
 #### 4.5 Update Trackers ✅
@@ -278,7 +278,7 @@ echo "✅ All resources created!"
 echo "Checking deployment status..."
 
 # Check Pages
-wrangler pages project list | grep litecky-editing
+wrangler pages project list | grep liteckyeditingservices
 
 # Check Workers
 wrangler deployments list
@@ -307,10 +307,10 @@ echo "R2 Buckets:"
 ### Pages Deployment Rollback
 ```bash
 # List deployments
-wrangler pages deployment list --project-name=litecky-editing
+wrangler pages deployment list --project-name=liteckyeditingservices
 
 # Rollback to previous
-wrangler pages deployment rollback --project-name=litecky-editing
+wrangler pages deployment rollback --project-name=liteckyeditingservices
 ```
 
 ### Worker Rollback

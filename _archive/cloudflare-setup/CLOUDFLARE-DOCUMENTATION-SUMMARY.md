@@ -81,7 +81,7 @@
   "zone": { "id": "...", "name": "..." },
   "account": { "id": "...", "plan": "Workers Plan" },
   "apiToken": { "storage": "gopass:..." },
-  "pagesProject": { "name": "litecky-editing-services" }
+  "pagesProject": { "name": "liteckyeditingservices" }
 }
 ```
 
@@ -101,7 +101,7 @@ pnpm add -D wrangler  # Already installed: v4.38.0
 ### Key Commands
 ```bash
 # Pages deployment
-pnpm wrangler pages deploy dist/ --project-name=litecky-editing-services
+pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
 
 # Workers deployment
 pnpm wrangler deploy
@@ -142,13 +142,13 @@ pnpm wrangler dispatch-namespace create production
 2. **Build & Deploy**
    ```bash
    pnpm build
-   pnpm wrangler pages deploy dist/ --project-name=litecky-editing-services
+   pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
    ```
 
 3. **Update DNS** (after deployment)
    ```bash
    ./scripts/cf-dns-manage.fish backup
-   ./scripts/cf-dns-manage.fish add CNAME www litecky-editing-services.pages.dev
+   ./scripts/cf-dns-manage.fish add CNAME www liteckyeditingservices.pages.dev
    ```
 
 ## 🆕 What's New with Workers Plan

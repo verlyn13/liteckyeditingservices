@@ -553,7 +553,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy apps/site/dist --project-name=litecky-editing --branch=main
+          command: pages deploy apps/site/dist --project-name=liteckyeditingservices --branch=main
       
       - name: Comment deployment URL
         if: github.event_name == 'pull_request'
@@ -969,7 +969,7 @@ Best times for maintenance (lowest traffic):
 
 ```bash
 # View recent deployments
-wrangler pages deployment list --project-name=litecky-editing
+wrangler pages deployment list --project-name=liteckyeditingservices
 
 # Tail Worker logs
 wrangler tail --name litecky-decap-oauth

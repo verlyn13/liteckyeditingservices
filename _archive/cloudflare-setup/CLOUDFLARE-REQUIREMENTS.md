@@ -248,7 +248,7 @@ crons = [
    ```bash
    cd apps/site
    pnpm build
-   wrangler pages deploy dist --project-name=litecky-editing
+   wrangler pages deploy dist --project-name=liteckyeditingservices
    ```
 
 ### Phase 5: Email Setup

@@ -44,6 +44,33 @@ Reference: ENVIRONMENT.md for full variable matrix and usage.
 - Cloudflare Dashboard → Workers → Worker → Settings → Variables (for decap-oauth)
 - GitHub → Settings → Secrets and variables → Actions (CI/CD)
 
+## Infisical (Production Source of Truth)
+
+Production values are managed in Infisical and synced to Cloudflare Pages.
+
+- Workspace: `liteckyeditingservices` (project id `d6f4ecdd-a92e-4a2a-92f6-afc23e7175c7`)
+- Infisical environment: `prod`
+- Cloudflare Pages environment: `Production`
+
+Commands:
+
+```bash
+# 0) Seed Infisical prod from gopass (no values printed)
+./scripts/secrets/infisical_seed_prod_from_gopass.sh || true
+
+# 1) Pull Infisical prod secrets to a local dotenv (git-ignored)
+./scripts/secrets/infisical_pull_prod.sh
+
+# 2) Prepare Cloudflare files (splits PUBLIC_* vs secrets)
+./scripts/secrets/cloudflare_prepare_from_infisical.sh
+
+# 3) Upload to Cloudflare Pages (Production)
+#    - public.env   → Environment Variables
+#    - secrets.env  → Secrets (encrypted at rest)
+```
+
+See `secrets/PRODUCTION_KEYS.md` for the canonical list of required keys.
+
 ## Rotation Procedures
 
 SendGrid API Key

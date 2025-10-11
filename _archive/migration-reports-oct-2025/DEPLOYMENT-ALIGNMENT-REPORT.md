@@ -50,7 +50,7 @@
 2. **Script-Based Deployment**: Following scripts in `_archive/cloudflare-setup/` that use wrangler CLI:
    ```bash
    # This creates a direct-upload project, NOT Git-connected:
-   pnpm wrangler pages deploy dist/ --project-name=litecky-editing-services
+   pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
    ```
 3. **Documentation Ambiguity**: Mixed instructions between:
    - Dashboard-based setup (Git-connected)

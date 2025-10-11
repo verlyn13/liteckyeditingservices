@@ -8,7 +8,7 @@
 
 ### ✅ Root Domain - CORRECT
 ```
-liteckyeditingservices.com    CNAME    litecky-editing-services.pages.dev (proxied)
+liteckyeditingservices.com    CNAME    liteckyeditingservices.pages.dev (proxied)
 ```
 **Status**: ✅ **MIGRATED** - Points to Cloudflare Pages
 **Behavior**: Redirects (301) to www.liteckyeditingservices.com
@@ -56,9 +56,9 @@ Google Workspace:
 
 ## Verification Results
 
-### Pages Deployment (litecky-editing-services.pages.dev)
+### Pages Deployment (liteckyeditingservices.pages.dev)
 ```bash
-$ curl -sI https://litecky-editing-services.pages.dev
+$ curl -sI https://liteckyeditingservices.pages.dev
 HTTP/2 200
 server: cloudflare
 ```
@@ -106,7 +106,7 @@ content-security-policy: ... frame-ancestors https://google-admin.corp.google.co
    ```
    Type: CNAME
    Name: www
-   Target: litecky-editing-services.pages.dev
+   Target: liteckyeditingservices.pages.dev
    Proxy: Proxied (orange cloud) ← Keep this enabled
    ```
 
@@ -117,11 +117,11 @@ content-security-policy: ... frame-ancestors https://google-admin.corp.google.co
 ## Expected Behavior After Update
 
 ### Root Domain (liteckyeditingservices.com)
-- DNS: `CNAME → litecky-editing-services.pages.dev` ✅ Already correct
+- DNS: `CNAME → liteckyeditingservices.pages.dev` ✅ Already correct
 - HTTP: Serves Pages content OR redirects to www (Pages decides)
 
 ### WWW Subdomain (www.liteckyeditingservices.com)
-- DNS: `CNAME → litecky-editing-services.pages.dev` ← Will update
+- DNS: `CNAME → liteckyeditingservices.pages.dev` ← Will update
 - HTTP: Serves Pages content directly
 - Title: "Home | Litecky Editing Services"
 

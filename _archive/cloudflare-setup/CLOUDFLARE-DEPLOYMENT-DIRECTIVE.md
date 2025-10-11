@@ -139,7 +139,7 @@ Workers are not yet created. Skip this phase until workers are implemented.
 pnpm add -D wrangler
 
 # Deploy to Pages (creates project on first run)
-pnpm wrangler pages deploy dist/ --project-name=litecky-editing-services
+pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
 ```
 
 #### Step 4.2: Configure Custom Domain
@@ -155,7 +155,7 @@ After first deployment:
 
 # Update www CNAME (replace ID with actual)
 ./scripts/cf-dns-manage.fish delete a8b747e6dffdb95e0bea543316e6d3cf
-./scripts/cf-dns-manage.fish add CNAME www litecky-editing-services.pages.dev
+./scripts/cf-dns-manage.fish add CNAME www liteckyeditingservices.pages.dev
 ```
 
 #### Step 4.3: Set Environment Variables
@@ -218,7 +218,7 @@ pnpm build
 set -x CF_API_TOKEN (gopass show -o cloudflare/api-tokens/initial-project-setup-master)
 
 # 3. Deploy to Pages
-pnpm wrangler pages deploy dist/ --project-name=litecky-editing-services
+pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
 
 # 4. Note the URL and update DNS when ready
 ```

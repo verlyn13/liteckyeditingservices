@@ -1,7 +1,7 @@
 # Cloudflare Pages configuration (code-first)
 # Docs: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
 
-name = "litecky-editing-site"
+name = "liteckyeditingservices"
 compatibility_date = "2025-09-30"
 pages_build_output_dir = "./dist"
 compatibility_flags = ["nodejs_compat"]
@@ -15,4 +15,3 @@ queue = "send-email-queue"
 binding = "SEND_EMAIL"
 
 # Do NOT add secrets here. Use Pages environment variables or Worker Secrets.
-

@@ -13,7 +13,7 @@
   - `carol.ns.cloudflare.com`
   - `ignacio.ns.cloudflare.com`
 - [x] Production deployment validated
-  - Preview URL: https://b9ee6806.litecky-editing-services.pages.dev
+  - Preview URL: https://b9ee6806.liteckyeditingservices.pages.dev
   - Status: Production ready (see POST-DEPLOYMENT-VALIDATION-2025-10-02.md)
 
 ### Current DNS Configuration
@@ -77,8 +77,8 @@ liteckyeditingservices.com       CNAME  www.liteckyeditingservices.com (proxied)
 www.liteckyeditingservices.com   CNAME  ghs.googlehosted.com (proxied)
 
 NEW:
-liteckyeditingservices.com       CNAME  litecky-editing-services.pages.dev (proxied)
-www.liteckyeditingservices.com   CNAME  litecky-editing-services.pages.dev (proxied)
+liteckyeditingservices.com       CNAME  liteckyeditingservices.pages.dev (proxied)
+www.liteckyeditingservices.com   CNAME  liteckyeditingservices.pages.dev (proxied)
 ```
 
 **Note**: All existing SendGrid DNS records remain untouched.
@@ -95,7 +95,7 @@ dig liteckyeditingservices.com A +short
 dig www.liteckyeditingservices.com CNAME +short
 
 # Should see something like:
-# www.liteckyeditingservices.com -> litecky-editing-services.pages.dev
+# www.liteckyeditingservices.com -> liteckyeditingservices.pages.dev
 ```
 
 ### Step 4: Wait for SSL Certificate Provisioning
@@ -191,11 +191,11 @@ After migration completes:
 - **SendGrid DNS**: Already configured, no changes needed
 - **Cloudflare Proxy**: Pages custom domains are automatically proxied (orange cloud)
 - **Cache**: May need to purge Cloudflare cache after migration
-- **Preview URLs**: Will continue to work (b9ee6806.litecky-editing-services.pages.dev)
+- **Preview URLs**: Will continue to work (b9ee6806.liteckyeditingservices.pages.dev)
 
 ## References
 
 - Cloudflare Pages Docs: https://developers.cloudflare.com/pages/configuration/custom-domains/
-- Current deployment: https://b9ee6806.litecky-editing-services.pages.dev
+- Current deployment: https://b9ee6806.liteckyeditingservices.pages.dev
 - Validation report: POST-DEPLOYMENT-VALIDATION-2025-10-02.md
 - Project status: PROJECT-STATUS.md
