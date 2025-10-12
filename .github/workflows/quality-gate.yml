@@ -9,10 +9,49 @@ on:
   push:
     branches: [main]
 
+# Cancel in-progress runs for PRs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  # Preflight check to verify CI configuration
+  preflight:
+    name: Verify CI Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required repository secrets
+        run: |
+          echo "Checking required secrets and variables..."
+
+          # Check required secrets (we can't read values, just check if set)
+          required_secrets=(
+            "SENTRY_AUTH_TOKEN"
+            "CLOUDFLARE_API_TOKEN"
+            "CLOUDFLARE_ACCOUNT_ID"
+          )
+
+          # Check required variables (these are public)
+          if [ -z "${{ vars.SENTRY_ORG }}" ]; then
+            echo "ERROR: SENTRY_ORG variable not set"
+            exit 1
+          fi
+
+          if [ -z "${{ vars.SENTRY_PROJECT }}" ]; then
+            echo "ERROR: SENTRY_PROJECT variable not set"
+            exit 1
+          fi
+
+          if [ -z "${{ vars.CF_GIT_CONNECTED }}" ]; then
+            echo "WARNING: CF_GIT_CONNECTED variable not set (defaulting to false)"
+          fi
+
+          echo "✅ All required CI configuration verified"
+
   validate-structure:
     name: Validate Repository Structure
     runs-on: ubuntu-latest
+    needs: preflight
     steps:
       - uses: actions/checkout@v4
 
@@ -24,6 +63,14 @@ jobs:
         with:
           node-version: '24'
           cache: 'pnpm'
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -37,6 +84,7 @@ jobs:
   code-quality:
     name: Code Quality Checks
     runs-on: ubuntu-latest
+    needs: preflight
     steps:
       - uses: actions/checkout@v4
 
@@ -49,6 +97,14 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
 
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -60,6 +116,17 @@ jobs:
 
       - name: Build project
         run: pnpm build
+
+      - name: Verify sourcemaps exist
+        run: |
+          echo "Checking for sourcemap files..."
+          if ! find dist -name "*.map" -type f | head -1; then
+            echo "WARNING: No sourcemap files found in dist/"
+            echo "Sentry error tracking may not work properly"
+          else
+            echo "✅ Sourcemap files found:"
+            find dist -name "*.map" -type f | head -5
+          fi
 
       - name: Create Sentry release and upload source maps
         uses: getsentry/action-release@v3

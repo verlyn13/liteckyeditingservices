@@ -5,6 +5,11 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Cancel in-progress runs for PRs
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   validate-preview:
     runs-on: ubuntu-latest
@@ -25,11 +30,19 @@ jobs:
         with:
           version: 10.17.1
 
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Install Wrangler
-        run: pnpm add -D wrangler@^4
+      - name: Install Wrangler (pinned version)
+        run: pnpm add -D wrangler@4.40.3
 
       - name: Wait for Cloudflare Pages preview (Git-connected)
         if: ${{ vars.CF_GIT_CONNECTED == 'true' || secrets.CF_GIT_CONNECTED == 'true' }}
@@ -70,6 +83,14 @@ jobs:
       - name: Show preview URL
         run: |
           echo "Preview URL: $(cat preview_url.txt)"
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
 
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps

@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Locator, Page } from "@playwright/test";
 
 /**
  * Prepare page for visual snapshots (Oct 2025 hardened best-practice).
@@ -8,39 +8,39 @@ import type { Locator, Page } from '@playwright/test';
  * - Blocks animations/transitions at both script and style level
  */
 export async function prepareForVisualTest(
-  page: Page,
-  el?: Locator,
-  opts?: { readySelector?: string }
+	page: Page,
+	el?: Locator,
+	opts?: { readySelector?: string },
 ) {
-  // Freeze time and randomness BEFORE any page content loads
-  await page.addInitScript(() => {
-    // @ts-expect-error - global for test stability
-    window.___fixedNow = new Date('2025-01-01T00:00:00Z').valueOf();
-    const OrigDate = Date;
-    // @ts-expect-error - override global Date for deterministic tests
-    // biome-ignore lint/suspicious/noGlobalAssign: Intentional global override for deterministic tests
-    Date = class extends OrigDate {
-      // biome-ignore lint/suspicious/noExplicitAny: Test utility needs flexible args
-      constructor(...args: any[]) {
-        // @ts-expect-error - access to global
-        super(...(args.length ? args : [window.___fixedNow]));
-      }
-      static now() {
-        // @ts-expect-error - access to global
-        return window.___fixedNow;
-      }
-    };
-    // Deterministic random for any UI that uses Math.random()
-    let seed = 42;
-    Math.random = () => {
-      seed = (seed * 1664525 + 1013904223) % 4294967296;
-      return seed / 4294967296;
-    };
-  });
+	// Freeze time and randomness BEFORE any page content loads
+	await page.addInitScript(() => {
+		// @ts-expect-error - global for test stability
+		window.___fixedNow = new Date("2025-01-01T00:00:00Z").valueOf();
+		const OrigDate = Date;
+		// @ts-expect-error - override global Date for deterministic tests
+		// biome-ignore lint/suspicious/noGlobalAssign: Intentional global override for deterministic tests
+		Date = class extends OrigDate {
+			// biome-ignore lint/suspicious/noExplicitAny: Test utility needs flexible args
+			constructor(...args: any[]) {
+				// @ts-expect-error - access to global
+				super(...(args.length ? args : [window.___fixedNow]));
+			}
+			static now() {
+				// @ts-expect-error - access to global
+				return window.___fixedNow;
+			}
+		};
+		// Deterministic random for any UI that uses Math.random()
+		let seed = 42;
+		Math.random = () => {
+			seed = (seed * 1664525 + 1013904223) % 4294967296;
+			return seed / 4294967296;
+		};
+	});
 
-  // Stabilize layout BEFORE content renders
-  await page.addInitScript(() => {
-    const css = `
+	// Stabilize layout BEFORE content renders
+	await page.addInitScript(() => {
+		const css = `
       /* No vertical scrollbar during capture (keeps width at 1250px) */
       html, body {
         overflow-y: hidden !important;
@@ -57,45 +57,45 @@ export async function prepareForVisualTest(
         transition-duration: 0s !important;
       }
     `;
-    const style = document.createElement('style');
-    style.setAttribute('data-visual-lock', 'init');
-    style.textContent = css;
-    document.documentElement.appendChild(style);
-  });
+		const style = document.createElement("style");
+		style.setAttribute("data-visual-lock", "init");
+		style.textContent = css;
+		document.documentElement.appendChild(style);
+	});
 
-  await page.waitForLoadState('domcontentloaded');
+	await page.waitForLoadState("domcontentloaded");
 
-  // Wait for specific element if provided
-  if (opts?.readySelector) {
-    await page
-      .locator(opts.readySelector)
-      .first()
-      .waitFor({ state: 'visible', timeout: 10_000 })
-      .catch(() => {});
-  }
+	// Wait for specific element if provided
+	if (opts?.readySelector) {
+		await page
+			.locator(opts.readySelector)
+			.first()
+			.waitFor({ state: "visible", timeout: 10_000 })
+			.catch(() => {});
+	}
 
-  // CRITICAL: Wait for fonts to load before measuring/snapshotting
-  await page.evaluate(async () => {
-    // document.fonts.ready ensures @fontsource fonts are fully loaded
-    if (document.fonts?.ready) {
-      await document.fonts.ready;
-    }
-    // Double-check: also wait for any images still loading
-    const pending = Array.from(document.images)
-      .filter((img) => !img.complete)
-      .map(
-        (img) =>
-          new Promise<void>((res) => {
-            img.addEventListener('load', () => res(), { once: true });
-            img.addEventListener('error', () => res(), { once: true });
-          })
-      );
-    await Promise.all(pending);
-  });
+	// CRITICAL: Wait for fonts to load before measuring/snapshotting
+	await page.evaluate(async () => {
+		// document.fonts.ready ensures @fontsource fonts are fully loaded
+		if (document.fonts?.ready) {
+			await document.fonts.ready;
+		}
+		// Double-check: also wait for any images still loading
+		const pending = Array.from(document.images)
+			.filter((img) => !img.complete)
+			.map(
+				(img) =>
+					new Promise<void>((res) => {
+						img.addEventListener("load", () => res(), { once: true });
+						img.addEventListener("error", () => res(), { once: true });
+					}),
+			);
+		await Promise.all(pending);
+	});
 
-  // Add runtime style locks (in case init script was bypassed)
-  await page.addStyleTag({
-    content: `
+	// Add runtime style locks (in case init script was bypassed)
+	await page.addStyleTag({
+		content: `
       /* Hide flaky dynamic elements */
       [data-flaky], .live-chat, .cookie-banner, .chat-widget {
         visibility: hidden !important;
@@ -110,30 +110,30 @@ export async function prepareForVisualTest(
         caret-color: transparent !important;
       }
     `,
-  });
+	});
 
-  // Scroll element into view if provided
-  if (el) {
-    await el.scrollIntoViewIfNeeded();
-    await el.waitFor({ state: 'visible' });
-  }
+	// Scroll element into view if provided
+	if (el) {
+		await el.scrollIntoViewIfNeeded();
+		await el.waitFor({ state: "visible" });
+	}
 
-  // Final settle time for any lingering layout shifts
-  await page.waitForTimeout(100);
+	// Final settle time for any lingering layout shifts
+	await page.waitForTimeout(100);
 }
 
-import { expect } from '@playwright/test';
+import { expect } from "@playwright/test";
 
 export async function assertViewportAndRoot(page: Page) {
-  const sz = page.viewportSize();
-  if (!sz) throw new Error('Viewport size is not set');
-  const rootWidth = await page.evaluate(
-    () => document.documentElement.getBoundingClientRect().width
-  );
-  if (process.env.VISUAL_POLICY === 'no-gutter') {
-    expect(Math.round(rootWidth)).toBe(1250);
-  } else {
-    // Linux scrollbar ~15px gutter expected
-    expect(Math.round(rootWidth)).toBe(1235);
-  }
+	const sz = page.viewportSize();
+	if (!sz) throw new Error("Viewport size is not set");
+	const rootWidth = await page.evaluate(
+		() => document.documentElement.getBoundingClientRect().width,
+	);
+	if (process.env.VISUAL_POLICY === "no-gutter") {
+		expect(Math.round(rootWidth)).toBe(1250);
+	} else {
+		// Linux scrollbar ~15px gutter expected
+		expect(Math.round(rootWidth)).toBe(1235);
+	}
 }
