@@ -1,14 +1,13 @@
 name: Infisical → Cloudflare (Production)
 
 on:
+  # Deprecated push-based sync; run manually if needed
   workflow_dispatch:
     inputs:
       dry_run:
         description: 'Dry run (do not apply changes)'
         type: boolean
         default: true
-  push:
-    branches: [main]
 
 permissions:
   contents: read

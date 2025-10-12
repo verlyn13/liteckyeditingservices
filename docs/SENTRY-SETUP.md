@@ -543,18 +543,127 @@ Fits in: Free tier ✅
 
 ---
 
-## 14. Quick Start Checklist
+## 14. Operational Setup (Secrets Management)
+
+### Store Sentry Tokens in Gopass
+
+For production secret management, use gopass:
+
+```bash
+./scripts/secrets/store-sentry-tokens.sh
+```
+
+When prompted, enter:
+- **Org Token**: `sntrys_************CsAY`
+- **Personal Token**: `************2244`
+
+This stores tokens at:
+- `sentry/happy-patterns-llc/org-token`
+- `sentry/happy-patterns-llc/personal-token`
+- `sentry/happy-patterns-llc/auth-token` (CI/CD)
+- `sentry/happy-patterns-llc/dsn`
+
+### Configure GitHub Actions (CI/CD)
+
+**Set Repository Variables**:
+```bash
+SENTRY_ORG=happy-patterns-llc
+SENTRY_PROJECT=javascript-astro
+```
+
+**Set Repository Secret**:
+```bash
+# Via GitHub CLI
+gh secret set SENTRY_AUTH_TOKEN --body "$(gopass show -o sentry/happy-patterns-llc/auth-token)"
+
+# Or manually copy from gopass and add via GitHub UI
+gopass show sentry/happy-patterns-llc/auth-token
+```
+
+### Configure Cloudflare Pages
+
+**Production Environment** (via Dashboard or wrangler):
+```bash
+# Variables (NOT encrypted)
+PUBLIC_SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+PUBLIC_SENTRY_ENVIRONMENT=production
+PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
+SENTRY_ORG=happy-patterns-llc
+SENTRY_PROJECT=javascript-astro
+ENVIRONMENT=production
+
+# Secrets (encrypted) - via wrangler
+gopass show -o sentry/happy-patterns-llc/auth-token | \
+  pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices --env production
+```
+
+**Preview Environment** (same variables except environment):
+```bash
+PUBLIC_SENTRY_ENVIRONMENT=preview
+ENVIRONMENT=preview
+
+gopass show -o sentry/happy-patterns-llc/auth-token | \
+  pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices --env preview
+```
+
+### Local Development (.dev.vars)
+
+Generate local dev vars from gopass:
+```bash
+./scripts/generate-dev-vars.sh
+```
+
+Verify `.dev.vars` contains:
+```bash
+PUBLIC_SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+PUBLIC_SENTRY_ENVIRONMENT=development
+PUBLIC_SENTRY_RELEASE=1.0.0
+```
+
+### Token Rotation
+
+When rotating Sentry tokens:
+
+1. **Generate new token** in Sentry dashboard:
+   - Settings → Developer Settings → Auth Tokens
+   - Create token with `project:releases` scope
+
+2. **Update gopass**:
+   ```bash
+   gopass edit sentry/happy-patterns-llc/auth-token
+   ```
+
+3. **Update GitHub secret**:
+   ```bash
+   gh secret set SENTRY_AUTH_TOKEN --body "$(gopass show -o sentry/happy-patterns-llc/auth-token)"
+   ```
+
+4. **Update Cloudflare Pages**:
+   ```bash
+   gopass show -o sentry/happy-patterns-llc/auth-token | \
+     pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices
+   ```
+
+5. **Revoke old token** in Sentry dashboard
+
+See `SECRETS.md` for complete rotation procedures.
+
+---
+
+## 15. Quick Start Checklist
 
 - [ ] Create Sentry account and project
 - [ ] Copy DSN from Sentry dashboard
-- [ ] Add `PUBLIC_SENTRY_DSN` to `.env`
-- [ ] Add `PUBLIC_SENTRY_ENVIRONMENT=development` to `.env`
+- [ ] Store tokens in gopass (`./scripts/secrets/store-sentry-tokens.sh`)
+- [ ] Configure GitHub Actions (variables + secret)
+- [ ] Add environment variables to Cloudflare Pages
+- [ ] Generate local `.dev.vars` (`./scripts/generate-dev-vars.sh`)
 - [ ] Run `pnpm install` to install Sentry packages
 - [ ] Run `pnpm dev` and test error capture
 - [ ] Visit `/test-sentry` to verify integration
 - [ ] Check Sentry dashboard for test error
-- [ ] Deploy to production with environment variables
-- [ ] Verify production errors are captured
+- [ ] Deploy to production and verify errors are captured
 - [ ] Adjust sampling rates based on traffic
 - [ ] Set up alerts in Sentry dashboard
 

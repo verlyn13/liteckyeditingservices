@@ -2,10 +2,10 @@
 
 ## Complete Documentation Organization & Status
 
-Last Updated: October 11, 2025 (Admin npm delivery + ES2025 bundling; Infisical CI sync)
+Last Updated: October 12, 2025 (Documentation consolidation + Infisical CLI automation)
 Documentation Read: 100% (15/15 files analyzed)
 Deployment Status: ✅ LIVE with Git-Connected Deployment (migrated October 5, 2025)
-Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
+Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, automation documented
 
 ---
 
@@ -61,26 +61,43 @@ Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
 
 **Purpose**: Frontend error tracking, performance monitoring, and structured logging
 
-| Document                           | Purpose                             | Status     | Cross-References                        |
+**Current Documentation Structure** (Updated October 12, 2025):
+- **Quick Reference**: `docs/SENTRY-README.md` - Getting started, common tasks, troubleshooting
+- **Complete Guide**: `docs/SENTRY-SETUP.md` - 15 sections including operational setup (gopass, CI/CD, Cloudflare)
+- **Technical Reference**: `docs/SENTRY-INTEGRATIONS.md` - API examples, integration patterns
+
+**Implementation Files**:
+| File                               | Purpose                             | Status     | Cross-References                        |
 | ---------------------------------- | ----------------------------------- | ---------- | --------------------------------------- |
-| `docs/SENTRY-README.md`            | Quick reference & getting started   | ✅ Created | ENVIRONMENT.md (lines 198-246)          |
-| `docs/SENTRY-SETUP.md`             | Complete setup guide (14 sections)  | ✅ Created | .env.example (lines 22-26)              |
-| `docs/SENTRY-INTEGRATIONS.md`      | Integration reference & examples    | ✅ Created | src/lib/sentry.ts                       |
 | `src/lib/sentry.ts`                | Core configuration & helpers        | ✅ Created | BaseLayout.astro                        |
 | `src/scripts/sentry-init.ts`       | Client-side initialization          | ✅ Created | sentry.ts                               |
 | `public/admin/sentry-admin.js`     | Admin/CMS instrumentation (classic) | ✅ Created | admin/index.html; CSP allows Sentry CDN |
 | `src/pages/test-sentry.astro`      | Interactive test page (dev only)    | ✅ Created | SENTRY-README.md                        |
 | `tests/sentry-integration.spec.ts` | Objective Playwright tests          | ✅ Created | SENTRY-SETUP.md                         |
-| `docs/playbooks/sentry-setup.md`   | Complete setup & secret management  | ✅ Created | ENVIRONMENT.md, SECRETS.md, gopass      |
 | `functions/_middleware.ts`         | Server-side Sentry + headers        | ✅ Created | @sentry/cloudflare integration          |
+
+**Archived** (October 12, 2025):
+- `docs/SENTRY-SETUP-COMPLETE.md` → `_archive/sentry-migration-2025-10-11/`
+- `docs/playbooks/sentry-setup.md` → `_archive/sentry-migration-2025-10-11/sentry-setup-playbook.md` (consolidated into SENTRY-SETUP.md Section 14)
 
 ### 4. INFRASTRUCTURE & SECRETS
 
 **Purpose**: Cloudflare configuration and Infisical secrets
 
+**Documentation**:
 - `docs/INFISICAL-QUICKSTART.md` – Production secrets workflow (seed → verify → prepare)
+- `docs/INFISICAL-CI-SYNC.md` – CI workflow for Infisical → Cloudflare automation
 - `SECRETS.md` – Secrets inventory and rotation procedures
 - `secrets/PRODUCTION_KEYS.md` – Canonical list of prod keys (PUBLIC vs Secrets)
+
+**Automation Scripts** (Added October 12, 2025):
+- `scripts/secrets/infisical_seed_prod_from_gopass.sh` – Seed Infisical from gopass (includes Sentry)
+- `scripts/secrets/infisical_pull_prod.sh` – Pull secrets from Infisical to local dotenv
+- `scripts/secrets/cloudflare_prepare_from_infisical.sh` – Split into public.env and secrets.env
+- `scripts/secrets/sync-to-cloudflare-pages.sh` – **NEW**: Automated wrangler CLI upload to Production and Preview environments
+- `scripts/secrets/store-sentry-tokens.sh` – Interactive Sentry token storage in gopass
+- `scripts/secrets/setup-sentry-github-actions.sh` – Automated GitHub Actions configuration for Sentry
+- `scripts/generate-dev-vars.sh` – Generate .dev.vars from gopass (includes Sentry DSN)
 
 ### 5. DECISIONS & PLAYBOOKS (Admin CMS & Secrets)
 
