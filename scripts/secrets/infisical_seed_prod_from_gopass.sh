@@ -32,6 +32,10 @@ SENDGRID_CONFIRMATION_TEMPLATE_ID|sendgrid/litecky/template/confirmation
 GITHUB_CLIENT_ID|github/litecky/oauth/client-id github/oauth/litecky-editing/client-id github/oauth/client-id
 GITHUB_CLIENT_SECRET|github/litecky/oauth/client-secret github/oauth/litecky-editing/client-secret github/oauth/client-secret
 SENTRY_AUTH_TOKEN|sentry/happy-patterns-llc/auth-token
+PUBLIC_SENTRY_DSN|sentry/happy-patterns-llc/dsn
+SENTRY_DSN|sentry/happy-patterns-llc/dsn
+SENTRY_ORG|sentry/happy-patterns-llc/org
+SENTRY_PROJECT|sentry/happy-patterns-llc/project
 SENDGRID_FROM|sendgrid/litecky/from development/sendgrid/email-from
 SENDGRID_TO|sendgrid/litecky/to development/sendgrid/email-to
 EOF

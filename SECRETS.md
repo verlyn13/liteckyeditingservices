@@ -42,7 +42,13 @@ Reference: ENVIRONMENT.md for full variable matrix and usage.
   - github/litecky/oauth/\* (GitHub OAuth for Decap CMS)
   - development/turnstile/\* (Turnstile test keys)
   - development/sendgrid/\* (SendGrid test config)
-  - sentry/happy-patterns-llc/\* (Sentry tokens; org-token, personal-token, auth-token)
+  - sentry/happy-patterns-llc/\* (Sentry configuration):
+    - org-token (sntrys\_... organization auth token)
+    - personal-token (sntryu\_... personal auth token)
+    - auth-token (CI/CD sourcemap upload token)
+    - dsn (project DSN for error reporting)
+    - org (organization slug: happy-patterns-llc)
+    - project (project slug: javascript-astro)
   - cloudflare/litecky/turnstile/\* (Turnstile production keys)
   - sendgrid/api-keys/liteckyeditingservices-\* (SendGrid production)
   - cloudflare/account/_, cloudflare/api-tokens/_ (Cloudflare API access)
@@ -107,25 +113,101 @@ GitHub OAuth (Pages Functions /api/auth, /api/callback)
    ```
 4. Validate login at https://www.liteckyeditingservices.com/admin/
 
-Sentry Tokens (Astro integration — source maps)
+Sentry Tokens and Configuration (Error tracking + sourcemaps)
 
-1. Store tokens in gopass (organization slug `happy-patterns-llc`):
-   ```bash
-   gopass insert -f sentry/happy-patterns-llc/org-token
-   gopass insert -f sentry/happy-patterns-llc/personal-token
-   # Use org token for build-time upload
-   gopass insert -f sentry/happy-patterns-llc/auth-token
-   ```
-2. Sync build secret to Cloudflare Pages:
-   ```bash
-   gopass show -o sentry/happy-patterns-llc/auth-token | \
-     pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices
-   ```
-3. Set non-secret vars (Pages → Environment variables):
-   ```
-   SENTRY_ORG=happy-patterns-llc
-   SENTRY_PROJECT=javascript-astro
-   ```
+**Project Details:**
+
+- Organization: `happy-patterns-llc` (ID: 4510172424699904)
+- Project: `javascript-astro` (ID: 4510172426731520)
+- DSN: `https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520`
+
+**1. Store tokens and configuration in gopass:**
+
+```bash
+# Interactive script prompts for tokens and DSN
+./scripts/secrets/store-sentry-tokens.sh
+```
+
+This stores:
+
+- `sentry/happy-patterns-llc/org-token` (sntrys\_... token)
+- `sentry/happy-patterns-llc/personal-token` (sntryu\_... token)
+- `sentry/happy-patterns-llc/auth-token` (copy of org token for CI/CD)
+- `sentry/happy-patterns-llc/dsn` (project DSN)
+- `sentry/happy-patterns-llc/org` (organization slug)
+- `sentry/happy-patterns-llc/project` (project slug)
+
+**2. Sync to GitHub Actions (CI/CD):**
+
+```bash
+# Automated setup from gopass
+./scripts/secrets/setup-sentry-github-actions.sh
+```
+
+This configures:
+
+- Variable: `SENTRY_ORG=happy-patterns-llc`
+- Variable: `SENTRY_PROJECT=javascript-astro`
+- Secret: `SENTRY_AUTH_TOKEN` (from gopass)
+
+**3. Sync to Infisical (Production):**
+
+```bash
+# Seeds Sentry config along with other production secrets
+./scripts/secrets/infisical_seed_prod_from_gopass.sh
+```
+
+This includes:
+
+- `PUBLIC_SENTRY_DSN` (client-side)
+- `SENTRY_DSN` (server-side)
+- `SENTRY_ORG`, `SENTRY_PROJECT` (build-time)
+- `SENTRY_AUTH_TOKEN` (build-time sourcemap upload)
+
+**4. Configure Cloudflare Pages manually** (or via Infisical sync):
+
+**Production Environment:**
+
+```
+PUBLIC_SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+PUBLIC_SENTRY_ENVIRONMENT=production
+PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
+SENTRY_ORG=happy-patterns-llc
+SENTRY_PROJECT=javascript-astro
+```
+
+Secret (encrypted):
+
+```bash
+gopass show -o sentry/happy-patterns-llc/auth-token | \
+  pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices --env production
+```
+
+**Preview Environment:**
+
+```
+PUBLIC_SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+PUBLIC_SENTRY_ENVIRONMENT=preview
+PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
+SENTRY_ORG=happy-patterns-llc
+SENTRY_PROJECT=javascript-astro
+```
+
+Secret (encrypted):
+
+```bash
+gopass show -o sentry/happy-patterns-llc/auth-token | \
+  pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices --env preview
+```
+
+**5. Local development:**
+
+```bash
+# Generates .dev.vars from gopass (includes Sentry config)
+./scripts/generate-dev-vars.sh
+```
 
 Cloudflare API Token (CI)
 

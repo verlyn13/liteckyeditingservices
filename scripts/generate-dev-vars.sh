@@ -71,17 +71,33 @@ echo "" >> .dev.vars
 
 cat >> .dev.vars << 'EOF'
 
-# Sentry (client-side; DSN is non-secret)
-PUBLIC_SENTRY_DSN=
+# Sentry (Error Tracking)
+EOF
+
+# Get Sentry DSN from gopass
+echo -n "PUBLIC_SENTRY_DSN=" >> .dev.vars
+(gopass show -o sentry/happy-patterns-llc/dsn 2>/dev/null || echo "# Missing sentry/happy-patterns-llc/dsn") >> .dev.vars
+echo "" >> .dev.vars
+
+echo -n "SENTRY_DSN=" >> .dev.vars
+(gopass show -o sentry/happy-patterns-llc/dsn 2>/dev/null || echo "# Missing sentry/happy-patterns-llc/dsn") >> .dev.vars
+echo "" >> .dev.vars
+
+cat >> .dev.vars << 'EOF'
 PUBLIC_SENTRY_ENVIRONMENT=development
 PUBLIC_SENTRY_RELEASE=1.0.0
 
 # Sentry build-time (sensitive: pulled from gopass)
-SENTRY_ORG=happy-patterns-llc
-SENTRY_PROJECT=javascript-astro
 EOF
 
-# Build-time Sentry auth token from gopass (if available)
+echo -n "SENTRY_ORG=" >> .dev.vars
+(gopass show -o sentry/happy-patterns-llc/org 2>/dev/null || echo "happy-patterns-llc") >> .dev.vars
+echo "" >> .dev.vars
+
+echo -n "SENTRY_PROJECT=" >> .dev.vars
+(gopass show -o sentry/happy-patterns-llc/project 2>/dev/null || echo "javascript-astro") >> .dev.vars
+echo "" >> .dev.vars
+
 echo -n "SENTRY_AUTH_TOKEN=" >> .dev.vars
 (gopass show -o sentry/happy-patterns-llc/auth-token 2>/dev/null || echo "# Missing sentry/happy-patterns-llc/auth-token") >> .dev.vars
 echo "" >> .dev.vars

@@ -269,6 +269,7 @@ Preview:
 ```
 
 **Sentry Project Details:**
+
 - Project: `javascript-astro`
 - Project ID: `4510172426731520`
 - Organization: `happy-patterns-llc`
