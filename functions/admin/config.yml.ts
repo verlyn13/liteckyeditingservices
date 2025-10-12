@@ -15,34 +15,32 @@
 type Env = Record<string, never>;
 
 interface EventContext<Env> {
-	request: Request;
-	env: Env;
-	params: Record<string, string>;
-	waitUntil: (promise: Promise<unknown>) => void;
-	next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-	data: Record<string, unknown>;
+  request: Request;
+  env: Env;
+  params: Record<string, string>;
+  waitUntil: (promise: Promise<unknown>) => void;
+  next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
+  data: Record<string, unknown>;
 }
 
-type PagesFunction<Env> = (
-	context: EventContext<Env>,
-) => Response | Promise<Response>;
+type PagesFunction<Env> = (context: EventContext<Env>) => Response | Promise<Response>;
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
-	const origin = new URL(context.request.url).origin;
+  const origin = new URL(context.request.url).origin;
 
-	try {
-		console.log(
-			JSON.stringify({
-				evt: "cms_config_emit",
-				origin,
-				path: "/admin/config.yml",
-			}),
-		);
-	} catch {}
+  try {
+    console.log(
+      JSON.stringify({
+        evt: 'cms_config_emit',
+        origin,
+        path: '/admin/config.yml',
+      })
+    );
+  } catch {}
 
-	// CRITICAL: base_url must match the origin where OAuth handlers live
-	// This tells Decap to use "external auth" mode and listen for postMessage
-	const yaml = `backend:
+  // CRITICAL: base_url must match the origin where OAuth handlers live
+  // This tells Decap to use "external auth" mode and listen for postMessage
+  const yaml = `backend:
   name: github
   repo: verlyn13/liteckyeditingservices
   branch: main
@@ -147,11 +145,11 @@ collections:
       - { label: "Detailed Answer", name: "body", widget: "markdown", required: true }
 `;
 
-	return new Response(yaml, {
-		headers: {
-			"Content-Type": "text/yaml; charset=utf-8",
-			"Cache-Control": "no-store",
-			"X-Config-Origin": origin, // Debug header
-		},
-	});
+  return new Response(yaml, {
+    headers: {
+      'Content-Type': 'text/yaml; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'X-Config-Origin': origin, // Debug header
+    },
+  });
 };

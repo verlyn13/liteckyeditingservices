@@ -84,6 +84,14 @@ jobs:
         run: |
           echo "Preview URL: $(cat preview_url.txt)"
 
+      - name: Wait for preview to be live with SHA verification
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          PREVIEW_URL=$(cat preview_url.txt)
+          chmod +x scripts/ci/probe.sh
+          scripts/ci/probe.sh "$PREVIEW_URL" "$EXPECTED_SHA" 30 10
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         with:
