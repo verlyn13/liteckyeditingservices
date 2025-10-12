@@ -69,11 +69,12 @@ jobs:
           SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
         with:
           environment: ${{ github.ref_name == 'main' && 'production' || 'preview' }}
-          release: ${{ github.sha }}
+          version: ${{ github.sha }}
           sourcemaps: ./dist
           url_prefix: ~/
           finalize: true
           set_commits: auto
+          ignore_empty: true
 
       # Note: Add `pnpm exec playwright install chromium` here when E2E tests are enabled
 

@@ -74,7 +74,7 @@
     "react-dom": "18.2.0",
     "yaml": "latest",
     "tailwindcss": "latest",
-    "@cloudflare/pages-plugin-sentry": "latest"
+    "@sentry/cloudflare": "latest"
   },
   "devDependencies": {
     "@astrojs/check": "latest",

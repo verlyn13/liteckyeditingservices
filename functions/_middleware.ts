@@ -1,32 +1,40 @@
 // functions/_middleware.ts
-import sentryPlugin from '@cloudflare/pages-plugin-sentry';
-import type { PagesFunction } from '@cloudflare/workers-types';
 
-// 1) Sentry at the top of the chain. Prefer server DSN, fall back to PUBLIC_SENTRY_DSN.
-export const onRequest: PagesFunction<{
+import type { EventContext, PagesFunction } from '@cloudflare/workers-types';
+import * as Sentry from '@sentry/cloudflare';
+
+type Env = {
   SENTRY_DSN?: string;
   PUBLIC_SENTRY_DSN?: string;
-}> = (context) => {
-  const dsn = context.env.SENTRY_DSN ?? context.env.PUBLIC_SENTRY_DSN ?? '';
-  return sentryPlugin({ dsn })(context);
+  ENVIRONMENT?: string;
+  NODE_ENV?: string;
+  SENTRY_RELEASE?: string;
+  CF_PAGES_COMMIT_SHA?: string;
 };
 
-// 2) Shared security / caching headers for all dynamic responses
-export const onRequestPost: PagesFunction[] = [
-  async ({ next }: { next: () => Promise<Response> }) => {
-    const res = await next();
-    // Light, conservative defaults; tweak per-route where needed.
-    const headers = new Headers(res.headers as unknown as HeadersInit);
-    headers.set('X-Frame-Options', 'DENY');
-    headers.set('X-Content-Type-Options', 'nosniff');
-    headers.set('Referrer-Policy', 'no-referrer-when-downgrade');
-    // Example cache guidance for APIs; static pages use _headers / static caching.
-    if (!headers.has('Cache-Control')) headers.set('Cache-Control', 'no-store');
+// Export an array of PagesFunction handlers (plugins + shared headers)
+export const onRequest: PagesFunction<Env>[] = [
+  // 1) Sentry first in chain
+  (ctx: EventContext<Env, any, Record<string, unknown>>) => {
+    const dsn = ctx.env.SENTRY_DSN ?? ctx.env.PUBLIC_SENTRY_DSN ?? '';
+    const environment = ctx.env.ENVIRONMENT ?? ctx.env.NODE_ENV ?? 'production';
+    const release = ctx.env.SENTRY_RELEASE ?? ctx.env.CF_PAGES_COMMIT_SHA ?? 'unknown';
 
-    return new Response(res.body as unknown as BodyInit, {
-      status: res.status,
-      statusText: res.statusText,
-      headers,
-    }) as unknown as Response;
+    return Sentry.sentryPagesPlugin({
+      dsn,
+      tracesSampleRate: 1.0,
+      environment,
+      release,
+    })(ctx as unknown as any) as unknown as Response | Promise<Response>;
   },
-] as unknown as PagesFunction[];
+
+  // 2) Shared security headers for dynamic responses
+  async (ctx: EventContext<Env, any, Record<string, unknown>>) => {
+    const res = await ctx.next();
+    res.headers.set('X-Frame-Options', 'DENY');
+    res.headers.set('X-Content-Type-Options', 'nosniff');
+    res.headers.set('Referrer-Policy', 'no-referrer-when-downgrade');
+    if (!res.headers.has('Cache-Control')) res.headers.set('Cache-Control', 'no-store');
+    return res;
+  },
+] as unknown as PagesFunction<Env>[];

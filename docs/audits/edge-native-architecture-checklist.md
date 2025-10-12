@@ -89,7 +89,7 @@ return new Response(JSON.stringify(body), {
 
 | Area | Blueprint Recommendation | Current Implementation | Status | Notes / Action Items |
 | :--- | :--- | :--- | :--- | :--- |
-| Server-Side Sentry | Instrument Functions with `@sentry/cloudflare` via `_middleware`. | Implemented: `functions/_middleware.ts:1` (Pages Sentry plugin + headers) | ✅ Matched | Uses `@cloudflare/pages-plugin-sentry` (deprecated); migrate to official `@sentry/cloudflare` when ready. |
+| Server-Side Sentry | Instrument Functions with `@sentry/cloudflare` via `_middleware`. | Implemented: `functions/_middleware.ts:1` (Sentry Cloudflare middleware + headers) | ✅ Matched | Uses `@sentry/cloudflare`; shared headers applied. |
 | Client-Side Sentry | Use `@sentry/astro` in the frontend. | `@sentry/astro` configured (`astro.config.mjs:18..31`) | ✅ Matched | `sourceMapsUploadOptions` present (org/project/token).
 | Decap CMS Sentry | Inject Sentry in admin (separate DSN) for CMS errors. | `public/admin/sentry-admin.js` present | ✅ Matched | CSP permits Sentry loader. |
 | Source Maps | Upload source maps in CI as a dedicated step. | Implemented: `.github/workflows/quality-gate.yml` Sentry release upload step | ✅ Matched | Uses `getsentry/action-release@v3` with `${{ github.sha }}`.
