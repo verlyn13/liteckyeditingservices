@@ -36,9 +36,13 @@
 | `ENVIRONMENT`                       | `production`                       | `preview`              | `development`                       | Variable | Yes      |
 | `DEBUG`                             | -                                  | `true`                 | `true`                              | Variable | No       |
 | **Error Tracking (Sentry)**         |
-| `PUBLIC_SENTRY_DSN`                 | Production DSN                     | Production DSN         | Dev DSN                             | Variable | No       |
-| `PUBLIC_SENTRY_ENVIRONMENT`         | `production`                       | `preview`              | `development`                       | Variable | No       |
-| `PUBLIC_SENTRY_RELEASE`             | `$CF_PAGES_COMMIT_SHA`             | `$CF_PAGES_COMMIT_SHA` | `1.0.0`                             | Variable | No       |
+| `PUBLIC_SENTRY_DSN`                 | `https://ceac9b5e...@o4510...`     | Same DSN               | Same DSN (or dev project)           | Public   | No       |
+| `SENTRY_DSN`                        | Same as PUBLIC_SENTRY_DSN          | Same DSN               | Same DSN                            | Variable | No       |
+| `PUBLIC_SENTRY_ENVIRONMENT`         | `production`                       | `preview`              | `development`                       | Public   | No       |
+| `PUBLIC_SENTRY_RELEASE`             | `$CF_PAGES_COMMIT_SHA`             | `$CF_PAGES_COMMIT_SHA` | `1.0.0`                             | Public   | No       |
+| `SENTRY_ORG`                        | `happy-patterns-llc`               | Same                   | Same                                | Variable | Yes (CI) |
+| `SENTRY_PROJECT`                    | `javascript-astro`                 | Same                   | Same                                | Variable | Yes (CI) |
+| `SENTRY_AUTH_TOKEN`                 | From gopass (secret)               | Same secret            | Not needed locally                  | Secret   | Yes (CI) |
 | **Admin Feature Flags**             |
 | `ADMIN_CMS_NPM`                     | `0` (off)                          | `1` (preview flip)     | `0` (off)                           | Variable | No       |
 
@@ -246,21 +250,32 @@ PUBLIC_SENTRY_RELEASE=1.0.0
 
 ```
 Production:
-  PUBLIC_SENTRY_DSN=https://...@o0.ingest.sentry.io/0
+  PUBLIC_SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
   PUBLIC_SENTRY_ENVIRONMENT=production
   PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
   SENTRY_ORG=happy-patterns-llc
   SENTRY_PROJECT=javascript-astro
-  SENTRY_AUTH_TOKEN=sntrys_... (set as secret)
+  SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+  SENTRY_AUTH_TOKEN=sntrys_... (set as secret from gopass sentry/happy-patterns-llc/auth-token)
 
 Preview:
-  PUBLIC_SENTRY_DSN=https://...@o0.ingest.sentry.io/0
+  PUBLIC_SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
   PUBLIC_SENTRY_ENVIRONMENT=preview
   PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
   SENTRY_ORG=happy-patterns-llc
   SENTRY_PROJECT=javascript-astro
-  SENTRY_AUTH_TOKEN=sntrys_... (set as secret)
+  SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+  SENTRY_AUTH_TOKEN=sntrys_... (set as secret from gopass sentry/happy-patterns-llc/auth-token)
 ```
+
+**Sentry Project Details:**
+- Project: `javascript-astro`
+- Project ID: `4510172426731520`
+- Organization: `happy-patterns-llc`
+- Organization ID: `4510172424699904`
+- Org Token: `gopass sentry/happy-patterns-llc/org-token-sentry`
+- Personal Token: `gopass sentry/happy-patterns-llc/personal-token-sentry`
+- Auth Token (CI): `gopass sentry/happy-patterns-llc/auth-token`
 
 **Testing:**
 Visit `/test-sentry` in development to verify integration.

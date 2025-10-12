@@ -71,6 +71,8 @@ Cleanup Status: ✅ Duplicates archived, inconsistencies fixed
 | `public/admin/sentry-admin.js`     | Admin/CMS instrumentation (classic) | ✅ Created | admin/index.html; CSP allows Sentry CDN |
 | `src/pages/test-sentry.astro`      | Interactive test page (dev only)    | ✅ Created | SENTRY-README.md                        |
 | `tests/sentry-integration.spec.ts` | Objective Playwright tests          | ✅ Created | SENTRY-SETUP.md                         |
+| `docs/playbooks/sentry-setup.md`   | Complete setup & secret management  | ✅ Created | ENVIRONMENT.md, SECRETS.md, gopass      |
+| `functions/_middleware.ts`         | Server-side Sentry + headers        | ✅ Created | @sentry/cloudflare integration          |
 
 ### 4. INFRASTRUCTURE & SECRETS
 
