@@ -155,6 +155,7 @@ jobs:
           url_prefix: ~/
           finalize: true
           set_commits: auto
+          ignore_missing: true
           ignore_empty: true
 
       # Note: Add `pnpm exec playwright install chromium` here when E2E tests are enabled
