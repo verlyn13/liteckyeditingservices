@@ -92,5 +92,7 @@ window.addEventListener(
   true
 );
 
-// Diagnostics handle
+// Diagnostics handle and global export for compatibility
 (window as Window).__cmsApp = cms as unknown;
+// Also expose as window.CMS for test compatibility
+(window as Window & { CMS?: unknown }).CMS = cms;

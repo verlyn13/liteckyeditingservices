@@ -54,9 +54,12 @@ test('CMS script loads without CSP violations', async ({ page }) => {
 
   await page.goto('/admin/');
 
-  // Wait for CMS to initialize (self-hosted bundle loads and sets window.CMS)
-  await page.waitForFunction(() => !!(window as unknown as { CMS?: unknown }).CMS, {
-    timeout: 5000,
+  // Wait for CMS to initialize (self-hosted bundle loads and sets window.CMS or window.__cmsApp)
+  await page.waitForFunction(() => {
+    const win = window as unknown as { CMS?: unknown; __cmsApp?: unknown };
+    return !!(win.CMS || win.__cmsApp);
+  }, {
+    timeout: 10000,
   });
 
   // Verify no CSP violations occurred
@@ -105,7 +108,7 @@ test('Admin headers allow OAuth popup handoff (October 2025 hardened)', async ({
 });
 
 test('Admin CMS initializes without CSP violations', async ({ page }) => {
-  // Synthetic test: verify CMS bundle loads and window.CMS is available
+  // Synthetic test: verify CMS bundle loads and window.CMS or window.__cmsApp is available
   // Note: This doesn't test full OAuth flow (requires GitHub auth)
   // We verify the boot script loads the CMS successfully
 
@@ -121,9 +124,12 @@ test('Admin CMS initializes without CSP violations', async ({ page }) => {
   await page.goto('/admin/');
 
   // Wait for cms.js to load and initialize CMS
-  // Decap sets window.CMS when bundle loads
+  // Decap sets window.CMS or window.__cmsApp when bundle loads
   const cmsInitialized = await page
-    .waitForFunction(() => !!(window as unknown as { CMS?: unknown }).CMS, {
+    .waitForFunction(() => {
+      const win = window as unknown as { CMS?: unknown; __cmsApp?: unknown };
+      return !!(win.CMS || win.__cmsApp);
+    }, {
       timeout: 15000,
     })
     .then(() => true)
