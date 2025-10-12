@@ -13,13 +13,13 @@ pre-commit:
       tags: structure
 
     forbidden-files:
-      glob: "*.{env,env.local,dev.vars}"
+      glob: '*.{env,env.local,dev.vars}'
       run: |
         echo "❌ Attempting to commit forbidden file: {staged_files}"
         exit 1
 
     lint:
-      glob: "*.{js,mjs,ts,tsx,astro,svelte}"
+      glob: '*.{js,mjs,ts,tsx,astro,svelte}'
       run: pnpm check
 
 pre-push:

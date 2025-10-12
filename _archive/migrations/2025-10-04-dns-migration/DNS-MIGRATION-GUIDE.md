@@ -1,4 +1,5 @@
 # DNS Migration Guide - liteckyeditingservices.com
+
 **Date**: October 2, 2025
 **Status**: In Progress
 **Project**: litecky-editing-services (Cloudflare Pages)
@@ -6,6 +7,7 @@
 ## Current Status
 
 ### ✅ Pre-Migration Checklist
+
 - [x] SendGrid DNS authentication configured
   - `s1._domainkey.liteckyeditingservices.com` → `s1.domainkey.u54920324.wl075.sendgrid.net`
   - `s2._domainkey.liteckyeditingservices.com` → `s2.domainkey.u54920324.wl075.sendgrid.net`
@@ -19,6 +21,7 @@
 ### Current DNS Configuration
 
 **Root Domain** (`liteckyeditingservices.com`):
+
 ```
 Type: CNAME
 Target: www.liteckyeditingservices.com
@@ -27,6 +30,7 @@ Effect: Redirects to www, which serves Google Sites
 ```
 
 **WWW Subdomain** (`www.liteckyeditingservices.com`):
+
 ```
 Type: CNAME
 Target: ghs.googlehosted.com
@@ -35,6 +39,7 @@ Status: Serving Google Sites content
 ```
 
 **SendGrid DNS** (Complete - No Changes Needed):
+
 ```
 ✅ s1._domainkey.liteckyeditingservices.com → s1.domainkey.u54920324.wl075.sendgrid.net
 ✅ s2._domainkey.liteckyeditingservices.com → s2.domainkey.u54920324.wl075.sendgrid.net
@@ -48,6 +53,7 @@ Status: Serving Google Sites content
 ### Step 1: Add Custom Domain to Cloudflare Pages
 
 **Via Cloudflare Dashboard**:
+
 1. Navigate to https://dash.cloudflare.com/
 2. Select account → Pages
 3. Click on `litecky-editing-services` project
@@ -59,18 +65,21 @@ Status: Serving Google Sites content
 9. Click **Activate domain**
 
 **Expected Outcome**:
+
 - Cloudflare will update existing DNS records automatically
 - SSL certificate will be provisioned (usually within minutes)
 
 ### Step 2: Add WWW Subdomain
 
 Repeat Step 1 for `www.liteckyeditingservices.com`:
+
 1. Click **Set up a custom domain** again
 2. Enter: `www.liteckyeditingservices.com`
 3. Click **Continue** → **Activate domain**
 
 **What Happens Behind the Scenes**:
 Pages will update these DNS records in Cloudflare:
+
 ```
 OLD:
 liteckyeditingservices.com       CNAME  www.liteckyeditingservices.com (proxied)
@@ -101,6 +110,7 @@ dig www.liteckyeditingservices.com CNAME +short
 ### Step 4: Wait for SSL Certificate Provisioning
 
 Cloudflare Pages automatically provisions SSL certificates:
+
 - Usually takes 1-5 minutes
 - Can take up to 24 hours in rare cases
 - Check status in Custom domains tab (will show "Active" with green checkmark)
@@ -176,6 +186,7 @@ If issues occur, revert DNS to Google Sites:
 ## Verification Checklist
 
 After migration completes:
+
 - [ ] Root domain loads correctly (https://liteckyeditingservices.com)
 - [ ] WWW subdomain loads correctly (https://www.liteckyeditingservices.com)
 - [ ] SSL certificate valid (green padlock in browser)

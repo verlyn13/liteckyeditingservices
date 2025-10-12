@@ -1,22 +1,16 @@
 {
-	"mcpServers": {
-		"filesystem": {
-			"command": "pnpm",
-			"args": [
-				"dlx",
-				"-y",
-				"@modelcontextprotocol/server-filesystem",
-				"--root",
-				"."
-			]
-		},
-		"ripgrep": {
-			"command": "pnpm",
-			"args": ["dlx", "-y", "@modelcontextprotocol/server-ripgrep"]
-		},
-		"git": {
-			"command": "pnpm",
-			"args": ["dlx", "-y", "@modelcontextprotocol/server-git"]
-		}
-	}
+  "mcpServers": {
+    "filesystem": {
+      "command": "pnpm",
+      "args": ["dlx", "-y", "@modelcontextprotocol/server-filesystem", "--root", "."]
+    },
+    "ripgrep": {
+      "command": "pnpm",
+      "args": ["dlx", "-y", "@modelcontextprotocol/server-ripgrep"]
+    },
+    "git": {
+      "command": "pnpm",
+      "args": ["dlx", "-y", "@modelcontextprotocol/server-git"]
+    }
+  }
 }

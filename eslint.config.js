@@ -1,3 +1,4 @@
+import tsParser from "@typescript-eslint/parser";
 import astro from "eslint-plugin-astro";
 import svelte from "eslint-plugin-svelte";
 import globals from "globals";
@@ -16,6 +17,12 @@ export default [
 		files: ["**/*.svelte"],
 		languageOptions: {
 			parser: svelteParser,
+			parserOptions: {
+				// Let <script lang="ts"> parse TypeScript via @typescript-eslint/parser
+				parser: tsParser,
+				ecmaVersion: "latest",
+				sourceType: "module",
+			},
 		},
 	},
 	{

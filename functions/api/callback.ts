@@ -174,12 +174,17 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 						redirect_uri: `${reqUrl.origin}/api/callback`,
 					}),
 				});
-				const data = (await res.json().catch(() => ({}))) as Record<
-					string,
-					unknown
-				>;
-				const at = (data as any)?.access_token;
-				if (res.ok && at) token = String(at);
+				const parsed: unknown = await res.json().catch(() => ({}));
+				let at: string | undefined;
+				if (
+					parsed !== null &&
+					typeof parsed === "object" &&
+					"access_token" in parsed
+				) {
+					const v = (parsed as { access_token?: unknown }).access_token;
+					if (typeof v === "string") at = v;
+				}
+				if (res.ok && at) token = at;
 			} catch (e) {
 				console.warn("[/api/callback] server-side exchange failed", e);
 			}

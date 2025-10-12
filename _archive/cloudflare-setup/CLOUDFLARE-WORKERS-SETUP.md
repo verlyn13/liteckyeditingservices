@@ -3,6 +3,7 @@
 ## Account Configuration
 
 ### Workers Plan Enabled ✅
+
 - **Account ID**: `13eb584192d9cefb730fde0cfd271328`
 - **Plan**: Workers Plan ($5/month)
 - **Capabilities**: Workers for Platforms, Dispatch Namespaces, Enhanced limits
@@ -11,6 +12,7 @@
 ## Workers Architecture for This Project
 
 ### 1. OAuth Proxy Worker (Decap CMS)
+
 **Purpose**: Handle GitHub OAuth for Decap CMS admin interface
 
 ```
@@ -26,6 +28,7 @@ Decap CMS Admin (/admin)
 **Status**: ❌ Not yet implemented
 
 ### 2. Contact Form Worker (API)
+
 **Purpose**: Handle contact form submissions
 
 ```
@@ -41,6 +44,7 @@ Contact Form (Svelte)
 **Status**: ❌ Not yet implemented
 
 ### 3. Document Processing Worker (Future)
+
 **Purpose**: Process uploaded documents using Workers for Platforms
 
 ```
@@ -58,6 +62,7 @@ Dispatch Worker
 ### Phase 1: Basic Workers Setup
 
 #### 1.1 Create OAuth Worker
+
 ```bash
 # Navigate to workers directory
 cd workers
@@ -87,6 +92,7 @@ pnpm wrangler secret put OAUTH_GITHUB_CLIENT_SECRET
 ```
 
 #### 1.2 Deploy OAuth Worker
+
 ```bash
 pnpm wrangler deploy
 ```
@@ -94,11 +100,12 @@ pnpm wrangler deploy
 ### Phase 2: Workers for Platforms Setup
 
 #### 2.1 Create Dispatch Namespace
+
 ```bash
 # Create staging namespace
 pnpm wrangler dispatch-namespace create staging
 
-# Create production namespace  
+# Create production namespace
 pnpm wrangler dispatch-namespace create production
 
 # Store namespace IDs in gopass
@@ -107,6 +114,7 @@ gopass insert cloudflare/workers/dispatch-namespace/production
 ```
 
 #### 2.2 Create Dispatch Worker
+
 ```bash
 # Create dispatcher
 npm create cloudflare@latest document-dispatcher -- --type=worker
@@ -128,34 +136,36 @@ EOF
 ```
 
 #### 2.3 Implement Dispatch Logic
+
 ```javascript
 // index.js
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const customerId = request.headers.get('x-customer-id');
-    
+
     if (!customerId) {
       return new Response('Customer ID required', { status: 400 });
     }
-    
+
     // Get customer-specific worker
     const workerName = `processor-${customerId}`;
     const processor = env.processors.get(workerName);
-    
+
     if (!processor) {
       return new Response('Processor not found', { status: 404 });
     }
-    
+
     // Forward request to customer worker
     return processor.fetch(request);
-  }
+  },
 };
 ```
 
 ### Phase 3: Customer Worker Template
 
 #### 3.1 Create Template Worker
+
 ```bash
 # Create template for customer workers
 npm create cloudflare@latest processor-template -- --type=worker
@@ -165,6 +175,7 @@ cd processor-template
 ```
 
 #### 3.2 Deploy Customer Worker
+
 ```bash
 # Deploy to namespace for a specific customer
 pnpm wrangler deploy \
@@ -175,6 +186,7 @@ pnpm wrangler deploy \
 ## Environment Variables
 
 ### Required Secrets
+
 ```bash
 # OAuth Worker
 OAUTH_GITHUB_CLIENT_ID=<from GitHub>
@@ -188,6 +200,7 @@ TURNSTILE_SECRET_KEY=<from Cloudflare>
 ```
 
 ### Setting Secrets
+
 ```bash
 # For Workers
 pnpm wrangler secret put SECRET_NAME
@@ -199,6 +212,7 @@ pnpm wrangler pages secret put SECRET_NAME
 ## DNS Configuration for Workers
 
 ### Required DNS Records
+
 ```bash
 # OAuth subdomain
 ./scripts/cf-dns-manage.fish add CNAME cms-auth litecky-decap-oauth.workers.dev
@@ -210,6 +224,7 @@ pnpm wrangler pages secret put SECRET_NAME
 ## Testing Workers
 
 ### Local Development
+
 ```bash
 # Run worker locally
 pnpm wrangler dev
@@ -219,6 +234,7 @@ curl http://localhost:8787/test
 ```
 
 ### Production Testing
+
 ```bash
 # Tail logs
 pnpm wrangler tail
@@ -230,6 +246,7 @@ curl https://cms-auth.liteckyeditingservices.com/auth
 ## Monitoring & Debugging
 
 ### View Logs
+
 ```bash
 # Real-time logs
 pnpm wrangler tail worker-name
@@ -239,6 +256,7 @@ pnpm wrangler tail worker-name --status 500
 ```
 
 ### Analytics
+
 - Dashboard: https://dash.cloudflare.com → Workers & Pages
 - Metrics: Requests, errors, CPU time, duration
 - Real User Monitoring (RUM) available
@@ -246,12 +264,14 @@ pnpm wrangler tail worker-name --status 500
 ## Cost Tracking
 
 ### Workers Plan Includes
+
 - 10 million requests/month
 - 30 seconds CPU time per request
 - Dispatch namespaces
 - No Worker count limit
 
 ### Additional Costs
+
 - $0.30 per million requests over 10M
 - $0.12 per million KV reads
 - $5.00 per million KV writes
@@ -262,6 +282,7 @@ pnpm wrangler tail worker-name --status 500
 ### Common Issues
 
 #### Authentication Error
+
 ```bash
 # Re-login to Wrangler
 pnpm wrangler login
@@ -271,10 +292,12 @@ export CLOUDFLARE_API_TOKEN=$(gopass show -o cloudflare/api-tokens/initial-proje
 ```
 
 #### Route Conflicts
+
 - Check existing routes: `pnpm wrangler routes list`
 - Remove route: `pnpm wrangler routes delete route-id`
 
 #### Namespace Issues
+
 - List namespaces: `pnpm wrangler dispatch-namespace list`
 - Check bindings in wrangler.toml
 

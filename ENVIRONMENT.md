@@ -4,43 +4,43 @@
 
 ## Variable Matrix
 
-| Variable | Production | Preview | Development | Type | Required |
-|----------|------------|---------|-------------|------|----------|
-| **Cloudflare** |
-| `CF_API_TOKEN` | Via gopass | Via gopass | Via gopass | Secret | Yes |
-| `CF_ZONE_ID` | a5e7c69768502d649a8f2c615f555eca | Same | Same | Variable | Yes |
-| `CF_ACCOUNT_ID` | 13eb584192d9cefb730fde0cfd271328 | Same | Same | Variable | Yes |
-| **Workers** |
-| `DISPATCH_NAMESPACE` | production | staging | staging | Variable | No |
-| `WORKERS_SUBDOMAIN` | Set after first deploy | Same | localhost | Variable | No |
-| **OAuth (Pages Functions)** |
-| `GITHUB_CLIENT_ID` | Production ID | Preview ID | Dev ID | Variable | Yes |
-| `GITHUB_CLIENT_SECRET` | Via wrangler secret | Via wrangler secret | Dev secret | Secret | Yes |
-| **Turnstile** |
-| `PUBLIC_TURNSTILE_SITE_KEY` | 0x4AAAAAAB27CNFPS0wEzPP5 | Same | 1x00000000000000000000AA | Public | Yes |
-| `TURNSTILE_SECRET_KEY` | Via wrangler secret | Via wrangler secret | 2x0000000000000000000000000000000AA | Secret | Yes |
-| `USE_TURNSTILE_TEST` | - | `1` | `1` | Variable | No |
-| `TURNSTILE_TEST_SITE_KEY` | - | Test key | Test key | Variable | No |
-| `TURNSTILE_TEST_SECRET_KEY` | - | Test secret | Test secret | Secret | No |
-| **SendGrid** |
-| `SENDGRID_API_KEY` | Real key | Real key | Test key | Secret | Yes |
-| `SENDGRID_FROM` | noreply@liteckyeditingservices.com | Same | Same | Variable | Yes |
-| `SENDGRID_CONTACT_TEMPLATE_ID` | `d-prod123` | `d-prev456` | `d-test789` | Variable | Yes |
-| `SENDGRID_CONFIRMATION_TEMPLATE_ID` | `d-prod234` | `d-prev567` | `d-test890` | Variable | Yes |
-| **Admin** |
-| `ADMIN_EMAIL` | admin@domain | admin@domain | test@test | Variable | Yes |
-| **Site** |
-| `PUBLIC_SITE_NAME` | Litecky Editing | Litecky (Preview) | Litecky (Dev) | Variable | Yes |
-| `PUBLIC_SITE_URL` | https://site.com | Preview URL | http://localhost | Variable | Yes |
-| **System** |
-| `ENVIRONMENT` | `production` | `preview` | `development` | Variable | Yes |
-| `DEBUG` | - | `true` | `true` | Variable | No |
-| **Error Tracking (Sentry)** |
-| `PUBLIC_SENTRY_DSN` | Production DSN | Production DSN | Dev DSN | Variable | No |
-| `PUBLIC_SENTRY_ENVIRONMENT` | `production` | `preview` | `development` | Variable | No |
-| `PUBLIC_SENTRY_RELEASE` | `$CF_PAGES_COMMIT_SHA` | `$CF_PAGES_COMMIT_SHA` | `1.0.0` | Variable | No |
-| **Admin Feature Flags** |
-| `ADMIN_CMS_NPM` | `0` (off) | `1` (preview flip) | `0` (off) | Variable | No |
+| Variable                            | Production                         | Preview                | Development                         | Type     | Required |
+| ----------------------------------- | ---------------------------------- | ---------------------- | ----------------------------------- | -------- | -------- |
+| **Cloudflare**                      |
+| `CF_API_TOKEN`                      | Via gopass                         | Via gopass             | Via gopass                          | Secret   | Yes      |
+| `CF_ZONE_ID`                        | a5e7c69768502d649a8f2c615f555eca   | Same                   | Same                                | Variable | Yes      |
+| `CF_ACCOUNT_ID`                     | 13eb584192d9cefb730fde0cfd271328   | Same                   | Same                                | Variable | Yes      |
+| **Workers**                         |
+| `DISPATCH_NAMESPACE`                | production                         | staging                | staging                             | Variable | No       |
+| `WORKERS_SUBDOMAIN`                 | Set after first deploy             | Same                   | localhost                           | Variable | No       |
+| **OAuth (Pages Functions)**         |
+| `GITHUB_CLIENT_ID`                  | Production ID                      | Preview ID             | Dev ID                              | Variable | Yes      |
+| `GITHUB_CLIENT_SECRET`              | Via wrangler secret                | Via wrangler secret    | Dev secret                          | Secret   | Yes      |
+| **Turnstile**                       |
+| `PUBLIC_TURNSTILE_SITE_KEY`         | 0x4AAAAAAB27CNFPS0wEzPP5           | Same                   | 1x00000000000000000000AA            | Public   | Yes      |
+| `TURNSTILE_SECRET_KEY`              | Via wrangler secret                | Via wrangler secret    | 2x0000000000000000000000000000000AA | Secret   | Yes      |
+| `USE_TURNSTILE_TEST`                | -                                  | `1`                    | `1`                                 | Variable | No       |
+| `TURNSTILE_TEST_SITE_KEY`           | -                                  | Test key               | Test key                            | Variable | No       |
+| `TURNSTILE_TEST_SECRET_KEY`         | -                                  | Test secret            | Test secret                         | Secret   | No       |
+| **SendGrid**                        |
+| `SENDGRID_API_KEY`                  | Real key                           | Real key               | Test key                            | Secret   | Yes      |
+| `SENDGRID_FROM`                     | noreply@liteckyeditingservices.com | Same                   | Same                                | Variable | Yes      |
+| `SENDGRID_CONTACT_TEMPLATE_ID`      | `d-prod123`                        | `d-prev456`            | `d-test789`                         | Variable | Yes      |
+| `SENDGRID_CONFIRMATION_TEMPLATE_ID` | `d-prod234`                        | `d-prev567`            | `d-test890`                         | Variable | Yes      |
+| **Admin**                           |
+| `ADMIN_EMAIL`                       | admin@domain                       | admin@domain           | test@test                           | Variable | Yes      |
+| **Site**                            |
+| `PUBLIC_SITE_NAME`                  | Litecky Editing                    | Litecky (Preview)      | Litecky (Dev)                       | Variable | Yes      |
+| `PUBLIC_SITE_URL`                   | https://site.com                   | Preview URL            | http://localhost                    | Variable | Yes      |
+| **System**                          |
+| `ENVIRONMENT`                       | `production`                       | `preview`              | `development`                       | Variable | Yes      |
+| `DEBUG`                             | -                                  | `true`                 | `true`                              | Variable | No       |
+| **Error Tracking (Sentry)**         |
+| `PUBLIC_SENTRY_DSN`                 | Production DSN                     | Production DSN         | Dev DSN                             | Variable | No       |
+| `PUBLIC_SENTRY_ENVIRONMENT`         | `production`                       | `preview`              | `development`                       | Variable | No       |
+| `PUBLIC_SENTRY_RELEASE`             | `$CF_PAGES_COMMIT_SHA`             | `$CF_PAGES_COMMIT_SHA` | `1.0.0`                             | Variable | No       |
+| **Admin Feature Flags**             |
+| `ADMIN_CMS_NPM`                     | `0` (off)                          | `1` (preview flip)     | `0` (off)                           | Variable | No       |
 
 ## Setting Environment Variables
 
@@ -64,6 +64,7 @@ All development credentials are stored in gopass for security and portability:
 ```
 
 Example `.dev.vars` structure:
+
 ```bash
 # .dev.vars (project root)
 PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAB27CNFPS0wEzPP5
@@ -80,6 +81,7 @@ GITHUB_CLIENT_SECRET=dev_client_secret
 #### Gopass Organization
 
 Credentials are stored in the following gopass paths:
+
 - `development/turnstile/*` - Turnstile test keys
 - `development/sendgrid/*` - SendGrid configuration
 - `github/oauth/litecky-editing/*` - GitHub OAuth credentials
@@ -98,18 +100,21 @@ GITHUB_CLIENT_SECRET
 Repository → Settings → Secrets and variables → Actions
 
 Required:
+
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
 
 ## Accessing Variables in Code
 
 ### Astro Pages
+
 ```typescript
 // In .astro files
 const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ```
 
 ### Pages Functions
+
 ```typescript
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { env } = context;
@@ -118,11 +123,13 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 ```
 
 ### Svelte Components
+
 ```typescript
 const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ```
 
 ### Pages Functions
+
 ```typescript
 export const onRequestGet: PagesFunction<Env> = async (ctx) => {
   const clientId = ctx.env.GITHUB_CLIENT_ID;
@@ -132,6 +139,7 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 ## Type Safety
 
 ### Type Definition
+
 ```typescript
 // env.d.ts
 interface ImportMetaEnv {
@@ -151,6 +159,7 @@ interface Env {
 ## Best Practices
 
 ### Naming Convention
+
 - `PUBLIC_*` - Available in browser
 - `*_KEY/*_SECRET` - Sensitive values
 - `*_ID` - Identifiers
@@ -158,12 +167,14 @@ interface Env {
   - e.g., `ADMIN_CMS_NPM=1` enables the npm-based admin bundle during migration
 
 ### Security
+
 - Never log secret values
 - Don't commit .dev.vars
 - Use encrypted secrets in Cloudflare
 - Rotate keys regularly
 
 ### Validation
+
 ```typescript
 // Validate at startup
 function validateEnv(env: unknown): Env {
@@ -178,12 +189,14 @@ function validateEnv(env: unknown): Env {
 ## Troubleshooting
 
 ### Variable Not Found
+
 1. Check spelling (case-sensitive)
 2. Verify environment (prod/preview/dev)
 3. Restart dev server after changes
 4. Check .dev.vars exists locally
 
 ### Wrong Value Used
+
 1. Check environment precedence
 2. Clear cache if needed
 3. Verify no hardcoded values
@@ -193,31 +206,35 @@ function validateEnv(env: unknown): Env {
 
 These are safe for development use only:
 
-| Key | Value | Purpose |
-|-----|-------|---------|
-| `TURNSTILE_TEST_SITE_KEY` | `1x00000000000000000000AA` | Always passes |
+| Key                         | Value                                 | Purpose               |
+| --------------------------- | ------------------------------------- | --------------------- |
+| `TURNSTILE_TEST_SITE_KEY`   | `1x00000000000000000000AA`            | Always passes         |
 | `TURNSTILE_TEST_SECRET_KEY` | `2x0000000000000000000000000000000AA` | Validates test tokens |
 
 ## Sentry Error Tracking
 
 ### Configuration
+
 Sentry is configured in `src/lib/sentry.ts` and automatically initialized in `src/layouts/BaseLayout.astro`.
 
 **Environment Variables:**
+
 - `PUBLIC_SENTRY_DSN` - Data Source Name from Sentry project settings
 - `PUBLIC_SENTRY_ENVIRONMENT` - Environment identifier (production/preview/development)
 - `PUBLIC_SENTRY_RELEASE` - Version/commit for tracking regressions
- - `SENTRY_ORG` - Organization slug for source maps upload (Astro integration)
- - `SENTRY_PROJECT` - Project slug for source maps upload (Astro integration)
- - `SENTRY_AUTH_TOKEN` - Auth token for source maps upload (sensitive; set in CI via gopass)
+- `SENTRY_ORG` - Organization slug for source maps upload (Astro integration)
+- `SENTRY_PROJECT` - Project slug for source maps upload (Astro integration)
+- `SENTRY_AUTH_TOKEN` - Auth token for source maps upload (sensitive; set in CI via gopass)
 
 **Getting Your DSN:**
+
 1. Sign up at https://sentry.io/
 2. Create a project (Platform: Browser JavaScript)
 3. Go to Settings → Projects → [Your Project] → Client Keys (DSN)
 4. Copy the DSN value
 
 **Local Development:**
+
 ```bash
 # .dev.vars or .env
 PUBLIC_SENTRY_DSN=https://examplePublicKey@o0.ingest.sentry.io/0
@@ -226,6 +243,7 @@ PUBLIC_SENTRY_RELEASE=1.0.0
 ```
 
 **Cloudflare Pages:**
+
 ```
 Production:
   PUBLIC_SENTRY_DSN=https://...@o0.ingest.sentry.io/0
@@ -248,14 +266,17 @@ Preview:
 Visit `/test-sentry` in development to verify integration.
 
 **Documentation:**
+
 - Complete setup guide: [docs/SENTRY-SETUP.md](./docs/SENTRY-SETUP.md)
 - Integration reference: [docs/SENTRY-INTEGRATIONS.md](./docs/SENTRY-INTEGRATIONS.md)
 - Quick reference: [docs/SENTRY-README.md](./docs/SENTRY-README.md)
 
 ## Related Documentation
+
 - [docs/onboarding.md](./docs/onboarding.md) - Developer setup
-- [_archive/secrets-env-setup.md](./_archive/secrets-env-setup.md) - Advanced secret management
+- [\_archive/secrets-env-setup.md](./_archive/secrets-env-setup.md) - Advanced secret management
 - [docs/SENTRY-README.md](./docs/SENTRY-README.md) - Sentry quick reference
+
 ### Cloudflare Pages (Site)
 
 Set the following in Pages (Project → Settings → Environment variables):

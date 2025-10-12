@@ -28,18 +28,21 @@ Monitor and alert on errors from Cloudflare Pages and Workers to proactively det
 **Cost**: Free (included with Workers)
 
 **Approach**:
+
 1. Create a monitoring Worker with scheduled trigger
 2. Query Workers Analytics API for error metrics
 3. Check thresholds and send alerts via SendGrid
 4. Store metrics in D1 for trending
 
 **Advantages**:
+
 - No external dependencies
 - Free
 - Full control over logic
 - Can aggregate multiple sources
 
 **Disadvantages**:
+
 - Requires implementation effort
 - ~15 minute delay (Analytics API lag)
 
@@ -53,17 +56,20 @@ Monitor and alert on errors from Cloudflare Pages and Workers to proactively det
 Use Cloudflare Dashboard notifications for basic alerts.
 
 **Available Notifications**:
+
 - Pages deployment failures
 - SSL certificate expiration
 - Load balancing health checks (Business+ plans)
 
 **Limitations**:
+
 - Limited granularity
 - No custom thresholds
 - No Worker error alerts
 - Email only (no webhooks)
 
 **Setup**:
+
 ```
 Cloudflare Dashboard → Notifications
 
@@ -84,16 +90,19 @@ Enable:
 **Cost**: $200+/month (requires Business or Enterprise plan)
 
 **Approach**:
+
 1. Push logs to R2 or external storage
 2. Process logs with Worker or external tool
 3. Alert on patterns
 
 **Advantages**:
+
 - Real-time logs
 - Complete request data
 - Can feed into external tools (Datadog, Splunk)
 
 **Disadvantages**:
+
 - Expensive
 - Requires Business+ plan
 - Overkill for current needs
@@ -105,17 +114,20 @@ Enable:
 **Cost**: Free tier (5k events/month) or $26+/month
 
 **Approach**:
+
 1. Instrument Workers with Sentry SDK
 2. Automatic error tracking
 3. Alerts via email, Slack, PagerDuty
 
 **Advantages**:
+
 - Purpose-built for error tracking
 - Excellent UX
 - Stack traces, breadcrumbs
 - Issue deduplication
 
 **Disadvantages**:
+
 - Additional service dependency
 - Requires instrumentation
 - Limited free tier
@@ -184,27 +196,24 @@ export default {
 
     // Check Workers Analytics
     const workersData = await checkWorkersErrors(env);
-    if (workersData.errorRate > 0.05) { // 5% error rate
+    if (workersData.errorRate > 0.05) {
+      // 5% error rate
       alerts.push(
         `⚠️ Workers error rate: ${(workersData.errorRate * 100).toFixed(2)}%\n` +
-        `Errors: ${workersData.errors}/${workersData.requests} requests`
+          `Errors: ${workersData.errors}/${workersData.requests} requests`
       );
     }
 
     // Check Pages status
     const pagesData = await checkPagesErrors(env);
     if (pagesData.recentFailures > 0) {
-      alerts.push(
-        `⚠️ Pages deployment failures: ${pagesData.recentFailures} in last hour`
-      );
+      alerts.push(`⚠️ Pages deployment failures: ${pagesData.recentFailures} in last hour`);
     }
 
     // Check Queue health (separate function)
     const queueData = await checkQueueHealth(env);
     if (queueData.size > 100) {
-      alerts.push(
-        `⚠️ Email queue backlog: ${queueData.size} messages`
-      );
+      alerts.push(`⚠️ Email queue backlog: ${queueData.size} messages`);
     }
 
     // Send alerts if any
@@ -216,13 +225,13 @@ export default {
     if (env.DB) {
       await storeMetrics(env.DB, { workersData, pagesData, queueData });
     }
-  }
+  },
 };
 
 async function checkWorkersErrors(env: Env): Promise<WorkerAnalytics> {
   // Query Workers Analytics API
   // https://developers.cloudflare.com/analytics/graphql-api/
-  
+
   const query = `
     query {
       viewer {
@@ -247,7 +256,7 @@ async function checkWorkersErrors(env: Env): Promise<WorkerAnalytics> {
   const response = await fetch('https://api.cloudflare.com/client/v4/graphql', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+      Authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ query }),
@@ -255,7 +264,7 @@ async function checkWorkersErrors(env: Env): Promise<WorkerAnalytics> {
 
   const data = await response.json();
   const sum = data.data.viewer.accounts[0].workersInvocationsAdaptive[0]?.sum;
-  
+
   return {
     errors: sum?.errors || 0,
     requests: sum?.requests || 0,
@@ -269,17 +278,18 @@ async function checkPagesErrors(env: Env): Promise<{ recentFailures: number }> {
     `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/pages/projects/liteckyeditingservices/deployments`,
     {
       headers: {
-        'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+        Authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
       },
     }
   );
 
   const data = await response.json();
   const oneHourAgo = Date.now() - 60 * 60 * 1000;
-  
-  const recentFailures = data.result.filter((d: any) => 
-    new Date(d.created_on).getTime() > oneHourAgo &&
-    (d.latest_stage.status === 'failure' || d.latest_stage.status === 'canceled')
+
+  const recentFailures = data.result.filter(
+    (d: any) =>
+      new Date(d.created_on).getTime() > oneHourAgo &&
+      (d.latest_stage.status === 'failure' || d.latest_stage.status === 'canceled')
   ).length;
 
   return { recentFailures };
@@ -288,7 +298,7 @@ async function checkPagesErrors(env: Env): Promise<{ recentFailures: number }> {
 async function checkQueueHealth(env: Env): Promise<{ size: number }> {
   // Note: Queue metrics API may not be available yet
   // Alternative: Keep counter in KV or D1
-  
+
   // Placeholder - implement based on available APIs
   return { size: 0 };
 }
@@ -297,7 +307,7 @@ async function sendAlert(env: Env, message: string) {
   await fetch('https://api.sendgrid.com/v3/mail/send', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${env.SENDGRID_API_KEY}`,
+      Authorization: `Bearer ${env.SENDGRID_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -319,15 +329,18 @@ async function sendAlert(env: Env, message: string) {
 }
 
 async function storeMetrics(db: D1Database, metrics: any) {
-  await db.prepare(
-    'INSERT INTO error_metrics (timestamp, workers_errors, workers_requests, pages_failures, queue_size) VALUES (?, ?, ?, ?, ?)'
-  ).bind(
-    new Date().toISOString(),
-    metrics.workersData.errors,
-    metrics.workersData.requests,
-    metrics.pagesData.recentFailures,
-    metrics.queueData.size
-  ).run();
+  await db
+    .prepare(
+      'INSERT INTO error_metrics (timestamp, workers_errors, workers_requests, pages_failures, queue_size) VALUES (?, ?, ?, ?, ?)'
+    )
+    .bind(
+      new Date().toISOString(),
+      metrics.workersData.errors,
+      metrics.workersData.requests,
+      metrics.pagesData.recentFailures,
+      metrics.queueData.size
+    )
+    .run();
 }
 
 function getTimeAgo(minutes: number): string {
@@ -407,19 +420,19 @@ Customize based on your needs:
 const THRESHOLDS = {
   // Worker error rate threshold (5%)
   workerErrorRate: 0.05,
-  
+
   // Pages deployment failures in last hour
   pagesFailures: 1,
-  
+
   // Queue size threshold
   queueSize: 100,
-  
+
   // Queue message age threshold (1 hour in milliseconds)
   queueMaxAge: 60 * 60 * 1000,
-  
+
   // 4xx rate threshold (50% of requests)
   clientErrorRate: 0.5,
-  
+
   // 5xx rate threshold (1% of requests)
   serverErrorRate: 0.01,
 };
@@ -428,6 +441,7 @@ const THRESHOLDS = {
 ## Alert Message Examples
 
 ### Worker Error Alert
+
 ```
 ⚠️ Litecky Editing Services - Worker Errors Detected
 
@@ -444,6 +458,7 @@ Time: 2025-10-04 14:30 UTC
 ```
 
 ### Pages Deployment Failure
+
 ```
 ⚠️ Litecky Editing Services - Deployment Failed
 
@@ -459,6 +474,7 @@ View details: https://dash.cloudflare.com/...
 ```
 
 ### Queue Backlog Alert
+
 ```
 ⚠️ Litecky Editing Services - Email Queue Backlog
 
@@ -519,11 +535,13 @@ Copy token and store as CLOUDFLARE_API_TOKEN secret
 ## Maintenance
 
 ### Weekly Review
+
 - Check alert accuracy (false positives/negatives)
 - Adjust thresholds if needed
 - Review error trends in D1 (if storing metrics)
 
 ### Monthly Review
+
 - Verify alerting Worker is running (check logs)
 - Review alert history
 - Update error patterns as needed
@@ -531,17 +549,20 @@ Copy token and store as CLOUDFLARE_API_TOKEN secret
 ## Cost Analysis
 
 **Free Tier (Recommended)**:
+
 - Workers requests: Free (100k/day)
 - Scheduled triggers: Free
 - SendGrid emails: Free (100/day)
 - **Total**: $0/month
 
 **If Storing Metrics in D1**:
+
 - D1 storage: Free (up to 500MB)
 - D1 reads: Free (5M/day)
 - **Total**: $0/month
 
 **Alternative: Sentry**:
+
 - Free tier: 5k events/month
 - Developer plan: $26/month (50k events)
 
@@ -550,6 +571,7 @@ Copy token and store as CLOUDFLARE_API_TOKEN secret
 ### Issue: No alerts received
 
 **Debug**:
+
 ```bash
 # Check Worker logs
 wrangler tail error-monitor
@@ -568,7 +590,7 @@ wrangler deployments list
 ```typescript
 // Increase error rate threshold
 const THRESHOLDS = {
-  workerErrorRate: 0.10, // 10% instead of 5%
+  workerErrorRate: 0.1, // 10% instead of 5%
   // ...
 };
 ```
@@ -578,6 +600,7 @@ const THRESHOLDS = {
 **Cause**: 15-minute check interval + Analytics API lag
 
 **Solution**:
+
 - Reduce cron interval to `*/5 * * * *` (every 5 min)
 - Accept ~5-10 minute delay inherent to Analytics API
 - For real-time alerts, consider Sentry

@@ -1,20 +1,20 @@
 {
-	"required": [
-		"README.md",
-		"CONTRIBUTING.md",
-		"PROJECT-STATUS.md",
-		"IMPLEMENTATION-ROADMAP.md",
-		"DOCUMENTATION-MASTER-INDEX.md",
-		"ENVIRONMENT.md",
-		".github/CODEOWNERS",
-		".gitignore",
-		"package.json",
-		"pnpm-lock.yaml",
-		"astro.config.mjs",
-		"tsconfig.json",
-		"docs/onboarding.md",
-		"desired-state/cloudflare.pages.json",
-		"desired-state/cloudflare.worker-oauth.json",
-		"desired-state/sendgrid.templates.json"
-	]
+  "required": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "PROJECT-STATUS.md",
+    "IMPLEMENTATION-ROADMAP.md",
+    "DOCUMENTATION-MASTER-INDEX.md",
+    "ENVIRONMENT.md",
+    ".github/CODEOWNERS",
+    ".gitignore",
+    "package.json",
+    "pnpm-lock.yaml",
+    "astro.config.mjs",
+    "tsconfig.json",
+    "docs/onboarding.md",
+    "desired-state/cloudflare.pages.json",
+    "desired-state/cloudflare.worker-oauth.json",
+    "desired-state/sendgrid.templates.json"
+  ]
 }

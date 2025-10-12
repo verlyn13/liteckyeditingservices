@@ -1,6 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Modules
+
 - `src/` — App code (Astro pages, Svelte components, lib, styles).
 - `public/` — Static assets served as-is.
 - `tests/` — `unit/` (Vitest) and `e2e/` (Playwright).
@@ -10,6 +11,7 @@
 - `desired-state/` — Deployment/config templates.
 
 ## Build, Test, and Development
+
 - `pnpm install` — Install deps (Node ≥24, pnpm ≥10.16).
 - `pnpm dev` — Run locally at http://localhost:4321.
 - `pnpm build` — Type-check then build for production.
@@ -21,6 +23,7 @@
 - `pnpm validate:all` and `pnpm policy:check` — Repo gates.
 
 ## Coding Style & Conventions
+
 - Indentation: 2 spaces; no tabs.
 - Languages: TypeScript preferred; avoid `any`.
 - Components: Astro for pages/layouts; Svelte 5 for interactivity.
@@ -31,27 +34,32 @@
 - File naming: kebab-case for files; PascalCase for Svelte components.
 
 ## Testing Guidelines
+
 - Unit tests: place in `tests/unit`, name `*.test.ts`.
 - E2E tests: place in `tests/e2e` (Playwright).
 - Target ≥80% meaningful coverage; mock external calls.
 - Run `pnpm test && pnpm test:e2e` before PRs.
 
 ## Commit & Pull Requests
+
 - Branches: `feature/*`, `fix/*`, `docs/*`, `deps/*`.
 - Conventional Commits, e.g. `feat: add pricing table`.
 - Before push: `pnpm check`; hooks (lefthook) also validate structure.
 - PRs: clear description, linked issues, screenshots for UI, and note breaking changes.
 
 ## Security & Configuration
+
 - Never commit secrets. Use env vars; see `.env.example` and `ENVIRONMENT.md`.
 - Protected files: hooks block `*.env`, `*.env.local`, `*.dev.vars`.
 - Follow `desired-state/` templates for deploy-related config.
 
 ## Agent Tips
+
 - Use `pnpm` (repo is pinned: `packageManager` in `package.json`).
 - Keep changes minimal and align with existing patterns. Update docs when behavior changes.
 
 ## Development Environment
+
 - Version manager: `mise` controls Node and pnpm versions from `.mise.toml`.
 - Env loading: `.envrc` + `direnv` load `.dev.vars` and `.env` when present. Optional.
 - If direnv is unavailable: `pnpm run dev:env` loads `.dev.vars` and starts dev.

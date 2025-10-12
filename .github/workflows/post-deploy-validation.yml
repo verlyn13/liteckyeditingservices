@@ -2,11 +2,11 @@ name: post-deploy-validation
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
   workflow_run:
-    workflows: ["deploy-production"]
-    types: ["completed"]
+    workflows: ['deploy-production']
+    types: ['completed']
 
 jobs:
   validate:

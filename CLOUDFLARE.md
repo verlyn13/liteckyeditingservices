@@ -15,11 +15,13 @@
 ## 🌐 Production URLs
 
 ### Primary Domains
+
 - **Root**: https://liteckyeditingservices.com
 - **WWW**: https://www.liteckyeditingservices.com
 - **Pages Subdomain**: https://liteckyeditingservices.pages.dev
 
 ### Workers
+
 - **OAuth Proxy (Legacy)**: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev
   - **Status**: Decommissioned Oct 2025
   - **Replacement**: On-site Pages Functions (`/api/auth`, `/api/callback`)
@@ -28,6 +30,7 @@
 ## 🏗️ Infrastructure Overview
 
 ### Cloudflare Pages
+
 - **Project**: `liteckyeditingservices`
 - **Build command**: `pnpm build`
 - **Output directory**: `dist`
@@ -39,6 +42,7 @@
 - **Environment variables**: SendGrid API keys, Turnstile keys
 
 ### Pages Functions (Serverless)
+
 1. **Decap OAuth** (On-Site Authentication)
    - Start: `/api/auth` — Generates state cookie and redirects to GitHub authorize
    - Callback: `/api/callback` — Validates state, exchanges code→token, posts token to opener (`authorization:github:success:…` string), then closes popup
@@ -50,6 +54,7 @@
    - Queue producer or direct SendGrid fallback
 
 ### Workers
+
 1. **Queue Consumer** (`workers/queue-consumer/`)
    - Processes email queue
    - Queue binding: `send-email-queue`
@@ -60,6 +65,7 @@
    - **Replacement**: On-site Pages Functions (see above)
 
 ### Queues
+
 - **Name**: `send-email-queue`
 - **ID**: `a2fafae4567242b5b9acb8a4a32fa615`
 - **Producer**: Pages Function (`/api/contact`)
@@ -67,20 +73,24 @@
 - **Status**: Active
 
 ### DNS Configuration
+
 - **Nameservers**: `carol.ns.cloudflare.com`, `ignacio.ns.cloudflare.com`
 - **Custom domains**: Root and WWW (proxied/orange-clouded)
 - **SSL/TLS**: Full (strict) - Cloudflare managed certificates
 - **Google Workspace**: MX records configured
 
 #### Email Authentication (SendGrid Domain Verification)
+
 **Status**: Authenticated (Verified Oct 2025)
 
 SendGrid domain authentication configured with the following DNS records:
+
 - **DKIM Records**: CNAME records for `s1._domainkey` and `s2._domainkey` pointing to SendGrid
 - **SPF Record**: TXT record at `@` including `include:sendgrid.net ~all`
 - **DMARC Record**: TXT record at `_dmarc` with policy configuration
 
 **Verification**:
+
 ```bash
 # Verify DKIM records
 dig s1._domainkey.liteckyeditingservices.com CNAME +short
@@ -102,11 +112,13 @@ See `docs/playbooks/email-issues.md` for troubleshooting email delivery problems
 ### Local Development
 
 **For UI-only development** (no OAuth):
+
 ```bash
 pnpm dev  # Astro dev server at localhost:4321
 ```
 
 **For full OAuth testing** (same-origin admin + functions):
+
 ```bash
 pnpm build                    # Build static output to ./dist
 npx wrangler pages dev        # Serves ./dist + /functions on one origin
@@ -117,6 +129,7 @@ npx wrangler pages dev        # Serves ./dist + /functions on one origin
 > **Why `wrangler pages dev` for OAuth?** Decap CMS requires same-origin for state validation. `wrangler pages dev` serves static assets and Pages Functions on one origin, matching production behavior. See [Cloudflare Docs: Local Development](https://developers.cloudflare.com/pages/functions/local-development/).
 
 ### Deploy Site (Pages)
+
 ```bash
 # Automatic via GitHub push to main
 git push origin main
@@ -126,6 +139,7 @@ pnpm wrangler pages deploy dist --project-name=liteckyeditingservices
 ```
 
 ### Deploy Worker
+
 ```bash
 # From worker directory
 cd workers/queue-consumer
@@ -136,6 +150,7 @@ pnpm --filter queue-consumer deploy
 ```
 
 ### View Logs
+
 ```bash
 # Pages Functions logs
 pnpm wrangler pages deployment tail --project-name=liteckyeditingservices
@@ -145,6 +160,7 @@ pnpm wrangler tail litecky-queue-consumer
 ```
 
 ### Manage Secrets
+
 ```bash
 # Pages secrets
 pnpm wrangler pages secret put SENDGRID_API_KEY --project-name=liteckyeditingservices
@@ -155,6 +171,7 @@ pnpm wrangler secret put SENDGRID_API_KEY
 ```
 
 ### Check Queue Status
+
 ```bash
 # View queue details
 pnpm wrangler queues list
@@ -166,7 +183,9 @@ pnpm wrangler queues consumer list send-email-queue
 ## 🔐 Authentication
 
 ### API Token
+
 Stored in gopass. Load with:
+
 ```bash
 # Fish shell
 source scripts/load-cloudflare-env.fish
@@ -176,6 +195,7 @@ export CF_API_TOKEN=$(gopass show -o cloudflare/api-tokens/initial-project-setup
 ```
 
 ### Wrangler Login
+
 ```bash
 pnpm wrangler login
 # Or use CF_API_TOKEN environment variable
@@ -184,6 +204,7 @@ pnpm wrangler login
 ## 📋 Environment Variables
 
 ### Pages Production Environment
+
 - `SENDGRID_API_KEY` (secret)
 - `SENDGRID_FROM` (secret)
 - `SENDGRID_TO` (secret)
@@ -191,15 +212,18 @@ pnpm wrangler login
 - `PUBLIC_TURNSTILE_SITE_KEY`: `0x4AAAAAAB27CNFPS0wEzPP5`
 
 Tip: Generate current values from Infisical
+
 - Follow `docs/INFISICAL-QUICKSTART.md` to produce `secrets/public.env` and `secrets/secrets.env`
 - Upload their contents to Cloudflare Pages → liteckyeditingservices → Production
 
 ### Worker Environment
+
 Queue consumer has same SendGrid variables as secrets.
 
 ## 📚 Additional Documentation
 
 For detailed setup and deployment history, see:
+
 - `_archive/cloudflare-setup/` - Detailed deployment guides
 - `docs/infrastructure/` - Infrastructure management docs
 - `DEPLOYMENT.md` - Current deployment procedures
@@ -216,6 +240,7 @@ For detailed setup and deployment history, see:
 ## 🆘 Troubleshooting
 
 ### Pages Deployment Failed
+
 ```bash
 # Check build logs
 pnpm wrangler pages deployment list --project-name=liteckyeditingservices
@@ -226,6 +251,7 @@ git push origin main
 ```
 
 ### Worker Not Responding
+
 ```bash
 # Check logs
 pnpm wrangler tail <worker-name>
@@ -236,6 +262,7 @@ pnpm wrangler deploy
 ```
 
 ### Queue Not Processing
+
 ```bash
 # Check queue status
 pnpm wrangler queues consumer list send-email-queue
@@ -245,6 +272,7 @@ pnpm wrangler tail litecky-queue-consumer
 ```
 
 ### DNS Issues
+
 ```bash
 # Verify DNS records
 dig liteckyeditingservices.com A +short

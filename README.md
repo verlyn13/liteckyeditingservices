@@ -63,6 +63,7 @@ pnpm preview      # Preview production build
 pnpm check        # Run all quality checks
 pnpm test:e2e     # Run Playwright tests
 pnpm lint:fix     # Auto-fix linting issues
+pnpm biome:check  # Biome v2.2.5 (format+lint JS/TS/JSON)
 ```
 
 ## Windsurf/Cascade
@@ -110,6 +111,7 @@ pnpm lint:fix     # Auto-fix linting issues
 ### ⚠️ Deployment Constraints
 
 This project deploys **ONLY to Cloudflare Pages**. Do not add or use:
+
 - `@astrojs/vercel` adapter
 - `@astrojs/netlify` adapter
 - Any non-Cloudflare deployment adapters
@@ -127,6 +129,9 @@ Validators and Rego policies enforce these constraints to prevent drift.
 - Project Status: see `PROJECT-STATUS.md`
 - Implementation Roadmap: see `IMPLEMENTATION-ROADMAP.md`
 - Documentation Index: see `DOCUMENTATION-MASTER-INDEX.md`
+- Architecture Audit Checklist: see `docs/audits/edge-native-architecture-checklist.md`
+- Biome Strategy (v2.2.5): see `docs/decisions/2025-10-12-biome-2.2.5.md`
+- Biome Playbook: see `docs/playbooks/biome.md`
 - Production secrets: see `docs/INFISICAL-QUICKSTART.md`
 - New developer setup: see `docs/onboarding.md`
 - Workflow overview: see `WORKFLOW.md`

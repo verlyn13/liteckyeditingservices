@@ -3,6 +3,7 @@
 ## Overview
 
 This setup provides a secure, type-safe environment variable and secrets management system using:
+
 - **mise** for local development orchestration
 - **gopass/age** for encrypted local secrets storage
 - **Cloudflare** for production secrets and bindings
@@ -42,6 +43,7 @@ academic-editor/
 ## Configuration Files
 
 ### `config/keys.ts` - Single Source of Truth
+
 ```typescript
 /**
  * Environment variable registry
@@ -54,46 +56,46 @@ export const ENV_KEYS = {
     SITE_NAME: 'Academic Editor',
     SITE_URL: 'https://academic-editor.com',
     TURNSTILE_SITE_KEY: '', // Public key for Turnstile
-    GA4_ID: '',             // Google Analytics ID
+    GA4_ID: '', // Google Analytics ID
     MAX_FILE_SIZE_MB: '10',
     ALLOWED_FILE_TYPES: '.doc,.docx,.pdf,.rtf,.txt',
   },
-  
+
   // Runtime secrets (never in repo)
   SECRET: {
     // Authentication & APIs
     TURNSTILE_SECRET_KEY: '',
     CLOUDFLARE_API_TOKEN: '',
     CLOUDFLARE_ACCOUNT_ID: '',
-    
+
     // Email services
     RESEND_API_KEY: '',
     ADMIN_EMAIL: '',
     NOTIFICATION_WEBHOOK: '',
-    
+
     // Storage keys (R2)
     R2_ACCESS_KEY_ID: '',
     R2_SECRET_ACCESS_KEY: '',
-    
+
     // Monitoring
     SENTRY_DSN: '',
     LOGFLARE_API_KEY: '',
   },
-  
+
   // Cloudflare bindings (resource names)
   BINDINGS: {
     // Storage
     DOCUMENTS_BUCKET: 'academic-editor-documents',
     CACHE_KV: 'academic-editor-cache',
-    
+
     // Database
     DB_NAME: 'academic-editor',
     DB_ID: '',
-    
+
     // Queues
     DOCUMENT_QUEUE: 'document-processing',
     EMAIL_QUEUE: 'email-notifications',
-    
+
     // Analytics
     ANALYTICS_DATASET: 'academic-editor-analytics',
   },
@@ -121,6 +123,7 @@ export const GOPASS_PATHS: Record<SecretEnvKey, string> = {
 ```
 
 ### `config/env.schema.ts` - Zod Validation
+
 ```typescript
 import { z } from 'zod';
 
@@ -157,25 +160,23 @@ export const secretEnvSchema = z.object({
 export const bindingsSchema = z.object({
   // R2 Bucket
   DOCUMENTS: z.custom<R2Bucket>(),
-  
+
   // KV Namespace
   CACHE: z.custom<KVNamespace>(),
-  
+
   // D1 Database
   DB: z.custom<D1Database>(),
-  
+
   // Queues
   DOCUMENT_QUEUE: z.custom<Queue>(),
   EMAIL_QUEUE: z.custom<Queue>(),
-  
+
   // Analytics Engine
   ANALYTICS: z.custom<AnalyticsEngineDataset>(),
 });
 
 // Combined runtime environment (for Pages Functions/Workers)
-export const runtimeEnvSchema = publicEnvSchema
-  .merge(secretEnvSchema)
-  .merge(bindingsSchema);
+export const runtimeEnvSchema = publicEnvSchema.merge(secretEnvSchema).merge(bindingsSchema);
 
 // Types
 export type PublicEnv = z.infer<typeof publicEnvSchema>;
@@ -185,6 +186,7 @@ export type RuntimeEnv = z.infer<typeof runtimeEnvSchema>;
 ```
 
 ### `config/validate.ts` - Runtime Validation Helper
+
 ```typescript
 import { publicEnvSchema, secretEnvSchema, bindingsSchema, type RuntimeEnv } from './env.schema';
 
@@ -196,12 +198,12 @@ export function validateEnv(env: unknown): RuntimeEnv {
   try {
     // In development, some bindings might be mocked
     const isDev = process.env.NODE_ENV === 'development';
-    
+
     if (isDev) {
       // Validate only public and secret vars in dev
       const publicVars = publicEnvSchema.parse(env);
       const secretVars = secretEnvSchema.partial().parse(env);
-      
+
       // Return with mock bindings
       return {
         ...publicVars,
@@ -209,7 +211,7 @@ export function validateEnv(env: unknown): RuntimeEnv {
         // Mock bindings will be provided by miniflare/wrangler
       } as RuntimeEnv;
     }
-    
+
     // Production: validate everything
     return runtimeEnvSchema.parse(env);
   } catch (error) {
@@ -230,6 +232,7 @@ export function hasEnvKey<K extends keyof RuntimeEnv>(
 ```
 
 ### `.mise.toml` - Development Orchestration
+
 ```toml
 [env]
 # Node version for consistency
@@ -280,6 +283,7 @@ pnpm = "10.16.0"
 ## Scripts
 
 ### `scripts/setup-gopass.sh` - Initialize gopass with age
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -346,6 +350,7 @@ echo ""
 ```
 
 ### `scripts/export-dev-vars.sh` - Generate .dev.vars
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -356,7 +361,7 @@ echo "📦 Exporting secrets from gopass to .dev.vars files..."
 get_secret() {
   local path=$1
   local default=${2:-""}
-  
+
   if gopass show -o "$path" 2>/dev/null; then
     gopass show -o "$path"
   else
@@ -417,6 +422,7 @@ echo "  - workers/queue-consumer/.dev.vars"
 ```
 
 ### `scripts/rotate-secrets.sh` - Secret Rotation Helper
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -438,16 +444,16 @@ read -p "Select secret to rotate (1-5): " choice
 rotate_secret() {
   local path=$1
   local name=$2
-  
+
   echo "Rotating $name..."
-  
+
   # Backup old secret
   OLD_VALUE=$(gopass show -o "$path" 2>/dev/null || echo "")
   if [ -n "$OLD_VALUE" ]; then
     gopass insert -f "${path}.backup.$(date +%Y%m%d)" <<< "$OLD_VALUE"
     echo "  ✅ Backed up old value"
   fi
-  
+
   # Prompt for new value
   echo "  Enter new value for $name:"
   read -s NEW_VALUE
@@ -490,6 +496,7 @@ echo "4. Redeploy application"
 ```
 
 ### `scripts/audit-secrets.sh` - Security Audit
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
@@ -550,6 +557,7 @@ echo "Audit complete!"
 ## Type-Safe Environment Access
 
 ### `apps/site/src/lib/env.ts` - Runtime Environment Helper
+
 ```typescript
 import { validateEnv, type RuntimeEnv } from '@/config/validate';
 
@@ -561,10 +569,10 @@ let cachedEnv: RuntimeEnv | null = null;
  */
 export function getEnv(context?: { env: unknown }): RuntimeEnv {
   if (cachedEnv) return cachedEnv;
-  
+
   // In Pages Functions/Workers, env comes from context
   const rawEnv = context?.env || process.env;
-  
+
   cachedEnv = validateEnv(rawEnv);
   return cachedEnv;
 }
@@ -574,10 +582,7 @@ export function getEnv(context?: { env: unknown }): RuntimeEnv {
  * @example
  * const apiKey = env('RESEND_API_KEY');
  */
-export function env<K extends keyof RuntimeEnv>(
-  key: K,
-  context?: { env: unknown }
-): RuntimeEnv[K] {
+export function env<K extends keyof RuntimeEnv>(key: K, context?: { env: unknown }): RuntimeEnv[K] {
   const environment = getEnv(context);
   return environment[key];
 }
@@ -614,6 +619,7 @@ export function getPublicEnv(): PublicEnv {
 ```
 
 ### `apps/site/functions/api/example.ts` - Using Env in Pages Functions
+
 ```typescript
 import type { PagesFunction } from '@cloudflare/workers-types';
 import { getEnv } from '@/lib/env';
@@ -621,19 +627,19 @@ import { getEnv } from '@/lib/env';
 export const onRequestPost: PagesFunction = async (context) => {
   // Validate and get typed environment
   const env = getEnv(context);
-  
+
   // Now you have full type safety
   const { TURNSTILE_SECRET_KEY, DOCUMENTS, DB } = env;
-  
+
   // Use R2 bucket
   await DOCUMENTS.put('key', 'value');
-  
+
   // Use D1 database
   const result = await DB.prepare('SELECT * FROM quotes').all();
-  
+
   // Use secret
   const verified = await verifyTurnstile(TURNSTILE_SECRET_KEY);
-  
+
   return new Response('OK');
 };
 ```
@@ -641,18 +647,20 @@ export const onRequestPost: PagesFunction = async (context) => {
 ## GitHub Actions Secrets Setup
 
 ### Required GitHub Secrets
+
 ```yaml
 # Repository Settings > Secrets and variables > Actions
 
 # Deployment
-CLOUDFLARE_API_TOKEN: "your-api-token"
-CLOUDFLARE_ACCOUNT_ID: "your-account-id"
+CLOUDFLARE_API_TOKEN: 'your-api-token'
+CLOUDFLARE_ACCOUNT_ID: 'your-account-id'
 
 # Optional: for advanced workflows
-TURNSTILE_SITE_KEY: "public-key"  # Can be a variable instead
+TURNSTILE_SITE_KEY: 'public-key' # Can be a variable instead
 ```
 
 ### `.github/workflows/deploy-with-secrets.yml`
+
 ```yaml
 name: Deploy with Secrets Management
 
@@ -666,7 +674,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Validate environment config
         run: |
           # Check that all required configs are defined
@@ -674,27 +682,27 @@ jobs:
             const { ENV_KEYS } = require('./config/keys.ts');
             console.log('✅ Environment configuration valid');
           "
-  
+
   deploy:
     needs: validate-config
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.16.0
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'pnpm'
-      
+
       - name: Install and build
         run: |
           pnpm install --frozen-lockfile
           pnpm build:site
-      
+
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
@@ -707,6 +715,7 @@ jobs:
 ## Cloudflare Configuration
 
 ### Pages Variables & Secrets (Dashboard)
+
 ```bash
 # Production Environment
 # Pages > Settings > Environment variables > Production
@@ -724,6 +733,7 @@ ENVIRONMENT="production"
 ```
 
 ### Workers Secrets (CLI)
+
 ```bash
 # Deploy secrets to Workers
 wrangler secret put RESEND_API_KEY --name ae-cron
@@ -739,22 +749,26 @@ wrangler secret delete OLD_KEY --name ae-cron
 ## Security Best Practices
 
 ### 1. Secret Rotation Schedule
+
 - **API Keys**: Every 90 days
 - **Access Keys**: Every 180 days
 - **Webhooks**: On demand
 - **Passwords**: Every 60 days
 
 ### 2. Access Control
+
 - Use separate API tokens for different environments
 - Implement least privilege principle
 - Rotate immediately if compromised
 
 ### 3. Audit Trail
+
 - Run `mise run secrets:audit` monthly
 - Review Cloudflare audit logs
 - Monitor GitHub Actions secret usage
 
 ### 4. Emergency Response
+
 ```bash
 # If a secret is compromised:
 1. Rotate immediately:
@@ -775,6 +789,7 @@ wrangler secret delete OLD_KEY --name ae-cron
 ## Development Workflow
 
 ### Initial Setup (Once)
+
 ```bash
 # 1. Install tools
 brew install gopass age  # macOS
@@ -793,6 +808,7 @@ mise run secrets:export
 ```
 
 ### Daily Development
+
 ```bash
 # Start dev with fresh secrets
 mise run dev
@@ -803,6 +819,7 @@ pnpm dev
 ```
 
 ### Before Deployment
+
 ```bash
 # Audit secrets
 mise run secrets:audit
@@ -816,6 +833,7 @@ pnpm deploy:workers
 ```
 
 This setup provides:
+
 - 🔒 **Zero secrets in repository**
 - 🔑 **Encrypted local storage** with age
 - 📦 **Single-command setup** with mise

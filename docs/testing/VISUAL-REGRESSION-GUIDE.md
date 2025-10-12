@@ -14,6 +14,7 @@ Visual regression testing ensures our UI remains consistent across deployments b
 All visual regression issues have been resolved with October 2025 Playwright best practices:
 
 **Configuration Applied**:
+
 - ✅ Svelte async SSR enabled (future-proof for Svelte 5.39+)
 - ✅ Locked rendering environment (viewport, deviceScale, colorScheme)
 - ✅ Deterministic readiness (domcontentloaded + optional readySelector; no networkidle)
@@ -21,6 +22,7 @@ All visual regression issues have been resolved with October 2025 Playwright bes
 - ✅ Platform-specific baselines (darwin for local, linux for CI)
 
 **Results**:
+
 - Fixed 1-pixel height differences (deviceScaleFactor: 1)
 - 0.5% visual tolerance (maxDiffPixelRatio: 0.005)
 - Consistent rendering across local and CI environments
@@ -53,10 +55,16 @@ export default defineConfig({
   },
   expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.005 } },
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
-  webServer: process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')
-    ? undefined
-    : { command: 'pnpm build && pnpm preview --port 4321', url: 'http://localhost:4321', reuseExistingServer: true },
-  snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}-{platform}.png',
+  webServer:
+    process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')
+      ? undefined
+      : {
+          command: 'pnpm build && pnpm preview --port 4321',
+          url: 'http://localhost:4321',
+          reuseExistingServer: true,
+        },
+  snapshotPathTemplate:
+    '{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}-{platform}.png',
 });
 ```
 
@@ -66,7 +74,7 @@ export default defineConfig({
 // svelte.config.js
 export default {
   compilerOptions: {
-    experimental: { async: true },  // Enable async SSR for Svelte 5.39+
+    experimental: { async: true }, // Enable async SSR for Svelte 5.39+
   },
 };
 ```
@@ -74,20 +82,31 @@ export default {
 ### 3. Visual Helper (`tests/helpers/visual.ts`)
 
 ```typescript
-export async function prepareForVisualTest(page: Page, el?: Locator, opts?: { readySelector?: string }) {
+export async function prepareForVisualTest(
+  page: Page,
+  el?: Locator,
+  opts?: { readySelector?: string }
+) {
   await page.waitForLoadState('domcontentloaded');
   if (opts?.readySelector) {
-    await page.locator(opts.readySelector).first().waitFor({ state: 'visible', timeout: 10_000 }).catch(() => {});
+    await page
+      .locator(opts.readySelector)
+      .first()
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .catch(() => {});
   }
 
   await page.evaluate(async () => {
     if (document.fonts?.ready) await document.fonts.ready;
     const pending = Array.from(document.images)
       .filter((img) => !img.complete)
-      .map((img) => new Promise<void>((res) => {
-        img.addEventListener('load', () => res(), { once: true });
-        img.addEventListener('error', () => res(), { once: true });
-      }));
+      .map(
+        (img) =>
+          new Promise<void>((res) => {
+            img.addEventListener('load', () => res(), { once: true });
+            img.addEventListener('error', () => res(), { once: true });
+          })
+      );
     await Promise.all(pending);
   });
 
@@ -124,7 +143,7 @@ const snapshotOptions = {
   maxDiffPixelRatio: 0.005, // 0.5% tolerance
 };
 
-await expect(header).toHaveScreenshot("header.png", snapshotOptions);
+await expect(header).toHaveScreenshot('header.png', snapshotOptions);
 ```
 
 ## Workflow Management
@@ -148,11 +167,13 @@ pnpm exec playwright test tests/e2e/visual.spec.ts --ui
 ### CI/CD Workflows
 
 **1. e2e-visual.yml** (Auto on push to main; blocking)
+
 - Runs on every push to main
 - Uses Linux baselines (platform-specific)
 - Installs system fonts to match seeding env; kills port 4321 before server start
 
 **2. Visual Tests (Modern)** (Manual trigger)
+
 - Trigger with `updateBaselines=true` (optionally pass `ref=<SHA>` to seed from exact commit)
 - Uploads artifacts and can auto-open a PR with updated baselines
 - Use when UI changes are intentional or environment changed
@@ -160,11 +181,13 @@ pnpm exec playwright test tests/e2e/visual.spec.ts --ui
 ### Updating Baselines
 
 **Locally** (macOS/darwin):
+
 ```bash
 pnpm test:visual:update
 ```
 
 **Via CI** (Linux baselines on GitHub Actions):
+
 ```bash
 # Trigger workflow by file path (requires gh auth). Optionally pass a specific ref SHA.
 gh workflow run .github/workflows/visual-modern.yml -f updateBaselines=true -f ref=<SHA>
@@ -183,11 +206,15 @@ git commit -m "test: update Linux visual baselines"
 
 ```css
 /* Add to test styles */
-.timestamp, .date-display, time {
-    visibility: hidden !important;
+.timestamp,
+.date-display,
+time {
+  visibility: hidden !important;
 }
-.loading, .skeleton, .shimmer {
-    display: none !important;
+.loading,
+.skeleton,
+.shimmer {
+  display: none !important;
 }
 ```
 
@@ -195,19 +222,19 @@ git commit -m "test: update Linux visual baselines"
 
 ```typescript
 test.beforeEach(async ({ page }) => {
-    await page.context().addInitScript(() => {
-        // Mock Date for consistency
-        const constantDate = new Date('2025-01-01T12:00:00Z');
-        Date = class extends Date {
-            constructor(...args) {
-                if (args.length === 0) {
-                    super(constantDate);
-                } else {
-                    super(...args);
-                }
-            }
-        } as any;
-    });
+  await page.context().addInitScript(() => {
+    // Mock Date for consistency
+    const constantDate = new Date('2025-01-01T12:00:00Z');
+    Date = class extends Date {
+      constructor(...args) {
+        if (args.length === 0) {
+          super(constantDate);
+        } else {
+          super(...args);
+        }
+      }
+    } as any;
+  });
 });
 ```
 
@@ -216,9 +243,9 @@ test.beforeEach(async ({ page }) => {
 Instead of full-page screenshots, consider component-level tests:
 
 ```typescript
-test("header navigation", async ({ page }) => {
-    const header = page.locator('header').first();
-    await expect(header).toHaveScreenshot("header-nav.png");
+test('header navigation', async ({ page }) => {
+  const header = page.locator('header').first();
+  await expect(header).toHaveScreenshot('header-nav.png');
 });
 ```
 
@@ -227,6 +254,7 @@ test("header navigation", async ({ page }) => {
 ### Issue: Tests Pass Locally but Fail in CI
 
 **Solutions**:
+
 1. Ensure same viewport settings
 2. Use Docker locally to match CI environment
 3. Increase wait times for CI (slower machines)
@@ -235,6 +263,7 @@ test("header navigation", async ({ page }) => {
 ### Issue: Flaky Tests
 
 **Solutions**:
+
 1. Increase `waitForTimeout` to 2000ms or more
 2. Add explicit waits for specific elements
 3. Use `waitForLoadState("networkidle")`
@@ -243,6 +272,7 @@ test("header navigation", async ({ page }) => {
 ### Issue: Font Rendering Differences
 
 **Solutions**:
+
 1. Wait for `document.fonts.ready`
 2. Use web fonts with consistent rendering
 3. Increase `maxDiffPixelRatio` to 0.05-0.08
@@ -251,15 +281,18 @@ test("header navigation", async ({ page }) => {
 ## Maintenance Schedule
 
 ### Weekly
+
 - Review any failed visual tests
 - Update baselines if UI changes are intentional
 
 ### Monthly
+
 - Audit screenshot coverage
 - Clean up obsolete baselines
 - Review tolerance settings
 
 ### Quarterly
+
 - Evaluate if visual testing provides value
 - Consider switching to Percy.io or similar service for better stability
 
@@ -295,6 +328,7 @@ rm -rf tests/e2e/*-snapshots/
 ## Current Configuration
 
 **Test Suite**: `tests/e2e/visual.spec.ts`
+
 - **Tests**: 4 (header, footer, hero, contact form)
 - **Browser**: Chromium only (for speed and consistency)
 - **Viewport**: 1280×960
@@ -314,11 +348,13 @@ rm -rf tests/e2e/*-snapshots/
 ### When to Update Baselines
 
 ✅ **Update when**:
+
 - Intentional UI changes (new styles, layouts, colors)
 - Font updates or typography changes
 - Component structure modifications
 
 ❌ **Don't update for**:
+
 - Random CI failures (investigate root cause first)
 - Single pixel differences (adjust tolerance instead)
 - Flaky tests (fix stability issues first)

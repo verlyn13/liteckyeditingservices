@@ -1,6 +1,5 @@
 // @ts-check
 
-import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sitemap from "@astrojs/sitemap";
 import svelte from "@astrojs/svelte";
@@ -46,7 +45,7 @@ export default defineConfig({
 			},
 		},
 		build: {
-			target: "es2025",
+			target: "es2024",
 			cssCodeSplit: true,
 			rollupOptions: {
 				output: {

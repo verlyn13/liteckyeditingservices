@@ -9,10 +9,11 @@
   <body>
     <p>Authenticating, please wait...</p>
     <script>
-      (function() {
+      (function () {
         // Check if this window was opened by another window
         if (!window.opener) {
-          document.body.innerHTML = '<p style="color:red;">Error: This page should be opened in a popup.</p>';
+          document.body.innerHTML =
+            '<p style="color:red;">Error: This page should be opened in a popup.</p>';
           return;
         }
 
@@ -33,17 +34,18 @@
           const messageData = {
             provider: provider,
             token_type: tokenType,
-            token: token
+            token: token,
           };
 
           if (state) {
             messageData.state = state;
           }
 
-          const stringMessage = 'authorization:' + provider + ':success:' + JSON.stringify(messageData);
+          const stringMessage =
+            'authorization:' + provider + ':success:' + JSON.stringify(messageData);
           const objectMessage = {
             type: 'authorization:' + provider + ':success',
-            data: messageData
+            data: messageData,
           };
 
           console.log('[OAuth Callback] Sending messages to opener');
@@ -78,7 +80,7 @@
             if (e.data === 'authorization:ack' || (e.data && e.data.type === 'authorization:ack')) {
               console.log('[OAuth Callback] Received ACK from opener');
               window.removeEventListener('message', onAck);
-              setTimeout(function() {
+              setTimeout(function () {
                 console.log('[OAuth Callback] Closing popup');
                 window.close();
               }, 50);
@@ -87,18 +89,21 @@
           window.addEventListener('message', onAck);
 
           // Auto-close after 3s if no ACK received
-          setTimeout(function() {
+          setTimeout(function () {
             console.log('[OAuth Callback] Auto-closing popup (timeout)');
-            document.body.innerHTML = '<p>Authentication successful. You may close this window.</p>';
-            setTimeout(function() { window.close(); }, 500);
+            document.body.innerHTML =
+              '<p>Authentication successful. You may close this window.</p>';
+            setTimeout(function () {
+              window.close();
+            }, 500);
           }, 3000);
-
         } catch (err) {
           console.error('[OAuth Callback] Error:', err);
           // Let the opener know something went wrong
-          setTimeout(function() {
+          setTimeout(function () {
             try {
-              const errorMessage = 'authorization:github:error:' + JSON.stringify({ message: err.message });
+              const errorMessage =
+                'authorization:github:error:' + JSON.stringify({ message: err.message });
               window.opener.postMessage(errorMessage, window.location.origin);
             } catch (e) {
               console.error('[OAuth Callback] Failed to send error message:', e);

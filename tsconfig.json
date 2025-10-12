@@ -4,5 +4,14 @@
 		"types": ["vite/client", "astro/client"]
 	},
 	"include": [".astro/types.d.ts", "**/*"],
-	"exclude": ["dist", "vitest.config.ts", "astro.config.mjs"]
+	"exclude": [
+		"dist",
+		"public",
+		"playwright-report",
+		"test-results",
+		"coverage",
+		"node_modules",
+		"vitest.config.ts",
+		"astro.config.mjs"
+	]
 }

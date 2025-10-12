@@ -8,15 +8,19 @@ import baseConfig from "./cms-config";
 const origin = window.location.origin;
 
 const config = (() => {
-	const merged: Record<string, unknown> = { ...(baseConfig as any) };
-	const backend = { ...(baseConfig as any).backend } as Record<string, unknown>;
+	const base = baseConfig as unknown as {
+		backend?: Record<string, unknown>;
+		[key: string]: unknown;
+	};
+	const backend = { ...(base.backend ?? {}) } as Record<string, unknown>;
 	backend.base_url = origin;
 	backend.auth_endpoint = "api/auth";
-	(merged as any).backend = backend;
+	const merged: Record<string, unknown> = { ...baseConfig, backend };
 	return merged as typeof baseConfig;
 })();
 
-CMS.init({ config } as any);
+const cms = CMS as unknown as DecapCMS;
+cms.init?.({ config });
 
 // Canonical popup message → persist + dispatch + navigate
 window.addEventListener(
@@ -44,11 +48,7 @@ window.addEventListener(
 				localStorage.setItem("netlify-cms-user", JSON.stringify(user));
 			} catch {}
 			type StoreLike = { dispatch?: (action: unknown) => unknown } | undefined;
-			const cmsObj = CMS as unknown as {
-				reduxStore?: StoreLike;
-				store?: StoreLike;
-			};
-			const store = (cmsObj.reduxStore ?? cmsObj.store) as StoreLike;
+			const store: StoreLike = (cms.reduxStore ?? cms.store) as StoreLike;
 			try {
 				store?.dispatch?.({
 					type: "LOGIN_SUCCESS",
@@ -73,7 +73,8 @@ window.addEventListener(
 			const start = Date.now();
 			const check = async () => {
 				try {
-					const tok = await (CMS as any)?.getToken?.();
+					const maybeTok = await cms.getToken?.();
+					const tok = typeof maybeTok === "string" ? maybeTok : null;
 					if (tok) {
 						window.location.replace("/admin/#/");
 						return;
@@ -94,9 +95,4 @@ window.addEventListener(
 );
 
 // Diagnostics handle
-declare global {
-	interface Window {
-		__cmsApp?: unknown;
-	}
-}
-(window as Window).__cmsApp = CMS as unknown;
+(window as Window).__cmsApp = cms as unknown;

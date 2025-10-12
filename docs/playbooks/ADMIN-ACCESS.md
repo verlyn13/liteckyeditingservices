@@ -1,8 +1,9 @@
-# Cloudflare Access for /admin/*
+# Cloudflare Access for /admin/\*
 
 Protect the Decap CMS admin route with Cloudflare Access to restrict who can open the login screen.
 
 ## Policy
+
 - Application: `liteckyeditingservices-admin`
 - Domain: `www.liteckyeditingservices.com`
 - Path: `/admin/*`
@@ -10,6 +11,7 @@ Protect the Decap CMS admin route with Cloudflare Access to restrict who can ope
 - Session duration: 24h (recommended)
 
 ## Steps (Dashboard)
+
 1. Cloudflare → Zero Trust → Access → Applications → Add an application
 2. Type: Self-hosted
 3. Name: `liteckyeditingservices-admin`
@@ -21,9 +23,11 @@ Protect the Decap CMS admin route with Cloudflare Access to restrict who can ope
 6. Assign the application to your zone and deploy.
 
 ## Verify
+
 - Anonymous users should see Access challenge for `/admin/*`
 - Approved users proceed to the admin shell and Decap login
 
 ## Notes
+
 - Access runs before our admin CSP and scripts; no code change required
 - Keep `/admin/*` CSP strict as configured in `functions/admin/[[path]].ts`

@@ -29,6 +29,7 @@ curl -sI https://www.liteckyeditingservices.com | grep -i "strict-transport-secu
 **Success Criteria**: Grade **A** or better
 
 **If Grade < A**:
+
 - Review specific warnings
 - Check if headers are being overridden by Cloudflare
 - Verify `_headers` file deployed correctly
@@ -40,10 +41,12 @@ curl -sI https://www.liteckyeditingservices.com | grep -i "strict-transport-secu
 3. Paste and analyze
 
 **Expected Issues** (acceptable for now):
+
 - `'unsafe-inline'` in `script-src` - Marked for future improvement
 - `'unsafe-inline'` in `style-src` - Svelte requires this temporarily
 
 **Red Flags** (fix immediately):
+
 - Missing `object-src 'none'`
 - Missing `base-uri 'self'`
 - Wildcard in `script-src` or `default-src`
@@ -51,6 +54,7 @@ curl -sI https://www.liteckyeditingservices.com | grep -i "strict-transport-secu
 ### 4. Manual Browser Testing (10 minutes)
 
 #### Navigate Key Pages
+
 ```
 1. Homepage: https://www.liteckyeditingservices.com/
 2. Services: https://www.liteckyeditingservices.com/services
@@ -61,6 +65,7 @@ curl -sI https://www.liteckyeditingservices.com | grep -i "strict-transport-secu
 #### Check for CSP Violations
 
 **In Chrome DevTools**:
+
 1. Open DevTools (F12)
 2. Go to Console tab
 3. Filter for "Content Security Policy"
@@ -69,6 +74,7 @@ curl -sI https://www.liteckyeditingservices.com | grep -i "strict-transport-secu
 **Success**: No CSP violation errors
 
 **If Violations Found**:
+
 1. Note the blocked resource (script/style/image/font)
 2. Determine if it's legitimate (our code vs attack)
 3. If legitimate, add to CSP whitelist
@@ -94,6 +100,7 @@ curl -sI https://www.liteckyeditingservices.com | grep "content-security-policy"
 ```
 
 **Manual Test**:
+
 1. Go to: https://www.liteckyeditingservices.com/contact
 2. Fill out form
 3. Verify Turnstile widget appears
@@ -112,11 +119,13 @@ curl -sI https://www.liteckyeditingservices.com/admin/ | grep "content-security-
 ```
 
 **Manual Test**:
+
 1. Go to: https://www.liteckyeditingservices.com/admin/
 2. Click "Login with GitHub"
 3. Check DevTools Console for CSP errors
 
-**Success**: 
+**Success**:
+
 - Admin panel loads
 - GitHub OAuth initiates
 - No CSP errors blocking functionality
@@ -131,6 +140,7 @@ curl -sI https://www.liteckyeditingservices.com | grep -i "strict-transport-secu
 **Expected**: `max-age=31536000; includeSubDomains; preload`
 
 **Browser Test**:
+
 1. Clear browser cache
 2. Visit: `http://www.liteckyeditingservices.com` (HTTP)
 3. Should auto-redirect to HTTPS
@@ -145,6 +155,7 @@ pnpm test:e2e:prod -g "Security Headers"
 **Success**: All tests pass
 
 **If Tests Fail**:
+
 - Check test expectations vs actual headers
 - Verify production deployment completed
 - Allow 5 minutes for Cloudflare cache propagation
@@ -155,6 +166,7 @@ pnpm test:e2e:prod -g "Security Headers"
 If security headers cause issues:
 
 ### Quick Fix (removes all custom headers)
+
 ```bash
 # 1. Remove _headers file
 git mv public/_headers public/_headers.disabled
@@ -166,6 +178,7 @@ git push
 ```
 
 ### Surgical Fix (adjust specific headers)
+
 ```bash
 # Edit public/_headers
 # Comment out problematic directive
@@ -177,6 +190,7 @@ pnpm build && pnpm preview
 ## Monitoring
 
 ### Weekly Check (5 minutes)
+
 ```bash
 # Verify headers still present
 curl -sI https://www.liteckyeditingservices.com | grep -c "content-security-policy"
@@ -184,6 +198,7 @@ curl -sI https://www.liteckyeditingservices.com | grep -c "content-security-poli
 ```
 
 ### After Each Deployment
+
 - Run security headers E2E test
 - Spot-check homepage in DevTools Console
 - Verify no user reports of blocked content
@@ -195,6 +210,7 @@ curl -sI https://www.liteckyeditingservices.com | grep -c "content-security-poli
 **Cause**: `_headers` file not in build output
 
 **Fix**:
+
 ```bash
 pnpm build
 ls -la dist/_headers  # Should exist
@@ -205,6 +221,7 @@ ls -la dist/_headers  # Should exist
 **Symptom**: Images return 404 or don't load
 
 **Fix**: Check `img-src` directive allows required domains:
+
 ```
 img-src 'self' data: https:;
 ```
@@ -214,6 +231,7 @@ img-src 'self' data: https:;
 **Symptom**: System fonts used instead of custom fonts
 
 **Fix**: Verify `font-src` allows `data:` for base64 fonts:
+
 ```
 font-src 'self' data:;
 ```
@@ -223,6 +241,7 @@ font-src 'self' data:;
 **Symptom**: Captcha widget doesn't render
 
 **Fix**: Ensure Turnstile CDN is whitelisted:
+
 ```
 script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com;
 connect-src 'self' https://challenges.cloudflare.com;
@@ -234,10 +253,11 @@ frame-src https://challenges.cloudflare.com;
 **Symptom**: Decap CMS doesn't load or has console errors
 
 **Fix**: For self-hosted Decap, verify `/admin/*` CSP (set by Pages Function) allows:
+
 - `unsafe-eval` in `script-src` (AJV codegen)
 - GitHub/Netlify Identity/OAuth Worker in `connect-src` as needed; include `api.github.com` and `raw.githubusercontent.com` if calling GitHub directly
 - No third‑party script CDNs (should NOT include unpkg/jsdelivr)
- - COOP/COEP relaxed for admin only (no COEP; `Cross-Origin-Opener-Policy: unsafe-none`) to allow popup → opener postMessage
+- COOP/COEP relaxed for admin only (no COEP; `Cross-Origin-Opener-Policy: unsafe-none`) to allow popup → opener postMessage
 
 ## Success Criteria
 
@@ -254,6 +274,7 @@ After completing all validation steps:
 ## Documentation
 
 After successful deployment, update:
+
 - [ ] `IMPLEMENTATION-ROADMAP.md` - Mark security headers complete
 - [ ] `PROJECT-STATUS.md` - Update security section
 - [ ] GitHub issue #17 & #18 - Close with test results

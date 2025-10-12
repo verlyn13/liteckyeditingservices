@@ -3,6 +3,7 @@
 ## Root Configuration Updates
 
 ### Updated Root `package.json`
+
 ```json
 {
   "name": "academic-editor-monorepo",
@@ -56,6 +57,7 @@
 ```
 
 ### `biome.jsonc` (Root)
+
 ```jsonc
 {
   "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
@@ -63,7 +65,7 @@
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": true,
-    "defaultBranch": "main"
+    "defaultBranch": "main",
   },
   "formatter": {
     "enabled": true,
@@ -71,7 +73,7 @@
     "indentStyle": "space",
     "indentWidth": 2,
     "lineWidth": 100,
-    "lineEnding": "lf"
+    "lineEnding": "lf",
   },
   "linter": {
     "enabled": true,
@@ -82,32 +84,32 @@
         "useConst": "error",
         "useImportType": "error",
         "useNodejsImportProtocol": "error",
-        "noParameterAssign": "error"
+        "noParameterAssign": "error",
       },
       "correctness": {
         "noUnusedVariables": "error",
-        "noUnusedImports": "error"
+        "noUnusedImports": "error",
       },
       "complexity": {
         "noBannedTypes": "error",
         "noExtraBooleanCast": "error",
-        "noMultipleSpacesInRegularExpressionLiterals": "error"
+        "noMultipleSpacesInRegularExpressionLiterals": "error",
       },
       "suspicious": {
         "noExplicitAny": "warn",
-        "noConsoleLog": "warn"
+        "noConsoleLog": "warn",
       },
       "performance": {
         "noAccumulatingSpread": "error",
-        "noDelete": "error"
+        "noDelete": "error",
       },
       "a11y": {
-        "recommended": true
-      }
-    }
+        "recommended": true,
+      },
+    },
   },
   "organizeImports": {
-    "enabled": true
+    "enabled": true,
   },
   "javascript": {
     "formatter": {
@@ -117,26 +119,26 @@
       "semicolons": "always",
       "arrowParentheses": "always",
       "bracketSameLine": false,
-      "bracketSpacing": true
+      "bracketSpacing": true,
     },
     "parser": {
-      "unsafeParameterDecoratorsEnabled": false
-    }
+      "unsafeParameterDecoratorsEnabled": false,
+    },
   },
   "json": {
     "formatter": {
-      "trailingCommas": "none"
-    }
+      "trailingCommas": "none",
+    },
   },
   "css": {
     "linter": {
-      "enabled": true
+      "enabled": true,
     },
     "formatter": {
       "enabled": true,
       "indentWidth": 2,
-      "lineWidth": 100
-    }
+      "lineWidth": 100,
+    },
   },
   "files": {
     "ignore": [
@@ -150,35 +152,44 @@
       "**/.pnpm-store",
       "**/coverage",
       "**/.turbo",
-      "pnpm-lock.yaml"
+      "pnpm-lock.yaml",
     ],
-    "include": ["**/*.js", "**/*.ts", "**/*.jsx", "**/*.tsx", "**/*.json", "**/*.jsonc", "**/*.css"]
+    "include": [
+      "**/*.js",
+      "**/*.ts",
+      "**/*.jsx",
+      "**/*.tsx",
+      "**/*.json",
+      "**/*.jsonc",
+      "**/*.css",
+    ],
   },
   "overrides": [
     {
       "include": ["**/*.svelte", "**/*.astro"],
       "linter": {
-        "enabled": false
+        "enabled": false,
       },
       "formatter": {
-        "enabled": false
-      }
+        "enabled": false,
+      },
     },
     {
       "include": ["**/*.config.js", "**/*.config.ts", "**/*.config.mjs"],
       "linter": {
         "rules": {
           "suspicious": {
-            "noConsoleLog": "off"
-          }
-        }
-      }
-    }
-  ]
+            "noConsoleLog": "off",
+          },
+        },
+      },
+    },
+  ],
 }
 ```
 
 ### `eslint.config.js` (Root - ESLint 9 Flat Config)
+
 ```javascript
 import js from '@eslint/js';
 import globals from 'globals';
@@ -192,7 +203,7 @@ import tailwind from 'eslint-plugin-tailwindcss';
 export default [
   // Base configuration
   js.configs.recommended,
-  
+
   // Global settings
   {
     languageOptions: {
@@ -205,7 +216,7 @@ export default [
       },
     },
   },
-  
+
   // TypeScript files
   {
     files: ['**/*.ts', '**/*.tsx'],
@@ -217,7 +228,7 @@ export default [
       },
     },
   },
-  
+
   // Astro files
   ...astroPlugin.configs.recommended,
   ...astroPlugin.configs['jsx-a11y-recommended'],
@@ -238,7 +249,7 @@ export default [
       'astro/no-set-text-directive': 'warn',
     },
   },
-  
+
   // Svelte 5 files
   ...sveltePlugin.configs['flat/recommended'],
   {
@@ -260,7 +271,7 @@ export default [
       'svelte/no-target-blank': 'error',
     },
   },
-  
+
   // Tailwind CSS rules
   {
     plugins: {
@@ -271,7 +282,7 @@ export default [
       'tailwindcss/no-custom-classname': 'warn',
     },
   },
-  
+
   // Accessibility rules (general)
   {
     plugins: {
@@ -287,21 +298,24 @@ export default [
       'jsx-a11y/no-noninteractive-element-interactions': 'error',
     },
   },
-  
+
   // Project-specific rules
   {
     rules: {
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       'no-debugger': 'error',
       'prefer-const': 'error',
-      'no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
-      }],
+      'no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
-  
+
   // Ignore patterns
   {
     ignores: [
@@ -321,6 +335,7 @@ export default [
 ```
 
 ### `prettier.config.mjs` (Root)
+
 ```javascript
 /** @type {import('prettier').Config} */
 export default {
@@ -336,13 +351,13 @@ export default {
   bracketSameLine: false,
   arrowParens: 'always',
   endOfLine: 'lf',
-  
+
   plugins: [
     'prettier-plugin-astro',
     'prettier-plugin-svelte',
     'prettier-plugin-tailwindcss', // Must be last
   ],
-  
+
   overrides: [
     {
       files: '*.astro',
@@ -368,7 +383,7 @@ export default {
       },
     },
   ],
-  
+
   // Tailwind v4 configuration
   tailwindConfig: './apps/site/tailwind.config.js',
   tailwindFunctions: ['clsx', 'cn', 'tw'],
@@ -377,6 +392,7 @@ export default {
 ```
 
 ### `tsconfig.json` (Root)
+
 ```json
 {
   "compilerOptions": {
@@ -396,7 +412,7 @@ export default {
     "declarationMap": false,
     "inlineSources": false,
     "noEmit": true,
-    
+
     // Strictness beyond strict: true
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -405,15 +421,15 @@ export default {
     "noFallthroughCasesInSwitch": true,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
-    
+
     // Modern features
     "useDefineForClassFields": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    
+
     // Type acquisition
     "types": ["node", "@cloudflare/workers-types"],
-    
+
     // Paths
     "baseUrl": ".",
     "paths": {
@@ -433,32 +449,23 @@ export default {
 ```
 
 ### `.lintstagedrc.json` (Root)
+
 ```json
 {
   "*.{js,ts,mjs,cjs,jsx,tsx}": [
     "biome check --write --no-errors-on-unmatched",
     "eslint --fix --max-warnings 0"
   ],
-  "*.{json,jsonc}": [
-    "biome check --write --no-errors-on-unmatched"
-  ],
-  "*.css": [
-    "biome check --write --no-errors-on-unmatched"
-  ],
-  "*.{astro,svelte}": [
-    "prettier --write",
-    "eslint --fix --max-warnings 0"
-  ],
-  "*.{md,mdx}": [
-    "prettier --write"
-  ],
-  "*.{yml,yaml}": [
-    "prettier --write"
-  ]
+  "*.{json,jsonc}": ["biome check --write --no-errors-on-unmatched"],
+  "*.css": ["biome check --write --no-errors-on-unmatched"],
+  "*.{astro,svelte}": ["prettier --write", "eslint --fix --max-warnings 0"],
+  "*.{md,mdx}": ["prettier --write"],
+  "*.{yml,yaml}": ["prettier --write"]
 }
 ```
 
 ### `commitlint.config.js` (Root)
+
 ```javascript
 export default {
   extends: ['@commitlint/config-conventional'],
@@ -467,17 +474,17 @@ export default {
       2,
       'always',
       [
-        'feat',     // New feature
-        'fix',      // Bug fix
-        'docs',     // Documentation only
-        'style',    // Code style (formatting, semicolons, etc)
+        'feat', // New feature
+        'fix', // Bug fix
+        'docs', // Documentation only
+        'style', // Code style (formatting, semicolons, etc)
         'refactor', // Code refactoring
-        'perf',     // Performance improvements
-        'test',     // Tests
-        'build',    // Build system or dependencies
-        'ci',       // CI/CD configuration
-        'chore',    // Maintenance tasks
-        'revert',   // Revert previous commit
+        'perf', // Performance improvements
+        'test', // Tests
+        'build', // Build system or dependencies
+        'ci', // CI/CD configuration
+        'chore', // Maintenance tasks
+        'revert', // Revert previous commit
       ],
     ],
     'subject-case': [2, 'never', ['start-case', 'pascal-case', 'upper-case']],
@@ -490,6 +497,7 @@ export default {
 ```
 
 ### `.husky/pre-commit` (Git Hook)
+
 ```bash
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
@@ -498,6 +506,7 @@ pnpm exec lint-staged
 ```
 
 ### `.husky/commit-msg` (Git Hook)
+
 ```bash
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
@@ -508,6 +517,7 @@ pnpm exec commitlint --edit $1
 ## App-Specific Configurations
 
 ### `apps/site/tsconfig.json`
+
 ```json
 {
   "extends": "../../tsconfig.json",
@@ -522,17 +532,12 @@ pnpm exec commitlint --edit $1
     },
     "types": ["astro/client", "svelte", "@cloudflare/workers-types"]
   },
-  "include": [
-    "src/**/*",
-    "functions/**/*",
-    "astro.config.mjs",
-    "tailwind.config.js",
-    "env.d.ts"
-  ]
+  "include": ["src/**/*", "functions/**/*", "astro.config.mjs", "tailwind.config.js", "env.d.ts"]
 }
 ```
 
 ### `apps/site/package.json` (Updated scripts)
+
 ```json
 {
   "name": "@ae/site",
@@ -580,6 +585,7 @@ pnpm exec commitlint --edit $1
 ```
 
 ### `apps/site/env.d.ts`
+
 ```typescript
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="astro/client" />
@@ -616,6 +622,7 @@ declare namespace App {
 ## Worker Configurations
 
 ### `workers/cron/tsconfig.json`
+
 ```json
 {
   "extends": "../../tsconfig.json",
@@ -629,6 +636,7 @@ declare namespace App {
 ```
 
 ### `workers/queue-consumer/tsconfig.json`
+
 ```json
 {
   "extends": "../../tsconfig.json",
@@ -644,6 +652,7 @@ declare namespace App {
 ## VS Code Configuration
 
 ### `.vscode/settings.json`
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -690,6 +699,7 @@ declare namespace App {
 ```
 
 ### `.vscode/extensions.json`
+
 ```json
 {
   "recommendations": [
@@ -708,6 +718,7 @@ declare namespace App {
 ## GitHub Actions Updates
 
 ### `.github/workflows/quality.yml`
+
 ```yaml
 name: Code Quality
 
@@ -725,47 +736,47 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.16.0
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Biome CI (format + lint)
         run: pnpm exec biome ci .
-        
+
       - name: Prettier check (Astro/Svelte)
         run: pnpm exec prettier --check "**/*.{astro,svelte}"
-      
+
       - name: ESLint
         run: pnpm exec eslint . --max-warnings 0
-      
+
       - name: TypeScript checks
         run: |
           pnpm exec tsc --build
           pnpm --filter @ae/site exec astro check
           pnpm --filter @ae/site exec sv check --threshold error
-      
+
       - name: Build test
         run: pnpm build:site
-        
+
       - name: Size check
         run: |
           echo "### Bundle Size Report" >> $GITHUB_STEP_SUMMARY
           du -sh apps/site/dist/* | sort -h >> $GITHUB_STEP_SUMMARY
-      
+
       - name: Comment PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -789,25 +800,25 @@ jobs:
     needs: quality
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.16.0
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build site
         run: pnpm build:site
-      
+
       - name: Run Lighthouse
         run: |
           pnpm --filter @ae/site preview &
@@ -816,7 +827,7 @@ jobs:
             --output=json \
             --output-path=./lighthouse-report.json \
             --only-categories=performance,accessibility,best-practices,seo
-      
+
       - name: Upload Lighthouse report
         uses: actions/upload-artifact@v4
         with:
@@ -825,6 +836,7 @@ jobs:
 ```
 
 ### `lighthouse-budget.json` (apps/site/)
+
 ```json
 {
   "path": "/*",
@@ -901,6 +913,7 @@ pnpm check:ci
 ## Quick Reference
 
 ### Daily Development Commands
+
 ```bash
 # Format code
 pnpm format
@@ -921,12 +934,14 @@ git commit -m "docs: update README"
 ```
 
 ### CI/CD Pipeline
+
 - **Pre-commit**: Runs Biome, Prettier, ESLint on staged files
 - **Commit message**: Validates conventional commit format
 - **PR checks**: Full quality suite + Lighthouse
 - **Main branch**: Deploy after quality checks pass
 
 ### Performance Targets
+
 - **First Contentful Paint**: < 1.5s
 - **Largest Contentful Paint**: < 2.5s
 - **Time to Interactive**: < 3s
@@ -935,6 +950,7 @@ git commit -m "docs: update README"
 - **Stylesheet budget**: < 50KB
 
 This setup provides:
+
 - ⚡ **Fast checks** with Biome v2's Rust-based linter
 - 🎯 **Framework-specific rules** for Astro and Svelte
 - 🎨 **Consistent formatting** with proper Tailwind v4 class sorting

@@ -58,6 +58,7 @@ academic-editor/
 ## Root Configuration Files
 
 ### `pnpm-workspace.yaml`
+
 ```yaml
 packages:
   - 'apps/*'
@@ -66,6 +67,7 @@ packages:
 ```
 
 ### Root `package.json`
+
 ```json
 {
   "name": "academic-editor-monorepo",
@@ -101,6 +103,7 @@ packages:
 ```
 
 ### `.gitignore`
+
 ```
 # Dependencies
 node_modules/
@@ -145,6 +148,7 @@ coverage/
 ## Astro Site Configuration
 
 ### `apps/site/package.json`
+
 ```json
 {
   "name": "@ae/site",
@@ -187,6 +191,7 @@ coverage/
 ```
 
 ### `apps/site/astro.config.mjs`
+
 ```javascript
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
@@ -251,6 +256,7 @@ export default defineConfig({
 ```
 
 ### `apps/site/wrangler.toml`
+
 ```toml
 name = "academic-editor-site"
 compatibility_date = "2025-09-22"
@@ -296,6 +302,7 @@ vars = { ENVIRONMENT = "production" }
 ```
 
 ### `apps/site/.dev.vars`
+
 ```bash
 # Secret keys - NEVER commit this file
 TURNSTILE_SECRET_KEY=0x4AAAAAAAxxxxx_secret
@@ -318,6 +325,7 @@ PUBLIC_GA4_ID=G-XXXXXXXXXX
 ## Pages Functions (Server-side)
 
 ### `apps/site/functions/_middleware.ts`
+
 ```typescript
 import type { PagesFunction, EventContext } from '@cloudflare/workers-types';
 
@@ -333,12 +341,12 @@ const rateLimiter = new Map<string, number[]>();
 function isRateLimited(ip: string, limit = 10, window = 60000): boolean {
   const now = Date.now();
   const requests = rateLimiter.get(ip) || [];
-  const recentRequests = requests.filter(time => now - time < window);
-  
+  const recentRequests = requests.filter((time) => now - time < window);
+
   if (recentRequests.length >= limit) {
     return true;
   }
-  
+
   recentRequests.push(now);
   rateLimiter.set(ip, recentRequests);
   return false;
@@ -347,19 +355,22 @@ function isRateLimited(ip: string, limit = 10, window = 60000): boolean {
 export const onRequest: PagesFunction<Env> = async (context) => {
   const { request, env, next } = context;
   const url = new URL(request.url);
-  
+
   // Add security headers
   const response = await next();
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-XSS-Protection', '1; mode=block');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  
+
   // HSTS (only in production)
   if (env.ENVIRONMENT === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload'
+    );
   }
-  
+
   // Rate limiting for API routes
   if (url.pathname.startsWith('/api/')) {
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
@@ -367,7 +378,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       return new Response('Too many requests', { status: 429 });
     }
   }
-  
+
   // Log to Analytics Engine
   if (env.ANALYTICS) {
     env.ANALYTICS.writeDataPoint({
@@ -376,12 +387,13 @@ export const onRequest: PagesFunction<Env> = async (context) => {
       indexes: [request.method],
     });
   }
-  
+
   return response;
 };
 ```
 
 ### `apps/site/functions/api/submit-quote.ts`
+
 ```typescript
 import type { PagesFunction } from '@cloudflare/workers-types';
 
@@ -404,39 +416,40 @@ interface QuoteRequest {
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
-  
+
   try {
     const body: QuoteRequest = await request.json();
-    
+
     // Verify Turnstile token
-    const turnstileVerified = await verifyTurnstile(
-      body.turnstileToken,
-      env.TURNSTILE_SECRET_KEY
-    );
-    
+    const turnstileVerified = await verifyTurnstile(body.turnstileToken, env.TURNSTILE_SECRET_KEY);
+
     if (!turnstileVerified) {
       return Response.json({ error: 'Security verification failed' }, { status: 400 });
     }
-    
+
     // Validate input
     if (!body.name || !body.email || !body.serviceType) {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
     }
-    
+
     // Store quote request in D1
-    const quote = await env.DB.prepare(`
+    const quote = await env.DB.prepare(
+      `
       INSERT INTO quotes (name, email, service_type, deadline, message, document_id, status, created_at)
       VALUES (?, ?, ?, ?, ?, ?, 'pending', datetime('now'))
       RETURNING id
-    `).bind(
-      body.name,
-      body.email,
-      body.serviceType,
-      body.deadline,
-      body.message || null,
-      body.documentId || null
-    ).first();
-    
+    `
+    )
+      .bind(
+        body.name,
+        body.email,
+        body.serviceType,
+        body.deadline,
+        body.message || null,
+        body.documentId || null
+      )
+      .first();
+
     // Queue email notification
     await env.DOCUMENT_QUEUE.send({
       type: 'quote-notification',
@@ -444,26 +457,22 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       email: body.email,
       name: body.name,
     });
-    
+
     // Send confirmation email via Resend
     await sendEmail(env.RESEND_API_KEY, {
       to: body.email,
       subject: 'Quote Request Received - Academic Editor',
       html: generateQuoteEmailHtml(body.name, quote.id),
     });
-    
+
     return Response.json({
       success: true,
       quoteId: quote.id,
-      message: 'Your quote request has been received. We\'ll respond within 24 hours.',
+      message: "Your quote request has been received. We'll respond within 24 hours.",
     });
-    
   } catch (error) {
     console.error('Quote submission error:', error);
-    return Response.json(
-      { error: 'An error occurred processing your request' },
-      { status: 500 }
-    );
+    return Response.json({ error: 'An error occurred processing your request' }, { status: 500 });
   }
 };
 
@@ -473,7 +482,7 @@ async function verifyTurnstile(token: string, secret: string): Promise<boolean> 
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ secret, response: token }),
   });
-  
+
   const data = await response.json();
   return data.success;
 }
@@ -482,7 +491,7 @@ async function sendEmail(apiKey: string, params: any): Promise<void> {
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
+      Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -503,6 +512,7 @@ function generateQuoteEmailHtml(name: string, quoteId: string): string {
 ```
 
 ### `apps/site/functions/api/upload-document.ts`
+
 ```typescript
 import type { PagesFunction } from '@cloudflare/workers-types';
 
@@ -516,16 +526,16 @@ interface Env {
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
-  
+
   try {
     const formData = await request.formData();
     const file = formData.get('document') as File;
     const userId = formData.get('userId') as string;
-    
+
     if (!file) {
       return Response.json({ error: 'No file provided' }, { status: 400 });
     }
-    
+
     // Validate file size
     const maxSize = parseInt(env.MAX_FILE_SIZE_MB) * 1024 * 1024;
     if (file.size > maxSize) {
@@ -534,7 +544,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         { status: 400 }
       );
     }
-    
+
     // Validate file type
     const allowedTypes = env.ALLOWED_FILE_TYPES.split(',');
     const fileExt = '.' + file.name.split('.').pop()?.toLowerCase();
@@ -544,12 +554,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         { status: 400 }
       );
     }
-    
+
     // Generate secure filename
     const timestamp = Date.now();
     const randomId = crypto.randomUUID();
     const secureFilename = `${userId}/${timestamp}-${randomId}${fileExt}`;
-    
+
     // Upload to R2
     await env.DOCUMENTS.put(secureFilename, file.stream(), {
       httpMetadata: {
@@ -561,39 +571,33 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         uploadedAt: new Date().toISOString(),
       },
     });
-    
+
     // Store metadata in D1
-    const document = await env.DB.prepare(`
+    const document = await env.DB.prepare(
+      `
       INSERT INTO documents (user_id, filename, original_name, size, mime_type, status, created_at)
       VALUES (?, ?, ?, ?, ?, 'uploaded', datetime('now'))
       RETURNING id
-    `).bind(
-      userId,
-      secureFilename,
-      file.name,
-      file.size,
-      file.type
-    ).first();
-    
+    `
+    )
+      .bind(userId, secureFilename, file.name, file.size, file.type)
+      .first();
+
     // Queue for virus scanning (optional)
     await env.DOCUMENT_QUEUE.send({
       type: 'scan-document',
       documentId: document.id,
       filename: secureFilename,
     });
-    
+
     return Response.json({
       success: true,
       documentId: document.id,
       message: 'Document uploaded successfully',
     });
-    
   } catch (error) {
     console.error('Upload error:', error);
-    return Response.json(
-      { error: 'Failed to upload document' },
-      { status: 500 }
-    );
+    return Response.json({ error: 'Failed to upload document' }, { status: 500 });
   }
 };
 
@@ -602,38 +606,34 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
   const url = new URL(request.url);
   const documentId = url.searchParams.get('id');
-  
+
   if (!documentId) {
     return Response.json({ error: 'Document ID required' }, { status: 400 });
   }
-  
+
   try {
     // Get document from DB
-    const doc = await env.DB.prepare(
-      'SELECT * FROM documents WHERE id = ?'
-    ).bind(documentId).first();
-    
+    const doc = await env.DB.prepare('SELECT * FROM documents WHERE id = ?')
+      .bind(documentId)
+      .first();
+
     if (!doc) {
       return Response.json({ error: 'Document not found' }, { status: 404 });
     }
-    
+
     // Generate signed URL (valid for 1 hour)
     const signedUrl = await env.DOCUMENTS.createSignedUrl(doc.filename, {
       expiresIn: 3600,
     });
-    
+
     return Response.json({
       url: signedUrl,
       expiresIn: 3600,
       filename: doc.original_name,
     });
-    
   } catch (error) {
     console.error('Download error:', error);
-    return Response.json(
-      { error: 'Failed to generate download link' },
-      { status: 500 }
-    );
+    return Response.json({ error: 'Failed to generate download link' }, { status: 500 });
   }
 };
 ```
@@ -641,6 +641,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 ## Worker Configurations
 
 ### `workers/cron/package.json`
+
 ```json
 {
   "name": "@ae/worker-cron",
@@ -662,6 +663,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 ```
 
 ### `workers/cron/wrangler.toml`
+
 ```toml
 name = "ae-cron"
 main = "src/worker.ts"
@@ -698,6 +700,7 @@ ADMIN_EMAIL = "admin@academic-editor.com"
 ```
 
 ### `workers/cron/src/worker.ts`
+
 ```typescript
 export interface Env {
   DB: D1Database;
@@ -712,15 +715,15 @@ export default {
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
     const cronTime = new Date(event.scheduledTime).toISOString();
     console.log(`Cron triggered at ${cronTime}, cron: ${event.cron}`);
-    
+
     switch (event.cron) {
-      case "0 10 * * *":
+      case '0 10 * * *':
         await ctx.waitUntil(sendDailyFollowUps(env));
         break;
-      case "0 */6 * * *":
+      case '0 */6 * * *':
         await ctx.waitUntil(cleanupExpiredDocuments(env));
         break;
-      case "0 0 * * 1":
+      case '0 0 * * 1':
         await ctx.waitUntil(generateWeeklyReport(env));
         break;
     }
@@ -729,13 +732,15 @@ export default {
 
 async function sendDailyFollowUps(env: Env): Promise<void> {
   // Get quotes that need follow-up (3 days old, no response)
-  const quotes = await env.DB.prepare(`
+  const quotes = await env.DB.prepare(
+    `
     SELECT * FROM quotes 
     WHERE status = 'pending' 
     AND datetime(created_at) < datetime('now', '-3 days')
     AND follow_up_sent = 0
-  `).all();
-  
+  `
+  ).all();
+
   for (const quote of quotes.results) {
     // Queue follow-up email
     await env.DOCUMENT_QUEUE.send({
@@ -744,41 +749,40 @@ async function sendDailyFollowUps(env: Env): Promise<void> {
       email: quote.email,
       name: quote.name,
     });
-    
+
     // Mark as followed up
-    await env.DB.prepare(
-      'UPDATE quotes SET follow_up_sent = 1 WHERE id = ?'
-    ).bind(quote.id).run();
+    await env.DB.prepare('UPDATE quotes SET follow_up_sent = 1 WHERE id = ?').bind(quote.id).run();
   }
-  
+
   console.log(`Sent ${quotes.results.length} follow-up emails`);
 }
 
 async function cleanupExpiredDocuments(env: Env): Promise<void> {
   // Delete documents older than 30 days that aren't associated with active projects
-  const expiredDocs = await env.DB.prepare(`
+  const expiredDocs = await env.DB.prepare(
+    `
     SELECT * FROM documents 
     WHERE status = 'uploaded' 
     AND datetime(created_at) < datetime('now', '-30 days')
     AND project_id IS NULL
-  `).all();
-  
+  `
+  ).all();
+
   for (const doc of expiredDocs.results) {
     // Delete from R2
     await env.DOCUMENTS.delete(doc.filename);
-    
+
     // Delete from DB
-    await env.DB.prepare(
-      'DELETE FROM documents WHERE id = ?'
-    ).bind(doc.id).run();
+    await env.DB.prepare('DELETE FROM documents WHERE id = ?').bind(doc.id).run();
   }
-  
+
   console.log(`Cleaned up ${expiredDocs.results.length} expired documents`);
 }
 
 async function generateWeeklyReport(env: Env): Promise<void> {
   // Generate stats for the past week
-  const stats = await env.DB.prepare(`
+  const stats = await env.DB.prepare(
+    `
     SELECT 
       COUNT(CASE WHEN datetime(created_at) >= datetime('now', '-7 days') THEN 1 END) as new_quotes,
       COUNT(CASE WHEN status = 'completed' AND datetime(updated_at) >= datetime('now', '-7 days') THEN 1 END) as completed_projects,
@@ -787,8 +791,9 @@ async function generateWeeklyReport(env: Env): Promise<void> {
         THEN julianday(updated_at) - julianday(created_at) 
       END) as avg_turnaround_days
     FROM quotes
-  `).first();
-  
+  `
+  ).first();
+
   // Send report email
   const reportHtml = `
     <h2>Weekly Report - Academic Editor</h2>
@@ -799,11 +804,11 @@ async function generateWeeklyReport(env: Env): Promise<void> {
       <li>Average turnaround: ${Math.round(stats.avg_turnaround_days * 10) / 10} days</li>
     </ul>
   `;
-  
+
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -813,12 +818,13 @@ async function generateWeeklyReport(env: Env): Promise<void> {
       html: reportHtml,
     }),
   });
-  
+
   console.log('Weekly report sent');
 }
 ```
 
 ### `workers/queue-consumer/src/worker.ts`
+
 ```typescript
 export interface Env {
   DB: D1Database;
@@ -879,6 +885,7 @@ async function scanDocument(message: any, env: Env): Promise<void> {
 ## GitHub Actions Workflows
 
 ### `.github/workflows/deploy-site.yml`
+
 ```yaml
 name: Deploy Site to Cloudflare Pages
 
@@ -905,25 +912,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.16.0
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Type check
         run: pnpm --filter @ae/site lint
-      
+
       - name: Build site
         run: pnpm --filter @ae/site build
-      
+
       - name: Run Lighthouse CI
         run: |
           pnpm --filter @ae/site preview &
@@ -935,27 +942,27 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.16.0
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build site
         run: pnpm --filter @ae/site build
         env:
           PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
-      
+
       - name: Deploy to Cloudflare Pages
         id: deploy
         uses: cloudflare/wrangler-action@v3
@@ -963,7 +970,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy apps/site/dist --project-name=academic-editor --branch=main
-      
+
       - name: Comment deployment URL
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
@@ -975,7 +982,7 @@ jobs:
               repo: context.repo.repo,
               body: `🚀 Deployed to: ${{ steps.deploy.outputs.deployment-url }}`
             })
-      
+
       - name: Run post-deploy tests
         run: |
           sleep 10
@@ -983,6 +990,7 @@ jobs:
 ```
 
 ### `.github/workflows/deploy-workers.yml`
+
 ```yaml
 name: Deploy Workers
 
@@ -1003,23 +1011,23 @@ jobs:
     defaults:
       run:
         working-directory: workers/cron
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.16.0
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         working-directory: .
-      
+
       - name: Deploy Cron Worker
         uses: cloudflare/wrangler-action@v3
         with:
@@ -1027,7 +1035,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: workers/cron
           command: deploy
-      
+
       - name: Test cron triggers
         run: pnpm test:scheduled
         continue-on-error: true
@@ -1037,23 +1045,23 @@ jobs:
     defaults:
       run:
         working-directory: workers/queue-consumer
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.16.0
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         working-directory: .
-      
+
       - name: Deploy Queue Consumer
         uses: cloudflare/wrangler-action@v3
         with:
@@ -1064,6 +1072,7 @@ jobs:
 ```
 
 ### `.github/workflows/test-a11y.yml`
+
 ```yaml
 name: Accessibility Tests
 
@@ -1082,32 +1091,32 @@ permissions:
 jobs:
   a11y:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10.16.0
-      
+
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
-      
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       - name: Build and start site
         run: |
           pnpm --filter @ae/site build
           pnpm --filter @ae/site preview &
           sleep 10
-      
+
       - name: Run Pa11y tests
         run: pnpm --filter @ae/site test:a11y
         continue-on-error: true
-      
+
       - name: Upload results
         uses: actions/upload-artifact@v4
         if: always()
@@ -1119,6 +1128,7 @@ jobs:
 ## Database Schema (D1)
 
 ### `workers/schema.sql`
+
 ```sql
 -- Quotes table
 CREATE TABLE quotes (
@@ -1171,16 +1181,17 @@ CREATE INDEX idx_projects_status ON projects(status);
 ## Turnstile Integration (Client-side)
 
 ### `apps/site/src/components/ContactForm.svelte`
+
 ```svelte
 <script lang="ts">
   import { onMount } from 'svelte';
-  
+
   let turnstileToken = '';
   let turnstileWidgetId: string | null = null;
-  
+
   // Your public site key from Cloudflare Dashboard
   const TURNSTILE_SITE_KEY = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
-  
+
   onMount(() => {
     // Load Turnstile script
     const script = document.createElement('script');
@@ -1188,7 +1199,7 @@ CREATE INDEX idx_projects_status ON projects(status);
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
-    
+
     script.onload = () => {
       // Initialize Turnstile
       if (window.turnstile) {
@@ -1205,25 +1216,25 @@ CREATE INDEX idx_projects_status ON projects(status);
         });
       }
     };
-    
+
     return () => {
       if (window.turnstile && turnstileWidgetId) {
         window.turnstile.remove(turnstileWidgetId);
       }
     };
   });
-  
+
   async function handleSubmit(event: Event) {
     event.preventDefault();
-    
+
     if (!turnstileToken) {
       alert('Please complete the security check');
       return;
     }
-    
+
     const formData = new FormData(event.target as HTMLFormElement);
     const data = Object.fromEntries(formData);
-    
+
     const response = await fetch('/api/submit-quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1232,7 +1243,7 @@ CREATE INDEX idx_projects_status ON projects(status);
         turnstileToken,
       }),
     });
-    
+
     if (response.ok) {
       const result = await response.json();
       alert(`Success! Your quote ID is: ${result.quoteId}`);
@@ -1244,10 +1255,10 @@ CREATE INDEX idx_projects_status ON projects(status);
 
 <form on:submit={handleSubmit} class="quote-form">
   <!-- Form fields here -->
-  
+
   <!-- Turnstile widget -->
   <div id="turnstile-container" class="turnstile-wrapper"></div>
-  
+
   <button type="submit" class="btn btn-primary">
     Get Your Free Quote
   </button>

@@ -10,4 +10,3 @@ order: 2
 ---
 
 Ideal for near-final drafts needing polish and consistency. We focus on correctness and readability while preserving your meaning.
-

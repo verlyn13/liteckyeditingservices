@@ -64,7 +64,9 @@ test("CMS script loads without CSP violations", async ({ page }) => {
 	// Wait for CMS to initialize (self-hosted bundle loads and sets window.CMS)
 	await page.waitForFunction(
 		() => !!(window as unknown as { CMS?: unknown }).CMS,
-		{ timeout: 5000 },
+		{
+			timeout: 5000,
+		},
 	);
 
 	// Verify no CSP violations occurred
@@ -81,7 +83,8 @@ test("CMS bundle is served with immutable caching", async ({
 	const html = await resp.text();
 	const m = html.match(/\/admin\/cms\.[a-f0-9]{8}\.js/);
 	expect(m).not.toBeNull();
-	const response = await request.get(m![0]);
+	if (!m) throw new Error("CMS bundle link not found");
+	const response = await request.get(m[0]);
 	expect(response.status()).toBe(200);
 	const cacheControl = response.headers()["cache-control"] || "";
 	expect(cacheControl).toContain("immutable");

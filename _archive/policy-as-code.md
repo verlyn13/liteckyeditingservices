@@ -1,8 +1,8 @@
 # 0) The idea in one line
 
-* **Desired state lives in Git.**
-* **Policies (Rego/Conftest) say what “good” means.**
-* **CI runs fast guards on every PR + a nightly drift check** against Cloudflare & SendGrid APIs and your own docs/files.
+- **Desired state lives in Git.**
+- **Policies (Rego/Conftest) say what “good” means.**
+- **CI runs fast guards on every PR + a nightly drift check** against Cloudflare & SendGrid APIs and your own docs/files.
   (Turnstile test keys, secrets practices, Pages/Workers variables, and SendGrid templates referenced below are based on current docs.) ([Cloudflare Docs][1])
 
 ---
@@ -41,37 +41,37 @@
 
 ### A) Architecture & repo hygiene (`policy/code/architecture.rego`)
 
-* **Required files** in `repo.required-files.json` must exist (README, RUNBOOK, ARCHITECTURE, SECRETS, ENVIRONMENT, CONTRIBUTING, CODEOWNERS, Renovate config).
-* **Directory skeleton** (`src/`, `functions/api/`, `public/admin/`, `policy/`, `docs/`) must exist.
-* **No secrets** committed: deny if any files match `*secret*.*`, `.dev.vars*`, or `.env*`. (We still allow CI fixtures.)
-* **Turnstile self-test page only in non-prod**: deny if `USE_TURNSTILE_TEST` found in production env files. (Turnstile requires server-side verification & separate test/real keys.) ([Cloudflare Docs][2])
+- **Required files** in `repo.required-files.json` must exist (README, RUNBOOK, ARCHITECTURE, SECRETS, ENVIRONMENT, CONTRIBUTING, CODEOWNERS, Renovate config).
+- **Directory skeleton** (`src/`, `functions/api/`, `public/admin/`, `policy/`, `docs/`) must exist.
+- **No secrets** committed: deny if any files match `*secret*.*`, `.dev.vars*`, or `.env*`. (We still allow CI fixtures.)
+- **Turnstile self-test page only in non-prod**: deny if `USE_TURNSTILE_TEST` found in production env files. (Turnstile requires server-side verification & separate test/real keys.) ([Cloudflare Docs][2])
 
 ### B) Code quality gates (`policy/code/quality.rego`)
 
-* `package.json` must expose: `check`, `lint:fix`, `test:e2e`, and the exact linters/type-checks we set (Biome/Prettier/ESLint/`tsc`/`astro check`/`sv check`).
-* **Playwright** present and config points `testDir: ./tests/e2e`.
-* PRs touching `/functions` must include a test added/updated under `tests/e2e/`.
+- `package.json` must expose: `check`, `lint:fix`, `test:e2e`, and the exact linters/type-checks we set (Biome/Prettier/ESLint/`tsc`/`astro check`/`sv check`).
+- **Playwright** present and config points `testDir: ./tests/e2e`.
+- PRs touching `/functions` must include a test added/updated under `tests/e2e/`.
 
 ### C) Cloudflare config policy (`policy/infra/cloudflare.rego`)
 
-* `wrangler.toml` for the **OAuth Worker** must **not** set secrets in plaintext `vars`. (Use Worker Secrets only.) ([Cloudflare Docs][3])
-* **Pages Functions**: forbid checked-in secrets; require `TURNSTILE_SECRET_KEY`/`SENDGRID_API_KEY` to be bound at runtime (names checked, not values). Docs recommend `.dev.vars` for local dev. ([Cloudflare Docs][4])
-* Require **custom domain route** for the OAuth Worker (`cms-auth.<domain>`), with `/auth` and `/callback` available (Decap flow).
-* If `USE_TURNSTILE_TEST=1` in any env file, then **test keys** must be set (`TURNSTILE_TEST_SITE_KEY`, `TURNSTILE_TEST_SECRET_KEY`)—matching Turnstile testing guidance. ([Cloudflare Docs][5])
+- `wrangler.toml` for the **OAuth Worker** must **not** set secrets in plaintext `vars`. (Use Worker Secrets only.) ([Cloudflare Docs][3])
+- **Pages Functions**: forbid checked-in secrets; require `TURNSTILE_SECRET_KEY`/`SENDGRID_API_KEY` to be bound at runtime (names checked, not values). Docs recommend `.dev.vars` for local dev. ([Cloudflare Docs][4])
+- Require **custom domain route** for the OAuth Worker (`cms-auth.<domain>`), with `/auth` and `/callback` available (Decap flow).
+- If `USE_TURNSTILE_TEST=1` in any env file, then **test keys** must be set (`TURNSTILE_TEST_SITE_KEY`, `TURNSTILE_TEST_SECRET_KEY`)—matching Turnstile testing guidance. ([Cloudflare Docs][5])
 
 ### D) Decap CMS policy (`policy/cms/decap.rego`)
 
-* `public/admin/config.yml` must use `backend: github` with `base_url` at the **root of the OAuth subdomain** (no sub-paths) and a `folder` under `src/content/pages`. (This keeps OAuth clean and editors happy.)
+- `public/admin/config.yml` must use `backend: github` with `base_url` at the **root of the OAuth subdomain** (no sub-paths) and a `folder` under `src/content/pages`. (This keeps OAuth clean and editors happy.)
 
 ### E) Email policy (`policy/email/sendgrid.rego`)
 
-* `desired-state/sendgrid.templates.json` must list template ids used by the contact function; deny if function references an id not in desired state.
-* Encourage **v3 API dynamic templates** (not SMTP/legacy) per SendGrid docs. ([SendGrid][6])
+- `desired-state/sendgrid.templates.json` must list template ids used by the contact function; deny if function references an id not in desired state.
+- Encourage **v3 API dynamic templates** (not SMTP/legacy) per SendGrid docs. ([SendGrid][6])
 
 ### F) Docs policy (`policy/docs/docs.rego`)
 
-* Any PR that changes `src/**`, `functions/**`, or `wrangler.toml` **must** touch one of: `CHANGELOG.md`, `ARCHITECTURE.md`, or an ADR file.
-* If `functions/api/contact.ts` changes, require `docs/playbooks/email-issues.md` update (or allow an override label).
+- Any PR that changes `src/**`, `functions/**`, or `wrangler.toml` **must** touch one of: `CHANGELOG.md`, `ARCHITECTURE.md`, or an ADR file.
+- If `functions/api/contact.ts` changes, require `docs/playbooks/email-issues.md` update (or allow an override label).
 
 > Conftest/OPA is a perfect fit for these JSON/YAML file assertions. ([Conftest][7])
 
@@ -97,23 +97,28 @@ Use `ajv` to validate `public/admin/config.yml` (after converting to JSON) and y
 
 ```js
 // scripts/validate/ajv-validate.mjs
-import fs from "node:fs";
-import { load } from "js-yaml";
-import Ajv from "ajv";
+import fs from 'node:fs';
+import { load } from 'js-yaml';
+import Ajv from 'ajv';
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 
 const schemas = [
-  ["decap-config", "schemas/decap-config.schema.json", "public/admin/config.yml"],
-  ["sendgrid-desired", "schemas/sendgrid-templates.schema.json", "desired-state/sendgrid.templates.json"]
+  ['decap-config', 'schemas/decap-config.schema.json', 'public/admin/config.yml'],
+  [
+    'sendgrid-desired',
+    'schemas/sendgrid-templates.schema.json',
+    'desired-state/sendgrid.templates.json',
+  ],
 ];
 
 let failed = false;
 
 for (const [name, schemaPath, filePath] of schemas) {
-  const schema = JSON.parse(fs.readFileSync(schemaPath, "utf8"));
-  const raw = fs.readFileSync(filePath, "utf8");
-  const data = filePath.endsWith(".yml") || filePath.endsWith(".yaml") ? load(raw) : JSON.parse(raw);
+  const schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+  const raw = fs.readFileSync(filePath, 'utf8');
+  const data =
+    filePath.endsWith('.yml') || filePath.endsWith('.yaml') ? load(raw) : JSON.parse(raw);
   const validate = ajv.compile(schema);
   const ok = validate(data);
   if (!ok) {
@@ -133,31 +138,36 @@ Wrangler exposes Pages **secret list**—we can diff that with `desired-state/cl
 
 ```js
 // scripts/drift/cloudflare-pages.mjs
-import { execSync } from "node:child_process";
-import fs from "node:fs";
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 
 const project = process.env.CF_PAGES_PROJECT;
-const desired = JSON.parse(fs.readFileSync("desired-state/cloudflare.pages.json","utf8"));
+const desired = JSON.parse(fs.readFileSync('desired-state/cloudflare.pages.json', 'utf8'));
 // { production: { variables:[], secrets:[] }, preview: { variables:[], secrets:[] } }
 
-function listSecrets(envName){
-  const out = execSync(`npx wrangler pages secret list --project-name=${project} --environment=${envName}`, {stdio:"pipe"}).toString();
+function listSecrets(envName) {
+  const out = execSync(
+    `npx wrangler pages secret list --project-name=${project} --environment=${envName}`,
+    { stdio: 'pipe' }
+  ).toString();
   // JSON lines or table; parse names robustly:
-  const names = [...out.matchAll(/[A-Z0-9_]+/g)].map(m=>m[0]).filter(x=>x!=="NAME" && x!=="VALUE");
+  const names = [...out.matchAll(/[A-Z0-9_]+/g)]
+    .map((m) => m[0])
+    .filter((x) => x !== 'NAME' && x !== 'VALUE');
   return new Set(names);
 }
 
-function diff(kind, envName, expected){
+function diff(kind, envName, expected) {
   const have = listSecrets(envName);
-  const missing = expected.secrets.filter(n=>!have.has(n));
-  if (missing.length){
-    console.error(`[drift] ${kind}/${envName} missing secrets: ${missing.join(", ")}`);
+  const missing = expected.secrets.filter((n) => !have.has(n));
+  if (missing.length) {
+    console.error(`[drift] ${kind}/${envName} missing secrets: ${missing.join(', ')}`);
     process.exitCode = 1;
   }
 }
 
-diff("pages","production", desired.production);
-diff("pages","preview", desired.preview);
+diff('pages', 'production', desired.production);
+diff('pages', 'preview', desired.preview);
 ```
 
 **B) Cloudflare Worker (OAuth proxy) secrets**
@@ -170,21 +180,24 @@ Verify the IDs in `desired-state/sendgrid.templates.json` exist by calling `GET 
 
 ```js
 // scripts/drift/sendgrid-templates.mjs
-import fs from "node:fs";
+import fs from 'node:fs';
 
-const desired = JSON.parse(fs.readFileSync("desired-state/sendgrid.templates.json","utf8"));
+const desired = JSON.parse(fs.readFileSync('desired-state/sendgrid.templates.json', 'utf8'));
 // { templates: [{id:"d-xxxx", name:"ContactReceived"}, ...] }
 
-const res = await fetch("https://api.sendgrid.com/v3/templates?generations=dynamic", {
-  headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}` }
+const res = await fetch('https://api.sendgrid.com/v3/templates?generations=dynamic', {
+  headers: { Authorization: `Bearer ${process.env.SENDGRID_API_KEY}` },
 });
-if (!res.ok) { console.error("SendGrid list failed", await res.text()); process.exit(1); }
+if (!res.ok) {
+  console.error('SendGrid list failed', await res.text());
+  process.exit(1);
+}
 const body = await res.json();
-const ids = new Set((body.templates||[]).map(t=>t.id));
+const ids = new Set((body.templates || []).map((t) => t.id));
 
-const missing = desired.templates.filter(t=>!ids.has(t.id));
-if (missing.length){
-  console.error("[drift] Missing SendGrid templates:", missing.map(t=>t.id).join(", "));
+const missing = desired.templates.filter((t) => !ids.has(t.id));
+if (missing.length) {
+  console.error('[drift] Missing SendGrid templates:', missing.map((t) => t.id).join(', '));
   process.exit(1);
 }
 ```
@@ -197,14 +210,14 @@ if (missing.length){
 
 ### 4.1 PR quality gate (`.github/workflows/quality.yml`)
 
-* Runs **Conftest**, **AJV**, **linters & type checks**, and **Playwright smoke** (against PR preview URL).
-* Protected branch requires these checks to pass (GitHub **required status checks**). ([GitHub Docs][13])
+- Runs **Conftest**, **AJV**, **linters & type checks**, and **Playwright smoke** (against PR preview URL).
+- Protected branch requires these checks to pass (GitHub **required status checks**). ([GitHub Docs][13])
 
 ```yaml
 name: Quality Gate
 on:
   pull_request:
-    paths-ignore: ["**/*.md", "docs/**"]
+    paths-ignore: ['**/*.md', 'docs/**']
 jobs:
   policy:
     runs-on: ubuntu-latest
@@ -224,7 +237,7 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 'lts/*' }
       - run: npm ci
-      - run: npm run check     # biome/prettier/eslint/tsc/astro/sv
+      - run: npm run check # biome/prettier/eslint/tsc/astro/sv
 
   e2e:
     runs-on: ubuntu-latest
@@ -252,13 +265,13 @@ jobs:
 
 ### 4.2 Nightly drift check (`.github/workflows/drift-nightly.yml`)
 
-* Calls `scripts/drift/*` to compare **actual Cloudflare/SendGrid** with `desired-state/`.
-* Fails the run (emails you via GitHub notifications) if anything diverges.
+- Calls `scripts/drift/*` to compare **actual Cloudflare/SendGrid** with `desired-state/`.
+- Fails the run (emails you via GitHub notifications) if anything diverges.
 
 ```yaml
 name: Drift Nightly
 on:
-  schedule: [{ cron: "15 11 * * *" }]  # 11:15 UTC daily
+  schedule: [{ cron: '15 11 * * *' }] # 11:15 UTC daily
   workflow_dispatch:
 jobs:
   drift:
@@ -284,9 +297,9 @@ jobs:
 
 # 5) Guardrails in GitHub itself
 
-* **Branch protection**: require passing checks, disallow force-push, require CODEOWNERS review. ([GitHub Docs][14])
-* **CODEOWNERS**: assign `@you` for `/`, and also own `.github/`, `policy/`, `functions/**`, `workers/**`.
-* **Rules**: only allow squash merges; require signed commits if you like.
+- **Branch protection**: require passing checks, disallow force-push, require CODEOWNERS review. ([GitHub Docs][14])
+- **CODEOWNERS**: assign `@you` for `/`, and also own `.github/`, `policy/`, `functions/**`, `workers/**`.
+- **Rules**: only allow squash merges; require signed commits if you like.
 
 ---
 
@@ -317,11 +330,16 @@ pre-commit:
 {
   "production": {
     "variables": ["TURNSTILE_SITE_KEY", "SENDGRID_CONTACT_TEMPLATE_ID"],
-    "secrets":   ["TURNSTILE_SECRET_KEY", "SENDGRID_API_KEY"]
+    "secrets": ["TURNSTILE_SECRET_KEY", "SENDGRID_API_KEY"]
   },
   "preview": {
-    "variables": ["TURNSTILE_SITE_KEY", "SENDGRID_CONTACT_TEMPLATE_ID", "USE_TURNSTILE_TEST", "TURNSTILE_TEST_SITE_KEY"],
-    "secrets":   ["TURNSTILE_SECRET_KEY", "TURNSTILE_TEST_SECRET_KEY", "SENDGRID_API_KEY"]
+    "variables": [
+      "TURNSTILE_SITE_KEY",
+      "SENDGRID_CONTACT_TEMPLATE_ID",
+      "USE_TURNSTILE_TEST",
+      "TURNSTILE_TEST_SITE_KEY"
+    ],
+    "secrets": ["TURNSTILE_SECRET_KEY", "TURNSTILE_TEST_SECRET_KEY", "SENDGRID_API_KEY"]
   }
 }
 ```
@@ -335,10 +353,12 @@ pre-commit:
 **`desired-state/sendgrid.templates.json`**
 
 ```json
-{ "templates": [
-  { "id": "d-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "name": "ContactReceived" },
-  { "id": "d-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "name": "ContactConfirmation" }
-] }
+{
+  "templates": [
+    { "id": "d-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "name": "ContactReceived" },
+    { "id": "d-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "name": "ContactConfirmation" }
+  ]
+}
 ```
 
 (Template listing/diff uses SendGrid’s **Transactional Templates** v3 endpoints.) ([Twilio][11])
@@ -349,40 +369,40 @@ pre-commit:
 
 Two small helpers:
 
-* **Docs gate**: `scripts/gates/require-docs.mjs` fails if code-paths change and none of `CHANGELOG.md`, `ARCHITECTURE.md`, or any `docs/decisions/*.md` is touched.
-* **Docs health** Action (weekly) already shared; keep it—broken links/markdown lint catch rot.
+- **Docs gate**: `scripts/gates/require-docs.mjs` fails if code-paths change and none of `CHANGELOG.md`, `ARCHITECTURE.md`, or any `docs/decisions/*.md` is touched.
+- **Docs health** Action (weekly) already shared; keep it—broken links/markdown lint catch rot.
 
 ---
 
 # 9) Secret handling + tests
 
-* Local dev uses `.dev.vars` (Cloudflare’s recommended way). **Policies forbid committing it.** ([Cloudflare Docs][4])
-* Turnstile **test keys** only in Preview/Dev; production never sets `USE_TURNSTILE_TEST`. (Turnstile’s test keys & server-side validation guidance referenced.) ([Cloudflare Docs][5])
+- Local dev uses `.dev.vars` (Cloudflare’s recommended way). **Policies forbid committing it.** ([Cloudflare Docs][4])
+- Turnstile **test keys** only in Preview/Dev; production never sets `USE_TURNSTILE_TEST`. (Turnstile’s test keys & server-side validation guidance referenced.) ([Cloudflare Docs][5])
 
 ---
 
 ## TL;DR install list
 
-* **Conftest + Rego** for policy-as-code. ([GitHub][8])
-* **AJV** for schema sanity.
-* **Wrangler** already present; we use it to **list Pages/Worker secrets** in drift checks. ([Cloudflare Docs][9])
-* **SendGrid v3 API** to verify template IDs exist. ([Twilio][11])
-* **Branch protection** to make checks required. ([GitHub Docs][13])
+- **Conftest + Rego** for policy-as-code. ([GitHub][8])
+- **AJV** for schema sanity.
+- **Wrangler** already present; we use it to **list Pages/Worker secrets** in drift checks. ([Cloudflare Docs][9])
+- **SendGrid v3 API** to verify template IDs exist. ([Twilio][11])
+- **Branch protection** to make checks required. ([GitHub Docs][13])
 
-[1]: https://developers.cloudflare.com/turnstile/get-started/?utm_source=chatgpt.com "Get started · Cloudflare Turnstile docs"
-[2]: https://developers.cloudflare.com/turnstile/get-started/server-side-validation?utm_source=chatgpt.com "Server-side validation | Cloudflare Turnstile docs"
-[3]: https://developers.cloudflare.com/workers/configuration/environment-variables/?utm_source=chatgpt.com "Environment variables · Cloudflare Workers docs"
-[4]: https://developers.cloudflare.com/pages/functions/bindings/?utm_source=chatgpt.com "Bindings · Cloudflare Pages docs"
-[5]: https://developers.cloudflare.com/turnstile/troubleshooting/testing/?utm_source=chatgpt.com "Testing · Cloudflare Turnstile docs"
+[1]: https://developers.cloudflare.com/turnstile/get-started/?utm_source=chatgpt.com 'Get started · Cloudflare Turnstile docs'
+[2]: https://developers.cloudflare.com/turnstile/get-started/server-side-validation?utm_source=chatgpt.com 'Server-side validation | Cloudflare Turnstile docs'
+[3]: https://developers.cloudflare.com/workers/configuration/environment-variables/?utm_source=chatgpt.com 'Environment variables · Cloudflare Workers docs'
+[4]: https://developers.cloudflare.com/pages/functions/bindings/?utm_source=chatgpt.com 'Bindings · Cloudflare Pages docs'
+[5]: https://developers.cloudflare.com/turnstile/troubleshooting/testing/?utm_source=chatgpt.com 'Testing · Cloudflare Turnstile docs'
 [6]: https://sendgrid.com/en-us/blog/how-to-use-sendgrids-dynamic-templates-for-your-transactional-emails?utm_source=chatgpt.com "How to Use SendGrid's Dynamic Templates for Your Transactional Emails | SendGrid"
-[7]: https://www.conftest.dev/?utm_source=chatgpt.com "Conftest"
-[8]: https://github.com/open-policy-agent/conftest?utm_source=chatgpt.com "GitHub - open-policy-agent/conftest: Write tests against structured configuration data using the Open Policy Agent Rego query language"
-[9]: https://developers.cloudflare.com/workers/wrangler/commands?utm_source=chatgpt.com "Commands - Wrangler"
-[10]: https://developers.cloudflare.com/workers/configuration/secrets?utm_source=chatgpt.com "Secrets | Cloudflare Workers docs"
-[11]: https://www.twilio.com/docs/sendgrid/api-reference/transactional-templates/retrieve-paged-transactional-templates?utm_source=chatgpt.com "Retrieve paged transactional templates. | SendGrid Docs | Twilio"
-[12]: https://www.twilio.com/docs/sendgrid/api-reference/transactional-templates?utm_source=chatgpt.com "Transactional Templates | SendGrid Docs | Twilio"
-[13]: https://docs.github.com/articles/about-required-status-checks?utm_source=chatgpt.com "About protected branches - GitHub Docs"
-[14]: https://docs.github.com/articles/about-codeowners?utm_source=chatgpt.com "About code owners - GitHub Docs"
+[7]: https://www.conftest.dev/?utm_source=chatgpt.com 'Conftest'
+[8]: https://github.com/open-policy-agent/conftest?utm_source=chatgpt.com 'GitHub - open-policy-agent/conftest: Write tests against structured configuration data using the Open Policy Agent Rego query language'
+[9]: https://developers.cloudflare.com/workers/wrangler/commands?utm_source=chatgpt.com 'Commands - Wrangler'
+[10]: https://developers.cloudflare.com/workers/configuration/secrets?utm_source=chatgpt.com 'Secrets | Cloudflare Workers docs'
+[11]: https://www.twilio.com/docs/sendgrid/api-reference/transactional-templates/retrieve-paged-transactional-templates?utm_source=chatgpt.com 'Retrieve paged transactional templates. | SendGrid Docs | Twilio'
+[12]: https://www.twilio.com/docs/sendgrid/api-reference/transactional-templates?utm_source=chatgpt.com 'Transactional Templates | SendGrid Docs | Twilio'
+[13]: https://docs.github.com/articles/about-required-status-checks?utm_source=chatgpt.com 'About protected branches - GitHub Docs'
+[14]: https://docs.github.com/articles/about-codeowners?utm_source=chatgpt.com 'About code owners - GitHub Docs'
 
 ---
 
@@ -406,10 +426,10 @@ Add these scripts to `package.json`:
 
 You’ll need:
 
-* **Conftest** installed (or curl the static binary in CI).
-* Node 18+ (recommended LTS).
-* `wrangler` available in CI for Cloudflare listing.
-* `SENDGRID_API_KEY` available in env for the SendGrid drift script.
+- **Conftest** installed (or curl the static binary in CI).
+- Node 18+ (recommended LTS).
+- `wrangler` available in CI for Cloudflare listing.
+- `SENDGRID_API_KEY` available in env for the SendGrid drift script.
 
 ---
 
@@ -670,11 +690,16 @@ deny[msg] {
 {
   "production": {
     "variables": ["TURNSTILE_SITE_KEY", "SENDGRID_CONTACT_TEMPLATE_ID"],
-    "secrets":   ["TURNSTILE_SECRET_KEY", "SENDGRID_API_KEY"]
+    "secrets": ["TURNSTILE_SECRET_KEY", "SENDGRID_API_KEY"]
   },
   "preview": {
-    "variables": ["TURNSTILE_SITE_KEY", "SENDGRID_CONTACT_TEMPLATE_ID", "USE_TURNSTILE_TEST", "TURNSTILE_TEST_SITEKEY"],
-    "secrets":   ["TURNSTILE_SECRET_KEY", "TURNSTILE_TEST_SECRET_KEY", "SENDGRID_API_KEY"]
+    "variables": [
+      "TURNSTILE_SITE_KEY",
+      "SENDGRID_CONTACT_TEMPLATE_ID",
+      "USE_TURNSTILE_TEST",
+      "TURNSTILE_TEST_SITEKEY"
+    ],
+    "secrets": ["TURNSTILE_SECRET_KEY", "TURNSTILE_TEST_SECRET_KEY", "SENDGRID_API_KEY"]
   }
 }
 ```
@@ -706,20 +731,30 @@ deny[msg] {
 
 ```js
 #!/usr/bin/env node
-import { execSync } from "node:child_process";
-import fs from "node:fs";
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 
-const project = process.env.CF_PAGES_PROJECT || "liteckyeditingservices"; // change if needed
-const desired = JSON.parse(fs.readFileSync("desired-state/cloudflare.pages.json", "utf8"));
+const project = process.env.CF_PAGES_PROJECT || 'liteckyeditingservices'; // change if needed
+const desired = JSON.parse(fs.readFileSync('desired-state/cloudflare.pages.json', 'utf8'));
 
 function list(kind, envName) {
   // Wrangler prints a table; we parse NAME column text robustly.
   // secrets
-  let out = execSync(`npx wrangler pages secret list --project-name=${project} --environment=${envName}`, {stdio:"pipe"}).toString();
-  const sec = new Set([...out.matchAll(/\b[A-Z0-9_]{2,}\b/g)].map(m=>m[0]).filter(x => !["NAME","VALUE"].includes(x)));
+  let out = execSync(
+    `npx wrangler pages secret list --project-name=${project} --environment=${envName}`,
+    { stdio: 'pipe' }
+  ).toString();
+  const sec = new Set(
+    [...out.matchAll(/\b[A-Z0-9_]{2,}\b/g)]
+      .map((m) => m[0])
+      .filter((x) => !['NAME', 'VALUE'].includes(x))
+  );
 
   // variables
-  out = execSync(`npx wrangler pages project settings --project-name=${project} --environment=${envName}`, {stdio:"pipe"}).toString();
+  out = execSync(
+    `npx wrangler pages project settings --project-name=${project} --environment=${envName}`,
+    { stdio: 'pipe' }
+  ).toString();
   // Attempt to parse JSON first; fallback to scan
   let vars = new Set();
   try {
@@ -727,31 +762,31 @@ function list(kind, envName) {
     const entries = obj?.env_vars || obj?.deployment_configs?.[envName]?.env_vars || {};
     vars = new Set(Object.keys(entries));
   } catch {
-    vars = new Set([...out.matchAll(/\b[A-Z0-9_]{2,}\b/g)].map(m=>m[0]));
+    vars = new Set([...out.matchAll(/\b[A-Z0-9_]{2,}\b/g)].map((m) => m[0]));
   }
   return { vars, sec };
 }
 
 function diffEnv(envName, expected) {
-  const { vars, sec } = list("pages", envName);
+  const { vars, sec } = list('pages', envName);
 
-  const missVars = (expected.variables || []).filter(n => !vars.has(n));
-  const missSec  = (expected.secrets   || []).filter(n => !sec.has(n));
+  const missVars = (expected.variables || []).filter((n) => !vars.has(n));
+  const missSec = (expected.secrets || []).filter((n) => !sec.has(n));
 
   if (missVars.length) {
-    console.error(`[drift] Pages/${envName} missing VARIABLES: ${missVars.join(", ")}`);
+    console.error(`[drift] Pages/${envName} missing VARIABLES: ${missVars.join(', ')}`);
     process.exitCode = 1;
   }
   if (missSec.length) {
-    console.error(`[drift] Pages/${envName} missing SECRETS: ${missSec.join(", ")}`);
+    console.error(`[drift] Pages/${envName} missing SECRETS: ${missSec.join(', ')}`);
     process.exitCode = 1;
   }
 }
 
-diffEnv("production", desired.production || {});
-diffEnv("preview", desired.preview || {});
+diffEnv('production', desired.production || {});
+diffEnv('preview', desired.preview || {});
 if (process.exitCode) process.exit(process.exitCode);
-console.log("Pages drift: OK");
+console.log('Pages drift: OK');
 ```
 
 ---
@@ -760,27 +795,33 @@ console.log("Pages drift: OK");
 
 ```js
 #!/usr/bin/env node
-import { execSync } from "node:child_process";
-import fs from "node:fs";
+import { execSync } from 'node:child_process';
+import fs from 'node:fs';
 
-const workerName = process.env.CF_WORKER_NAME || "decap-oauth";
-const desired = JSON.parse(fs.readFileSync("desired-state/cloudflare.worker-oauth.json", "utf8"));
+const workerName = process.env.CF_WORKER_NAME || 'decap-oauth';
+const desired = JSON.parse(fs.readFileSync('desired-state/cloudflare.worker-oauth.json', 'utf8'));
 
 function listWorkerSecrets() {
-  const out = execSync(`npx wrangler secret list --name ${workerName}`, {stdio:"pipe"}).toString();
+  const out = execSync(`npx wrangler secret list --name ${workerName}`, {
+    stdio: 'pipe',
+  }).toString();
   // Parse NAME column
-  const names = new Set([...out.matchAll(/\b[A-Z0-9_]{2,}\b/g)].map(m=>m[0]).filter(x => !["NAME","VALUE"].includes(x)));
+  const names = new Set(
+    [...out.matchAll(/\b[A-Z0-9_]{2,}\b/g)]
+      .map((m) => m[0])
+      .filter((x) => !['NAME', 'VALUE'].includes(x))
+  );
   return names;
 }
 
 const have = listWorkerSecrets();
 const expected = new Set(desired.secrets || []);
-const missing = [...expected].filter(x => !have.has(x));
+const missing = [...expected].filter((x) => !have.has(x));
 if (missing.length) {
-  console.error(`[drift] Worker ${workerName} missing secrets: ${missing.join(", ")}`);
+  console.error(`[drift] Worker ${workerName} missing secrets: ${missing.join(', ')}`);
   process.exit(1);
 }
-console.log("Worker drift: OK");
+console.log('Worker drift: OK');
 ```
 
 ---
@@ -789,32 +830,32 @@ console.log("Worker drift: OK");
 
 ```js
 #!/usr/bin/env node
-import fs from "node:fs";
+import fs from 'node:fs';
 
 const apiKey = process.env.SENDGRID_API_KEY;
 if (!apiKey) {
-  console.error("SENDGRID_API_KEY not set");
+  console.error('SENDGRID_API_KEY not set');
   process.exit(1);
 }
 
-const desired = JSON.parse(fs.readFileSync("desired-state/sendgrid.templates.json", "utf8"));
-const want = new Set((desired.templates || []).map(t => t.id));
+const desired = JSON.parse(fs.readFileSync('desired-state/sendgrid.templates.json', 'utf8'));
+const want = new Set((desired.templates || []).map((t) => t.id));
 
-const res = await fetch("https://api.sendgrid.com/v3/templates?generations=dynamic", {
-  headers: { Authorization: `Bearer ${apiKey}` }
+const res = await fetch('https://api.sendgrid.com/v3/templates?generations=dynamic', {
+  headers: { Authorization: `Bearer ${apiKey}` },
 });
 if (!res.ok) {
-  console.error("[drift] SendGrid list failed:", await res.text());
+  console.error('[drift] SendGrid list failed:', await res.text());
   process.exit(1);
 }
 const body = await res.json();
-const got = new Set((body.templates || []).map(t => t.id));
-const missing = [...want].filter(id => !got.has(id));
+const got = new Set((body.templates || []).map((t) => t.id));
+const missing = [...want].filter((id) => !got.has(id));
 if (missing.length) {
-  console.error("[drift] Missing SendGrid templates:", missing.join(", "));
+  console.error('[drift] Missing SendGrid templates:', missing.join(', '));
   process.exit(1);
 }
-console.log("SendGrid drift: OK");
+console.log('SendGrid drift: OK');
 ```
 
 ---
@@ -823,24 +864,33 @@ console.log("SendGrid drift: OK");
 
 ```js
 #!/usr/bin/env node
-import fs from "node:fs";
-import { load as yamlLoad } from "js-yaml";
-import Ajv from "ajv";
+import fs from 'node:fs';
+import { load as yamlLoad } from 'js-yaml';
+import Ajv from 'ajv';
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 
 const checks = [
-  { name: "decap-config", schema: "schemas/decap-config.schema.json", file: "public/admin/config.yml" },
-  { name: "sendgrid-desired", schema: "schemas/sendgrid-templates.schema.json", file: "desired-state/sendgrid.templates.json" }
+  {
+    name: 'decap-config',
+    schema: 'schemas/decap-config.schema.json',
+    file: 'public/admin/config.yml',
+  },
+  {
+    name: 'sendgrid-desired',
+    schema: 'schemas/sendgrid-templates.schema.json',
+    file: 'desired-state/sendgrid.templates.json',
+  },
 ];
 
 let failed = false;
 
 for (const c of checks) {
   try {
-    const schema = JSON.parse(fs.readFileSync(c.schema, "utf8"));
-    const raw = fs.readFileSync(c.file, "utf8");
-    const data = c.file.endsWith(".yml") || c.file.endsWith(".yaml") ? yamlLoad(raw) : JSON.parse(raw);
+    const schema = JSON.parse(fs.readFileSync(c.schema, 'utf8'));
+    const raw = fs.readFileSync(c.file, 'utf8');
+    const data =
+      c.file.endsWith('.yml') || c.file.endsWith('.yaml') ? yamlLoad(raw) : JSON.parse(raw);
     const validate = ajv.compile(schema);
     const ok = validate(data);
     if (!ok) {
@@ -868,34 +918,45 @@ process.exit(failed ? 1 : 0);
  * Intended for PR CI where we can read the diff from GITHUB_SHA / BASE_SHA.
  * For local runs, we fallback to 'git diff --name-only origin/main...HEAD'.
  */
-import { execSync } from "node:child_process";
+import { execSync } from 'node:child_process';
 
-function sh(cmd) { return execSync(cmd, {stdio:"pipe"}).toString().trim(); }
+function sh(cmd) {
+  return execSync(cmd, { stdio: 'pipe' }).toString().trim();
+}
 
 let base = process.env.GITHUB_BASE_SHA || process.env.GITHUB_EVENT_BEFORE;
 if (!base) {
-  try { base = sh("git merge-base origin/main HEAD"); } catch { base = "HEAD~1"; }
+  try {
+    base = sh('git merge-base origin/main HEAD');
+  } catch {
+    base = 'HEAD~1';
+  }
 }
-const head = process.env.GITHUB_SHA || "HEAD";
+const head = process.env.GITHUB_SHA || 'HEAD';
 
-const diff = sh(`git diff --name-only ${base} ${head}`).split("\n").filter(Boolean);
-const touchedCode = diff.some(p =>
-  p.startsWith("src/") || p.startsWith("functions/") || p.startsWith("workers/") ||
-  p === "wrangler.toml" || p.startsWith("public/admin/")
+const diff = sh(`git diff --name-only ${base} ${head}`).split('\n').filter(Boolean);
+const touchedCode = diff.some(
+  (p) =>
+    p.startsWith('src/') ||
+    p.startsWith('functions/') ||
+    p.startsWith('workers/') ||
+    p === 'wrangler.toml' ||
+    p.startsWith('public/admin/')
 );
-const touchedDocs = diff.some(p =>
-  p === "CHANGELOG.md" ||
-  p === "ARCHITECTURE.md" ||
-  p.startsWith("docs/decisions/") ||
-  p.startsWith("docs/") && p.endsWith(".md")
+const touchedDocs = diff.some(
+  (p) =>
+    p === 'CHANGELOG.md' ||
+    p === 'ARCHITECTURE.md' ||
+    p.startsWith('docs/decisions/') ||
+    (p.startsWith('docs/') && p.endsWith('.md'))
 );
 
 if (touchedCode && !touchedDocs) {
-  console.error("Docs gate: code changed but no docs/ADR/CHANGELOG updated.");
-  console.error("Changed files:\n" + diff.join("\n"));
+  console.error('Docs gate: code changed but no docs/ADR/CHANGELOG updated.');
+  console.error('Changed files:\n' + diff.join('\n'));
   process.exit(1);
 }
-console.log("Docs gate: OK");
+console.log('Docs gate: OK');
 ```
 
 ---
@@ -908,19 +969,19 @@ If you want to run the “required files” and “git files” checks via Conft
 
 ```js
 #!/usr/bin/env node
-import fs from "node:fs";
-import { execSync } from "node:child_process";
+import fs from 'node:fs';
+import { execSync } from 'node:child_process';
 
-const required = JSON.parse(fs.readFileSync("desired-state/repo.required-files.json", "utf8"));
-const files = execSync("git ls-files", {stdio:"pipe"}).toString().trim().split("\n");
+const required = JSON.parse(fs.readFileSync('desired-state/repo.required-files.json', 'utf8'));
+const files = execSync('git ls-files', { stdio: 'pipe' }).toString().trim().split('\n');
 
 const inputs = [
-  { "kind": "repo.required", "required": required.required, "present": files },
-  { "name": "git.files", "files": files }
+  { kind: 'repo.required', required: required.required, present: files },
+  { name: 'git.files', files: files },
 ];
 
-fs.writeFileSync("policy-inputs.json", JSON.stringify(inputs, null, 2));
-console.log("policy-inputs.json written");
+fs.writeFileSync('policy-inputs.json', JSON.stringify(inputs, null, 2));
+console.log('policy-inputs.json written');
 ```
 
 ## `desired-state/repo.required-files.json`
@@ -960,8 +1021,7 @@ conftest test --policy policy policy-inputs.json package.json public/admin/confi
 
 ## That’s it
 
-* **Rego policies**: guard structure, secrets handling, CMS config, docs discipline.
-* **Schemas**: keep Decap config and SendGrid desired state well-formed.
-* **Drift scripts**: compare Cloudflare Pages/Worker secrets & SendGrid templates vs desired state.
-* **Docs gate**: ensures architecture/docs don’t drift when agents (or humans) change code.
-
+- **Rego policies**: guard structure, secrets handling, CMS config, docs discipline.
+- **Schemas**: keep Decap config and SendGrid desired state well-formed.
+- **Drift scripts**: compare Cloudflare Pages/Worker secrets & SendGrid templates vs desired state.
+- **Docs gate**: ensures architecture/docs don’t drift when agents (or humans) change code.

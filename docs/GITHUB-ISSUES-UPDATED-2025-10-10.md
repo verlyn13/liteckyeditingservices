@@ -12,6 +12,7 @@
 ## 🔴 Priority 1: PKCE Implementation (In Progress)
 
 ### Issue 1: Implement PKCE Client-Side Flow
+
 **Priority**: Critical
 **Estimated**: 3-4 hours
 
@@ -19,6 +20,7 @@
 Add PKCE (Proof Key for Code Exchange) to OAuth flow for enhanced security and proper separation of concerns (frontend generates verifier, backend exchanges token).
 
 **Tasks**:
+
 - [ ] Create `public/admin/pkce-login.js`:
   - Generate `code_verifier` (random 43-128 char string)
   - Create `code_challenge` using SHA-256 (S256 method)
@@ -44,6 +46,7 @@ Add PKCE (Proof Key for Code Exchange) to OAuth flow for enhanced security and p
   - Client then emits canonical success message to Decap
 
 **Definition of Done**:
+
 - [ ] PKCE flow completes without errors
 - [ ] Authorization code properly exchanged for token
 - [ ] Decap CMS loads editor successfully
@@ -51,6 +54,7 @@ Add PKCE (Proof Key for Code Exchange) to OAuth flow for enhanced security and p
 - [ ] Works in both dev and production
 
 **References**:
+
 - RFC 7636: PKCE specification
 - GitHub OAuth docs: PKCE support
 - Decap CMS external OAuth documentation
@@ -58,6 +62,7 @@ Add PKCE (Proof Key for Code Exchange) to OAuth flow for enhanced security and p
 ---
 
 ### Issue 2: PKCE Testing & Validation
+
 **Priority**: Critical
 **Estimated**: 2 hours
 
@@ -65,6 +70,7 @@ Add PKCE (Proof Key for Code Exchange) to OAuth flow for enhanced security and p
 Comprehensive testing of PKCE implementation across environments and edge cases.
 
 **Tasks**:
+
 - [ ] Test complete PKCE flow in development (`http://127.0.0.1:8788`)
 - [ ] Test complete PKCE flow in production (`https://www.liteckyeditingservices.com`)
 - [ ] Verify `code_challenge` validation (reject mismatched verifier)
@@ -74,6 +80,7 @@ Comprehensive testing of PKCE implementation across environments and edge cases.
 - [ ] Document any issues or edge cases discovered
 
 **Definition of Done**:
+
 - [ ] All environments tested successfully
 - [ ] Security validations confirmed working
 - [ ] Edge cases documented
@@ -86,6 +93,7 @@ Comprehensive testing of PKCE implementation across environments and edge cases.
 **Status**: Documentation complete, implementation deferred until after PKCE
 
 ### Issue 3: External Uptime Monitoring
+
 **Priority**: High (after PKCE)
 **Estimated**: 30 minutes
 
@@ -95,6 +103,7 @@ Set up external uptime monitoring using UptimeRobot (free tier).
 **Reference**: `/docs/infrastructure/UPTIME-MONITORING.md`
 
 **Tasks**:
+
 - [ ] Create UptimeRobot account
 - [ ] Add 3 monitors:
   - Homepage: `https://www.liteckyeditingservices.com/`
@@ -105,6 +114,7 @@ Set up external uptime monitoring using UptimeRobot (free tier).
 - [ ] Test alerts
 
 **Definition of Done**:
+
 - [ ] 3 monitors active and reporting
 - [ ] Alert email configured and tested
 - [ ] Screenshots of dashboard saved to `/docs/infrastructure/`
@@ -112,6 +122,7 @@ Set up external uptime monitoring using UptimeRobot (free tier).
 ---
 
 ### Issue 4: Cloudflare Error Alerting Worker
+
 **Priority**: High (after PKCE)
 **Estimated**: 2 hours
 
@@ -121,6 +132,7 @@ Implement scheduled Worker to monitor Pages/Workers errors and send alerts.
 **Reference**: `/docs/infrastructure/ERROR-ALERTING.md`
 
 **Tasks**:
+
 - [ ] Create `workers/error-monitor/` Worker
 - [ ] Implement Workers Analytics API integration
 - [ ] Add Pages deployment failure detection
@@ -130,6 +142,7 @@ Implement scheduled Worker to monitor Pages/Workers errors and send alerts.
 - [ ] Set secrets: `CLOUDFLARE_API_TOKEN`, `SENDGRID_API_KEY`, `ALERT_EMAIL`
 
 **Definition of Done**:
+
 - [ ] Worker deployed and running on schedule (every 15 minutes)
 - [ ] Alert thresholds validated
 - [ ] Test alert received successfully
@@ -138,6 +151,7 @@ Implement scheduled Worker to monitor Pages/Workers errors and send alerts.
 ---
 
 ### Issue 5: Queue Health Monitoring Worker
+
 **Priority**: Medium (after PKCE)
 **Estimated**: 2.5 hours
 
@@ -147,6 +161,7 @@ Monitor `send-email-queue` health with KV-based metrics.
 **Reference**: `/docs/infrastructure/QUEUE-HEALTH.md`
 
 **Tasks**:
+
 - [ ] Create `workers/queue-health/` Worker
 - [ ] Create KV namespace: `wrangler kv:namespace create QUEUE_STATS`
 - [ ] Implement metrics tracking (produced vs consumed)
@@ -157,6 +172,7 @@ Monitor `send-email-queue` health with KV-based metrics.
 - [ ] Deploy and test
 
 **Definition of Done**:
+
 - [ ] Queue metrics tracking accurately
 - [ ] Alerts trigger at correct thresholds
 - [ ] Daily report email received
@@ -167,10 +183,12 @@ Monitor `send-email-queue` health with KV-based metrics.
 ## 🟢 Priority 3: Testing & Quality (After PKCE)
 
 ### Issue 6: Production E2E Test Suite ✅ DONE
+
 **Status**: Complete
 **Completed**: October 4, 2025
 
 Tests passing against `https://liteckyeditingservices.com`:
+
 - ✅ Homepage load and navigation
 - ✅ Contact form submission
 - ✅ Security headers validation
@@ -181,6 +199,7 @@ Tests passing against `https://liteckyeditingservices.com`:
 ---
 
 ### Issue 7: Expand E2E Failure State Coverage
+
 **Priority**: Medium (after PKCE)
 **Estimated**: 3 hours
 
@@ -188,6 +207,7 @@ Tests passing against `https://liteckyeditingservices.com`:
 Add E2E tests for error states and edge cases.
 
 **Tasks**:
+
 - [ ] Form validation errors (missing fields, invalid email)
 - [ ] Turnstile edge cases (failure, timeout, network error)
 - [ ] Rate limiting scenarios (trigger 429 responses)
@@ -195,6 +215,7 @@ Add E2E tests for error states and edge cases.
 - [ ] OAuth failure states (GitHub deny, invalid state, expired code)
 
 **Definition of Done**:
+
 - [ ] 10+ failure state tests added
 - [ ] Tests documented in `/tests/e2e/`
 - [ ] CI pipeline runs all tests
@@ -203,6 +224,7 @@ Add E2E tests for error states and edge cases.
 ---
 
 ### Issue 8: Visual Regression - Additional Pages
+
 **Priority**: Low (after PKCE)
 **Estimated**: 30 minutes
 
@@ -213,6 +235,7 @@ Expand visual regression testing to all 7 pages.
 **Needed**: About, Testimonials, FAQ, Process, Contact
 
 **Tasks**:
+
 - [ ] Update `/tests/e2e/visual.spec.ts`
 - [ ] Add tests for 5 remaining pages
 - [ ] Generate baselines: `pnpm test:e2e:prod -g "@visual" --update-snapshots`
@@ -220,6 +243,7 @@ Expand visual regression testing to all 7 pages.
 - [ ] Verify CI detects visual changes
 
 **Definition of Done**:
+
 - [ ] 14 baseline screenshots (7 pages × 2 devices)
 - [ ] CI fails on visual regressions
 - [ ] Documented in `/docs/testing/VISUAL-REGRESSION-GUIDE.md`
@@ -227,6 +251,7 @@ Expand visual regression testing to all 7 pages.
 ---
 
 ### Issue 9: Accessibility Audit (WCAG 2.1 AA)
+
 **Priority**: High (after PKCE)
 **Estimated**: 4 hours
 
@@ -234,6 +259,7 @@ Expand visual regression testing to all 7 pages.
 Complete accessibility sweep for all 7 pages.
 
 **Tasks**:
+
 - [ ] Run pa11y on all pages:
   ```bash
   pa11y --standard WCAG2AA https://www.liteckyeditingservices.com/
@@ -247,6 +273,7 @@ Complete accessibility sweep for all 7 pages.
 - [ ] Document findings and fixes
 
 **Definition of Done**:
+
 - [ ] All pages pass pa11y WCAG2AA
 - [ ] Manual testing complete (checklist)
 - [ ] Fixes deployed and verified
@@ -257,6 +284,7 @@ Complete accessibility sweep for all 7 pages.
 ## 🔵 Priority 4: Performance (After PKCE)
 
 ### Issue 10: Image Optimization
+
 **Priority**: Medium
 **Estimated**: 3 hours
 
@@ -264,6 +292,7 @@ Complete accessibility sweep for all 7 pages.
 Optimize images for performance (LCP < 2.5s on mobile 4G).
 
 **Tasks**:
+
 - [ ] Audit current images (formats, sizes, loading)
 - [ ] Convert to WebP/AVIF with fallbacks
 - [ ] Implement responsive images (`srcset`, `sizes`)
@@ -272,6 +301,7 @@ Optimize images for performance (LCP < 2.5s on mobile 4G).
 - [ ] Test LCP on mobile 4G (Lighthouse throttling)
 
 **Definition of Done**:
+
 - [ ] LCP < 2.5s for home and services pages (mobile 4G)
 - [ ] All images optimized (WebP/AVIF)
 - [ ] Lighthouse performance score >90
@@ -280,6 +310,7 @@ Optimize images for performance (LCP < 2.5s on mobile 4G).
 ---
 
 ### Issue 11: Code Splitting & Lazy Loading
+
 **Priority**: Low
 **Estimated**: 2 hours
 
@@ -287,6 +318,7 @@ Optimize images for performance (LCP < 2.5s on mobile 4G).
 Review and optimize JavaScript bundle size.
 
 **Tasks**:
+
 - [ ] Analyze current bundle with Astro build output
 - [ ] Identify heavy components (FileUpload.svelte, etc.)
 - [ ] Implement lazy loading for interactive components
@@ -294,6 +326,7 @@ Review and optimize JavaScript bundle size.
 - [ ] Measure bundle size reduction
 
 **Definition of Done**:
+
 - [ ] Initial JS bundle < 100KB gzipped
 - [ ] Interactive components lazy-loaded
 - [ ] Bundle analysis documented
@@ -302,6 +335,7 @@ Review and optimize JavaScript bundle size.
 ---
 
 ### Issue 12: Cloudflare Caching Strategy
+
 **Priority**: Medium
 **Estimated**: 2 hours
 
@@ -309,6 +343,7 @@ Review and optimize JavaScript bundle size.
 Optimize Cloudflare caching for static assets and selective HTML caching.
 
 **Tasks**:
+
 - [ ] Audit current cache headers (`/public/_headers`)
 - [ ] Set long TTL for static assets (images, CSS, JS)
 - [ ] Implement short TTL for HTML where safe (5min for static pages)
@@ -316,6 +351,7 @@ Optimize Cloudflare caching for static assets and selective HTML caching.
 - [ ] Document cache strategy
 
 **Definition of Done**:
+
 - [ ] Static assets cached for 1 year
 - [ ] HTML caching enabled for static pages
 - [ ] Cache hit rate >80%
@@ -324,6 +360,7 @@ Optimize Cloudflare caching for static assets and selective HTML caching.
 ---
 
 ### Issue 13: Core Web Vitals Monitoring
+
 **Priority**: Medium
 **Estimated**: 1 hour
 
@@ -331,6 +368,7 @@ Optimize Cloudflare caching for static assets and selective HTML caching.
 Set up Core Web Vitals monitoring using Cloudflare Web Analytics or alternative.
 
 **Tasks**:
+
 - [ ] Enable Cloudflare Web Analytics (free, privacy-friendly)
 - [ ] Configure real user monitoring (RUM)
 - [ ] Set up alerts for degraded metrics
@@ -338,6 +376,7 @@ Set up Core Web Vitals monitoring using Cloudflare Web Analytics or alternative.
 - [ ] Document baseline metrics
 
 **Definition of Done**:
+
 - [ ] Web Analytics enabled
 - [ ] 7 days of baseline data collected
 - [ ] Alerts configured for degraded metrics
@@ -348,6 +387,7 @@ Set up Core Web Vitals monitoring using Cloudflare Web Analytics or alternative.
 ## 🟣 Priority 5: Security (After PKCE)
 
 ### Issue 14: CSP Hardening with Nonces ✅ PARTIALLY DONE
+
 **Status**: CSP implemented, nonces pending
 **Completed**: October 4, 2025 (basic CSP)
 **Remaining**: Nonce implementation
@@ -356,6 +396,7 @@ Set up Core Web Vitals monitoring using Cloudflare Web Analytics or alternative.
 **Needed**: Replace with nonce-based CSP
 
 **Tasks**:
+
 - [ ] Generate nonces in Astro layout
 - [ ] Update `public/_headers` to use nonces
 - [ ] Remove `'unsafe-inline'` from CSP
@@ -363,6 +404,7 @@ Set up Core Web Vitals monitoring using Cloudflare Web Analytics or alternative.
 - [ ] Update Svelte components to use nonces
 
 **Definition of Done**:
+
 - [ ] No `'unsafe-inline'` in CSP
 - [ ] All scripts/styles use nonces
 - [ ] No CSP violations in console
@@ -371,6 +413,7 @@ Set up Core Web Vitals monitoring using Cloudflare Web Analytics or alternative.
 ---
 
 ### Issue 15: Dependency Security Audit
+
 **Priority**: High
 **Estimated**: 1 hour
 
@@ -378,6 +421,7 @@ Set up Core Web Vitals monitoring using Cloudflare Web Analytics or alternative.
 Regular dependency audits and updates.
 
 **Tasks**:
+
 - [ ] Run `pnpm audit` and review vulnerabilities
 - [ ] Update dependencies with fixes
 - [ ] Test for breaking changes
@@ -385,6 +429,7 @@ Regular dependency audits and updates.
 - [ ] Document update process
 
 **Definition of Done**:
+
 - [ ] `pnpm audit` shows 0 high/critical vulnerabilities
 - [ ] All dependencies current (within 1 minor version)
 - [ ] Automated updates configured
@@ -395,6 +440,7 @@ Regular dependency audits and updates.
 ## 🟠 Priority 6: SEO & Content (After PKCE)
 
 ### Issue 16: Meta Descriptions & Open Graph Images
+
 **Priority**: Medium
 **Estimated**: 2 hours
 
@@ -402,6 +448,7 @@ Regular dependency audits and updates.
 Add SEO metadata to all pages.
 
 **Tasks**:
+
 - [ ] Write meta descriptions for all 7 pages (155-160 chars)
 - [ ] Create Open Graph images (1200×630px)
 - [ ] Add Twitter Card metadata
@@ -409,6 +456,7 @@ Add SEO metadata to all pages.
 - [ ] Test with social media preview tools
 
 **Definition of Done**:
+
 - [ ] All pages have unique meta descriptions
 - [ ] All pages have OG images
 - [ ] Preview renders correctly on Facebook/Twitter/LinkedIn
@@ -417,6 +465,7 @@ Add SEO metadata to all pages.
 ---
 
 ### Issue 17: Sitemap & Search Console Setup
+
 **Priority**: Medium
 **Estimated**: 1 hour
 
@@ -424,6 +473,7 @@ Add SEO metadata to all pages.
 Submit sitemap and verify in Google Search Console.
 
 **Tasks**:
+
 - [ ] Verify sitemap.xml is generated correctly
 - [ ] Submit to Google Search Console
 - [ ] Submit to Bing Webmaster Tools
@@ -432,6 +482,7 @@ Submit sitemap and verify in Google Search Console.
 - [ ] Fix any indexing issues
 
 **Definition of Done**:
+
 - [ ] Sitemap submitted to Google & Bing
 - [ ] All 7 pages indexed
 - [ ] No coverage errors
@@ -440,6 +491,7 @@ Submit sitemap and verify in Google Search Console.
 ---
 
 ### Issue 18: High-Value Content Creation
+
 **Priority**: Low
 **Estimated**: 6-8 hours (content creation)
 
@@ -447,11 +499,13 @@ Submit sitemap and verify in Google Search Console.
 Add 2-3 high-value content pieces for SEO and authority.
 
 **Ideas**:
+
 1. Case study: "How We Helped [Client] Publish Their Dissertation"
 2. Resource: "Academic Writing Style Guide for Graduate Students"
 3. Guide: "Dissertation Editing Checklist: 50 Points to Review"
 
 **Tasks**:
+
 - [ ] Plan content topics and outlines
 - [ ] Write content (or collaborate with domain expert)
 - [ ] Add to Decap CMS as blog posts/resources
@@ -459,6 +513,7 @@ Add 2-3 high-value content pieces for SEO and authority.
 - [ ] Promote on social media
 
 **Definition of Done**:
+
 - [ ] 2-3 pieces published
 - [ ] SEO-optimized (target keywords, internal links)
 - [ ] Promoted via social channels
@@ -469,6 +524,7 @@ Add 2-3 high-value content pieces for SEO and authority.
 ## ⚫ Priority 7: Developer Experience (After PKCE)
 
 ### Issue 19: Validate Windsurf Cascade Workflows
+
 **Priority**: Low
 **Estimated**: 30 minutes
 
@@ -476,12 +532,14 @@ Add 2-3 high-value content pieces for SEO and authority.
 Verify all Cascade workflows are functional.
 
 **Tasks**:
+
 - [ ] List all `.cascade` files in `.cascade/`
 - [ ] Test each workflow in Windsurf
 - [ ] Fix any broken workflows
 - [ ] Document usage in README
 
 **Definition of Done**:
+
 - [ ] All workflows tested and functional
 - [ ] Documentation updated
 - [ ] Screenshots added to `/docs/WINDSURF-SETUP.md`
@@ -489,6 +547,7 @@ Verify all Cascade workflows are functional.
 ---
 
 ### Issue 20: MCP Server Configuration
+
 **Priority**: Low
 **Estimated**: 30 minutes
 
@@ -496,6 +555,7 @@ Verify all Cascade workflows are functional.
 Verify MCP servers available in Windsurf.
 
 **Tasks**:
+
 - [ ] Check filesystem MCP server
 - [ ] Check ripgrep MCP server
 - [ ] Check git MCP server
@@ -504,6 +564,7 @@ Verify MCP servers available in Windsurf.
 - [ ] Document MCP setup
 
 **Definition of Done**:
+
 - [ ] All core MCP servers verified working
 - [ ] Optional servers evaluated
 - [ ] Configuration documented
@@ -513,15 +574,18 @@ Verify MCP servers available in Windsurf.
 ## 📊 Summary & Prioritization
 
 ### Immediate Focus (Next 48 hours)
+
 1. **PKCE Implementation** (Issues #1-2) - 5-6 hours total
 2. **PKCE Testing & Documentation** - 2 hours
 
 ### Post-PKCE (Week of Oct 14)
+
 3. **Monitoring Setup** (Issues #3-5) - 5 hours total
 4. **A11y Audit** (Issue #9) - 4 hours
 5. **Security Audit** (Issue #15) - 1 hour
 
 ### Ongoing/Lower Priority
+
 - Performance optimizations (Issues #10-13)
 - SEO enhancements (Issues #16-18)
 - Testing expansion (Issues #7-8)

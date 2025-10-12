@@ -1,37 +1,37 @@
 {
-	"zone": {
-		"id": "a5e7c69768502d649a8f2c615f555eca",
-		"name": "liteckyeditingservices.com",
-		"nameServers": ["carol.ns.cloudflare.com", "ignacio.ns.cloudflare.com"],
-		"plan": "Free Website",
-		"status": "active",
-		"type": "full"
-	},
-	"account": {
-		"id": "13eb584192d9cefb730fde0cfd271328",
-		"plan": "Workers Plan",
-		"type": "Paid"
-	},
-	"apiToken": {
-		"name": "Initial-Project-Setup-Master",
-		"storage": "gopass:cloudflare/api-tokens/initial-project-setup-master",
-		"permissions": [
-			"Zone:Read",
-			"Zone:Edit",
-			"DNS:Read",
-			"DNS:Edit",
-			"SSL/TLS:Read",
-			"SSL/TLS:Edit",
-			"Firewall:Read",
-			"Firewall:Edit",
-			"Workers:Read",
-			"Workers:Edit",
-			"Pages:Read",
-			"Pages:Edit"
-		]
-	},
-	"pagesProject": {
-		"name": "liteckyeditingservices",
-		"subdomain": "liteckyeditingservices.pages.dev"
-	}
+  "zone": {
+    "id": "a5e7c69768502d649a8f2c615f555eca",
+    "name": "liteckyeditingservices.com",
+    "nameServers": ["carol.ns.cloudflare.com", "ignacio.ns.cloudflare.com"],
+    "plan": "Free Website",
+    "status": "active",
+    "type": "full"
+  },
+  "account": {
+    "id": "13eb584192d9cefb730fde0cfd271328",
+    "plan": "Workers Plan",
+    "type": "Paid"
+  },
+  "apiToken": {
+    "name": "Initial-Project-Setup-Master",
+    "storage": "gopass:cloudflare/api-tokens/initial-project-setup-master",
+    "permissions": [
+      "Zone:Read",
+      "Zone:Edit",
+      "DNS:Read",
+      "DNS:Edit",
+      "SSL/TLS:Read",
+      "SSL/TLS:Edit",
+      "Firewall:Read",
+      "Firewall:Edit",
+      "Workers:Read",
+      "Workers:Edit",
+      "Pages:Read",
+      "Pages:Edit"
+    ]
+  },
+  "pagesProject": {
+    "name": "liteckyeditingservices",
+    "subdomain": "liteckyeditingservices.pages.dev"
+  }
 }

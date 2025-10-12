@@ -5,12 +5,14 @@
 ### Installed Browsers
 
 #### System Chromium (Fedora Package)
+
 - **Binary**: `/usr/bin/chromium-browser`
 - **Actual Binary**: `/usr/lib64/chromium-browser/chromium-browser`
 - **Version**: Chromium 140.0.7339.127 Fedora Project
 - **Wrapper Script**: `/usr/lib64/chromium-browser/chromium-browser.sh`
 
 #### Puppeteer Managed Chrome
+
 - **Location**: `~/.cache/puppeteer/chrome/`
 - **Available Versions**:
   - `chrome@131.0.6778.204` - `$HOME/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome`
@@ -20,6 +22,7 @@
 ## Puppeteer Configuration
 
 ### Project Setup
+
 - **Package**: `puppeteer@24.22.0` (dev dependency)
 - **Browser Management**: Via `npx puppeteer browsers` command
 - **Default Chrome**: Downloaded and managed by Puppeteer
@@ -27,6 +30,7 @@
 ### Available Commands
 
 #### Browser Management
+
 ```bash
 # List installed browsers
 npx puppeteer browsers list
@@ -43,6 +47,7 @@ npx puppeteer browsers clear
 ```
 
 #### Browser Usage
+
 ```bash
 # Launch system Chromium with dev tools
 chromium-browser --remote-debugging-port=9222
@@ -57,12 +62,13 @@ chromium-browser --headless --remote-debugging-port=9222 --disable-gpu --no-sand
 ## Playwright Configuration
 
 ### Current Setup (playwright.config.ts)
+
 ```typescript
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
-  projects: [ { name: 'chromium', use: { browserName: 'chromium' } } ],
+  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
   use: {
     baseURL: process.env.BASE_URL ?? 'http://localhost:4321',
     headless: true,
@@ -74,13 +80,19 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   // Use preview (no HMR websockets) when BASE_URL is not provided
-  webServer: process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')
-    ? undefined
-    : { command: 'pnpm build && pnpm preview --port 4321', url: 'http://localhost:4321', reuseExistingServer: true },
+  webServer:
+    process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')
+      ? undefined
+      : {
+          command: 'pnpm build && pnpm preview --port 4321',
+          url: 'http://localhost:4321',
+          reuseExistingServer: true,
+        },
 });
 ```
 
 ### Playwright Browser Management
+
 ```bash
 # Install Playwright browsers
 npx playwright install
@@ -99,6 +111,7 @@ npx playwright test --project=chromium
 ### For Manual Testing
 
 #### System Chromium (Native Fedora)
+
 ```bash
 # Launch with dev tools (GUI)
 chromium-browser --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-dev
@@ -108,6 +121,7 @@ chromium-browser --remote-debugging-port=9222 --user-data-dir=/tmp/chrome-dev
 ```
 
 #### Puppeteer Chrome (Recommended for automation)
+
 ```bash
 # Launch latest Puppeteer Chrome
 npx puppeteer browsers launch chrome
@@ -123,6 +137,7 @@ $HOME/.cache/puppeteer/chrome/linux-131.0.6778.204/chrome-linux64/chrome \
 ### For Automated Testing
 
 #### Puppeteer Script Example
+
 ```javascript
 // puppeteer-test.js
 const puppeteer = require('puppeteer');
@@ -131,27 +146,28 @@ const puppeteer = require('puppeteer');
   // Use Puppeteer's Chrome
   const browser = await puppeteer.launch({
     headless: false,
-    devtools: true
+    devtools: true,
   });
-  
+
   // Or use system Chromium
   const browser = await puppeteer.launch({
     executablePath: '/usr/bin/chromium-browser',
     headless: false,
     devtools: true,
-    args: ['--no-sandbox', '--disable-dev-shm-usage']
+    args: ['--no-sandbox', '--disable-dev-shm-usage'],
   });
-  
+
   const page = await browser.newPage();
   await page.goto('http://localhost:4321');
-  
+
   // Your automation code here
-  
+
   await browser.close();
 })();
 ```
 
 #### Playwright Test Example
+
 ```bash
 # Run E2E tests
 pnpm test:e2e
@@ -166,6 +182,7 @@ npx playwright test --project=chromium
 ## Browser Flags for Development
 
 ### Essential Dev Flags
+
 ```bash
 --remote-debugging-port=9222   # Enable DevTools Protocol
 --user-data-dir=/tmp/chrome-dev # Separate profile
@@ -176,6 +193,7 @@ npx playwright test --project=chromium
 ```
 
 ### Headless Automation Flags
+
 ```bash
 --headless                     # No GUI
 --disable-gpu                  # Headless GPU
@@ -188,6 +206,7 @@ npx playwright test --project=chromium
 ## Environment Configuration
 
 ### For CI/CD (GitHub Actions)
+
 ```yaml
 - name: Install Playwright browsers
   run: npx playwright install --with-deps chromium
@@ -199,6 +218,7 @@ npx playwright test --project=chromium
 ```
 
 ### For Local Development
+
 ```bash
 # In .dev.vars or environment
 PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
@@ -210,6 +230,7 @@ PLAYWRIGHT_BROWSERS_PATH=~/.cache/ms-playwright
 ### Common Issues
 
 #### "Chrome not found" Error
+
 ```bash
 # Install Puppeteer Chrome
 npx puppeteer browsers install chrome
@@ -219,12 +240,14 @@ export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ```
 
 #### Sandbox Issues (Linux)
+
 ```bash
 # Add --no-sandbox flag
 chromium-browser --no-sandbox --remote-debugging-port=9222
 ```
 
 #### Display Issues (Headless)
+
 ```bash
 # Install virtual display
 sudo dnf install xvfb
@@ -234,6 +257,7 @@ xvfb-run -a chromium-browser --remote-debugging-port=9222
 ```
 
 ### Debug Commands
+
 ```bash
 # Check browser versions
 chromium-browser --version
@@ -249,6 +273,7 @@ curl http://localhost:9222/json/version
 ## Project Integration
 
 ### Test Scripts (package.json)
+
 ```json
 {
   "scripts": {
@@ -261,6 +286,7 @@ curl http://localhost:9222/json/version
 ```
 
 ### Admin Interface Testing
+
 ```bash
 # Test Decap CMS admin
 pnpm test:admin
@@ -272,18 +298,21 @@ chromium-browser http://localhost:4321/admin
 ## Best Practices
 
 ### Development
+
 1. **Use Puppeteer Chrome** for consistent automation
 2. **Use System Chromium** for manual testing with system integration
 3. **Enable DevTools** during development
 4. **Separate user profiles** for testing
 
 ### Testing
+
 1. **Playwright for E2E tests** (multiple browsers)
 2. **Puppeteer for admin testing** (Chrome-specific)
 3. **Headless in CI**, **headed in dev**
 4. **Consistent browser versions** across environments
 
 ### Performance
+
 1. **Reuse browser instances** when possible
 2. **Use headless-shell** for pure automation
 3. **Close browsers** properly to free resources

@@ -20,7 +20,8 @@ const config = {
 	collections: [], // Required by CMS type but loaded dynamically
 };
 
-CMS.init({ config } as any);
+const cms = CMS as unknown as DecapCMS;
+cms.init?.({ config });
 
 // Canonical auth success re-emit listener
 window.addEventListener(
@@ -47,7 +48,9 @@ window.addEventListener(
 			try {
 				localStorage.setItem("netlify-cms-user", JSON.stringify(user));
 			} catch {}
-			const store: any = (CMS as any)?.reduxStore || (CMS as any)?.store;
+			const store = (cms.reduxStore ?? cms.store) as
+				| { dispatch?: (action: unknown) => unknown }
+				| undefined;
 			try {
 				store?.dispatch?.({ type: "LOGIN_SUCCESS", payload: { token } });
 			} catch {}
@@ -62,5 +65,4 @@ window.addEventListener(
 );
 
 // Expose for diagnostics
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(window as any).__cmsApp = CMS;
+(window as Window).__cmsApp = cms as unknown;

@@ -7,11 +7,13 @@ This document details the production-grade SendGrid email configuration for Lite
 ## Domain Configuration
 
 ### Primary Domain Authentication
+
 - **Domain**: `liteckyeditingservices.com`
 - **Link Branding**: `email.liteckyeditingservices.com`
 - **Purpose**: Primary domain authentication for general emails
 
 ### Transactional Email Subdomain
+
 - **Domain**: `em.liteckyeditingservices.com`
 - **Authentication**: Automated Security enabled (auto-rotating DKIM keys)
 - **Purpose**: Dedicated subdomain for transactional emails (contact forms, notifications)
@@ -20,15 +22,18 @@ This document details the production-grade SendGrid email configuration for Lite
 ## DNS Records
 
 ### Root Domain Records
+
 ```
 SPF: v=spf1 include:_spf.google.com include:sendgrid.net ~all
 DMARC: v=DMARC1; p=none; rua=mailto:dmarc@liteckyeditingservices.com; aspf=s; adkim=s
 ```
 
 ### SendGrid Authentication Records
+
 All records must be set to **DNS-only** (gray cloud) in Cloudflare:
 
 **Root Domain Records:**
+
 ```
 54920324.liteckyeditingservices.com → sendgrid.net
 em1041.liteckyeditingservices.com → u54920324.wl075.sendgrid.net
@@ -37,6 +42,7 @@ s2._domainkey.liteckyeditingservices.com → s2.domainkey.u54920324.wl075.sendgr
 ```
 
 **Transactional Subdomain Records (em.liteckyeditingservices.com):**
+
 ```
 url1796.em.liteckyeditingservices.com → sendgrid.net
 54920324.em.liteckyeditingservices.com → sendgrid.net
@@ -51,6 +57,7 @@ _dmarc.em.liteckyeditingservices.com → v=DMARC1; p=none; rua=mailto:dmarc@lite
 ### Email Service (`src/lib/email.ts`)
 
 Key features:
+
 - SendGrid SDK integration (`@sendgrid/mail`)
 - Automatic subdomain selection (em for transactional)
 - Categories for analytics
@@ -63,6 +70,7 @@ Key features:
 ### Contact Form API (`src/pages/api/contact.ts`)
 
 Features:
+
 - Turnstile verification for security
 - Dual rate limiting (IP and email)
 - Content validation
@@ -74,6 +82,7 @@ Features:
 ## Email Categories
 
 All emails include categories for tracking:
+
 - `contact_form` - All contact form submissions
 - `admin_notification` - Admin notifications
 - `user_confirmation` - User confirmations
@@ -84,6 +93,7 @@ All emails include categories for tracking:
 ### Environment Variables
 
 **Local Development (`.dev.vars`):**
+
 ```bash
 # SendGrid Configuration
 SENDGRID_API_KEY=SG.xxxxxxxxxxxxx
@@ -97,6 +107,7 @@ SENDGRID_DOMAIN_ID=54920324
 
 **Cloudflare Pages (Production):**
 Set these as environment variables in Cloudflare Pages dashboard:
+
 ```bash
 SENDGRID_API_KEY  # Secret (encrypted)
 EMAIL_FROM        # Plain text: hello@liteckyeditingservices.com
@@ -107,9 +118,11 @@ SENDGRID_DOMAIN_ID # Plain text: 54920324
 ### Testing
 
 1. **Sandbox Mode** (default in dev):
+
    ```bash
    node test-production-contact.mjs
    ```
+
    - Validates emails without sending
    - Logs all details to console
 
@@ -118,6 +131,7 @@ SENDGRID_DOMAIN_ID # Plain text: 54920324
    # Enable in .dev.vars: SENDGRID_FORCE_SEND=true
    node test-production-email.mjs
    ```
+
    - Sends real emails from `hello@em.liteckyeditingservices.com`
    - Full DKIM signing and link tracking
 
@@ -141,7 +155,9 @@ SENDGRID_DOMAIN_ID # Plain text: 54920324
 ## Monitoring & Analytics
 
 ### SendGrid Dashboard
+
 Track in real-time:
+
 - Delivery rate
 - Open rate
 - Click rate
@@ -149,7 +165,9 @@ Track in real-time:
 - Spam reports
 
 ### Custom Arguments
+
 Every email includes:
+
 - `quoteId` - Unique identifier
 - `source` - Origin (web_form)
 - `service` - Service type selected
@@ -157,7 +175,9 @@ Every email includes:
 - `timestamp` - ISO timestamp
 
 ### Google Postmaster Tools
+
 Monitor reputation and delivery to Gmail:
+
 1. Add `liteckyeditingservices.com` to Postmaster Tools
 2. Verify ownership via DNS TXT record
 3. Monitor spam rate and authentication status
@@ -165,6 +185,7 @@ Monitor reputation and delivery to Gmail:
 ## Production Checklist
 
 ✅ **Completed**:
+
 - [x] SendGrid account configured
 - [x] Domain authentication (root + em subdomain)
 - [x] Link branding configured
@@ -178,6 +199,7 @@ Monitor reputation and delivery to Gmail:
 - [x] Turnstile integration
 
 ⏳ **Pending**:
+
 - [ ] Google Postmaster Tools setup
 - [ ] Event webhook for bounces/complaints
 - [ ] DMARC policy upgrade (p=none → p=quarantine)
@@ -186,6 +208,7 @@ Monitor reputation and delivery to Gmail:
 ## Maintenance
 
 ### Regular Tasks
+
 - Review SendGrid analytics weekly
 - Monitor DMARC reports
 - Check Google Postmaster Tools
@@ -195,16 +218,19 @@ Monitor reputation and delivery to Gmail:
 ### Troubleshooting
 
 **Low delivery rate**:
+
 - Check SendGrid suppressions
 - Verify DKIM/SPF alignment
 - Review content for spam triggers
 
 **High bounce rate**:
+
 - Check for typos in email addresses
 - Implement double opt-in
 - Clean email list regularly
 
 **Rate limiting triggered**:
+
 - Check logs for abuse patterns
 - Adjust limits if legitimate traffic
 - Implement CAPTCHA if needed
@@ -212,6 +238,7 @@ Monitor reputation and delivery to Gmail:
 ## Scripts
 
 ### DNS Management
+
 ```bash
 # List all DNS records
 ./scripts/cf-dns-manage.fish list
@@ -224,6 +251,7 @@ Monitor reputation and delivery to Gmail:
 ```
 
 ### Testing
+
 ```bash
 # Test with sandbox mode
 node test-production-contact.mjs
@@ -235,6 +263,7 @@ node test-production-email.mjs
 ## Support
 
 For issues or questions:
+
 - SendGrid Support: https://support.sendgrid.com
 - Cloudflare DNS: https://developers.cloudflare.com/dns
 - Project documentation: `/docs` directory

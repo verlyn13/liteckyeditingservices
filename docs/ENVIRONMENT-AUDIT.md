@@ -6,6 +6,7 @@
 ## Summary
 
 This project uses environment variables in **three contexts**:
+
 1. **Local development** (`.dev.vars`)
 2. **Cloudflare Pages production** (via Cloudflare Dashboard)
 3. **GitHub Actions CI/CD** (repository secrets)
@@ -14,47 +15,48 @@ All secrets are stored in **gopass** as the authoritative source and should neve
 
 ## 📁 File Locations
 
-| File | Purpose | Committed to Git? | Source |
-|------|---------|-------------------|--------|
-| `.dev.vars` | Local development | ❌ No (gitignored) | Generated from gopass |
-| `.dev.vars.example` | Template | ✅ Yes | Manual |
-| `.env.example` | Legacy template | ✅ Yes | Manual |
-| `ENVIRONMENT.md` | Documentation | ✅ Yes | Manual |
-| `SECRETS.md` | Rotation procedures | ✅ Yes | Manual |
+| File                | Purpose             | Committed to Git?  | Source                |
+| ------------------- | ------------------- | ------------------ | --------------------- |
+| `.dev.vars`         | Local development   | ❌ No (gitignored) | Generated from gopass |
+| `.dev.vars.example` | Template            | ✅ Yes             | Manual                |
+| `.env.example`      | Legacy template     | ✅ Yes             | Manual                |
+| `ENVIRONMENT.md`    | Documentation       | ✅ Yes             | Manual                |
+| `SECRETS.md`        | Rotation procedures | ✅ Yes             | Manual                |
 
 ## 🔑 Variable Inventory by Service
 
 ### GitHub OAuth (Decap CMS)
 
-| Variable | Local (.dev.vars) | Pages Production | Gopass Path |
-|----------|-------------------|------------------|-------------|
-| `GITHUB_CLIENT_ID` | ✅ Required | ✅ Secret | `github/litecky/oauth/client-id` |
-| `GITHUB_CLIENT_SECRET` | ✅ Required | ✅ Secret | `github/litecky/oauth/client-secret` |
+| Variable               | Local (.dev.vars) | Pages Production | Gopass Path                          |
+| ---------------------- | ----------------- | ---------------- | ------------------------------------ |
+| `GITHUB_CLIENT_ID`     | ✅ Required       | ✅ Secret        | `github/litecky/oauth/client-id`     |
+| `GITHUB_CLIENT_SECRET` | ✅ Required       | ✅ Secret        | `github/litecky/oauth/client-secret` |
 
 **Used by**: `/api/auth`, `/api/callback` (Pages Functions)
 **Purpose**: OAuth flow for Decap CMS admin authentication
 
 ### Turnstile (Bot Protection)
 
-| Variable | Local (.dev.vars) | Pages Production | Gopass Path |
-|----------|-------------------|------------------|-------------|
-| `PUBLIC_TURNSTILE_SITE_KEY` | ✅ Test key | ✅ Prod key | `development/turnstile/site-key` (dev)<br>`cloudflare/litecky/turnstile/site-key` (prod) |
-| `TURNSTILE_SECRET_KEY` | ✅ Test key | ✅ Secret | `development/turnstile/secret-key` (dev)<br>`cloudflare/litecky/turnstile/secret-key` (prod) |
+| Variable                    | Local (.dev.vars) | Pages Production | Gopass Path                                                                                  |
+| --------------------------- | ----------------- | ---------------- | -------------------------------------------------------------------------------------------- |
+| `PUBLIC_TURNSTILE_SITE_KEY` | ✅ Test key       | ✅ Prod key      | `development/turnstile/site-key` (dev)<br>`cloudflare/litecky/turnstile/site-key` (prod)     |
+| `TURNSTILE_SECRET_KEY`      | ✅ Test key       | ✅ Secret        | `development/turnstile/secret-key` (dev)<br>`cloudflare/litecky/turnstile/secret-key` (prod) |
 
 **Used by**: Contact form (`/api/contact`)
 **Purpose**: Spam protection
 **Test keys** (always pass):
+
 - Site: `1x00000000000000000000AA`
 - Secret: `1x0000000000000000000000000000000AA`
 
 ### SendGrid (Email Service)
 
-| Variable | Local (.dev.vars) | Pages Production | Gopass Path |
-|----------|-------------------|------------------|-------------|
-| `SENDGRID_API_KEY` | ⚠️ Optional | ✅ Secret | `development/sendgrid/api-key` (dev)<br>`sendgrid/api-keys/liteckyeditingservices-key` (prod) |
-| `SENDGRID_FROM` | ⚠️ Optional | ✅ Variable | `development/sendgrid/email-from` |
-| `SENDGRID_TO` | ⚠️ Optional | ✅ Variable | `development/sendgrid/email-to` |
-| `SENDGRID_DOMAIN_ID` | ⚠️ Optional | ✅ Variable | `development/sendgrid/domain-id` |
+| Variable             | Local (.dev.vars) | Pages Production | Gopass Path                                                                                   |
+| -------------------- | ----------------- | ---------------- | --------------------------------------------------------------------------------------------- |
+| `SENDGRID_API_KEY`   | ⚠️ Optional       | ✅ Secret        | `development/sendgrid/api-key` (dev)<br>`sendgrid/api-keys/liteckyeditingservices-key` (prod) |
+| `SENDGRID_FROM`      | ⚠️ Optional       | ✅ Variable      | `development/sendgrid/email-from`                                                             |
+| `SENDGRID_TO`        | ⚠️ Optional       | ✅ Variable      | `development/sendgrid/email-to`                                                               |
+| `SENDGRID_DOMAIN_ID` | ⚠️ Optional       | ✅ Variable      | `development/sendgrid/domain-id`                                                              |
 
 **Used by**: `/api/contact` (Pages Function), queue consumer worker
 **Purpose**: Transactional email delivery
@@ -62,11 +64,11 @@ All secrets are stored in **gopass** as the authoritative source and should neve
 
 ### Cloudflare (Deployment/CI)
 
-| Variable | CI (GitHub Actions) | Gopass Path |
-|----------|---------------------|-------------|
-| `CLOUDFLARE_API_TOKEN` | ✅ Repository Secret | `cloudflare/api-tokens/initial-project-setup-master` |
-| `CF_ACCOUNT_ID` | Public (in code) | `cloudflare/account/id` |
-| `CF_ZONE_ID` | Public (in code) | `cloudflare/zones/liteckyeditingservices-com/zone-id` |
+| Variable               | CI (GitHub Actions)  | Gopass Path                                           |
+| ---------------------- | -------------------- | ----------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN` | ✅ Repository Secret | `cloudflare/api-tokens/initial-project-setup-master`  |
+| `CF_ACCOUNT_ID`        | Public (in code)     | `cloudflare/account/id`                               |
+| `CF_ZONE_ID`           | Public (in code)     | `cloudflare/zones/liteckyeditingservices-com/zone-id` |
 
 **Used by**: GitHub Actions workflows for deployment
 **Purpose**: Automated deployments to Cloudflare Pages
@@ -107,11 +109,13 @@ gopass
 ### Local Development Setup
 
 1. **Generate .dev.vars from gopass**:
+
    ```bash
    ./scripts/generate-dev-vars.sh
    ```
 
 2. **Or manually create**:
+
    ```bash
    cp .dev.vars.example .dev.vars
    # Edit and fill in values from gopass
@@ -126,6 +130,7 @@ gopass
 ### Production Setup (Cloudflare Pages)
 
 **Via Wrangler CLI**:
+
 ```bash
 # Set a secret
 echo "value" | pnpm wrangler pages secret put GITHUB_CLIENT_SECRET --project-name=liteckyeditingservices
@@ -135,6 +140,7 @@ gopass show -o github/litecky/oauth/client-secret | pnpm wrangler pages secret p
 ```
 
 **Via Cloudflare Dashboard**:
+
 1. Go to Pages project → Settings → Environment variables
 2. Choose Production environment
 3. Add variable (public) or secret (encrypted)
@@ -160,17 +166,22 @@ graph LR
 ## ⚠️ Common Issues
 
 ### "Missing GITHUB_CLIENT_ID" in local dev
+
 **Solution**: Ensure `.dev.vars` exists and has the credentials. Restart dev server.
 
 ### Config.yml 404 error
+
 **Solution**: Dev server not running. Run `pnpm dev` and wait for startup.
 
 ### OAuth fails in production
+
 **Solution**:
+
 1. Verify secrets are set in Cloudflare Pages dashboard
 2. Check GitHub OAuth App callback URL is `https://www.liteckyeditingservices.com/api/callback`
 
 ### Emails not sending in dev
+
 **Solution**: This is intentional. Uncomment `SENDGRID_API_KEY` in `.dev.vars` to enable.
 
 ## 📚 Related Documentation

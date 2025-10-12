@@ -20,7 +20,7 @@ collections:
     create: true
     extension: md
     format: frontmatter
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     editor:
       preview: false
     fields:
@@ -43,7 +43,7 @@ collections:
     create: true
     extension: md
     format: frontmatter
-    slug: "{{slug}}"
+    slug: '{{slug}}'
     sortable_fields: [order, title]
     editor:
       preview: false
@@ -66,8 +66,8 @@ collections:
     create: true
     extension: md
     format: frontmatter
-    slug: "{{year}}-{{month}}-{{author}}"
-    summary: "{{author}} - {{university}}"
+    slug: '{{year}}-{{month}}-{{author}}'
+    summary: '{{author}} - {{university}}'
     sortable_fields: [date, author, featured, rating]
     editor:
       preview: false
@@ -88,8 +88,8 @@ collections:
     create: true
     extension: md
     format: frontmatter
-    slug: "{{category}}-{{slug}}"
-    summary: "{{category}}: {{question}}"
+    slug: '{{category}}-{{slug}}'
+    summary: '{{category}}: {{question}}'
     sortable_fields: [category, order]
     editor:
       preview: false
@@ -103,4 +103,3 @@ collections:
         default: General
       - { label: Order, name: order, widget: number, default: 0 }
       - { label: Detailed Answer, name: body, widget: markdown, required: true }
-

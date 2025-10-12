@@ -5,12 +5,14 @@ Welcome! This guide will get you productive in ~45 minutes.
 ## Prerequisites
 
 ### Required Tools
+
 - **mise** (version manager - [install](https://mise.jdx.dev/))
 - **Node.js 24+** (managed via mise)
 - **pnpm 10.16+** (managed via mise)
 - **Git** (with GitHub account)
 
 ### Optional Tools
+
 - **gopass + age** (for secret management)
 - **VS Code** (with recommended extensions)
 - **Wrangler** (installed automatically)
@@ -36,6 +38,7 @@ pnpm exec playwright install chromium
 ## Step 2: Environment Setup (10 minutes)
 
 ### Option A: Using gopass (Recommended for team members)
+
 ```bash
 # First-time only: store credentials in gopass (optional helper)
 ./store-dev-vars-in-gopass.sh
@@ -47,6 +50,7 @@ direnv allow .
 ```
 
 ### Option B: Manual Setup
+
 ```bash
 # Copy templates at repo root
 cp .env.example .env
@@ -122,6 +126,7 @@ git push origin test/your-name-onboarding
 ## Step 7: Understand the Codebase (5 minutes)
 
 ### Key Directories
+
 - `src/` - Astro pages, Svelte components, content, styles
 - `public/` - Static assets
 - `workers/` - Cloudflare Workers
@@ -133,6 +138,7 @@ git push origin test/your-name-onboarding
 - `_archive/` - Original specification documents
 
 ### Important Files
+
 - `PROJECT-STATUS.md` - Current implementation status
 - `IMPLEMENTATION-ROADMAP.md` - Build order and dependencies
 - `DOCUMENTATION-MASTER-INDEX.md` - All documentation references
@@ -141,6 +147,7 @@ git push origin test/your-name-onboarding
 ## Development Workflow
 
 ### Daily Flow
+
 1. Pull latest: `git pull origin main`
 2. Create branch: `git checkout -b feature/thing`
 3. Make changes
@@ -151,11 +158,13 @@ git push origin test/your-name-onboarding
 8. Merge after approval
 
 ### Testing
+
 - **Local**: `pnpm test:e2e`
 - **CI**: Automatic on PR
 - **Smoke**: Nightly at 2:30 AM Alaska
 
 ### Deployment
+
 - **Automatic**: Push to main → deployed
 - **Preview**: Every PR gets URL
 - **Rollback**: Via Cloudflare dashboard
@@ -163,15 +172,18 @@ git push origin test/your-name-onboarding
 ## Common Tasks
 
 ### Update Content
+
 - Edit files in `src/content/`
 - Or use CMS at `/admin`
 
 ### Add Environment Variable
+
 1. Add to `.dev.vars` locally
 2. Add to Cloudflare dashboard
 3. Document in ENVIRONMENT.md
 
 ### Debug Issue
+
 1. Check browser console
 2. Check Pages Functions logs
 3. Check Worker logs if OAuth issue
@@ -179,12 +191,14 @@ git push origin test/your-name-onboarding
 ## Getting Help
 
 ### Documentation
+
 - `PROJECT-STATUS.md` - Implementation progress
 - `IMPLEMENTATION-ROADMAP.md` - Build sequence
 - `docs/playbooks/` - Specific guides
 - `_archive/` - Original specifications
 
 ### Tools
+
 - [Cloudflare Dashboard](https://dash.cloudflare.com)
 - [SendGrid Dashboard](https://app.sendgrid.com)
 - [GitHub Issues](https://github.com/verlyn13/liteckyeditingservices/issues)
@@ -192,6 +206,7 @@ git push origin test/your-name-onboarding
 ## VS Code Setup (Optional)
 
 ### Install Extensions
+
 ```bash
 code --install-extension biomejs.biome
 code --install-extension astro-build.astro-vscode
@@ -200,23 +215,27 @@ code --install-extension bradlc.vscode-tailwindcss
 ```
 
 ### Settings
+
 Use extension defaults or configure to taste. No repo settings file is checked in.
 
 ## Troubleshooting
 
 ### Port already in use
+
 ```bash
 lsof -i :4321
 kill -9 <PID>
 ```
 
 ### Dependencies won't install
+
 ```bash
 rm -rf node_modules pnpm-lock.yaml
 pnpm install
 ```
 
 ### CMS won't load
+
 - Check you have repo access
 - Verify OAuth proxy is running
 - Check browser console for errors

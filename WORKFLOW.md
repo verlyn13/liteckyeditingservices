@@ -28,4 +28,3 @@ This is the quickest way to understand how to work with the repo.
 - `pnpm check` — Validate versions/structure/paths + Biome + TypeScript
 - `pnpm test:e2e` — Playwright tests (auto-starts dev server)
 - `pnpm test:a11y` — Accessibility checks
-

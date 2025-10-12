@@ -11,11 +11,13 @@ Navigate to: **Security → Security rules → Custom rules → Create rule**
 **When incoming requests match…**:
 
 Option 1 - User Agent (Simplest):
+
 - **Field**: `User Agent`
 - **Operator**: `contains`
 - **Value**: `Playwright`
 
 Option 2 - Multiple CI Tools:
+
 - **Field**: `User Agent`
 - **Operator**: `contains any`
 - **Value**:
@@ -25,6 +27,7 @@ Option 2 - Multiple CI Tools:
   ```
 
 Option 3 - GitHub Actions IP Ranges (Most Secure):
+
 - **Field**: `IP Source Address`
 - **Operator**: `is in`
 - **Value**: Use GitHub Actions IP ranges from https://api.github.com/meta
@@ -42,6 +45,7 @@ If you prefer the expression editor, use:
 **Choose action**: `Skip`
 
 Then select what to skip:
+
 - ✅ **All remaining custom rules**
 - ✅ **Rate limiting**
 - ✅ **Managed rules** (if you have any)
@@ -112,6 +116,7 @@ If tests still fail after adding the rule:
 ## Alternative: Page Rules (Legacy)
 
 If Custom Rules don't work, try Page Rules:
+
 1. Go to **Rules → Page Rules**
 2. Create rule for `*liteckyeditingservices.com/*`
 3. Settings:

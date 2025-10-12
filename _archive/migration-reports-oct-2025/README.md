@@ -5,6 +5,7 @@ This directory contains analysis and advisory reports from the Cloudflare Pages 
 ## Files Archived
 
 ### DEPLOYMENT-ALIGNMENT-REPORT.md
+
 - **Created**: Pre-migration analysis
 - **Purpose**: Documented discrepancies between direct-upload and Git-connected deployment methods
 - **Key Findings**:
@@ -14,6 +15,7 @@ This directory contains analysis and advisory reports from the Cloudflare Pages 
   - Custom domain transfer requirements
 
 ### MIGRATION-ADVISORY-REPORT.md
+
 - **Created**: Pre-migration planning
 - **Purpose**: Advisory on migration strategy and risks
 - **Recommendations**:

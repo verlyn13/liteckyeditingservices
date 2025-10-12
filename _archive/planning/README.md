@@ -5,6 +5,7 @@
 ## Archived Files
 
 ### next-steps-backlog-2025-10-04.md
+
 - **Original location**: `/docs/next-steps-issues.md`
 - **Date**: October 4, 2025
 - **Purpose**: Backlog of tasks for Phase 7 Week 2 (Oct 4-18, 2025)
@@ -13,6 +14,7 @@
 ## Contents of Backlog
 
 The backlog included tasks across 5 categories:
+
 1. **Monitoring & Reliability** (3 tasks)
 2. **Testing & Quality** (4 tasks)
 3. **Performance** (4 tasks)

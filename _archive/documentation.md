@@ -1,7 +1,8 @@
 # Litecky Editing Services - Documentation Suite
 
 ## README.md
-```markdown
+
+````markdown
 # Litecky Editing Services — Website
 
 Professional academic editing services for graduate students, built with modern web technologies and a focus on simplicity and reliability.
@@ -42,6 +43,7 @@ pnpm dev
 # Site available at http://localhost:4321
 # CMS available at http://localhost:4321/admin
 ```
+````
 
 ## Key Commands
 
@@ -86,7 +88,8 @@ pnpm lint:fix     # Auto-fix linting issues
 ## License
 
 Private repository - All rights reserved
-```
+
+````
 
 ## CONTRIBUTING.md
 ```markdown
@@ -103,12 +106,14 @@ Private repository - All rights reserved
 
 ### Commit Messages
 We follow conventional commits:
-```
+````
+
 feat: add contact form validation
 fix: correct Turnstile token refresh
 docs: update deployment guide
 chore: update dependencies
-```
+
+````
 
 ### Pull Request Process
 1. Create feature branch from `main`
@@ -137,11 +142,12 @@ See [ENVIRONMENT.md](./ENVIRONMENT.md) for complete reference.
 For local development, copy and edit:
 ```bash
 cp apps/site/.dev.vars.example apps/site/.dev.vars
-```
+````
 
 ## Quality Standards
 
 ### Before Committing
+
 ```bash
 # Run all checks
 pnpm check
@@ -156,6 +162,7 @@ pnpm --filter @ae/site exec sv check
 ```
 
 ### Testing
+
 ```bash
 # Unit tests (if any)
 pnpm test
@@ -170,22 +177,26 @@ pnpm test:e2e:headed
 ## Code Style
 
 ### JavaScript/TypeScript
+
 - Biome handles formatting and linting
 - Prefer `const` over `let`
 - Use TypeScript for new code
 - Avoid `any` types
 
 ### Astro Components
+
 - Use TypeScript in frontmatter
 - Minimize client-side JavaScript
 - Prefer static rendering when possible
 
 ### Svelte Components
+
 - Use Svelte 5 runes
 - Keep components focused and small
 - Document props with TypeScript
 
 ### CSS
+
 - Use Tailwind utility classes
 - Custom CSS only when necessary
 - Mobile-first responsive design
@@ -193,12 +204,14 @@ pnpm test:e2e:headed
 ## Documentation
 
 ### When to Update Docs
+
 - New features or significant changes
 - Configuration changes
 - Dependency major version updates
 - Incident post-mortems
 
 ### Documentation Standards
+
 - Keep it concise and actionable
 - Include examples and commands
 - Update CHANGELOG.md for user-facing changes
@@ -207,7 +220,9 @@ pnpm test:e2e:headed
 ## CI/CD Pipeline
 
 ### Automated Checks
+
 Every PR runs:
+
 1. Code quality (Biome, Prettier, ESLint)
 2. Type checking (TypeScript, Astro, Svelte)
 3. Build verification
@@ -215,6 +230,7 @@ Every PR runs:
 5. Deployment preview
 
 ### Nightly Tests
+
 - Smoke tests run at 2:30 AM Alaska time
 - Monitor homepage, CMS, API endpoints
 - Failures trigger notifications
@@ -222,12 +238,14 @@ Every PR runs:
 ## Dependency Management
 
 ### Renovate Bot
+
 - Runs weekly (weekends)
 - Auto-merges minor/patch for devDependencies
 - Groups related packages
 - Requires approval for major updates
 
 ### Manual Updates
+
 ```bash
 # Check for updates
 pnpm update --interactive
@@ -241,14 +259,17 @@ pnpm audit
 ### Common Issues
 
 **Build fails locally but works in CI**
+
 - Clear caches: `rm -rf .astro node_modules`
 - Reinstall: `pnpm install`
 
 **Turnstile widget not loading**
+
 - Check PUBLIC_TURNSTILE_SITE_KEY is set
 - Verify you're using test keys in development
 
 **CMS login fails**
+
 - Ensure GitHub OAuth app is configured
 - Check Worker logs: `wrangler tail --name litecky-decap-oauth`
 
@@ -257,7 +278,8 @@ pnpm audit
 - Check existing issues on GitHub
 - Review relevant playbook in `docs/playbooks/`
 - Contact maintainer (see SUPPORT.md)
-```
+
+````
 
 ## ARCHITECTURE.md
 ```markdown
@@ -269,36 +291,38 @@ Litecky Editing Services is a JAMstack application with content management and t
 
 ## Architecture Diagram
 
-```
-┌──────────────┐     ┌──────────────────┐     ┌─────────────┐
-│              │────▶│                  │────▶│             │
-│   Browser    │     │ Cloudflare Pages │     │   GitHub    │
-│              │◀────│     (CDN + SSR)   │◀────│    Repo     │
-└──────────────┘     └──────────────────┘     └─────────────┘
-       │                      │                      ▲
-       │                      │                      │
-       ▼                      ▼                      │
-┌──────────────┐     ┌──────────────────┐          │
-│  Turnstile   │     │  Pages Functions │          │
-│   (Widget)   │     │  (/api/contact)  │          │
-└──────────────┘     └──────────────────┘          │
-                              │                      │
-                              ▼                      │
-                     ┌──────────────────┐           │
-                     │    SendGrid      │           │
-                     │  (Email API)     │           │
-                     └──────────────────┘           │
-                                                     │
-┌──────────────┐     ┌──────────────────┐          │
-│              │────▶│  Decap CMS       │──────────┘
-│   Editor     │     │   (/admin)       │
-│  (Browser)   │     └──────────────────┘
-└──────────────┘              │
-                              ▼
-                     ┌──────────────────┐     ┌─────────────┐
-                     │  Worker: OAuth   │────▶│   GitHub    │
-                     │    Proxy          │◀────│    OAuth    │
-                     └──────────────────┘     └─────────────┘
+````
+
+┌──────────────┐ ┌──────────────────┐ ┌─────────────┐
+│ │────▶│ │────▶│ │
+│ Browser │ │ Cloudflare Pages │ │ GitHub │
+│ │◀────│ (CDN + SSR) │◀────│ Repo │
+└──────────────┘ └──────────────────┘ └─────────────┘
+│ │ ▲
+│ │ │
+▼ ▼ │
+┌──────────────┐ ┌──────────────────┐ │
+│ Turnstile │ │ Pages Functions │ │
+│ (Widget) │ │ (/api/contact) │ │
+└──────────────┘ └──────────────────┘ │
+│ │
+▼ │
+┌──────────────────┐ │
+│ SendGrid │ │
+│ (Email API) │ │
+└──────────────────┘ │
+│
+┌──────────────┐ ┌──────────────────┐ │
+│ │────▶│ Decap CMS │──────────┘
+│ Editor │ │ (/admin) │
+│ (Browser) │ └──────────────────┘
+└──────────────┘ │
+▼
+┌──────────────────┐ ┌─────────────┐
+│ Worker: OAuth │────▶│ GitHub │
+│ Proxy │◀────│ OAuth │
+└──────────────────┘ └─────────────┘
+
 ```
 
 ## Components
@@ -452,7 +476,8 @@ Litecky Editing Services is a JAMstack application with content management and t
 ```
 
 ## DEPLOYMENT.md
-```markdown
+
+````markdown
 # Deployment Guide
 
 ## Overview
@@ -462,18 +487,21 @@ The application uses continuous deployment via Cloudflare Pages with automatic p
 ## Environments
 
 ### Production
+
 - **URL**: https://liteckyeditingservices.com
 - **Branch**: `main`
 - **Deployment**: Automatic on push
 - **Rollback**: Via Cloudflare dashboard or Git revert
 
 ### Preview
+
 - **URL**: `https://<hash>.litecky-editing.pages.dev`
 - **Branches**: All PRs
 - **Deployment**: Automatic on PR update
 - **Cleanup**: Automatic on PR close
 
 ### Local Development
+
 - **URL**: http://localhost:4321
 - **Command**: `pnpm dev`
 - **Environment**: `.dev.vars` file
@@ -483,6 +511,7 @@ The application uses continuous deployment via Cloudflare Pages with automatic p
 ### Website (Cloudflare Pages)
 
 #### Automatic Deployment
+
 ```bash
 # Simply push to main
 git push origin main
@@ -494,8 +523,10 @@ git push origin main
 # 4. Deploys to global network
 # 5. Purges cache if needed
 ```
+````
 
 #### Manual Deployment
+
 ```bash
 # Build locally
 pnpm build:site
@@ -507,13 +538,16 @@ wrangler pages deploy apps/site/dist \
 ```
 
 #### Rollback
+
 Option 1: Via Dashboard
+
 1. Go to Cloudflare Dashboard
 2. Pages → liteckyeditingservices → Deployments
 3. Find previous good deployment
 4. Click "Rollback"
 
 Option 2: Via Git
+
 ```bash
 # Revert the bad commit
 git revert HEAD
@@ -523,6 +557,7 @@ git push origin main
 ### OAuth Worker (Cloudflare Workers)
 
 #### Deployment
+
 ```bash
 cd workers/decap-oauth
 pnpm install
@@ -530,6 +565,7 @@ wrangler deploy
 ```
 
 #### Rollback
+
 ```bash
 # List deployments
 wrangler deployments list
@@ -541,6 +577,7 @@ wrangler rollback
 ## Build Configuration
 
 ### Cloudflare Pages Settings
+
 ```yaml
 Build command: pnpm build
 Build output directory: apps/site/dist
@@ -550,6 +587,7 @@ Environment variables: (see ENVIRONMENT.md)
 ```
 
 ### Build Process
+
 1. Install dependencies (`pnpm install`)
 2. Run build (`astro build`)
 3. Generate static assets
@@ -559,6 +597,7 @@ Environment variables: (see ENVIRONMENT.md)
 ## Deployment Checklist
 
 ### Before Deployment
+
 - [ ] Run `pnpm check` locally
 - [ ] Test critical paths
 - [ ] Review environment variables
@@ -566,6 +605,7 @@ Environment variables: (see ENVIRONMENT.md)
 - [ ] Update CHANGELOG if needed
 
 ### After Deployment
+
 - [ ] Verify homepage loads
 - [ ] Test contact form
 - [ ] Check CMS access
@@ -575,33 +615,37 @@ Environment variables: (see ENVIRONMENT.md)
 ## CI/CD Pipeline
 
 ### GitHub Actions Workflow
+
 ```yaml
 main branch push →
-  1. Quality checks (lint, type, build)
-  2. E2E tests (Playwright)
-  3. Deploy to Cloudflare Pages
-  4. Run smoke tests
-  5. Notify on failure
+1. Quality checks (lint, type, build)
+2. E2E tests (Playwright)
+3. Deploy to Cloudflare Pages
+4. Run smoke tests
+5. Notify on failure
 ```
 
 ### Preview Deployments
+
 ```yaml
 PR opened/updated →
-  1. Quality checks
-  2. Build
-  3. Deploy preview
-  4. Comment URL on PR
-  5. Run basic tests
+1. Quality checks
+2. Build
+3. Deploy preview
+4. Comment URL on PR
+5. Run basic tests
 ```
 
 ## Monitoring Deployments
 
 ### Real-time Monitoring
+
 - Cloudflare Dashboard → Pages → litecky-editing → Deployments
 - GitHub Actions tab for CI status
 - `wrangler tail` for Worker logs
 
 ### Alerts
+
 - GitHub Actions failures → Email
 - Build failures → Cloudflare dashboard
 - Runtime errors → Function logs
@@ -609,18 +653,21 @@ PR opened/updated →
 ## Environment-Specific Configuration
 
 ### Production
+
 - Real Turnstile keys
 - Production SendGrid templates
 - Analytics enabled
 - Caching aggressive
 
 ### Preview
+
 - Test Turnstile keys available
 - Sandbox mode for emails
 - Analytics enabled
 - Caching moderate
 
 ### Development
+
 - Test keys only
 - Local email testing
 - No analytics
@@ -629,6 +676,7 @@ PR opened/updated →
 ## Troubleshooting Deployments
 
 ### Build Failures
+
 ```bash
 # Check build logs
 # Cloudflare Dashboard → Pages → Deployments → View build log
@@ -641,6 +689,7 @@ PR opened/updated →
 ```
 
 ### Deployment Stuck
+
 ```bash
 # Cancel and retry
 # Dashboard → Cancel deployment
@@ -651,6 +700,7 @@ git push origin main
 ```
 
 ### Wrong Content Deployed
+
 ```bash
 # Verify correct branch
 git branch --show-current
@@ -665,12 +715,14 @@ git log -1 --oneline
 ## Performance Optimization
 
 ### Build Optimization
+
 - Cache dependencies in CI
 - Minimize build output
 - Use production builds
 - Tree-shake unused code
 
 ### Deployment Speed
+
 - Average build time: 2-3 minutes
 - Propagation time: <1 minute
 - Cache purge: ~30 seconds
@@ -678,22 +730,26 @@ git log -1 --oneline
 ## Security Considerations
 
 ### Secrets Management
+
 - Never commit secrets
 - Use environment variables
 - Rotate keys regularly
 - Document in SECRETS.md
 
 ### Access Control
+
 - Limit deployment permissions
 - Use API tokens, not global keys
 - Enable 2FA on all accounts
 - Audit access quarterly
 
 ## Related Documentation
+
 - [ENVIRONMENT.md](./ENVIRONMENT.md) - Environment variables
 - [SECRETS.md](./SECRETS.md) - Secret management
 - [RUNBOOK.md](./RUNBOOK.md) - Operations procedures
-```
+
+````
 
 ## SECRETS.md
 ```markdown
@@ -766,9 +822,10 @@ gopass insert sendgrid/api-key
 
 # Export to .dev.vars
 ./scripts/export-dev-vars.sh
-```
+````
 
 ### Manual Setup
+
 ```bash
 # Copy template
 cp apps/site/.dev.vars.example apps/site/.dev.vars
@@ -780,6 +837,7 @@ vim apps/site/.dev.vars
 ## Rotation Procedures
 
 ### Turnstile Keys
+
 1. Create new widget in Cloudflare Dashboard
 2. Update `TURNSTILE_SITE_KEY` in Pages variables
 3. Update `TURNSTILE_SECRET_KEY` in Pages secrets
@@ -788,6 +846,7 @@ vim apps/site/.dev.vars
 6. Delete old widget after verification
 
 ### SendGrid API Key
+
 ```bash
 # 1. Create new key in SendGrid
 # 2. Update in Cloudflare Pages
@@ -796,6 +855,7 @@ vim apps/site/.dev.vars
 ```
 
 ### GitHub OAuth
+
 ```bash
 # 1. Generate new secret in GitHub OAuth App
 # 2. Update Worker secret
@@ -807,6 +867,7 @@ wrangler deploy
 ```
 
 ### Cloudflare API Token
+
 1. Create new token in Cloudflare Dashboard
 2. Update in GitHub Actions secrets
 3. Test with manual workflow run
@@ -815,6 +876,7 @@ wrangler deploy
 ## Emergency Access
 
 ### Break Glass Procedure
+
 1. Log into Cloudflare Dashboard with admin account
 2. Pages → Settings → Environment variables
 3. Update compromised secret immediately
@@ -822,6 +884,7 @@ wrangler deploy
 5. Document incident
 
 ### Recovery Contacts
+
 - Primary: tech-lead@company.com
 - Secondary: ops@company.com
 - Cloudflare Support: (if account issue)
@@ -852,10 +915,12 @@ curl https://cms-auth.liteckyeditingservices.com/
 ```
 
 ## Related Documentation
+
 - [ENVIRONMENT.md](./ENVIRONMENT.md) - Where secrets are used
 - [RUNBOOK.md](./RUNBOOK.md) - Rotation procedures
 - [docs/playbooks/](./docs/playbooks/) - Service-specific guides
-```
+
+````
 
 ## ENVIRONMENT.md
 ```markdown
@@ -903,7 +968,7 @@ SENDGRID_API_KEY=SG.test_key_here
 ADMIN_EMAIL=test@example.com
 ENVIRONMENT=development
 DEBUG=true
-```
+````
 
 ### Worker Secrets
 
@@ -918,18 +983,21 @@ wrangler secret put GITHUB_OAUTH_SECRET
 Repository → Settings → Secrets and variables → Actions
 
 Required:
+
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
 
 ## Accessing Variables in Code
 
 ### Astro Pages
+
 ```typescript
 // In .astro files
 const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ```
 
 ### Pages Functions
+
 ```typescript
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { env } = context;
@@ -938,22 +1006,25 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 ```
 
 ### Svelte Components
+
 ```typescript
 const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 ```
 
 ### Workers
+
 ```typescript
 export default {
   async fetch(request: Request, env: Env) {
     const clientId = env.GITHUB_OAUTH_ID;
-  }
+  },
 };
 ```
 
 ## Type Safety
 
 ### Type Definition
+
 ```typescript
 // env.d.ts
 interface ImportMetaEnv {
@@ -973,18 +1044,21 @@ interface Env {
 ## Best Practices
 
 ### Naming Convention
+
 - `PUBLIC_*` - Available in browser
 - `*_KEY/*_SECRET` - Sensitive values
 - `*_ID` - Identifiers
 - `USE_*` - Feature flags
 
 ### Security
+
 - Never log secret values
 - Don't commit .dev.vars
 - Use encrypted secrets in Cloudflare
 - Rotate keys regularly
 
 ### Validation
+
 ```typescript
 // Validate at startup
 function validateEnv(env: unknown): Env {
@@ -999,22 +1073,26 @@ function validateEnv(env: unknown): Env {
 ## Troubleshooting
 
 ### Variable Not Found
+
 1. Check spelling (case-sensitive)
 2. Verify environment (prod/preview/dev)
 3. Restart dev server after changes
 4. Check .dev.vars exists locally
 
 ### Wrong Value Used
+
 1. Check environment precedence
 2. Clear cache if needed
 3. Verify no hardcoded values
 4. Check build logs
 
 ## Related Documentation
+
 - [SECRETS.md](./SECRETS.md) - Secret management
 - [DEPLOYMENT.md](./DEPLOYMENT.md) - Environment setup
 - [docs/onboarding.md](./docs/onboarding.md) - Developer setup
-```
+
+````
 
 ## Additional Key Documents
 
@@ -1048,11 +1126,12 @@ pnpm install
 
 # Install Playwright browsers (for testing)
 pnpm exec playwright install chromium
-```
+````
 
 ## Step 2: Environment Setup (10 minutes)
 
 ### Option A: Using gopass (Recommended)
+
 ```bash
 # Get access to gopass store from team lead
 # Then export secrets
@@ -1060,6 +1139,7 @@ pnpm exec playwright install chromium
 ```
 
 ### Option B: Manual Setup
+
 ```bash
 # Copy templates
 cp apps/site/.dev.vars.example apps/site/.dev.vars
@@ -1132,12 +1212,14 @@ git push origin test/your-name-onboarding
 ## Step 7: Understand the Codebase (5 minutes)
 
 ### Key Directories
+
 - `apps/site/` - Main website (Astro)
 - `workers/` - Cloudflare Workers
 - `docs/` - Documentation
 - `scripts/` - Build and utility scripts
 
 ### Important Files
+
 - `RUNBOOK.md` - Operations guide
 - `ARCHITECTURE.md` - System design
 - `.github/workflows/` - CI/CD pipelines
@@ -1145,6 +1227,7 @@ git push origin test/your-name-onboarding
 ## Development Workflow
 
 ### Daily Flow
+
 1. Pull latest: `git pull origin main`
 2. Create branch: `git checkout -b feature/thing`
 3. Make changes
@@ -1155,11 +1238,13 @@ git push origin test/your-name-onboarding
 8. Merge after approval
 
 ### Testing
+
 - **Local**: `pnpm test:e2e`
 - **CI**: Automatic on PR
 - **Smoke**: Nightly at 2:30 AM Alaska
 
 ### Deployment
+
 - **Automatic**: Push to main → deployed
 - **Preview**: Every PR gets URL
 - **Rollback**: See RUNBOOK.md
@@ -1167,15 +1252,18 @@ git push origin test/your-name-onboarding
 ## Common Tasks
 
 ### Update Content
+
 - Edit files in `src/content/`
 - Or use CMS at `/admin`
 
 ### Add Environment Variable
+
 1. Add to `.dev.vars` locally
 2. Add to Cloudflare dashboard
 3. Document in ENVIRONMENT.md
 
 ### Debug Issue
+
 1. Check browser console
 2. Check Pages Functions logs
 3. Check Worker logs if OAuth issue
@@ -1183,15 +1271,18 @@ git push origin test/your-name-onboarding
 ## Getting Help
 
 ### Documentation
+
 - `RUNBOOK.md` - Operations
 - `docs/playbooks/` - Specific guides
 - `docs/decisions/` - Why things are done
 
 ### People
+
 - Team Lead: @github-username
 - Ops: ops@company.com
 
 ### Tools
+
 - [Cloudflare Dashboard](https://dash.cloudflare.com)
 - [SendGrid Dashboard](https://app.sendgrid.com)
 - [GitHub Issues](https://github.com/YOUR_ORG/litecky-editing/issues)
@@ -1199,6 +1290,7 @@ git push origin test/your-name-onboarding
 ## VS Code Setup (Optional)
 
 ### Install Extensions
+
 ```bash
 code --install-extension biomejs.biome
 code --install-extension astro-build.astro-vscode
@@ -1207,23 +1299,27 @@ code --install-extension bradlc.vscode-tailwindcss
 ```
 
 ### Settings
+
 Already configured in `.vscode/settings.json`
 
 ## Troubleshooting
 
 ### Port already in use
+
 ```bash
 lsof -i :4321
 kill -9 <PID>
 ```
 
 ### Dependencies won't install
+
 ```bash
 rm -rf node_modules pnpm-lock.yaml
 pnpm install
 ```
 
 ### CMS won't load
+
 - Check you have repo access
 - Verify OAuth proxy is running
 - Check browser console for errors
@@ -1236,7 +1332,8 @@ pnpm install
 4. Ask questions in Slack/Discord
 
 Welcome aboard! 🚀
-```
+
+````
 
 ### docs/playbooks/email-issues.md
 ```markdown
@@ -1261,11 +1358,12 @@ dig txt s2._domainkey.liteckyeditingservices.com
 
 # Check SPF record
 dig txt liteckyeditingservices.com | grep spf
-```
+````
 
 Dashboard: Settings → Sender Authentication → Verify
 
 ### Step 3: Test API Connection
+
 ```bash
 # Test with curl
 curl -X POST https://api.sendgrid.com/v3/mail/send \
@@ -1282,6 +1380,7 @@ curl -X POST https://api.sendgrid.com/v3/mail/send \
 ```
 
 ### Step 4: Check Template IDs
+
 - Dashboard → Email API → Dynamic Templates
 - Verify IDs match environment variables
 - Test template with preview send
@@ -1293,12 +1392,14 @@ curl -X POST https://api.sendgrid.com/v3/mail/send \
 **Symptom**: Form submits but no email received
 
 **Check**:
+
 1. Pages Function logs for errors
 2. SendGrid Activity for blocks
 3. Spam folders
 4. Template ID correct
 
 **Fix**:
+
 ```bash
 # Verify API key
 wrangler pages secret list --project-name=liteckyeditingservices
@@ -1312,6 +1413,7 @@ wrangler pages secret put SENDGRID_API_KEY --project-name=liteckyeditingservices
 **Symptom**: 401 errors in logs
 
 **Fix**:
+
 1. Regenerate API key in SendGrid
 2. Update in Cloudflare Pages
 3. Redeploy
@@ -1321,6 +1423,7 @@ wrangler pages secret put SENDGRID_API_KEY --project-name=liteckyeditingservices
 **Symptom**: Emails go to spam or bounce
 
 **Fix**:
+
 1. Re-authenticate domain in SendGrid
 2. Update DNS records in Cloudflare
 3. Wait 24-48 hours for propagation
@@ -1330,6 +1433,7 @@ wrangler pages secret put SENDGRID_API_KEY --project-name=liteckyeditingservices
 **Symptom**: 429 errors after multiple sends
 
 **Fix**:
+
 1. Check SendGrid plan limits
 2. Implement client-side throttling
 3. Use queue for bulk sends
@@ -1337,25 +1441,30 @@ wrangler pages secret put SENDGRID_API_KEY --project-name=liteckyeditingservices
 ## Testing Email Delivery
 
 ### Local Testing with Sandbox
+
 ```javascript
 // In contact function
 const sandboxMode = env.ENVIRONMENT === 'development';
 
 const payload = {
   // ... normal payload
-  mail_settings: sandboxMode ? {
-    sandbox_mode: { enable: true }
-  } : undefined
+  mail_settings: sandboxMode
+    ? {
+        sandbox_mode: { enable: true },
+      }
+    : undefined,
 };
 ```
 
 ### Preview Environment Testing
+
 1. Use preview deployment URL
 2. Submit form with real email
 3. Check SendGrid Activity
 4. Verify both emails sent
 
 ### Load Testing
+
 ```bash
 # Don't do this in production!
 for i in {1..10}; do
@@ -1368,11 +1477,13 @@ done
 ## Monitoring
 
 ### Set Up Webhooks
+
 1. SendGrid → Settings → Mail Settings → Event Webhook
 2. Point to Worker endpoint
 3. Track bounces, opens, clicks
 
 ### Daily Health Check
+
 ```bash
 # Add to nightly smoke test
 curl -X POST $URL/api/contact \
@@ -1382,6 +1493,7 @@ curl -X POST $URL/api/contact \
 ## Emergency Procedures
 
 ### All Emails Failing
+
 1. **Immediate**: Enable fallback notifications
 2. **Check**: SendGrid account status
 3. **Verify**: API key not revoked
@@ -1389,6 +1501,7 @@ curl -X POST $URL/api/contact \
 5. **Escalate**: SendGrid support if needed
 
 ### Switch to Backup Provider
+
 ```javascript
 // In contact function
 try {
@@ -1400,33 +1513,43 @@ try {
 ```
 
 ## Related Documentation
+
 - [SECRETS.md](../../SECRETS.md) - API key management
 - [ENVIRONMENT.md](../../ENVIRONMENT.md) - Template IDs
 - [RUNBOOK.md](../../RUNBOOK.md) - General operations
+
 ```
 
 ### .github/CODEOWNERS
 ```
+
 # Default owner for everything
-* @YOUR_GITHUB_USERNAME
+
+- @YOUR_GITHUB_USERNAME
 
 # Documentation
+
 /docs/ @YOUR_GITHUB_USERNAME
-*.md @YOUR_GITHUB_USERNAME
+\*.md @YOUR_GITHUB_USERNAME
 
 # Infrastructure
+
 /workers/ @YOUR_GITHUB_USERNAME
 /.github/ @YOUR_GITHUB_USERNAME
 /functions/ @YOUR_GITHUB_USERNAME
 
 # Configuration
-*.toml @YOUR_GITHUB_USERNAME
-*.json @YOUR_GITHUB_USERNAME
-*.yml @YOUR_GITHUB_USERNAME
-*.yaml @YOUR_GITHUB_USERNAME
+
+_.toml @YOUR_GITHUB_USERNAME
+_.json @YOUR_GITHUB_USERNAME
+_.yml @YOUR_GITHUB_USERNAME
+_.yaml @YOUR_GITHUB_USERNAME
 
 # Content can be edited by editors
+
 /apps/site/src/content/ @YOUR_GITHUB_USERNAME @YOUR_WIFE_USERNAME
+
 ```
 
 This comprehensive documentation suite ensures that any developer can understand, run, and maintain your system with minimal ramp-up time. Each document is focused, actionable, and cross-referenced for easy navigation.
+```

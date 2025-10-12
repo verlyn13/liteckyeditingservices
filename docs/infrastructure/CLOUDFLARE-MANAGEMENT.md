@@ -21,7 +21,9 @@
 ## 🔧 Available Management Scripts
 
 ### 1. `cloudflare-audit.fish`
+
 Comprehensive domain audit that checks:
+
 - Zone configuration
 - DNS records (full access ✅)
 - SSL/TLS settings
@@ -33,7 +35,9 @@ Comprehensive domain audit that checks:
 - Website availability
 
 ### 2. `cf-dns-manage.fish`
+
 DNS record management with safety features:
+
 - **list** - Display all DNS records with IDs
 - **backup** - Create timestamped JSON backup
 - **add** - Add new DNS records
@@ -41,7 +45,9 @@ DNS record management with safety features:
 - **prepare-pages** - Prepare for Pages deployment
 
 ### 3. `cf-pages-deploy.fish`
+
 Cloudflare Pages deployment helper:
+
 - **status** - Show current deployment status
 - **prepare** - Build and prepare for deployment
 - **config** - Create wrangler.toml
@@ -49,11 +55,13 @@ Cloudflare Pages deployment helper:
 - **dns** - Show DNS update commands
 
 ### 4. `cf.fish`
+
 Quick wrapper for flarectl commands with automatic token loading.
 
 ## 🔐 API Token Capabilities
 
 ### ✅ Full Access (Working)
+
 - Zone Read/Edit
 - DNS Read/Edit
 - SSL/TLS Read/Edit
@@ -62,18 +70,21 @@ Quick wrapper for flarectl commands with automatic token loading.
 - Cloudflare Pages Read/Edit
 
 ### ❌ Limited Access
+
 - Page Rules (requires zone-specific token)
 - Some user-level operations
 
 ## 📝 Current Domain Configuration
 
 ### DNS Records Summary
+
 - **Root Domain**: CNAME to www (proxied)
 - **WWW**: CNAME to ghs.googlehosted.com (Google Sites)
 - **Email**: 5 MX records for Google Workspace
 - **Authentication**: SPF and DKIM for Google
 
 ### Important IDs
+
 - **Zone ID**: `a5e7c69768502d649a8f2c615f555eca`
 - **Account ID**: Available via API
 - **Name Servers**: carol.ns.cloudflare.com, ignacio.ns.cloudflare.com
@@ -81,6 +92,7 @@ Quick wrapper for flarectl commands with automatic token loading.
 ## 🚀 Deployment Workflow
 
 ### Phase 1: Prepare
+
 ```bash
 # 1. Backup current configuration
 ./scripts/cf-dns-manage.fish backup
@@ -93,6 +105,7 @@ pnpm add -D wrangler
 ```
 
 ### Phase 2: Deploy to Pages
+
 ```bash
 # 1. Create wrangler config
 ./scripts/cf-pages-deploy.fish config
@@ -104,6 +117,7 @@ pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
 ```
 
 ### Phase 3: Update DNS
+
 ```bash
 # 1. List current records to get IDs
 ./scripts/cf-dns-manage.fish list
@@ -122,19 +136,21 @@ pnpm wrangler pages deploy dist/ --project-name=liteckyeditingservices
 If something goes wrong:
 
 1. **Restore from backup**:
+
    ```bash
    # Find your backup file
    ls dns-backup-*.json
-   
+
    # Restore (manual process for safety)
    # Review the backup file and restore records as needed
    ```
 
 2. **Quick revert to Google Sites**:
+
    ```bash
    # Delete Pages CNAME
    ./scripts/cf-dns-manage.fish delete [record-id]
-   
+
    # Restore Google Sites CNAME
    ./scripts/cf-dns-manage.fish add CNAME www ghs.googlehosted.com
    ```
@@ -142,12 +158,15 @@ If something goes wrong:
 ## 📧 Email Configuration
 
 ### Current Setup (Google Workspace)
+
 - MX records pointing to Google servers
 - SPF: `v=spf1 include:_spf.google.com ~all`
 - DKIM: Google domain key configured
 
 ### Adding SendGrid (Future)
+
 When ready to add transactional email:
+
 ```bash
 # Update SPF to include SendGrid
 ./scripts/cf-dns-manage.fish add TXT @ "v=spf1 include:_spf.google.com include:sendgrid.net ~all"
@@ -164,6 +183,7 @@ When ready to add transactional email:
 ## 📊 Monitoring
 
 ### Check DNS Propagation
+
 ```bash
 # Check A records
 dig liteckyeditingservices.com +short
@@ -176,6 +196,7 @@ dig CNAME www.liteckyeditingservices.com +short
 ```
 
 ### Website Status
+
 ```bash
 # Check HTTP status
 curl -I https://liteckyeditingservices.com

@@ -1,6 +1,7 @@
 # Cloudflare Deployment Workflow - Litecky Editing Services
 
 ## Overview
+
 This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-ROADMAP.md tracking system, leveraging our established Cloudflare management infrastructure.
 
 ---
@@ -8,6 +9,7 @@ This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-
 ## 📦 Current Infrastructure Status
 
 ### ✅ Already In Place
+
 - **Domain**: liteckyeditingservices.com (Zone ID: a5e7c69768502d649a8f2c615f555eca)
 - **Cloudflare Account**: Active (Account ID: 13eb584192d9cefb730fde0cfd271328)
 - **DNS**: Currently pointing to Google (ghs.googlehosted.com)
@@ -20,6 +22,7 @@ This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-
 - **API Credentials**: Stored in gopass
 
 ### 🔄 Migration Required
+
 - DNS from Google Sites to Cloudflare Pages
 - Remove Google-specific CNAME records
 - Add Pages deployment records
@@ -29,6 +32,7 @@ This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-
 ## 🚀 Deployment Phases (Aligned with IMPLEMENTATION-ROADMAP.md)
 
 ### Phase 0: Pre-Deployment Preparation ✅
+
 **Status**: COMPLETE
 **Blockers**: None
 
@@ -39,10 +43,12 @@ This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-
 - [x] Verify build output in `dist/` directory
 
 ### Phase 1: Cloudflare Infrastructure Setup ✅
+
 **Status**: COMPLETE
 **Dependencies**: Frontend completion
 
 #### 1.1 Create Core Resources ✅
+
 ```bash
 # COMPLETED using wrangler:
 # 1. D1 Database: litecky-db (ID: 208dd91d-8f15-40ef-b23d-d79672590112)
@@ -52,16 +58,19 @@ This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-
 ```
 
 #### 1.2 Update PROJECT-STATUS.md ✅
+
 - [x] Mark D1 Database as created
 - [x] Mark R2 Bucket as created
 - [x] Mark KV Namespace as created
 - [x] Mark Queue as deferred (paid plan required)
 
 ### Phase 2: Security & Authentication Setup 🟡
+
 **Status**: PARTIALLY COMPLETE
 **Dependencies**: Phase 1 ✅
 
 #### 2.1 Turnstile Setup ✅
+
 ```bash
 # COMPLETED:
 # 1. Widget created: litecky-editing-production
@@ -74,6 +83,7 @@ This workflow integrates with our existing PROJECT-STATUS.md and IMPLEMENTATION-
 ```
 
 #### 2.2 GitHub OAuth App
+
 ```bash
 # Create via GitHub Settings > Developer settings
 # Homepage: https://liteckyeditingservices.com
@@ -85,14 +95,17 @@ gopass insert github/litecky/oauth/client-secret
 ```
 
 #### 2.3 Update Trackers
+
 - [x] Update PROJECT-STATUS.md: Turnstile configured
 - [ ] Update PROJECT-STATUS.md: GitHub OAuth created
 
 ### Phase 3: Workers Deployment 👷
+
 **Status**: Not Started
 **Dependencies**: Phase 2
 
 #### 3.1 Deploy OAuth Worker
+
 ```bash
 cd workers/decap-oauth
 pnpm install
@@ -109,6 +122,7 @@ wrangler deploy
 ```
 
 #### 3.2 Deploy Cron Worker
+
 ```bash
 cd workers/cron
 pnpm install
@@ -116,6 +130,7 @@ wrangler deploy
 ```
 
 #### 3.3 Deploy Queue Consumer
+
 ```bash
 cd workers/queue-consumer
 pnpm install
@@ -123,15 +138,18 @@ wrangler deploy
 ```
 
 #### 3.4 Update Tracking
+
 - [ ] Mark OAuth Worker deployed in PROJECT-STATUS.md
 - [ ] Mark Cron Worker deployed
 - [ ] Mark Queue Consumer deployed
 
 ### Phase 4: Main Site Deployment 🟡
+
 **Status**: PARTIALLY COMPLETE
 **Dependencies**: Phase 1 ✅
 
 #### 4.1 Initial Pages Setup ✅
+
 ```bash
 # COMPLETED:
 wrangler pages project create liteckyeditingservices --production-branch main
@@ -139,6 +157,7 @@ wrangler pages project create liteckyeditingservices --production-branch main
 ```
 
 #### 4.2 Configure Environment Variables ⏳
+
 ```bash
 # TODO: Via dashboard or wrangler
 wrangler pages secret put PUBLIC_TURNSTILE_SITE_KEY
@@ -148,6 +167,7 @@ wrangler pages secret put SENDGRID_API_KEY
 ```
 
 #### 4.3 DNS Migration ⏳
+
 ```bash
 # TODO: After ready for production
 # Backup current DNS (COMPLETED)
@@ -161,6 +181,7 @@ wrangler pages secret put SENDGRID_API_KEY
 ```
 
 #### 4.4 Deploy Site ✅
+
 ```bash
 # COMPLETED:
 pnpm build
@@ -170,16 +191,19 @@ wrangler pages deploy dist --project-name=liteckyeditingservices
 ```
 
 #### 4.5 Update Trackers ✅
+
 - [x] Mark Cloudflare Pages created
 - [ ] Mark DNS migrated (pending)
 - [x] Mark site deployed
 - [x] Update PROJECT-STATUS.md deployment section
 
 ### Phase 5: Email Configuration 📧
+
 **Status**: Not Started
 **Dependencies**: SendGrid account setup
 
 #### 5.1 SendGrid Setup
+
 ```bash
 # After SendGrid account creation
 # 1. Domain authentication
@@ -192,6 +216,7 @@ gopass insert sendgrid/litecky/template/confirmation
 ```
 
 #### 5.2 DNS Records for Email
+
 ```bash
 # Add SendGrid records
 ./scripts/cf-dns-manage.fish add CNAME em1234 u12345.wl123.sendgrid.net false
@@ -200,10 +225,12 @@ gopass insert sendgrid/litecky/template/confirmation
 ```
 
 ### Phase 6: Post-Deployment Verification ✅
+
 **Status**: Not Started
 **Dependencies**: All phases complete
 
 #### 6.1 Functional Tests
+
 ```bash
 # Run from project root
 ./scripts/verify-deployment.fish
@@ -217,6 +244,7 @@ gopass insert sendgrid/litecky/template/confirmation
 ```
 
 #### 6.2 Update Documentation
+
 - [ ] Update PROJECT-STATUS.md to 100% deployed
 - [ ] Update IMPLEMENTATION-ROADMAP.md completion
 - [ ] Create production runbook
@@ -227,6 +255,7 @@ gopass insert sendgrid/litecky/template/confirmation
 ## 📊 Progress Tracking Integration
 
 ### PROJECT-STATUS.md Updates
+
 After each phase completion, update the deployment section:
 
 ```markdown
@@ -234,6 +263,7 @@ After each phase completion, update the deployment section:
 ```
 
 ### IMPLEMENTATION-ROADMAP.md Updates
+
 Update the Cloudflare Infrastructure section:
 
 ```markdown
@@ -245,6 +275,7 @@ Update the Cloudflare Infrastructure section:
 ## 🛠️ Helper Scripts
 
 ### Create All Resources Script
+
 ```fish
 #!/usr/bin/env fish
 # scripts/cloudflare-setup-all.fish
@@ -271,6 +302,7 @@ echo "✅ All resources created!"
 ```
 
 ### Deployment Status Check
+
 ```fish
 #!/usr/bin/env fish
 # scripts/cloudflare-deploy-status.fish
@@ -299,12 +331,14 @@ echo "R2 Buckets:"
 ## 🚨 Rollback Procedures
 
 ### Emergency DNS Rollback
+
 ```bash
 # Restore from backup
 ./scripts/cf-dns-restore.fish dns-backup-YYYYMMDD.json
 ```
 
 ### Pages Deployment Rollback
+
 ```bash
 # List deployments
 wrangler pages deployment list --project-name=liteckyeditingservices
@@ -314,6 +348,7 @@ wrangler pages deployment rollback --project-name=liteckyeditingservices
 ```
 
 ### Worker Rollback
+
 ```bash
 cd workers/[worker-name]
 wrangler rollback
@@ -324,12 +359,14 @@ wrangler rollback
 ## 📝 Checklist Summary
 
 ### Pre-Flight Checklist
+
 - [ ] Frontend complete and tested
 - [ ] Build passes all validations
 - [ ] Credentials stored in gopass
 - [ ] Backup current DNS configuration
 
 ### Deployment Checklist
+
 - [ ] Phase 1: Infrastructure created
 - [ ] Phase 2: Security configured
 - [ ] Phase 3: Workers deployed
@@ -338,6 +375,7 @@ wrangler rollback
 - [ ] Phase 6: Verification complete
 
 ### Post-Deployment Checklist
+
 - [ ] All trackers updated
 - [ ] Documentation complete
 - [ ] Monitoring enabled

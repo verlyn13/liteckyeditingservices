@@ -7,6 +7,7 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 ## Recommended Service: UptimeRobot
 
 **Free Tier Includes**:
+
 - 50 monitors
 - 5-minute check intervals
 - Email, SMS, webhook alerts
@@ -14,6 +15,7 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 - 2-month log retention
 
 **Paid Plans** ($7-58/month):
+
 - 1-minute intervals
 - More monitors
 - Advanced alerting
@@ -24,6 +26,7 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 ### Primary Monitors (Required)
 
 #### 1. Homepage Monitor
+
 - **URL**: `https://www.liteckyeditingservices.com`
 - **Type**: HTTPS
 - **Interval**: 5 minutes (free) or 1 minute (paid)
@@ -32,6 +35,7 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 - **Keyword Check**: "Litecky Editing Services" (optional)
 
 #### 2. Contact Page Monitor
+
 - **URL**: `https://www.liteckyeditingservices.com/contact`
 - **Type**: HTTPS
 - **Interval**: 5 minutes
@@ -40,6 +44,7 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 - **Keyword Check**: "Get My Free Quote" (verifies form renders)
 
 #### 3. Admin Panel Monitor
+
 - **URL**: `https://www.liteckyeditingservices.com/admin/`
 - **Type**: HTTPS
 - **Interval**: 5 minutes
@@ -50,12 +55,14 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 ### Secondary Monitors (Optional)
 
 #### 4. Services Page
+
 - **URL**: `https://www.liteckyeditingservices.com/services`
 - **Type**: HTTPS
 - **Interval**: 5 minutes
 - **Alert Threshold**: Down for 1 check
 
 #### 5. API Health Check
+
 - **URL**: `https://www.liteckyeditingservices.com/api/contact`
 - **Type**: HTTP POST (if UptimeRobot supports)
 - **Interval**: 5 minutes
@@ -63,6 +70,7 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 - **Note**: UptimeRobot may only support GET; consider Pingdom for POST
 
 #### 6. Sitemap Monitor
+
 - **URL**: `https://www.liteckyeditingservices.com/sitemap-index.xml`
 - **Type**: HTTPS
 - **Interval**: 30 minutes
@@ -75,10 +83,12 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 ### Alert Contacts
 
 **Primary** (Immediate):
+
 - Email: `your-email@example.com`
 - SMS: `+1-XXX-XXX-XXXX` (if available)
 
 **Secondary** (Daily digest):
+
 - Team email or Slack webhook
 
 ### Alert Rules
@@ -101,6 +111,7 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 ### Option A: UptimeRobot (Recommended - Free)
 
 #### 1. Create Account
+
 ```
 1. Visit: https://uptimerobot.com/signUp
 2. Enter email, create password
@@ -110,6 +121,7 @@ External uptime monitoring provides alerts when the site becomes unavailable fro
 #### 2. Add Monitors
 
 **Homepage Monitor**:
+
 ```
 Dashboard → Add New Monitor
 
@@ -124,6 +136,7 @@ Advanced Settings:
 ```
 
 **Contact Page Monitor**:
+
 ```
 Monitor Type: HTTPS
 Friendly Name: Litecky - Contact Form
@@ -133,6 +146,7 @@ Keyword exists: "Get My Free Quote"
 ```
 
 **Admin Panel Monitor**:
+
 ```
 Monitor Type: HTTPS
 Friendly Name: Litecky - Admin Panel
@@ -142,6 +156,7 @@ Alert When Down For: 10 minutes
 ```
 
 #### 3. Configure Alert Settings
+
 ```
 My Settings → Alert Contacts
 
@@ -149,13 +164,14 @@ Add Email:
   - Email: your-primary-email@example.com
   - Receive alerts when: Monitor Down
   - Receive alerts when: Monitor Up
-  
+
 Optional - Add SMS:
   - Phone: +1-XXX-XXX-XXXX
   - Only for critical monitors (homepage)
 ```
 
 #### 4. Create Public Status Page (Optional)
+
 ```
 My Settings → Status Pages → Add New
 
@@ -166,6 +182,7 @@ Brand: Add logo, colors
 ```
 
 #### 5. Configure Maintenance Windows
+
 ```
 For planned deployments:
 My Settings → Maintenance Windows
@@ -181,6 +198,7 @@ Add window before deploying:
 **Pricing**: Starting at $10/month
 
 **Advantages**:
+
 - 1-minute intervals
 - True multi-location checks (not synthetic)
 - Transaction monitoring (can test full user flows)
@@ -188,6 +206,7 @@ Add window before deploying:
 - Real user monitoring (RUM)
 
 **Setup**:
+
 ```
 1. Sign up: https://www.pingdom.com/
 2. Add Uptime Check
@@ -204,11 +223,13 @@ Add window before deploying:
 **Availability**: Requires Business plan ($200/month) or higher
 
 **Advantages**:
+
 - Native Cloudflare integration
 - Can trigger failover if using load balancer
 - No additional cost if already on Business plan
 
 **Setup** (if available):
+
 ```
 Cloudflare Dashboard → Traffic → Health Checks
 
@@ -227,11 +248,9 @@ Recommended geographic distribution:
 1. **North America** (Primary market):
    - US West Coast (Seattle/SF)
    - US East Coast (NYC/Virginia)
-   
 2. **Europe** (Secondary market):
    - UK (London)
    - Germany (Frankfurt)
-   
 3. **Asia-Pacific** (Global coverage):
    - Singapore or Tokyo
 
@@ -317,6 +336,7 @@ After setup, verify monitoring works:
 ### 1. Test Alert
 
 **In UptimeRobot**:
+
 ```
 1. Select a monitor
 2. Click "Pause Monitoring"
@@ -337,6 +357,7 @@ curl "https://api.uptimerobot.com/v2/getMonitors" \
 ### 3. Review Historical Data
 
 Check that monitors have been collecting data:
+
 - Uptime percentage (should be 99.9%+)
 - Response times (should be < 1000ms)
 - No extended outages
@@ -375,16 +396,19 @@ Check that monitors have been collecting data:
 ## Cost Estimate
 
 ### Free Option (UptimeRobot)
+
 - **Cost**: $0/month
 - **Limitations**: 5-minute intervals, basic features
 - **Suitable for**: Initial setup, small projects
 
 ### Paid Option (UptimeRobot Pro)
+
 - **Cost**: $7/month (10 monitors, 1-min intervals)
 - **Cost**: $15/month (50 monitors, 1-min intervals)
 - **Recommended for**: Production sites
 
 ### Premium Option (Pingdom)
+
 - **Cost**: $10-15/month (basic plan)
 - **Cost**: $40+/month (advanced features)
 - **Recommended for**: High-traffic or revenue-critical sites
@@ -396,11 +420,13 @@ Check that monitors have been collecting data:
 **Symptom**: Alerts for site being down, but site is accessible
 
 **Causes**:
+
 - Cloudflare rate limiting monitor IP
 - Temporary network issue
 - SSL certificate renewal
 
 **Solutions**:
+
 1. Increase failure threshold (2-3 consecutive failures)
 2. Whitelist UptimeRobot IPs in Cloudflare
 3. Check Cloudflare Analytics for blocked requests
@@ -410,11 +436,13 @@ Check that monitors have been collecting data:
 **Symptom**: Site was down, but alert came late
 
 **Causes**:
+
 - 5-minute check interval
 - Email delivery delay
 - Alert contact not verified
 
 **Solutions**:
+
 1. Upgrade to 1-minute intervals
 2. Add SMS alerts for critical monitors
 3. Verify all alert contact emails
@@ -424,11 +452,13 @@ Check that monitors have been collecting data:
 **Symptom**: Monitor reports site down, but manual checks work
 
 **Causes**:
+
 - Geo-blocking monitor's location
 - Keyword check failing
 - SSL/TLS version mismatch
 
 **Solutions**:
+
 1. Check monitor location vs Cloudflare rules
 2. Update keyword check string
 3. Review SSL settings in Cloudflare
@@ -444,12 +474,14 @@ Check that monitors have been collecting data:
 ### UptimeRobot API
 
 Store API key securely:
+
 ```bash
 # In .env (not committed)
 UPTIMEROBOT_API_KEY=your_api_key_here
 ```
 
 Fetch monitor status:
+
 ```javascript
 // Example: Worker to check monitor status
 const response = await fetch('https://api.uptimerobot.com/v2/getMonitors', {
@@ -458,8 +490,8 @@ const response = await fetch('https://api.uptimerobot.com/v2/getMonitors', {
   body: JSON.stringify({
     api_key: env.UPTIMEROBOT_API_KEY,
     format: 'json',
-    logs: 1
-  })
+    logs: 1,
+  }),
 });
 
 const data = await response.json();

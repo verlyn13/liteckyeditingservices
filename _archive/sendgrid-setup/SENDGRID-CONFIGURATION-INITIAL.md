@@ -3,6 +3,7 @@
 ## Domain Authentication Setup
 
 ### SendGrid Account Details
+
 - **Account**: Litecky Editing Services
 - **API Key Name**: sendgrid-liteckyeditingservices-key
 - **API Key Permissions**: Full Access (all endpoints except billing and Email Address Validation)
@@ -13,6 +14,7 @@
 ## DNS Records for Cloudflare
 
 ### Required CNAME Records
+
 ```
 Type: CNAME
 Name: email.liteckyeditingservices.com
@@ -36,6 +38,7 @@ Value: s2.domainkey.u54920324.wl075.sendgrid.net
 ```
 
 ### Required TXT Record
+
 ```
 Type: TXT
 Name: _dmarc.liteckyeditingservices.com
@@ -45,6 +48,7 @@ Value: v=DMARC1; p=none;
 ## Environment Configuration
 
 ### Production Environment Variables
+
 ```bash
 SENDGRID_API_KEY=SG.xxxxxxxxxxxxxxxxxxxx  # Store in gopass: development/sendgrid/api-key
 EMAIL_FROM=hello@liteckyeditingservices.com
@@ -53,6 +57,7 @@ SENDGRID_DOMAIN_ID=54920324
 ```
 
 ### Gopass Storage Structure
+
 ```
 sendgrid/
 ├── api-keys/
@@ -72,6 +77,7 @@ sendgrid/
 ## Setup Steps
 
 ### 1. Add DNS Records to Cloudflare
+
 1. Log into Cloudflare dashboard
 2. Select liteckyeditingservices.com domain
 3. Go to DNS → Records
@@ -79,17 +85,20 @@ sendgrid/
 5. Wait for DNS propagation (usually 5-15 minutes)
 
 ### 2. Verify Domain in SendGrid
+
 1. Return to SendGrid domain authentication
 2. Click "Verify" to check DNS records
 3. Confirm all records are properly configured
 
 ### 3. Set Up Sender Identity
+
 1. Go to SendGrid → Settings → Sender Authentication
 2. Choose "Single Sender Verification"
 3. Add sender: hello@liteckyeditingservices.com
 4. Complete verification process
 
 ### 4. Test Email Functionality
+
 ```bash
 pnpm test:sendgrid
 ```

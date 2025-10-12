@@ -11,8 +11,7 @@ Location: `scripts/secrets/`
 
 - `cloudflare_prepare_from_infisical.sh`
   - Splits export into:
-    - `secrets/public.env` (keys starting with PUBLIC_)
+    - `secrets/public.env` (keys starting with PUBLIC\_)
     - `secrets/secrets.env` (all other keys)
 
 See also: `docs/INFISICAL-QUICKSTART.md` and `secrets/PRODUCTION_KEYS.md`.
-

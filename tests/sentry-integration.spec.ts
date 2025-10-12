@@ -100,7 +100,7 @@ test.describe("Sentry Integration", () => {
 				| undefined;
 			const client = sentry?.getClient?.();
 			const opts = client?.getOptions?.();
-			return !!(opts && opts.dsn);
+			return !!opts?.dsn;
 		});
 
 		if (hasDsn) {
@@ -256,7 +256,13 @@ test.describe("Sentry Test Page", () => {
 
 		// Verify user was set
 		const userSet = await page.evaluate(() => {
-			const sentry = (window as any).__sentry;
+			const w = window as unknown as {
+				__sentry?: {
+					getCurrentScope?: () => unknown;
+					getScope?: () => unknown;
+				};
+			};
+			const sentry = w.__sentry;
 			if (!sentry) return false;
 
 			// Check if getScope is available (varies by Sentry version)
@@ -277,15 +283,29 @@ test.describe("Sentry Configuration Validation", () => {
 		await page.goto(BASE_URL);
 
 		const integrations = await page.evaluate(() => {
-			const sentry = (window as any).__sentry;
+			const w = window as unknown as {
+				__sentry?: {
+					getClient?: () => { getOptions?: () => { integrations?: unknown } };
+				};
+			};
+			const sentry = w.__sentry;
 			if (!sentry) return null;
 
-			const client = sentry.getClient();
-			if (!client) return null;
+			const client = sentry.getClient?.();
+			if (!client || typeof client.getOptions !== "function") return null;
 
 			const options = client.getOptions();
-			const integrationNames =
-				options.integrations?.map((i: any) => i.name) || [];
+			const integrationNames = Array.isArray(options.integrations)
+				? options.integrations
+						.map((i: unknown) => {
+							if (i && typeof i === "object" && "name" in i) {
+								const n = (i as { name?: unknown }).name;
+								return typeof n === "string" ? n : String(n ?? "");
+							}
+							return "";
+						})
+						.filter(Boolean)
+				: [];
 
 			return {
 				hasBrowserTracing: integrationNames.includes("BrowserTracing"),

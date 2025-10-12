@@ -6,6 +6,7 @@
 ## Archived Files
 
 ### SENDGRID-CONFIGURATION-INITIAL.md
+
 - **Original location**: `/docs/infrastructure/SENDGRID-CONFIGURATION.md`
 - **Date**: Early October 2025
 - **Lines**: 109
@@ -18,6 +19,7 @@
 ## Current Documentation
 
 For up-to-date SendGrid configuration, see:
+
 - `/docs/infrastructure/SENDGRID-SETUP.md` - Comprehensive setup guide with:
   - Both root domain AND `em` subdomain configuration
   - Complete DNS records (verified October 10, 2025)

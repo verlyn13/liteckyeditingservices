@@ -1,5 +1,8 @@
 import { defineConfig } from "@playwright/test";
 
+// Default visual policy for macOS/overlay scrollbars to avoid width gutter mismatch
+if (!process.env.VISUAL_POLICY) process.env.VISUAL_POLICY = "no-gutter";
+
 // Canonical viewport dimensions matching committed baselines
 const CANONICAL_WIDTH = 1250;
 const CANONICAL_HEIGHT = 900;
@@ -47,11 +50,15 @@ export default defineConfig({
 		process.env.BASE_URL && !process.env.BASE_URL.includes("localhost")
 			? undefined
 			: {
-					// Build once, then preview (static server, no HMR)
-					command: "pnpm build && pnpm preview --port 4321 --strictPort",
+					// Build once, then run Cloudflare Pages dev to include Functions locally
+					// Ensures /api/* and /admin/config.yml endpoints exist during e2e
+					command:
+						"pnpm build && pnpm exec wrangler pages dev dist --port 4321 --local",
 					url: "http://localhost:4321",
-					reuseExistingServer: true,
-					timeout: 120_000, // Allow time for build + preview startup
+					reuseExistingServer: !process.env.CI, // Reuse locally, fresh in CI
+					timeout: 180_000, // Allow time for build + wrangler startup
+					stdout: "pipe", // Capture logs for debugging
+					stderr: "pipe",
 				},
 
 	// Keep snapshots organized by OS/browser (October 2025 best practice)

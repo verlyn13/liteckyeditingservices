@@ -1,4 +1,5 @@
 # DNS Analysis - liteckyeditingservices.com
+
 **Date**: October 3, 2025
 **Status**: Partial Migration Complete
 
@@ -7,9 +8,11 @@
 ## Current DNS Configuration (October 3, 2025 15:59:10)
 
 ### ✅ Root Domain - CORRECT
+
 ```
 liteckyeditingservices.com    CNAME    liteckyeditingservices.pages.dev (proxied)
 ```
+
 **Status**: ✅ **MIGRATED** - Points to Cloudflare Pages
 **Behavior**: Redirects (301) to www.liteckyeditingservices.com
 **Expected**: Root domain should serve Pages content directly OR redirect to www
@@ -17,9 +20,11 @@ liteckyeditingservices.com    CNAME    liteckyeditingservices.pages.dev (proxied
 ---
 
 ### ❌ WWW Subdomain - INCORRECT (Still on Google Sites)
+
 ```
 www.liteckyeditingservices.com    CNAME    ghs.googlehosted.com (proxied)
 ```
+
 **Status**: ❌ **NOT MIGRATED** - Still points to Google Sites
 **Current Title**: "Litecky Editing Services" (Google Sites version)
 **Expected Title**: "Home | Litecky Editing Services" (Pages version)
@@ -28,6 +33,7 @@ www.liteckyeditingservices.com    CNAME    ghs.googlehosted.com (proxied)
 ---
 
 ### ✅ SendGrid Email DNS - ALL CORRECT
+
 ```
 DKIM Records:
 ✅ s1._domainkey.liteckyeditingservices.com → s1.domainkey.u54920324.wl075.sendgrid.net
@@ -57,32 +63,38 @@ Google Workspace:
 ## Verification Results
 
 ### Pages Deployment (liteckyeditingservices.pages.dev)
+
 ```bash
 $ curl -sI https://liteckyeditingservices.pages.dev
 HTTP/2 200
 server: cloudflare
 ```
+
 **Title**: "Home | Litecky Editing Services"
 **Status**: ✅ **HEALTHY** - Serving correct Astro site
 
 ---
 
 ### Root Domain (liteckyeditingservices.com)
+
 ```bash
 $ curl -sI https://liteckyeditingservices.com
 HTTP/2 301
 location: https://www.liteckyeditingservices.com/
 ```
+
 **Status**: ✅ DNS updated, redirects to www (which still shows old site)
 
 ---
 
 ### WWW Subdomain (www.liteckyeditingservices.com)
+
 ```bash
 $ curl -sI https://www.liteckyeditingservices.com
 HTTP/2 200
 content-security-policy: ... frame-ancestors https://google-admin.corp.google.com/
 ```
+
 **Title**: "Litecky Editing Services" (Google Sites)
 **Status**: ❌ **SERVING OLD SITE** - Still pointing to Google Sites
 
@@ -95,6 +107,7 @@ content-security-policy: ... frame-ancestors https://google-admin.corp.google.co
 **In Cloudflare Dashboard** → DNS → liteckyeditingservices.com:
 
 1. Find the record:
+
    ```
    Type: CNAME
    Name: www
@@ -103,6 +116,7 @@ content-security-policy: ... frame-ancestors https://google-admin.corp.google.co
    ```
 
 2. **Edit** the record to:
+
    ```
    Type: CNAME
    Name: www
@@ -117,15 +131,18 @@ content-security-policy: ... frame-ancestors https://google-admin.corp.google.co
 ## Expected Behavior After Update
 
 ### Root Domain (liteckyeditingservices.com)
+
 - DNS: `CNAME → liteckyeditingservices.pages.dev` ✅ Already correct
 - HTTP: Serves Pages content OR redirects to www (Pages decides)
 
 ### WWW Subdomain (www.liteckyeditingservices.com)
+
 - DNS: `CNAME → liteckyeditingservices.pages.dev` ← Will update
 - HTTP: Serves Pages content directly
 - Title: "Home | Litecky Editing Services"
 
 ### Propagation Time
+
 - **Cloudflare DNS update**: Instant (1-5 minutes)
 - **Browser cache**: Clear browser cache or test in incognito
 - **DNS cache**: May take up to TTL (currently 1 second, so very fast)
@@ -165,11 +182,11 @@ curl -sI https://liteckyeditingservices.com | grep -E "(HTTP|location)"
 
 ## Summary
 
-| Record | Current Status | Action Needed |
-|--------|---------------|---------------|
-| Root (`liteckyeditingservices.com`) | ✅ Migrated to Pages | None - Already correct |
-| WWW (`www.liteckyeditingservices.com`) | ❌ Still on Google Sites | Update CNAME to Pages |
-| SendGrid DNS (all records) | ✅ Configured | None - Keep as-is |
-| MX Records (Google Workspace) | ✅ Configured | None - Keep as-is |
+| Record                                 | Current Status           | Action Needed          |
+| -------------------------------------- | ------------------------ | ---------------------- |
+| Root (`liteckyeditingservices.com`)    | ✅ Migrated to Pages     | None - Already correct |
+| WWW (`www.liteckyeditingservices.com`) | ❌ Still on Google Sites | Update CNAME to Pages  |
+| SendGrid DNS (all records)             | ✅ Configured            | None - Keep as-is      |
+| MX Records (Google Workspace)          | ✅ Configured            | None - Keep as-is      |
 
 **Next Step**: Update the single WWW CNAME record in Cloudflare DNS dashboard.

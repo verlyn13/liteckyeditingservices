@@ -5,87 +5,87 @@ version: 1
 
 context:
   include:
-    - "src/**"
-    - "tests/**"
-    - "docs/**"
-    - "policy/**"
-    - "scripts/**"
-    - "desired-state/**"
-    - "workers/**"
-    - "functions/**"
-    - "public/**"
-    - "astro.config.mjs"
-    - "package.json"
-    - "playwright.config.ts"
-    - "tsconfig.json"
-    - "vitest.config.ts"
-    - ".mise.toml"
-    - ".prettierrc.json"
-    - "eslint.config.js"
-    - "lefthook.yml"
-    - "wrangler.toml"
-    - "README.md"
-    - "AGENTS.md"
-    - "ENVIRONMENT.md"
-    - "ARCHITECTURE.md"
+    - 'src/**'
+    - 'tests/**'
+    - 'docs/**'
+    - 'policy/**'
+    - 'scripts/**'
+    - 'desired-state/**'
+    - 'workers/**'
+    - 'functions/**'
+    - 'public/**'
+    - 'astro.config.mjs'
+    - 'package.json'
+    - 'playwright.config.ts'
+    - 'tsconfig.json'
+    - 'vitest.config.ts'
+    - '.mise.toml'
+    - '.prettierrc.json'
+    - 'eslint.config.js'
+    - 'lefthook.yml'
+    - 'wrangler.toml'
+    - 'README.md'
+    - 'AGENTS.md'
+    - 'ENVIRONMENT.md'
+    - 'ARCHITECTURE.md'
   exclude:
-    - "node_modules/**"
-    - "dist/**"
-    - ".astro/**"
-    - "playwright-report/**"
-    - "test-results/**"
+    - 'node_modules/**'
+    - 'dist/**'
+    - '.astro/**'
+    - 'playwright-report/**'
+    - 'test-results/**'
 
 workflows:
-  - name: "Dev Loop"
-    description: "Plan, implement, and validate changes with tests and linting"
+  - name: 'Dev Loop'
+    description: 'Plan, implement, and validate changes with tests and linting'
     steps:
-      - run: "pnpm install"
-      - run: "pnpm check"
-      - run: "pnpm test"
-      - run: "pnpm test:e2e"
-      - run: "pnpm lint:fix"
+      - run: 'pnpm install'
+      - run: 'pnpm check'
+      - run: 'pnpm test'
+      - run: 'pnpm test:e2e'
+      - run: 'pnpm lint:fix'
 
-  - name: "Quick Validate"
-    description: "Fast repo gates + typecheck"
+  - name: 'Quick Validate'
+    description: 'Fast repo gates + typecheck'
     steps:
-      - run: "pnpm validate:all"
-      - run: "pnpm typecheck"
+      - run: 'pnpm validate:all'
+      - run: 'pnpm typecheck'
 
-  - name: "A11y + E2E"
-    description: "Accessibility checks and E2E tests"
+  - name: 'A11y + E2E'
+    description: 'Accessibility checks and E2E tests'
     steps:
-      - run: "pnpm test:a11y"
-      - run: "pnpm test:e2e"
+      - run: 'pnpm test:a11y'
+      - run: 'pnpm test:e2e'
 
-  - name: "Prod E2E Sweep"
-    description: "Run Playwright tests against the production domain"
+  - name: 'Prod E2E Sweep'
+    description: 'Run Playwright tests against the production domain'
     steps:
-      - run: "pnpm test:e2e:prod"
+      - run: 'pnpm test:e2e:prod'
 
-  - name: "Dev Setup"
-    description: "Set up local toolchain and dependencies"
+  - name: 'Dev Setup'
+    description: 'Set up local toolchain and dependencies'
     steps:
-      - run: "mise install"
-      - run: "pnpm install"
+      - run: 'mise install'
+      - run: 'pnpm install'
 
-  - name: "Build Preview"
-    description: "Typecheck and build for local preview"
+  - name: 'Build Preview'
+    description: 'Typecheck and build for local preview'
     steps:
-      - run: "pnpm build"
-      - run: "pnpm preview"
+      - run: 'pnpm build'
+      - run: 'pnpm preview'
 
-  - name: "Docs Gate"
-    description: "Ensure docs are in sync before push"
+  - name: 'Docs Gate'
+    description: 'Ensure docs are in sync before push'
     steps:
-      - run: "pnpm gate:docs"
+      - run: 'pnpm gate:docs'
 
-  - name: "Admin Check (Prod)"
-    description: "Run Playwright admin smoke test against production"
+  - name: 'Admin Check (Prod)'
+    description: 'Run Playwright admin smoke test against production'
     steps:
-      - run: "pnpm test:admin:prod"
+      - run: 'pnpm test:admin:prod'
 
-  - name: "Policy Gate"
-    description: "Validate repo structure and policy checks"
+  - name: 'Policy Gate'
+    description: 'Validate repo structure and policy checks'
     steps:
-      - run: "pnpm validate:all"
-      - run: "pnpm policy:check"
+      - run: 'pnpm validate:all'
+      - run: 'pnpm policy:check'

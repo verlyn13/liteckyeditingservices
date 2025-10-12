@@ -3,7 +3,7 @@ name: Infisical → Cloudflare (Admin/Pages)
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
@@ -59,4 +59,3 @@ jobs:
             [ -z "$k" ] && continue
             echo -n "$v" | npx wrangler pages project secret put "$CF_PAGES_PROJECT" "$k" --quiet
           done
-

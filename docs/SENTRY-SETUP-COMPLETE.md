@@ -8,6 +8,7 @@
 ## ✅ Completed Steps
 
 ### 1. Sentry Project Created
+
 - **Organization**: `happy-patterns-llc`
 - **Project**: `javascript-astro`
 - **Project ID**: `4510172426731520`
@@ -29,6 +30,7 @@ gopass ls sentry/
 ```
 
 **Verification:**
+
 ```bash
 # Verify tokens are stored
 gopass ls sentry/happy-patterns-llc/
@@ -44,6 +46,7 @@ gopass show sentry/happy-patterns-llc/personal-token | head -c 30
 ### 3. Local Development Variables Generated
 
 `.dev.vars` has been generated with Sentry configuration:
+
 ```bash
 # Sentry (client-side; DSN is non-secret)
 PUBLIC_SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520  # ✅ CONFIGURED
@@ -101,6 +104,7 @@ gopass show -o sentry/happy-patterns-llc/auth-token | \
 Go to: **Cloudflare Dashboard → Pages → liteckyeditingservices → Settings → Environment variables**
 
 **Production:**
+
 ```
 SENTRY_ORG=happy-patterns-llc
 SENTRY_PROJECT=javascript-astro
@@ -110,6 +114,7 @@ PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
 ```
 
 **Preview:**
+
 ```
 SENTRY_ORG=happy-patterns-llc
 SENTRY_PROJECT=javascript-astro
@@ -176,6 +181,7 @@ pnpm wrangler pages secret list --project-name=liteckyeditingservices
 ### Sentry Security Token
 
 A **Security Token** is configured for outbound requests:
+
 - **Token**: `f374114aa6d511f08832befdb131e6c1`
 - **Location**: `sentry/happy-patterns-llc/security-token`
 - **Purpose**: Appended as header to outbound requests matching allowed domains
@@ -205,20 +211,20 @@ See `SECRETS.md` for complete rotation procedures.
 
 ## 📊 Integration Status
 
-| Component | Status | Location |
-|-----------|--------|----------|
-| **Tokens in gopass** | ✅ Complete | `sentry/happy-patterns-llc/*` |
-| **Local .dev.vars** | ⚠️ Needs DSN | `.dev.vars` (line 16) |
-| **SDK Configuration** | ✅ Complete | `src/lib/sentry.ts` |
-| **Client Init** | ✅ Complete | `src/scripts/sentry-init.ts` |
-| **Admin Tracking** | ✅ Complete | `public/admin/sentry-admin.js` |
-| **Test Page** | ✅ Complete | `src/pages/test-sentry.astro` |
-| **Integration Tests** | ✅ Complete | `tests/sentry-integration.spec.ts` |
-| **Validation Script** | ✅ Complete | `scripts/validate/sentry-setup.mjs` |
-| **Documentation** | ✅ Complete | `docs/SENTRY-*.md` (3 files) |
-| **Cloudflare Secret** | 🔴 Pending | Run `wrangler pages secret put` |
-| **Cloudflare Env Vars** | 🔴 Pending | Add via dashboard |
-| **Production Deploy** | 🔴 Pending | After above steps |
+| Component               | Status       | Location                            |
+| ----------------------- | ------------ | ----------------------------------- |
+| **Tokens in gopass**    | ✅ Complete  | `sentry/happy-patterns-llc/*`       |
+| **Local .dev.vars**     | ⚠️ Needs DSN | `.dev.vars` (line 16)               |
+| **SDK Configuration**   | ✅ Complete  | `src/lib/sentry.ts`                 |
+| **Client Init**         | ✅ Complete  | `src/scripts/sentry-init.ts`        |
+| **Admin Tracking**      | ✅ Complete  | `public/admin/sentry-admin.js`      |
+| **Test Page**           | ✅ Complete  | `src/pages/test-sentry.astro`       |
+| **Integration Tests**   | ✅ Complete  | `tests/sentry-integration.spec.ts`  |
+| **Validation Script**   | ✅ Complete  | `scripts/validate/sentry-setup.mjs` |
+| **Documentation**       | ✅ Complete  | `docs/SENTRY-*.md` (3 files)        |
+| **Cloudflare Secret**   | 🔴 Pending   | Run `wrangler pages secret put`     |
+| **Cloudflare Env Vars** | 🔴 Pending   | Add via dashboard                   |
+| **Production Deploy**   | 🔴 Pending   | After above steps                   |
 
 ---
 
@@ -272,18 +278,20 @@ pnpm wrangler pages secret list --project-name=liteckyeditingservices | grep SEN
 ### Events Not Appearing
 
 1. Check DSN is correct in browser console:
+
    ```javascript
-   window.__sentry?.getClient()?.getOptions()?.dsn
+   window.__sentry?.getClient()?.getOptions()?.dsn;
    ```
 
 2. Check sampling rates (may be 10% by default):
+
    ```javascript
-   window.__sentry?.getClient()?.getOptions()?.tracesSampleRate
+   window.__sentry?.getClient()?.getOptions()?.tracesSampleRate;
    ```
 
 3. Test with manual capture:
    ```javascript
-   window.__sentry?.captureException(new Error("Manual test"))
+   window.__sentry?.captureException(new Error('Manual test'));
    ```
 
 ---

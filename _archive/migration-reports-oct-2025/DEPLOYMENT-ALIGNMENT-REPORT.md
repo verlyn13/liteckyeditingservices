@@ -16,6 +16,7 @@
    - Push to main branch triggers automatic deployment
 
 2. **GitHub Actions Workflows**:
+
    ```yaml
    .github/workflows/deploy-site.yml     # Auto-deploy on push to main
    .github/workflows/deploy-workers.yml  # Deploy workers
@@ -59,6 +60,7 @@
 ### Evidence from Original Plans
 
 #### deployment-config.md (Line 395-397):
+
 ```
 2. **Create Pages project**:
    - Dashboard → Pages → Create Project
@@ -66,9 +68,11 @@
 ```
 
 #### cloudflare-deployment.md (Lines 803-837):
+
 Contains full GitHub Actions workflow for `deploy-site.yml` expecting Git integration
 
 #### Multiple References to CI/CD:
+
 - "Configure GitHub secrets for CI/CD"
 - "GitHub Actions Workflows" section with 3 workflow files
 - Automated deployment pipeline architecture
@@ -76,12 +80,14 @@ Contains full GitHub Actions workflow for `deploy-site.yml` expecting Git integr
 ## Impact Assessment
 
 ### Current Issues
+
 1. **Stale Production**: Admin panel broken with old Decap CMS version
 2. **Manual Process**: Every deployment requires manual CLI commands
 3. **No PR Previews**: Pull requests don't get preview deployments
 4. **Broken Automation**: GitHub Actions workflows are ready but useless
 
 ### Risk Analysis
+
 - **High Risk**: Manual deployments prone to human error
 - **Medium Risk**: Inconsistent deployment timing
 - **Low Risk**: Security (manual process is actually more controlled)
@@ -89,10 +95,12 @@ Contains full GitHub Actions workflow for `deploy-site.yml` expecting Git integr
 ## Resolution Options
 
 ### Option 1: Create New Git-Connected Project (RECOMMENDED)
+
 **Effort**: 2-4 hours
 **Impact**: Permanent fix, full automation
 
 Steps:
+
 1. Create new Pages project via Dashboard
 2. Select "Connect to Git" during setup
 3. Configure build settings
@@ -100,21 +108,25 @@ Steps:
 5. Delete old direct-upload project
 
 **Pros**:
+
 - ✅ Aligns with original design
 - ✅ Enables all GitHub Actions workflows
 - ✅ Automatic PR previews
 - ✅ Zero-touch deployments
 
 **Cons**:
+
 - Requires DNS migration (brief downtime possible)
 - Need to recreate environment variables
 - New project URL
 
 ### Option 2: Continue with Workaround
+
 **Effort**: Already implemented
 **Impact**: Functional but manual
 
 Current workaround in `.github/workflows/deploy-production.yml`:
+
 ```yaml
 # Deploy to preview, then promote to production via API
 - Deploy via wrangler (creates preview)
@@ -122,20 +134,24 @@ Current workaround in `.github/workflows/deploy-production.yml`:
 ```
 
 **Pros**:
+
 - ✅ No DNS changes needed
 - ✅ Works with existing project
 - ✅ Already implemented
 
 **Cons**:
+
 - ❌ Not the intended architecture
 - ❌ More complex than necessary
 - ❌ Still requires manual trigger or push event
 
 ### Option 3: Hybrid Approach
+
 **Effort**: 1 hour
 **Impact**: Best of both worlds
 
 Steps:
+
 1. Keep current project for production stability
 2. Create second Git-connected project for staging/preview
 3. Gradually migrate once proven stable
@@ -145,6 +161,7 @@ Steps:
 **STRONGLY RECOMMEND Option 1**: Create new Git-connected Pages project
 
 ### Justification:
+
 1. **Aligns with original architectural intent**
 2. **Eliminates current production deployment issues**
 3. **Enables full CI/CD automation as designed**
@@ -152,6 +169,7 @@ Steps:
 5. **Industry best practice for production deployments**
 
 ### Implementation Priority:
+
 1. **Immediate**: Fix production with manual deploy (done via preview promotion)
 2. **Today**: Add GitHub secrets for current workaround
 3. **This Week**: Create new Git-connected project and migrate
@@ -161,9 +179,10 @@ Steps:
 The current Pages project configuration is **fundamentally misaligned** with the original design specifications. While workarounds exist, they don't provide the intended developer experience or automation benefits. Creating a new Git-connected Pages project is the only way to fully implement the original vision of automated, GitHub-integrated deployments.
 
 ### Key Takeaway:
+
 **A Cloudflare Pages project's deployment method (Git-connected vs direct-upload) is immutable after creation. The current project cannot be "fixed" - it must be replaced to achieve the intended architecture.**
 
 ---
 
-*Report Generated: October 2025*
-*Based on: Original specification documents in `_archive/` vs current production setup*
+_Report Generated: October 2025_
+_Based on: Original specification documents in `_archive/` vs current production setup_

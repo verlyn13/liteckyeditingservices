@@ -38,8 +38,8 @@ Categories and required keys:
 
 How to populate via Infisical CLI:
 
-1) Login if needed: `infisical login --domain $INFISICAL_API_URL`
-2) Set values (examples):
+1. Login if needed: `infisical login --domain $INFISICAL_API_URL`
+2. Set values (examples):
 
 ```bash
 infisical secrets set PUBLIC_TURNSTILE_SITE_KEY --env prod --projectId d6f4ecdd-a92e-4a2a-92f6-afc23e7175c7
@@ -58,6 +58,7 @@ Pull and Prepare for Cloudflare:
 ```
 
 Notes:
-- PUBLIC_* keys are safe for browser exposure; store as Environment Variables
+
+- PUBLIC\_\* keys are safe for browser exposure; store as Environment Variables
 - All others should be stored as Secrets in Cloudflare Pages
 - Consider setting PUBLIC_SENTRY_RELEASE in Cloudflare as `$CF_PAGES_COMMIT_SHA`

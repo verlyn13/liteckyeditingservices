@@ -1,4 +1,5 @@
 # IMPLEMENTATION ROADMAP - Litecky Editing Services
+
 ## Production Status & Path Forward
 
 **Last Updated**: October 5, 2025 (03:45 UTC)
@@ -14,19 +15,23 @@
 **Migration Success**: Cloudflare Pages now Git-connected with automatic deployments working.
 
 **Completed Actions**:
-1) ✅ Git-Connected Deployment
+
+1. ✅ Git-Connected Deployment
+
 - ✅ Migrated from `litecky-editing-services` (direct upload) to `liteckyeditingservices` (Git-connected)
 - ✅ Custom domains transferred successfully
 - ✅ Automatic deployments on push to main working
 - ✅ PR preview deployments enabled
 
-2) ✅ CI/CD Enabled
+2. ✅ CI/CD Enabled
+
 - ✅ `.github/workflows/deploy-production.yml` - Noop mode for Git-connected
 - ✅ GitHub secrets configured: `CF_GIT_CONNECTED=true`
 - ✅ Post-deploy validation passing (15/15 security headers tests)
 - ✅ Quality gate and E2E workflows operational
 
-3) ✅ CSP Fix Deployed
+3. ✅ CSP Fix Deployed
+
 - ✅ Added `data:` to script-src for Vite-inlined scripts
 - ✅ All CSP violations resolved in production
 - ✅ Automated validation tests passing
@@ -37,14 +42,16 @@
 
 **Deployment Automation & Monitoring Setup**
 
-1) **CI/CD Pipeline** - ✅ COMPLETE
+1. **CI/CD Pipeline** - ✅ COMPLETE
+
 - [x] ✅ Git-connected deployment migrated and operational
 - [x] ✅ Automated deployment workflow (`.github/workflows/deploy-production.yml`)
 - [x] ✅ Pre-deployment quality checks (quality-gate.yml)
 - [x] ✅ Post-deployment validation (post-deploy-validation.yml)
 - [x] ✅ Preview deployments for PRs (preview-validation.yml)
 
-2) **Monitoring & Reliability** - ✅ Documentation Complete
+2. **Monitoring & Reliability** - ✅ Documentation Complete
+
 - [x] ✅ Documentation complete (3 comprehensive guides)
 - [x] ✅ DNS configuration documented with verification commands
 - [x] ✅ Secrets automation scripts (gopass sync for Pages/Workers)
@@ -52,7 +59,8 @@
 - [ ] Deploy error monitoring Worker (2 hours) - Week 2
 - [ ] Deploy queue health Worker (2.5 hours) - Week 2
 
-3) **Testing & Quality** - 🔄 MODERNIZED (Oct 5, 2025)
+3. **Testing & Quality** - 🔄 MODERNIZED (Oct 5, 2025)
+
 - [x] ✅ Production E2E tests passing (18/20 tests)
 - [x] ✅ Visual regression tests MODERNIZED with October 2025 best practices:
   - ✅ Deterministic rendering in `playwright.config.ts`
@@ -68,15 +76,18 @@
 - [ ] A11y sweep to WCAG 2.1 AA - Week 2
 
 #### Week 2: Enhanced Testing (Oct 12-18, 2025)
+
 **Pre/Post Deployment Validation**
 
-1) **Pre-deployment Suite**
+1. **Pre-deployment Suite**
+
 - [ ] Lighthouse CI integration
 - [ ] Bundle size analysis
 - [ ] Security vulnerability scanning (Snyk)
 - [ ] Dependency audit automation
 
-2) **Post-deployment Validation**
+2. **Post-deployment Validation**
+
 - [ ] E2E tests against production
 - [ ] Admin panel health checks
 - [ ] Security headers verification
@@ -84,41 +95,51 @@
 - [ ] Performance metrics collection
 
 ### Phase 8: Admin CMS Delivery Migration (CDN → npm)
+
 Goal: Replace vendored `decap-cms.js` with a first-party bundle from `decap-cms-app` for deterministic init and hydration.
 
 Status: Implemented on Oct 11, 2025
 
-1) Scaffold — COMPLETE
+1. Scaffold — COMPLETE
+
 - Added `src/admin/cms.ts` with `decap-cms-app` init and canonical auth listener.
 
-2) Build path — COMPLETE
+2. Build path — COMPLETE
+
 - `scripts/build-cms.mjs` (esbuild) emits `public/admin/cms.js` (no sourcemaps).
 
-3) Flip — COMPLETE
+3. Flip — COMPLETE
+
 - Admin HTML now loads `/admin/cms.js`. Vendor reference removed (file remains for now for validators).
 
-4) Soak — IN PROGRESS
+4. Soak — IN PROGRESS
+
 - Keep hydrator for one release; monitor `hydr:*` breadcrumbs.
 
-5) Retire vendor bundle — TODO
+5. Retire vendor bundle — TODO
+
 - Remove `/public/vendor/decap/*` and validation references once verified.
 
 ### Phase 9: Secrets Orchestration via Infisical (Production SoT)
+
 Goal: Use Infisical as the source of truth for production/preview secrets and automate sync to Cloudflare Pages and Workers.
 
 Status: In progress
 
-1) Scripts — COMPLETE
+1. Scripts — COMPLETE
+
 - scripts/secrets/infisical_seed_prod_from_gopass.sh
 - scripts/secrets/infisical_pull_prod.sh
 - scripts/secrets/cloudflare_prepare_from_infisical.sh
 
-2) Documentation — COMPLETE
+2. Documentation — COMPLETE
+
 - docs/INFISICAL-QUICKSTART.md
 - SECRETS.md (inventory + rotation)
 - DOCUMENTATION-MASTER-INDEX.md (indexed)
 
-3) CI integration — TODO
+3. CI integration — TODO
+
 - Add GitHub Actions workflow to:
   - infisical export (projectId + env)
   - prepare public.env + secrets.env
@@ -126,57 +147,69 @@ Status: In progress
   - wrangler pages project variable set for public vars
   - workers secret sync (if applicable)
 
-4) Source of truth — COMPLETE
+4. Source of truth — COMPLETE
+
 - Local dev stays on gopass → .dev.vars
 - Production/Preview managed in Infisical
 
 Dependencies
+
 - Sentry optional for admin (breadcrumbs useful).
 - CSP for `/admin/*` compatible (no inline/module scripts required).
 
 Docs/ADR
+
 - ADR-002 updated to Implemented; playbook present for reference.
 
 #### Week 3: Observability (Oct 19-25, 2025)
+
 **Analytics & Performance Monitoring**
 
-1) **Analytics Integration**
+1. **Analytics Integration**
+
 - [ ] Deploy analytics collector Worker
 - [ ] Set up Cloudflare Analytics Engine
 - [ ] Configure custom events tracking
 - [ ] Create performance dashboard
 
-2) **Performance Monitoring**
+2. **Performance Monitoring**
+
 - [ ] Implement Server-Timing headers
 - [ ] Core Web Vitals tracking
 - [ ] Slow response logging
 - [ ] Resource timing analysis
 
 #### Week 4: Advanced Features (Oct 26-Nov 1, 2025)
+
 **Blue-Green Deployment & Rollback**
 
-1) **Deployment Strategies**
+1. **Deployment Strategies**
+
 - [ ] Blue-green deployment workflow
 - [ ] Quick rollback capability
 - [ ] Feature flag system (KV-based)
 - [ ] A/B testing infrastructure
 
-2) **Traffic Management**
+2. **Traffic Management**
+
 - [ ] Canary deployments
 - [ ] Gradual rollout controls
 - [ ] Geographic routing rules
 - [ ] Maintenance mode toggle
 
 #### Week 5: Disaster Recovery (Nov 2-8, 2025)
+
 **Backup & Recovery Systems**
 
-1) **Backup Strategy**
+1. **Backup Strategy**
+
 - [ ] Daily D1 database backups
 - [ ] KV namespace exports
 - [ ] R2 bucket replication
 - [ ] Automated backup to R2
 
-2) **Recovery Planning**
+2. **Recovery Planning**
+
 - [ ] Incident response runbooks
 - [ ] Restore procedure testing
 - [ ] Disaster recovery drills
@@ -184,33 +217,73 @@ Docs/ADR
 
 ### Original Workstreams (Continuing)
 
-4) **Security** ✅ Complete
+4. **Security** ✅ Complete
+
 - [x] ✅ Comprehensive security headers implemented
 - [x] ✅ Admin CSP properly configured
 - [ ] Run validation playbook (30 min)
 - [ ] Verify SecurityHeaders.com grade A
 
-5) **SEO & Content**
+5. **SEO & Content**
+
 - [ ] Meta descriptions for all pages and Open Graph images
 - [ ] Submit sitemap to Google/Bing
 - [ ] Add 2–3 high-value content pieces
 
 Developer Workflow Hooks
+
 - Prefer Windsurf Cascade workflows (Dev Loop, Quick Validate, A11y + E2E, Build Preview).
 - Commands: `pnpm validate:all`, `pnpm typecheck`, `pnpm test`, `pnpm test:e2e`, `pnpm test:a11y`, `pnpm build`.
 
+### Biome v2.2.5 Migration (Quality & DX)
+
+- Problem
+  - Prior Biome runs occasionally hung due to deep-directory ignore patterns and legacy scanner settings.
+  - We temporarily routed `check` through Prettier only, reducing coverage for JS/TS/JSON.
+
+- Objective
+  - Pin Biome to v2.2.5 and adopt a canonical `biome.jsonc` that scopes to JS/TS/JSON/JSONC only.
+  - Replace deep `**` excludes with directory-level excludes to stop crawling large folders.
+  - Reintroduce Biome into local `check` and CI via `biome:check`/`biome:ci`.
+
+- Deliverables
+  - docs/decisions/2025-10-12-biome-2.2.5.md (definitive configuration, scripts, RCA)
+  - docs/playbooks/biome.md (usage guide)
+  - docs/audits/edge-native-architecture-checklist.md (evidence-driven blueprint audit)
+  - biome.jsonc (version-locked, allowlist-first + folder-level excludes)
+  - package.json updates (pin v2.2.5, scripts, `check` pipeline)
+  - .prettierignore updates to avoid formatter overlap
+
+- Acceptance Criteria
+  - `pnpm run biome:check` completes quickly on a warm cache (<10s typical).
+  - `pnpm run check` passes locally and on CI with Biome enabled (no hangs).
+  - CI uses `pnpm run biome:ci` (read-only) and fails on violations without mutations.
+
+- Tasks
+  1. Pin `@biomejs/biome@2.2.5`
+  2. Replace `biome.json` with `biome.jsonc` (canonical config)
+  3. Update `.prettierignore` to exclude JS/TS/JSON/JSONC
+  4. Update scripts; add Biome into `check`
+  5. Run verification: biome:check → check → policy:check
+
+- Status
+  - Planned; implementation starting. See documentation index entries below.
+
 ### Deployment Workflow Files
+
 - ✅ `.github/workflows/deploy-production.yml` - Automated deployment (disabled when Git-connected)
 - ✅ `.github/workflows/post-deploy-validation.yml` - Post-deployment health checks
 - ✅ `.github/workflows/preview-validation.yml` - PR preview validation (homepage + admin)
 
 ### Migration Track: Pages Alignment
+
 - Read: `docs/migrations/DEPLOYMENT-ALIGNMENT-REPORT.md`
 - Execute: `docs/migrations/PAGES-GIT-MIGRATION.md` (Git-connected project creation + domain cutover)
 - Environment variables: `docs/migrations/PAGES-ENV-CHECKLIST.md`
 - Cutover steps: `docs/migrations/PAGES-GIT-CUTOVER-RUNBOOK.md`
 
 ### Required GitHub Secrets (Final)
+
 ```bash
 CLOUDFLARE_ACCOUNT_ID      # Your Cloudflare account ID
 CLOUDFLARE_API_TOKEN        # API token with Pages:Edit permission
@@ -219,6 +292,7 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 ```
 
 ### Milestones
+
 - ✅ **Week 1 (Oct 4-5, 2025)**: Monitoring docs + prod E2E + security headers + visual regression + Git migration + CSP fix - **COMPLETE**
 - ✅ **Git-connected migration**: Completed Oct 5; auto-deployments enabled
 - 🔜 **Cleanup (Oct 7, 2025)**: Remove old `litecky-editing-services` project after 48 hours
@@ -230,6 +304,7 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 ## 📊 Documentation Phase ✅ COMPLETE
 
 ### All Files Read (15/15 - 100%)
+
 1. ✅ project-document.md (1355 lines) - Core project specs
 2. ✅ production-files.md (870 lines) - Production implementations
 3. ✅ cloudflare-deployment.md (1310 lines) - Full deployment config
@@ -240,9 +315,10 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 8. ✅ operations-reliability.md (1048 lines) - Operations config
 9. ✅ documentation.md (1432 lines) - Documentation standards
 10. ✅ policy-as-code.md (967 lines) - Policy as code
-11-15. ✅ All .clinerules files (5 files) - Memory Bank system
+    11-15. ✅ All .clinerules files (5 files) - Memory Bank system
 
 ### Documentation Reorganization Complete
+
 - ✅ All 15 spec docs moved to `_archive/`
 - ✅ User docs created from templates in `documentation.md`
 - ✅ Project structure follows documentation standards
@@ -253,6 +329,7 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 ## 🎯 CRITICAL: Implementation Order
 
 ### Phase 0: Foundation ✅ COMPLETE
+
 **Infrastructure and tooling ready**
 
 1. **Repository & Structure** ✅
@@ -274,28 +351,33 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
    - [x] Pre-commit hooks setup
 
 ### Phase 1: Core Styling & Layout ✅ COMPLETE
+
 **Single-source styles and accessible base layout**
 
 1. **Global Styles**
-  - [x] src/styles/global.css (Lines 229-496)
-  - [x] Tailwind v4 @theme tokens
-  - [x] Typography system
-  - [x] Color palette
-  - [x] Spacing scale
+
+- [x] src/styles/global.css (Lines 229-496)
+- [x] Tailwind v4 @theme tokens
+- [x] Typography system
+- [x] Color palette
+- [x] Spacing scale
 
 2. **Base Layout Enhancement**
-  - [x] BaseLayout.astro (enhanced)
-  - [x] SEO meta tags
-  - [x] Schema.org JSON-LD (WebSite, Organization)
-  - [x] Skip link
-  - [x] Font loading
+
+- [x] BaseLayout.astro (enhanced)
+- [x] SEO meta tags
+- [x] Schema.org JSON-LD (WebSite, Organization)
+- [x] Skip link
+- [x] Font loading
 
 3. **Navigation Script**
-  - [x] menu-toggle.js (Lines 499-561)
-  - [x] Mobile menu functionality
-  - [x] ARIA attributes
+
+- [x] menu-toggle.js (Lines 499-561)
+- [x] Mobile menu functionality
+- [x] ARIA attributes
 
 ### Phase 2: Core Components ✅ COMPLETE
+
 **All 8 components built and deployed**
 
 1. ✅ **Header.astro** - Responsive navigation with mobile menu
@@ -308,33 +390,39 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 8. ✅ **FileUpload.svelte** - Drag-and-drop file upload (Svelte 5)
 
 **Pages** (7/7 Complete):
-   - ✅ index.astro - Homepage with all components
-   - ✅ services.astro - Service offerings
-   - ✅ process.astro - Editorial workflow
-   - ✅ about.astro - About/team information
-   - ✅ testimonials.astro - Client testimonials
-   - ✅ faq.astro - Frequently asked questions
-   - ✅ contact.astro - Contact form with Turnstile protection
+
+- ✅ index.astro - Homepage with all components
+- ✅ services.astro - Service offerings
+- ✅ process.astro - Editorial workflow
+- ✅ about.astro - About/team information
+- ✅ testimonials.astro - Client testimonials
+- ✅ faq.astro - Frequently asked questions
+- ✅ contact.astro - Contact form with Turnstile protection
 
 **Scripts**:
-   - ✅ menu-toggle.js - Mobile navigation
-   - ✅ contact-form.js - Form validation and submission
+
+- ✅ menu-toggle.js - Mobile navigation
+- ✅ contact-form.js - Form validation and submission
 
 ### Phase 3: Content Management ✅ COMPLETE
+
 **CMS fully operational with content collections**
 
 8. **Content Collections** ✅
-  - ✅ src/content/config.ts - Complete schema definitions
-  - ✅ Content folders: services/, testimonials/, faq/, pages/
-  - ✅ Sample content files present
+
+- ✅ src/content/config.ts - Complete schema definitions
+- ✅ Content folders: services/, testimonials/, faq/, pages/
+- ✅ Sample content files present
 
 9. **Decap CMS Setup** ✅
-  - ✅ public/admin/index.html - CMS admin interface (single bundle)
-  - ✅ functions/admin/config.yml.ts → `/admin/config.yml` (dynamic `base_url` + `auth_endpoint`)
-  - ✅ GitHub OAuth App(s) created (dev + prod)
-  - ✅ On‑site OAuth via Pages Functions (`/api/auth`, `/api/callback`)
+
+- ✅ public/admin/index.html - CMS admin interface (single bundle)
+- ✅ functions/admin/config.yml.ts → `/admin/config.yml` (dynamic `base_url` + `auth_endpoint`)
+- ✅ GitHub OAuth App(s) created (dev + prod)
+- ✅ On‑site OAuth via Pages Functions (`/api/auth`, `/api/callback`)
 
 ### Phase 4: Backend Services ✅ COMPLETE
+
 **All backend services deployed and operational**
 
 10. **Cloudflare Workers** ✅
@@ -353,29 +441,35 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
     - ✅ Server-side validation in Pages Function
 
 ### Phase 5: Cloudflare Deployment (6 Sub-phases)
+
 **After frontend complete - See CLOUDFLARE-DEPLOYMENT-WORKFLOW.md**
 
 #### Phase 5.0: Pre-Deployment Prep ✅
+
 - [x] Complete frontend to deployable state
 - [x] Pass all validations and tests
 - [x] Build production bundle
 
 #### Phase 5.1: Infrastructure Setup ✅
+
 - ✅ Create D1 database (litecky-db: 208dd91d-8f15-40ef-b23d-d79672590112)
 - ✅ Create R2 bucket (litecky-uploads)
 - ✅ Create KV namespace (CACHE: 6d85733ce2654d9980caf3239a12540a)
 - ✅ Create Queue (send-email-queue: a2fafae4567242b5b9acb8a4a32fa615)
 
 #### Phase 5.2: Security & Auth ✅
+
 - ✅ Configure Turnstile (Widget created, keys stored)
 - ✅ Create GitHub OAuth App
 - ✅ Store credentials in gopass (all keys secured)
 
 #### Phase 5.3: Workers Deployment ✅
+
 - ✅ Deploy Queue Consumer (litecky-queue-consumer)
 - N/A Cron Worker (not required for current functionality)
 
 #### Phase 5.4: Main Site Deployment ✅
+
 - ✅ Create Pages project (litecky-editing-services)
 - ✅ Configure environment variables (SendGrid, Turnstile)
 - ✅ Migrate DNS to Cloudflare Pages (Oct 4, 2025)
@@ -384,16 +478,19 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
   - https://www.liteckyeditingservices.com
 
 #### Phase 5.5: Email Configuration ✅
+
 - ✅ SendGrid setup and integrated
 - ✅ Email templates implemented
 - ✅ DNS records for email (DKIM, SPF, DMARC)
 
 #### Phase 5.6: Verification ✅
+
 - ✅ Functional tests (20 E2E tests across 5 browsers)
 - ✅ Documentation updated (see DOCUMENTATION-MASTER-INDEX.md)
 - ✅ Monitoring enabled (Cloudflare Analytics)
 
 ### Phase 6: Operations 🟡 IN PROGRESS
+
 **Continuous improvement and monitoring**
 
 16. **Monitoring** 🟡
@@ -427,6 +524,7 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 **Core application is live. Focus now on optimization and enhancements.**
 
 #### High Priority
+
 1. **Comprehensive E2E Testing**
    - ✅ 20 tests across 5 browsers configured
    - 🟡 Run full test suite against production domain
@@ -437,6 +535,7 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 Objective: Make Decap OAuth handoff deterministic, observable, and aligned with GitHub’s 2025 recommendations (PKCE), without weakening CSP.
 
 Completed (Oct 10, 2025)
+
 - ✅ Dynamic config discovery at `/api/config.yml` with `backend.base_url` + `auth_endpoint: api/auth`
 - ✅ String‑only callback message (canonical `authorization:github:success:`)
 - ✅ Callback retry tuning (10× @ 100ms, then close)
@@ -445,6 +544,7 @@ Completed (Oct 10, 2025)
 - ✅ Safety shim: `__forceAccept()` to verify acceptance path if Decap didn’t write state (diagnostic‑only)
 
 Planned (Oct 11–13, 2025)
+
 - [ ] PKCE client helper (`public/admin/pkce-login.js`):
   - Generate `code_verifier` (sessionStorage only) + `code_challenge` (S256)
   - Pre‑write Decap state key in localStorage before opening popup
@@ -456,15 +556,17 @@ Planned (Oct 11–13, 2025)
 - [ ] Pin a single self‑hosted Decap bundle (app/core aligned); purge `/admin/*` on bump
 
 Acceptance Criteria
+
 - PRE‑POPUP state exists (diagnostics log) and `STATE CHECK` shows `match: true`
 - `/api/exchange-token` returns `{ token }` and `__dumpUser()` shows a non‑null user
 - Zero CSP violations on `/admin` (no inline) and strict callback CSP applied only on `/api/callback`
 
 CI Gates
+
 - Header tests for `/admin` and `/api/callback?diag=1`
 - Repo‑side media paths check (public/uploads exists; config emits expected values)
 - (Planned) Decap bundle pin check (single exact version in `/admin/vendor`)
-   - 🟡 Add visual regression testing
+  - 🟡 Add visual regression testing
 
 2. **Performance Optimization**
    - 🟡 Implement caching strategies
@@ -485,6 +587,7 @@ CI Gates
    - 🟡 Regular dependency updates
 
 #### Medium Priority
+
 5. **Content Expansion**
    - 🟡 Add more service content via CMS
    - 🟡 Expand testimonials collection
@@ -510,6 +613,7 @@ CI Gates
    - 🟡 User behavior analysis
 
 #### Low Priority
+
 9. **Feature Additions**
    - 🟡 Document upload to R2 (infrastructure ready)
    - 🟡 Client portal/dashboard
@@ -538,7 +642,7 @@ graph TD
     H --> I[Deployment ✅]
     I --> J[Operations 🟡]
     J --> K[Optimization 🟡]
-    
+
     style A fill:#90EE90
     style B fill:#90EE90
     style C fill:#90EE90
@@ -556,22 +660,23 @@ graph TD
 
 ## 📈 Progress Metrics
 
-| Phase | Status | Progress | Notes |
-|-------|--------|----------|-------|
-| 0. Foundation | ✅ Complete | 100% | Repository, config, policies |
-| 1. Core Styling | ✅ Complete | 100% | Tailwind v4, global.css, tokens |
-| 2. Components | ✅ Complete | 100% | All 8 components built |
-| 3. Pages | ✅ Complete | 100% | All 7 pages live |
-| 4. CMS Integration | ✅ Complete | 100% | Decap CMS + OAuth worker operational |
-| 5. Backend Services | ✅ Complete | 100% | Contact API + Queue + Workers deployed |
-| 6. Cloudflare Infra | ✅ Complete | 100% | D1, R2, KV, Queues operational |
-| 7. Deployment | ✅ Complete | 100% | Production domain live with SSL |
-| 8. Operations | 🟡 In Progress | 70% | Basic monitoring active |
-| 9. Optimization | 🟡 Planned | 15% | Performance, SEO, advanced features |
+| Phase               | Status         | Progress | Notes                                  |
+| ------------------- | -------------- | -------- | -------------------------------------- |
+| 0. Foundation       | ✅ Complete    | 100%     | Repository, config, policies           |
+| 1. Core Styling     | ✅ Complete    | 100%     | Tailwind v4, global.css, tokens        |
+| 2. Components       | ✅ Complete    | 100%     | All 8 components built                 |
+| 3. Pages            | ✅ Complete    | 100%     | All 7 pages live                       |
+| 4. CMS Integration  | ✅ Complete    | 100%     | Decap CMS + OAuth worker operational   |
+| 5. Backend Services | ✅ Complete    | 100%     | Contact API + Queue + Workers deployed |
+| 6. Cloudflare Infra | ✅ Complete    | 100%     | D1, R2, KV, Queues operational         |
+| 7. Deployment       | ✅ Complete    | 100%     | Production domain live with SSL        |
+| 8. Operations       | 🟡 In Progress | 70%      | Basic monitoring active                |
+| 9. Optimization     | 🟡 Planned     | 15%      | Performance, SEO, advanced features    |
 
 **Overall Project Completion: 100%** (Core application) | **Post-Production: 20%** (Optimization phase)
 
 ### Milestone Achievements
+
 - ✅ **Oct 2, 2025**: Initial production deployment to Cloudflare Pages
 - ✅ **Oct 2, 2025**: Queue-based email processing operational
 - ✅ **Oct 4, 2025**: DNS migration complete - Custom domain live
@@ -594,18 +699,22 @@ graph TD
 ## 🌐 Production URLs
 
 **Live Site**:
+
 - **Primary**: https://liteckyeditingservices.com
 - **WWW**: https://www.liteckyeditingservices.com
 - **Pages Subdomain**: https://liteckyeditingservices.pages.dev
 
 **Workers**:
+
 - **OAuth Proxy (Legacy)**: https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev (decommissioned Oct 2025 - replaced by Pages Functions)
 - **Queue Consumer**: https://litecky-queue-consumer.jeffreyverlynjohnson.workers.dev
 
 **CMS**:
+
 - **Admin Panel**: https://liteckyeditingservices.com/admin (requires GitHub auth)
 
 **Infrastructure**:
+
 - **Queue**: send-email-queue (a2fafae4567242b5b9acb8a4a32fa615)
 - **KV Namespace**: CACHE (6d85733ce2654d9980caf3239a12540a)
 - **D1 Database**: litecky-db (208dd91d-8f15-40ef-b23d-d79672590112)

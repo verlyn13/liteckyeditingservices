@@ -42,9 +42,10 @@ pnpm policy:check        # Run all validations + doc gate
 ## Architecture & Key Files
 
 ### Current Structure (Not Final)
+
 - **Single repo** - Will migrate to monorepo (apps/, workers/, packages/)
 - **src/** - Astro components and pages
-- **_archive/** - Original 15 specification documents (8,818 lines total)
+- **\_archive/** - Original 15 specification documents (8,818 lines total)
 - **policy/** - Rego policies for validation
 - **scripts/** - Validation and drift detection scripts
 - **desired-state/** - Expected configuration states
@@ -52,6 +53,7 @@ pnpm policy:check        # Run all validations + doc gate
 ### Critical Implementation References
 
 **project-document.md** contains exact implementations:
+
 - Lines 229-496: global.css with Tailwind v4 tokens (BLOCKER - needed first)
 - Lines 499-561: menu-toggle.js implementation
 - Lines 599-775: Header.astro component
@@ -74,6 +76,7 @@ pnpm policy:check        # Run all validations + doc gate
 Current blocker: **src/styles/global.css** must be created first (extract from project-document.md lines 229-496)
 
 Build sequence:
+
 1. global.css → 2. Components (8 total) → 3. Pages (7 total) → 4. CMS → 5. Backend → 6. Deploy
 
 ## Project Status Tracking
@@ -87,6 +90,7 @@ Check these files to understand current state and next actions.
 ## Memory Bank System
 
 The project includes Memory Bank configuration files in `_archive/` that define operational modes:
+
 - **.clinerules-architect** - High-level planning and system design mode
 - **.clinerules-ask** - Q&A and exploration mode
 - **.clinerules-code** - Implementation and coding mode
@@ -98,6 +102,7 @@ These files provide context-specific rules and behaviors for different types of 
 ## Validation Framework
 
 The project has strict validation to prevent drift:
+
 - Package versions cannot be downgraded
 - Required files/directories are enforced
 - Documentation updates required with code changes
@@ -107,6 +112,7 @@ The project has strict validation to prevent drift:
 ## Environment Setup
 
 Local development uses `.dev.vars` for secrets (never commit):
+
 - Turnstile test keys for development
 - SendGrid API key for email testing
 - See ENVIRONMENT.md for complete variable reference
@@ -116,6 +122,7 @@ Local development uses `.dev.vars` for secrets (never commit):
 **IMMEDIATE BLOCKER**: Create `src/styles/global.css` with Tailwind v4 tokens. This blocks all component development. Extract exact implementation from `_archive/project-document.md` lines 229-496.
 
 After unblocking, build in order:
+
 1. BaseLayout.astro enhancements (SEO, Schema.org)
 2. menu-toggle.js (mobile nav)
 3. 8 core components

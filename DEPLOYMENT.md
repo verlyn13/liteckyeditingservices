@@ -3,6 +3,7 @@
 This project deploys to Cloudflare Pages (site) and Cloudflare Workers (Queue consumer for async email processing). Decap CMS OAuth now runs on Pages Functions at the production origin.
 
 **Current Status** (October 10, 2025):
+
 - ✅ **Git-Connected Deployment Active** - Automatic deployment on push to main
 - ✅ **Project Name**: `liteckyeditingservices` (Cloudflare Pages)
 - ✅ Site deployed to Cloudflare Pages
@@ -14,17 +15,21 @@ This project deploys to Cloudflare Pages (site) and Cloudflare Workers (Queue co
 **This project uses Git-connected deployment** - Cloudflare Pages automatically builds and deploys when you push to the repository.
 
 ### How It Works
+
 - **Push to `main`** → Automatic production deployment
 - **Open a PR** → Automatic preview deployment
 - **No manual `wrangler pages deploy` needed** - Cloudflare handles it
 
 ### GitHub Configuration
+
 Required for CI/CD workflows to work correctly:
 
 **Repository Variables** (Settings → Secrets and variables → Actions → Variables):
+
 - `CF_GIT_CONNECTED=true` - Tells deploy-production.yml to skip manual deployment
 
 **Repository Secrets** (Settings → Secrets and variables → Actions → Secrets):
+
 - `CLOUDFLARE_API_TOKEN` - For API access (if needed for other workflows)
 - `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare account ID
 
@@ -47,6 +52,7 @@ Required for CI/CD workflows to work correctly:
 Pages → Project → Settings → Environment variables
 
 Required (Production and Preview):
+
 - ✅ SENDGRID_API_KEY (secret) - Configured via `wrangler pages secret put`
 - ✅ SENDGRID_FROM (secret) - Configured via `wrangler pages secret put`
 - ✅ SENDGRID_TO (secret) - Configured via `wrangler pages secret put`
@@ -58,6 +64,7 @@ These enable `/api/contact` to send emails via queue. All variables are currentl
 ## Deploy the Site (Pages)
 
 **Status**: ✅ Git-Connected Deployment Active (October 5, 2025)
+
 - **Production URL**: https://liteckyeditingservices.com
 - **Alternate URL**: https://www.liteckyeditingservices.com
 - **Pages Project**: `liteckyeditingservices` (Git-connected to GitHub)
@@ -75,6 +82,7 @@ These enable `/api/contact` to send emails via queue. All variables are currentl
 If you need to verify or update settings in Cloudflare dashboard:
 
 **Pages → liteckyeditingservices → Settings → Builds & deployments**
+
 - Build command: `pnpm build`
 - Build output directory: `dist`
 - Root directory: `/` (default)
@@ -82,6 +90,7 @@ If you need to verify or update settings in Cloudflare dashboard:
 - Package manager: pnpm 10.17.1
 
 **Pages → liteckyeditingservices → Settings → Environment variables**
+
 - See "Configure Environment Variables" section below
 
 ### Manual Deploy (Only if Git-connected fails)
@@ -96,29 +105,35 @@ pnpm wrangler pages deployment list --project-name=liteckyeditingservices
 ```
 
 Rollback
+
 - Use Cloudflare Pages → Deployments → Promote a previous successful deployment
 - Or revert the commit on `main` and redeploy
 
 ## Deploy Workers
 
 ### CMS OAuth (On-Site Pages Functions)
+
 Uses on-site Pages Functions at `/api/auth` and `/api/callback`. Admin is a static HTML shell (`public/admin/index.html`). Functions deploy automatically with Pages. No external OAuth worker is required.
 
 **Configuration**: Pages → Settings → Environment variables
+
 - `GITHUB_CLIENT_ID` (secret)
 - `GITHUB_CLIENT_SECRET` (secret)
 
 **CMS Config**: Served dynamically by `functions/admin/config.yml.ts` at path `/admin/config.yml` with:
+
 - `backend.base_url: <request origin>` (e.g., `https://www.liteckyeditingservices.com`)
 - `backend.auth_endpoint: /api/auth`
-Headers: `Content-Type: text/yaml; charset=utf-8`, `Cache-Control: no-store`
+  Headers: `Content-Type: text/yaml; charset=utf-8`, `Cache-Control: no-store`
 
 **Local Testing**: Use `npx wrangler pages dev` (after `pnpm build`) to serve `./dist` + Pages Functions on one origin (http://127.0.0.1:8788) for OAuth testing. `.dev.vars` is loaded automatically. See CLOUDFLARE.md § Local Development.
 
 ### Legacy OAuth Worker (Decommissioned Oct 2025)
+
 External worker `litecky-decap-oauth` is no longer used. Legacy instructions are archived. CSP may still include its URL for troubleshooting, but production uses on-site `/api/auth` + `/api/callback`.
 
 Queue Consumer Worker ✅ **DEPLOYED**
+
 ```bash
 # Queue already created: send-email-queue (ID: a2fafae4567242b5b9acb8a4a32fa615)
 # Worker already deployed: litecky-queue-consumer.jeffreyverlynjohnson.workers.dev
@@ -135,6 +150,7 @@ pnpm wrangler secret put SENDGRID_TO --cwd workers/queue-consumer
 ```
 
 **Current Configuration**:
+
 - Queue producer binding `SEND_EMAIL` is active on Pages Functions
 - `/api/contact` enqueues messages (returns 202/enqueued)
 - Queue consumer processes batches (max 10 messages, 30s timeout)
@@ -171,6 +187,7 @@ pnpm wrangler secret put SENDGRID_TO --cwd workers/queue-consumer
 5. Click **Deploy**
 
 **Verify**:
+
 ```bash
 curl -sI https://liteckyeditingservices.com | grep -i location
 # Expected: Location: https://www.liteckyeditingservices.com/
@@ -184,6 +201,7 @@ curl -sI https://liteckyeditingservices.com | grep -i location
 pnpm test:e2e        # Playwright E2E
 pnpm test:a11y       # Accessibility checks
 ```
+
 - Verify `/contact` form end-to-end (Turnstile + email delivery)
 - Verify `/admin` GitHub OAuth login flow (Decap CMS)
 - Review Cloudflare logs for Pages and Workers
@@ -193,11 +211,13 @@ pnpm test:a11y       # Accessibility checks
 When updating the admin shell or Decap bundle, purge Cloudflare Pages cache to prevent stale assets:
 
 **Option 1: Via Cloudflare Dashboard**
+
 1. Pages → `liteckyeditingservices` → Deployments
 2. Click "..." menu on latest deployment → "Retry deployment"
 3. This rebuilds and purges the cache
 
 **Option 2: Via Wrangler (if needed)**
+
 ```bash
 # Purge specific paths
 wrangler pages deployment tail --project-name=liteckyeditingservices
@@ -208,10 +228,12 @@ git push origin main
 ```
 
 **Why this matters**: Cached `/admin/*` assets can cause:
+
 - Stale OAuth flow behavior
 - Outdated security headers
 
 **When to purge**:
+
 - After building `/admin/cms.<hash>.js`
 - After editing `public/admin/index.html`
 - After changing `functions/admin/config.yml.ts` or `functions/admin/[[path]].ts`
@@ -219,6 +241,7 @@ git push origin main
 ### Admin CMS Rollback (Hashed)
 
 If a rollback is needed:
+
 1. Note the previous hashed filename from the prior deploy (e.g., `cms.abc12345.js`).
 2. Update `public/admin/index.html` to reference the previous hash (or re-run the hash step with the prior file pre-copied).
 3. Purge CDN cache for `/admin/*`.

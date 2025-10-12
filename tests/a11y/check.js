@@ -14,6 +14,15 @@ const urls = [
 const options = {
 	standard: "WCAG2AA",
 	runners: ["axe", "htmlcs"],
+	timeout: 60000,
+	wait: 1000,
+	// Remove Turnstile widget before testing to avoid timeouts
+	beforeScript: () => {
+		const turnstile = document.querySelector(".cf-turnstile");
+		if (turnstile) {
+			turnstile.remove();
+		}
+	},
 	ignore: [
 		// Ignore known false positives
 	],

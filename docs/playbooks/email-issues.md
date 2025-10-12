@@ -24,6 +24,7 @@ Use this guide to diagnose and fix email problems related to the `/api/contact` 
    - Confirm required vars present for the active environment
 
 2. Run integration tests
+
    ```bash
    pnpm test:e2e
    node tests/sendgrid-test.mjs   # manual SendGrid check
@@ -70,4 +71,3 @@ Use this guide to diagnose and fix email problems related to the `/api/contact` 
 - docs/infrastructure/SENDGRID-CONFIGURATION.md
 - tests/e2e/pages-function-contact.spec.ts
 - tests/sendgrid-test.mjs
-

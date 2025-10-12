@@ -13,5 +13,4 @@
 
 ## Preview URL
 
-Paste here: 
-
+Paste here:

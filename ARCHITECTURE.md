@@ -32,17 +32,20 @@
 ## Data Flows
 
 Contact Submission (Direct)
+
 1. Browser loads Turnstile widget using `PUBLIC_TURNSTILE_SITE_KEY`
 2. User submits form; client sends JSON to `/api/contact`
 3. Pages Function validates and, if SendGrid vars are set, calls SendGrid API to deliver email
 4. Returns `202 { status: "sent" }` on success or `accepted-no-email` when SendGrid is not configured
 
 Contact Submission (Queued)
+
 1. Steps 1–2 same as Direct
 2. Pages Function detects a queue producer binding and enqueues `{ kind: "contact", data }`
 3. Queue Consumer Worker receives batch, sends via SendGrid, and `ack`s on success or `retry`s on failure
 
 CMS Authentication (Current - On-Site OAuth, 2025 Spec-Aligned)
+
 1. `/admin` is served by a static HTML page (`public/admin/index.html`) with a single Decap bundle and **spec-required** config discovery: `<link href="/admin/config.yml" type="text/yaml" rel="cms-config-url">`
 2. Decap **auto-initializes** from the vendored bundle (no manual `CMS.init()` call) — eliminates double-mount errors
 3. `config.yml` specifies `backend: { name: github, repo: ..., auth_endpoint: /api/auth }` (same-origin OAuth via Pages Functions)
@@ -58,6 +61,7 @@ CMS Authentication (Current - On-Site OAuth, 2025 Spec-Aligned)
 8. Decap receives token and completes authentication
 
 **Spec Compliance & 2025 Best Practices**:
+
 - Single bundle and auto-init (per [Decap install docs](https://decapcms.org/docs/install-decap-cms/)) — prevents React double-mount errors
 - Config discovery via `<link type="text/yaml" rel="cms-config-url">` (per [Decap docs](https://decapcms.org/docs/configuration-options/))
 - Auto-init mode (default behavior, per [Decap docs](https://decapcms.org/docs/manual-initialization/))
@@ -67,6 +71,7 @@ CMS Authentication (Current - On-Site OAuth, 2025 Spec-Aligned)
 ## Configuration
 
 Environment Variables (selected)
+
 - Pages Functions: `SENDGRID_API_KEY`, `SENDGRID_FROM`, `SENDGRID_TO`, `TURNSTILE_SECRET_KEY`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
 - Public: `PUBLIC_TURNSTILE_SITE_KEY`
 - Worker (queue-consumer): `SENDGRID_API_KEY`, `SENDGRID_FROM`, `SENDGRID_TO`

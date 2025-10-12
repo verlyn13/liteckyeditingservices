@@ -7,11 +7,13 @@ This project uses gopass for secure credential storage and portability across sy
 ### First Time Setup
 
 1. Store all development credentials in gopass:
+
 ```bash
 ./store-dev-vars-in-gopass.sh
 ```
 
 2. Manually add the SendGrid API key (for security):
+
 ```bash
 gopass insert development/sendgrid/api-key
 # Enter the API key when prompted
@@ -21,6 +23,7 @@ gopass insert development/sendgrid/api-key
 
 1. Ensure gopass is installed and configured
 2. Generate `.dev.vars` from stored credentials:
+
 ```bash
 ./scripts/generate-dev-vars.sh
 ```
@@ -62,11 +65,13 @@ github/
 If `generate-dev-vars.sh` reports missing credentials:
 
 1. Check gopass has the credential:
+
 ```bash
 gopass show development/sendgrid/api-key
 ```
 
 2. If missing, add it:
+
 ```bash
 gopass insert development/sendgrid/api-key
 ```
@@ -74,6 +79,7 @@ gopass insert development/sendgrid/api-key
 ### Gopass Sync Issues
 
 If gopass fails to sync with remote:
+
 - Credentials are still stored locally
 - Manual sync can be done with: `gopass sync`
 - Check remote configuration: `gopass config`

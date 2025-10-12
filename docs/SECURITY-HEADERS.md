@@ -19,6 +19,7 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 
 **Purpose**: Forces browsers to only connect via HTTPS
 **Configuration**:
+
 - `max-age=31536000`: 1 year duration
 - `includeSubDomains`: Applies to all subdomains
 - `preload`: Eligible for browser preload lists
@@ -28,6 +29,7 @@ Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
 **Purpose**: Prevents XSS attacks by restricting resource loading
 
 **Main Site Policy**:
+
 ```
 default-src 'self';
 script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com;
@@ -44,6 +46,7 @@ upgrade-insecure-requests;
 ```
 
 **Key Directives**:
+
 - `default-src 'self'`: Only load resources from same origin by default
 - `script-src`: Allow scripts from self and Turnstile CDN
 - `unsafe-inline`: Temporarily allowed for Svelte reactive styles (see Future Improvements)
@@ -52,6 +55,7 @@ upgrade-insecure-requests;
 - `upgrade-insecure-requests`: Auto-upgrade HTTP to HTTPS
 
 **Admin Panel Policy** (`/admin/*` via Pages Function):
+
 - Relaxed to allow Decap CMS requirements
 - Permits `unsafe-eval` for CMS runtime (AJV codegen)
 - Self-hosted CMS bundle, so no third‑party script CDNs (no jsDelivr/unpkg) are allowed
@@ -84,6 +88,7 @@ Referrer-Policy: strict-origin-when-cross-origin
 
 **Purpose**: Controls referrer information sent with requests
 **Behavior**:
+
 - Same-origin: Full URL
 - Cross-origin HTTPS: Origin only
 - Cross-origin HTTP: No referrer
@@ -110,6 +115,7 @@ X-Permitted-Cross-Domain-Policies: none
 ### Automated Tests
 
 Run security header tests:
+
 ```bash
 pnpm test:e2e -g "Security Headers"
 ```
@@ -117,15 +123,19 @@ pnpm test:e2e -g "Security Headers"
 ### Manual Testing
 
 1. **SecurityHeaders.com Scan**:
+
    ```bash
    open https://securityheaders.com/?q=https://www.liteckyeditingservices.com
    ```
+
    Target grade: **A** or better
 
 2. **CSP Evaluator**:
+
    ```bash
    open https://csp-evaluator.withgoogle.com/
    ```
+
    Paste the CSP policy for analysis
 
 3. **Browser DevTools**:
@@ -150,6 +160,7 @@ Content-Security-Policy: ... ; report-uri /api/csp-report
 **Current Issue**: Svelte reactive styles require `unsafe-inline`
 
 **Solution**:
+
 1. Generate nonce per request in middleware
 2. Pass nonce to Svelte components
 3. Update CSP: `style-src 'self' 'nonce-${nonce}'`
@@ -158,9 +169,10 @@ Content-Security-Policy: ... ; report-uri /api/csp-report
 ### 2. Subresource Integrity (SRI)
 
 For external scripts (if added in future):
+
 ```html
-<script 
-  src="https://cdn.example.com/lib.js" 
+<script
+  src="https://cdn.example.com/lib.js"
   integrity="sha384-..."
   crossorigin="anonymous"
 ></script>
@@ -169,6 +181,7 @@ For external scripts (if added in future):
 ### 3. CSP Reporting Endpoint
 
 Implement `/api/csp-report` to collect violations:
+
 - Store in D1 database
 - Alert on threshold breaches
 - Dashboard for monitoring
@@ -176,6 +189,7 @@ Implement `/api/csp-report` to collect violations:
 ### 4. HSTS Preload Submission
 
 After verifying HSTS works correctly for 3+ months:
+
 1. Visit https://hstspreload.org/
 2. Submit domain for inclusion in browser preload lists
 3. Verify all subdomains are HTTPS-ready
@@ -187,6 +201,7 @@ After verifying HSTS works correctly for 3+ months:
 **Symptom**: Content blocked, console errors
 
 **Debug Steps**:
+
 1. Check DevTools Console for specific violation
 2. Identify blocked resource (script, style, image, etc.)
 3. Update CSP directive to allow legitimate resource
@@ -198,12 +213,14 @@ After verifying HSTS works correctly for 3+ months:
 **Symptom**: securityheaders.com shows missing headers
 
 **Possible Causes**:
+
 1. `_headers` file not in `/public/`
 2. Syntax error in `_headers` file
 3. Cloudflare Pages cache (wait 5 min or purge)
 4. Testing wrong domain (naked vs www)
 
 **Resolution**:
+
 ```bash
 # Rebuild and redeploy
 pnpm build

@@ -16,7 +16,7 @@ initSentry({
 // Make Sentry available globally for debugging
 if (import.meta.env.DEV) {
 	import("@sentry/browser").then((Sentry) => {
-		(window as any).__sentry = Sentry;
+		(window as Window).__sentry = Sentry as unknown;
 		console.log("[Sentry] Available at window.__sentry");
 	});
 }

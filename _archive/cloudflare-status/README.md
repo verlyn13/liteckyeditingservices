@@ -5,6 +5,7 @@
 ## Archived Files
 
 ### CLOUDFLARE-STATUS-2025-09-23.md
+
 - **Audit Date**: September 23, 2025 09:49 AKDT
 - **Reason for Archive**: Outdated (DNS records have changed)
 - **Original location**: `/docs/infrastructure/CLOUDFLARE-STATUS.md`
@@ -32,6 +33,7 @@ To create a new Cloudflare status report:
 Use format: `CLOUDFLARE-STATUS-YYYY-MM-DD.md`
 
 Examples:
+
 - `CLOUDFLARE-STATUS-2025-09-23.md` ← This file
 - `CLOUDFLARE-STATUS-2025-10-10.md` ← Next expected archive
 - `CLOUDFLARE-STATUS-2025-11-01.md` ← Future monthly audit

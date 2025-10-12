@@ -9,6 +9,7 @@ This document outlines ALL Cloudflare services, configurations, and resources re
 ## 🎯 Core Cloudflare Services Required
 
 ### 1. **Cloudflare Pages** (Primary Hosting)
+
 - **Purpose**: Host the Astro-based frontend application with SSR capabilities
 - **Configuration**:
   - Project name: `litecky-editing` or `academic-editor`
@@ -19,6 +20,7 @@ This document outlines ALL Cloudflare services, configurations, and resources re
   - Output mode: `hybrid` (SSR for dynamic routes, static for others)
 
 ### 2. **Cloudflare Workers** (5 Workers Required)
+
 - **Decap OAuth Worker** (`cms-auth.liteckyeditingservices.com`)
   - GitHub OAuth proxy for CMS authentication
   - Custom domain routing required
@@ -38,6 +40,7 @@ This document outlines ALL Cloudflare services, configurations, and resources re
   - Template rendering
 
 ### 3. **D1 Database** (SQL Database)
+
 - **Database Name**: `academic-editor` or `litecky-editing`
 - **Required Tables**:
   - `quotes` - Store quote requests and status
@@ -47,6 +50,7 @@ This document outlines ALL Cloudflare services, configurations, and resources re
 - **Schema**: Includes timestamps, status tracking, relationships
 
 ### 4. **R2 Storage** (Object Storage)
+
 - **Bucket Name**: `academic-editor-documents` or `litecky-documents`
 - **Purpose**:
   - Store uploaded academic documents securely
@@ -58,6 +62,7 @@ This document outlines ALL Cloudflare services, configurations, and resources re
   - 30-day retention policy for orphaned files
 
 ### 5. **KV Namespace** (Key-Value Storage)
+
 - **Namespace**: `CACHE`
 - **Purpose**:
   - Session storage
@@ -66,6 +71,7 @@ This document outlines ALL Cloudflare services, configurations, and resources re
   - OAuth state management
 
 ### 6. **Queues**
+
 - **Queue Name**: `document-processing`
 - **Purpose**:
   - Async email sending
@@ -74,6 +80,7 @@ This document outlines ALL Cloudflare services, configurations, and resources re
   - Notification management
 
 ### 7. **Turnstile** (Bot Protection)
+
 - **Required Keys**:
   - Site Key (public): `PUBLIC_TURNSTILE_SITE_KEY`
   - Secret Key: `TURNSTILE_SECRET_KEY`
@@ -83,6 +90,7 @@ This document outlines ALL Cloudflare services, configurations, and resources re
   - Document upload
 
 ### 8. **Analytics Engine**
+
 - **Dataset Binding**: `ANALYTICS`
 - **Purpose**:
   - Track API usage
@@ -95,6 +103,7 @@ This document outlines ALL Cloudflare services, configurations, and resources re
 ## 🌐 DNS Configuration Requirements
 
 ### Primary Domain Setup
+
 ```
 Type    Name                          Value                         Proxy
 A       @                            192.0.2.1                      ✓
@@ -104,6 +113,7 @@ CNAME   cms-auth                     [worker-subdomain].workers.dev ✓
 ```
 
 ### Email Configuration (SendGrid)
+
 ```
 CNAME   em[xxxx]                     u[xxxxx].wl[xxx].sendgrid.net  ✗
 CNAME   s1._domainkey                s1.domainkey.[sendgrid]         ✗
@@ -116,6 +126,7 @@ TXT     @                            "v=spf1 include:sendgrid.net ~all"
 ## 🔐 Environment Variables & Secrets
 
 ### Public Variables (Client-Safe)
+
 ```env
 PUBLIC_SITE_NAME="Litecky Editing Services"
 PUBLIC_SITE_URL="https://liteckyeditingservices.com"
@@ -126,6 +137,7 @@ ALLOWED_FILE_TYPES=".doc,.docx,.pdf,.rtf,.txt"
 ```
 
 ### Secret Variables (Server-Only)
+
 ```env
 # Authentication
 GITHUB_OAUTH_ID="[github-oauth-app-id]"
@@ -160,11 +172,13 @@ WEBHOOK_SECRET="whsec_[...]"
 ## 📦 Wrangler Configuration Files
 
 ### Site (Cloudflare Pages)
+
 - Code-first configuration via root `wrangler.toml` (Pages V2 build system).
 - Build output: `dist` (see `astro.config.mjs`).
 - Environment variables and secrets set per environment in Pages settings (do not inline secrets in `wrangler.toml`).
 
 ### OAuth Worker (`workers/decap-oauth/wrangler.toml`)
+
 ```toml
 name = "litecky-decap-oauth"
 main = "src/index.ts"
@@ -177,6 +191,7 @@ routes = [
 ```
 
 ### Cron Worker (`workers/cron/wrangler.toml`)
+
 ```toml
 name = "litecky-cron"
 main = "src/worker.ts"
@@ -195,6 +210,7 @@ crons = [
 ## 🚀 Deployment Steps (Order Matters)
 
 ### Phase 1: Infrastructure Setup
+
 1. **Create Cloudflare Account** (if not exists)
 2. **Add Domain** to Cloudflare
 3. **Configure DNS** records (A, AAAA, CNAME)
@@ -217,6 +233,7 @@ crons = [
    ```
 
 ### Phase 2: Security & Auth
+
 1. **Enable Turnstile** in dashboard
 2. **Create GitHub OAuth App**
    - Homepage URL: `https://liteckyeditingservices.com`
@@ -230,6 +247,7 @@ crons = [
    ```
 
 ### Phase 3: Workers Deployment
+
 1. **Deploy Cron Worker**
    ```bash
    cd workers/cron
@@ -242,6 +260,7 @@ crons = [
    ```
 
 ### Phase 4: Main Application
+
 1. **Configure Pages Project**
 2. **Set Environment Variables** in dashboard
 3. **Deploy Site**
@@ -252,6 +271,7 @@ crons = [
    ```
 
 ### Phase 5: Email Setup
+
 1. **Configure SendGrid** domain authentication
 2. **Create Email Templates** in SendGrid
 3. **Update DNS** with SendGrid records
@@ -262,6 +282,7 @@ crons = [
 ## 💰 Cost Considerations
 
 ### Free Tier Limits
+
 - **Workers**: 100,000 requests/day
 - **KV**: 100,000 reads/day, 1,000 writes/day
 - **R2**: 10GB storage, 1M Class A operations/month
@@ -269,6 +290,7 @@ crons = [
 - **Pages**: Unlimited sites, 500 builds/month
 
 ### Estimated Monthly Costs (After Free Tier)
+
 - **Workers**: ~$5-10 (based on usage)
 - **R2 Storage**: ~$0.015/GB
 - **D1 Database**: ~$5 base
@@ -295,6 +317,7 @@ crons = [
 ## 📊 Monitoring & Maintenance
 
 ### Required Monitoring
+
 - **Cloudflare Analytics**: Built-in traffic monitoring
 - **Worker Analytics**: Request counts, errors, latency
 - **R2 Metrics**: Storage usage, bandwidth
@@ -303,6 +326,7 @@ crons = [
 - **Uptime Monitoring**: External service recommended
 
 ### Maintenance Tasks
+
 - **Daily**: Check error logs, monitor queues
 - **Weekly**: Review analytics, check storage usage
 - **Monthly**: Security updates, cost review

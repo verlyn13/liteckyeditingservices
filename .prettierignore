@@ -1,0 +1,42 @@
+# Prettier ignore file
+# Exclude files that should not be formatted
+
+# Dependencies
+node_modules
+pnpm-lock.yaml
+
+# Build artifacts
+dist
+.astro
+.wrangler
+
+# Archives and documentation with code snippets
+_archive
+docs
+
+# Let Biome format JS/TS/JSON/JSONC to avoid formatter contention
+**/*.{js,ts,tsx,mjs,cjs,json,jsonc}
+
+# Large generated files
+public/admin/cms.*.js
+public/admin/cms.js
+
+# Test reports
+playwright-report
+test-results
+coverage
+
+# Environment files
+.env
+.dev.vars
+
+# Astro files with complex template expressions (prettier-plugin-astro has issues)
+src/layouts/BaseLayout.astro
+src/pages/about.astro
+src/pages/contact.astro
+src/pages/faq.astro
+src/pages/services.astro
+src/pages/testimonials.astro
+
+# CSS files where quote style matters for validators
+src/styles/global.css

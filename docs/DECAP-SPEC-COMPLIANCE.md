@@ -30,7 +30,7 @@ This document records how our Decap CMS integration complies with current specs,
     name: github
     repo: verlyn13/liteckyeditingservices
     branch: main
-    base_url: ${origin}  # Dynamically set to request origin
+    base_url: ${origin} # Dynamically set to request origin
     auth_endpoint: /api/auth
   ```
 - Rationale: **CRITICAL**: When using external/self-hosted OAuth handlers, `base_url` is **required** for Decap to enter "external-auth" mode. Without it, Decap won't attach the postMessage listener that processes `authorization:github:success:` messages, even if the messages arrive correctly.
@@ -45,15 +45,15 @@ This document records how our Decap CMS integration complies with current specs,
 
 - Files: `functions/api/auth.ts`, `functions/api/callback.ts` (primary), `functions/api/exchange-token.ts` (fallback/compat)
 - Flow (server-side exchange with fallback):
-  1) `/api/auth` (server-side, same origin as `/admin`)
+  1. `/api/auth` (server-side, same origin as `/admin`)
      - Honors client-provided `state` and PKCE params; persists `state` in HttpOnly cookie
      - Redirects to GitHub authorize with `redirect_uri`, `scope`, `state`, and `code_challenge`
-  2) `/api/callback` (server-side; RETURNS HTML)
+  2. `/api/callback` (server-side; RETURNS HTML)
      - Validates `state` and reads a short-lived cookie `oauth_pkce_verifier` set by the admin prior to opening the popup
      - Exchanges `code` + `verifier` with GitHub server-side
      - Posts canonical success string with `{ token, state }` to opener; COOP: `unsafe-none`; CSP: inline allowed for this tiny handoff HTML only
      - Fallback: if no verifier cookie present, posts `{ code, state }` and admin will use `/api/exchange-token`
-  3) Admin re-emits the canonical success string (when needed), persists the user under both keys, and dispatches store actions (or reloads) so UI flips reliably without the Decap authorizer.
+  3. Admin re-emits the canonical success string (when needed), persists the user under both keys, and dispatches store actions (or reloads) so UI flips reliably without the Decap authorizer.
 
 - Verify (prod, after login):
   - `await CMS.getToken().then(Boolean) === true`
@@ -87,6 +87,7 @@ This document records how our Decap CMS integration complies with current specs,
 ## Migration Notes (October 2025)
 
 **Changes from previous implementation:**
+
 - Removed `src/pages/admin/index.astro` (Astro framework page with dynamic initialization)
 - Removed `public/admin/boot.js`, `debug.js`, `diagnose.js` (runtime injection scripts with HMR guards and cache-busting)
 - Replaced vendor bundle with first‑party `/admin/cms.js` built via esbuild (no sourcemaps)
@@ -104,6 +105,7 @@ This document records how our Decap CMS integration complies with current specs,
   - Archived static `public/admin/config.yml` to `config.yml.static-archive`
 
 **Why:**
+
 - Eliminates React double-mount/"removeChild" errors from multiple init paths
 - Simplifies local dev: `wrangler pages dev` serves admin + Pages Functions on one origin
 - Follows Decap install docs exactly (static HTML, single bundle, auto-init from config link)
@@ -111,6 +113,7 @@ This document records how our Decap CMS integration complies with current specs,
 - Dynamic config prevents env-specific configuration drift
 
 ## References
+
 - [Decap CMS: Install](https://decapcms.org/docs/install-decap-cms/) - Single bundle, auto-init
 - [Decap CMS: Configuration Options](https://decapcms.org/docs/configuration-options/) - Config link: `rel="cms-config-url"`, `type="text/yaml"`
 - [Decap CMS: Manual Initialization](https://decapcms.org/docs/manual-initialization/) - Auto‑init vs manual
@@ -125,14 +128,16 @@ This document records how our Decap CMS integration complies with current specs,
 Admin bundle: `/admin/cms.js` (built from `src/admin/cms.ts`).
 
 When updating Decap:
-1) Update decap-cms-app dependency.
-2) Rebuild cms: `pnpm build:cms`.
-3) Purge Pages cache for `/admin/*`.
+
+1. Update decap-cms-app dependency.
+2. Rebuild cms: `pnpm build:cms`.
+3. Purge Pages cache for `/admin/*`.
 
 ### Smoke test (console)
+
 - Open `/admin`, then:
-  1) Before login: `localStorage.getItem('netlify-cms-auth:state')` — copy value
-  2) Login with GitHub; wait for popup to close.
-  3) Confirm token: `await CMS.getToken().then(Boolean)` — should be `true`
-  4) Optional collections check: `await CMS.getBackend().then(Boolean)` — should be `true`
-Minor CSP hash update for debug logging
+  1. Before login: `localStorage.getItem('netlify-cms-auth:state')` — copy value
+  2. Login with GitHub; wait for popup to close.
+  3. Confirm token: `await CMS.getToken().then(Boolean)` — should be `true`
+  4. Optional collections check: `await CMS.getBackend().then(Boolean)` — should be `true`
+     Minor CSP hash update for debug logging

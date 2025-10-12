@@ -10,4 +10,3 @@ order: 1
 ---
 
 We focus on improving argument flow, paragraph cohesion, and overall readability while preserving your voice. You receive a short editor memo summarizing key themes and suggested next steps.
-
