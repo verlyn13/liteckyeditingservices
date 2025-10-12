@@ -128,7 +128,21 @@ jobs:
             find dist -name "*.map" -type f | head -5
           fi
 
+      - name: Check Sentry configuration
+        id: sentry-check
+        run: |
+          if [ -z "${{ secrets.SENTRY_AUTH_TOKEN }}" ]; then
+            echo "⚠️  SENTRY_AUTH_TOKEN not configured"
+            echo "Sentry release upload will be skipped"
+            echo "To enable: Add SENTRY_AUTH_TOKEN to GitHub repository secrets"
+            echo "configured=false" >> $GITHUB_OUTPUT
+          else
+            echo "✅ SENTRY_AUTH_TOKEN configured"
+            echo "configured=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: Create Sentry release and upload source maps
+        if: steps.sentry-check.outputs.configured == 'true'
         uses: getsentry/action-release@v3
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
