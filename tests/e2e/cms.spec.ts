@@ -55,12 +55,15 @@ test('CMS script loads without CSP violations', async ({ page }) => {
   await page.goto('/admin/');
 
   // Wait for CMS to initialize (self-hosted bundle loads and sets window.CMS or window.__cmsApp)
-  await page.waitForFunction(() => {
-    const win = window as unknown as { CMS?: unknown; __cmsApp?: unknown };
-    return !!(win.CMS || win.__cmsApp);
-  }, {
-    timeout: 10000,
-  });
+  await page.waitForFunction(
+    () => {
+      const win = window as unknown as { CMS?: unknown; __cmsApp?: unknown };
+      return !!(win.CMS || win.__cmsApp);
+    },
+    {
+      timeout: 10000,
+    }
+  );
 
   // Verify no CSP violations occurred
   expect(cspViolations).toHaveLength(0);
@@ -126,12 +129,15 @@ test('Admin CMS initializes without CSP violations', async ({ page }) => {
   // Wait for cms.js to load and initialize CMS
   // Decap sets window.CMS or window.__cmsApp when bundle loads
   const cmsInitialized = await page
-    .waitForFunction(() => {
-      const win = window as unknown as { CMS?: unknown; __cmsApp?: unknown };
-      return !!(win.CMS || win.__cmsApp);
-    }, {
-      timeout: 15000,
-    })
+    .waitForFunction(
+      () => {
+        const win = window as unknown as { CMS?: unknown; __cmsApp?: unknown };
+        return !!(win.CMS || win.__cmsApp);
+      },
+      {
+        timeout: 15000,
+      }
+    )
     .then(() => true)
     .catch(() => false);
 
