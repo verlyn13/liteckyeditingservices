@@ -9,47 +9,64 @@ export interface Props {
   currentPath?: string;
 }
 
-const { links = [
-  { href: '/', label: 'Home' },
-  { href: '/services', label: 'Services' },
-  { href: '/process', label: 'The Process' },
-  { href: '/about', label: 'About' },
-  { href: '/testimonials', label: 'Testimonials' },
-  { href: '/faq', label: 'FAQ' },
-  { href: '/contact', label: 'Contact' }
-], currentPath = '/' } = Astro.props;
+const {
+  links = [
+    { href: '/', label: 'Home' },
+    { href: '/services', label: 'Services' },
+    { href: '/process', label: 'The Process' },
+    { href: '/about', label: 'About' },
+    { href: '/testimonials', label: 'Testimonials' },
+    { href: '/faq', label: 'FAQ' },
+    { href: '/contact', label: 'Contact' },
+  ],
+  currentPath = '/',
+} = Astro.props;
 ---
 
-<header class="bg-off-white border-b border-soft-gray">
+<header class="border-b border-soft-gray bg-off-white">
   <div class="container flex items-center justify-between py-4">
-    <a href="/" class="font-semibold text-primary-navy text-lg">Litecky Editing Services</a>
+    <a href="/" class="text-lg font-semibold text-primary-navy">Litecky Editing Services</a>
 
     <!-- Mobile toggle -->
-    <button class="md:hidden p-2 rounded border border-soft-gray" aria-expanded="false" aria-controls="primary-menu" data-menu-toggle>
+    <button
+      class="rounded border border-soft-gray p-2 md:hidden"
+      aria-expanded="false"
+      aria-controls="primary-menu"
+      data-menu-toggle
+    >
       <span class="visually-hidden">Toggle menu</span>
       <!-- Simple icon -->
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"></path></svg
+      >
     </button>
 
     <nav id="primary-menu" class="hidden md:block" data-menu>
-      <ul class="flex flex-col md:flex-row gap-4 md:gap-6">
-        {links.map((l) => {
-          const isActive = currentPath === l.href;
-          return (
-            <li>
-              <a
-                href={l.href}
-                aria-current={isActive ? 'page' : undefined}
-                class:list={{
-                  'text-primary-navy hover:text-dark-navy': true,
-                  'font-semibold underline underline-offset-4': isActive,
-                }}
-              >
-                {l.label}
-              </a>
-            </li>
-          );
-        })}
+      <ul class="flex flex-col gap-4 md:flex-row md:gap-6">
+        {
+          links.map((l) => {
+            const isActive = currentPath === l.href;
+            return (
+              <li>
+                <a
+                  href={l.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  class:list={{
+                    'text-primary-navy hover:text-dark-navy': true,
+                    'font-semibold underline underline-offset-4': isActive,
+                  }}
+                >
+                  {l.label}
+                </a>
+              </li>
+            );
+          })
+        }
       </ul>
     </nav>
   </div>

@@ -1,163 +1,159 @@
 #!/usr/bin/env node
 
-import fs from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import fs from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const rootDir = join(__dirname, "../..");
+const rootDir = join(__dirname, '../..');
 
-console.log("🔍 Validating directory structure and path integrity...\n");
+console.log('🔍 Validating directory structure and path integrity...\n');
 
 // Expected directory structure
 const expectedStructure = {
-	"src/": [
-		"components/",
-		"layouts/",
-		"pages/",
-		"styles/",
-		"scripts/",
-		"content/",
-		"images/",
-		"lib/",
-		"utils/",
-	],
-	"public/": ["fonts/", "images/", "admin/", "scripts/"],
-	"workers/": ["decap-oauth/", "queue-consumer/"],
-	"tests/": ["unit/", "e2e/", "a11y/"],
-	"scripts/": ["validate/", "gates/", "drift/"],
-	"policy/": ["code/", "infra/", "cms/", "email/", "docs/"],
-	"docs/": ["playbooks/", "decisions/", "api/", "infrastructure/"],
-	"desired-state/": [],
-	"_archive/": [],
+  'src/': [
+    'components/',
+    'layouts/',
+    'pages/',
+    'styles/',
+    'scripts/',
+    'content/',
+    'images/',
+    'lib/',
+    'utils/',
+  ],
+  'public/': ['fonts/', 'images/', 'admin/', 'scripts/'],
+  'workers/': ['decap-oauth/', 'queue-consumer/'],
+  'tests/': ['unit/', 'e2e/', 'a11y/'],
+  'scripts/': ['validate/', 'gates/', 'drift/'],
+  'policy/': ['code/', 'infra/', 'cms/', 'email/', 'docs/'],
+  'docs/': ['playbooks/', 'decisions/', 'api/', 'infrastructure/'],
+  'desired-state/': [],
+  '_archive/': [],
 };
 
 // Forbidden nested patterns (prevent directory duplication)
 const forbiddenNestedPatterns = [
-	"workers/*/workers/",
-	"src/*/src/",
-	"public/*/public/",
-	"tests/*/tests/",
-	"scripts/*/scripts/",
-	"policy/*/policy/",
-	"docs/*/docs/",
+  'workers/*/workers/',
+  'src/*/src/',
+  'public/*/public/',
+  'tests/*/tests/',
+  'scripts/*/scripts/',
+  'policy/*/policy/',
+  'docs/*/docs/',
 ];
 
 let hasErrors = false;
 
 function checkExpectedStructure() {
-	console.log("Checking expected directory structure...");
+  console.log('Checking expected directory structure...');
 
-	for (const [parentDir, expectedSubDirs] of Object.entries(
-		expectedStructure,
-	)) {
-		const parentPath = join(rootDir, parentDir);
+  for (const [parentDir, expectedSubDirs] of Object.entries(expectedStructure)) {
+    const parentPath = join(rootDir, parentDir);
 
-		if (!fs.existsSync(parentPath)) {
-			console.log(`❌ Missing expected directory: ${parentDir}`);
-			hasErrors = true;
-			continue;
-		}
+    if (!fs.existsSync(parentPath)) {
+      console.log(`❌ Missing expected directory: ${parentDir}`);
+      hasErrors = true;
+      continue;
+    }
 
-		console.log(`✅ ${parentDir}`);
+    console.log(`✅ ${parentDir}`);
 
-		for (const subDir of expectedSubDirs) {
-			const subPath = join(parentPath, subDir);
-			if (!fs.existsSync(subPath)) {
-				console.log(`⚠️  Missing expected subdirectory: ${parentDir}${subDir}`);
-			} else {
-				console.log(`  ✅ ${parentDir}${subDir}`);
-			}
-		}
-	}
-	console.log();
+    for (const subDir of expectedSubDirs) {
+      const subPath = join(parentPath, subDir);
+      if (!fs.existsSync(subPath)) {
+        console.log(`⚠️  Missing expected subdirectory: ${parentDir}${subDir}`);
+      } else {
+        console.log(`  ✅ ${parentDir}${subDir}`);
+      }
+    }
+  }
+  console.log();
 }
 
 function checkForbiddenNesting() {
-	console.log("Checking for forbidden nested directory patterns...");
+  console.log('Checking for forbidden nested directory patterns...');
 
-	for (const pattern of forbiddenNestedPatterns) {
-		const parts = pattern.split("/");
-		const parentPattern = parts[0];
-		const nestedPattern = parts[2];
+  for (const pattern of forbiddenNestedPatterns) {
+    const parts = pattern.split('/');
+    const parentPattern = parts[0];
+    const nestedPattern = parts[2];
 
-		// Find all directories matching the parent pattern
-		const parentDirs = fs
-			.readdirSync(rootDir, { withFileTypes: true })
-			.filter(
-				(entry) =>
-					entry.isDirectory() &&
-					(parentPattern === "*" || entry.name === parentPattern),
-			)
-			.map((entry) => entry.name);
+    // Find all directories matching the parent pattern
+    const parentDirs = fs
+      .readdirSync(rootDir, { withFileTypes: true })
+      .filter(
+        (entry) => entry.isDirectory() && (parentPattern === '*' || entry.name === parentPattern)
+      )
+      .map((entry) => entry.name);
 
-		for (const parentDir of parentDirs) {
-			if (parentPattern === "workers" || parentDir === parentPattern) {
-				const parentPath = join(rootDir, parentDir);
+    for (const parentDir of parentDirs) {
+      if (parentPattern === 'workers' || parentDir === parentPattern) {
+        const parentPath = join(rootDir, parentDir);
 
-				try {
-					const subDirs = fs
-						.readdirSync(parentPath, { withFileTypes: true })
-						.filter((entry) => entry.isDirectory())
-						.map((entry) => entry.name);
+        try {
+          const subDirs = fs
+            .readdirSync(parentPath, { withFileTypes: true })
+            .filter((entry) => entry.isDirectory())
+            .map((entry) => entry.name);
 
-					for (const subDir of subDirs) {
-						const subPath = join(parentPath, subDir);
+          for (const subDir of subDirs) {
+            const subPath = join(parentPath, subDir);
 
-						try {
-							const nestedDirs = fs
-								.readdirSync(subPath, { withFileTypes: true })
-								.filter((entry) => entry.isDirectory())
-								.map((entry) => entry.name);
+            try {
+              const nestedDirs = fs
+                .readdirSync(subPath, { withFileTypes: true })
+                .filter((entry) => entry.isDirectory())
+                .map((entry) => entry.name);
 
-							for (const nestedDir of nestedDirs) {
-								if (
-									nestedPattern === "*" ||
-									nestedDir === nestedPattern ||
-									nestedDir === parentDir
-								) {
-									console.log(
-										`❌ Forbidden nested structure found: ${parentDir}/${subDir}/${nestedDir}/`,
-									);
-									hasErrors = true;
-								}
-							}
-						} catch (_err) {
-							// Directory might not be readable, skip
-						}
-					}
-				} catch (_err) {
-					// Directory might not be readable, skip
-				}
-			}
-		}
-	}
+              for (const nestedDir of nestedDirs) {
+                if (
+                  nestedPattern === '*' ||
+                  nestedDir === nestedPattern ||
+                  nestedDir === parentDir
+                ) {
+                  console.log(
+                    `❌ Forbidden nested structure found: ${parentDir}/${subDir}/${nestedDir}/`
+                  );
+                  hasErrors = true;
+                }
+              }
+            } catch (_err) {
+              // Directory might not be readable, skip
+            }
+          }
+        } catch (_err) {
+          // Directory might not be readable, skip
+        }
+      }
+    }
+  }
 
-	if (!hasErrors) {
-		console.log("✅ No forbidden nested patterns found");
-	}
-	console.log();
+  if (!hasErrors) {
+    console.log('✅ No forbidden nested patterns found');
+  }
+  console.log();
 }
 
 function checkWorkingDirectory() {
-	console.log("Checking working directory context...");
+  console.log('Checking working directory context...');
 
-	const cwd = process.cwd();
-	const expectedRoot = rootDir;
+  const cwd = process.cwd();
+  const expectedRoot = rootDir;
 
-	if (cwd !== expectedRoot) {
-		console.log(`⚠️  Current working directory: ${cwd}`);
-		console.log(`⚠️  Project root detected at: ${expectedRoot}`);
-		console.log("   Tip: run from project root to avoid path issues");
-	} else {
-		console.log(`✅ Working directory is project root: ${cwd}`);
-	}
-	console.log();
+  if (cwd !== expectedRoot) {
+    console.log(`⚠️  Current working directory: ${cwd}`);
+    console.log(`⚠️  Project root detected at: ${expectedRoot}`);
+    console.log('   Tip: run from project root to avoid path issues');
+  } else {
+    console.log(`✅ Working directory is project root: ${cwd}`);
+  }
+  console.log();
 }
 
 function generatePathHelper() {
-	const helperContent = `#!/bin/bash
+  const helperContent = `#!/bin/bash
 
 # Path Helper for Litecky Editing Services
 # Source this file to ensure correct working directory and paths
@@ -211,16 +207,14 @@ if [ "\${BASH_SOURCE[0]}" != "\${0}" ]; then
 fi
 `;
 
-	const helperPath = join(rootDir, "scripts/path-helper.sh");
-	fs.writeFileSync(helperPath, helperContent);
-	fs.chmodSync(helperPath, 0o755);
+  const helperPath = join(rootDir, 'scripts/path-helper.sh');
+  fs.writeFileSync(helperPath, helperContent);
+  fs.chmodSync(helperPath, 0o755);
 
-	console.log("📝 Generated path helper script: scripts/path-helper.sh");
-	console.log("   Usage: source scripts/path-helper.sh");
-	console.log(
-		"   Functions: ensure_project_root, run_in_worker, validate_path",
-	);
-	console.log();
+  console.log('📝 Generated path helper script: scripts/path-helper.sh');
+  console.log('   Usage: source scripts/path-helper.sh');
+  console.log('   Functions: ensure_project_root, run_in_worker, validate_path');
+  console.log();
 }
 
 // Run all checks
@@ -230,8 +224,8 @@ checkForbiddenNesting();
 generatePathHelper();
 
 if (hasErrors) {
-	console.log("❌ Path structure validation failed");
-	process.exit(1);
+  console.log('❌ Path structure validation failed');
+  process.exit(1);
 } else {
-	console.log("✅ Path structure validation passed");
+  console.log('✅ Path structure validation passed');
 }

@@ -1,25 +1,39 @@
 ---
-export interface Step { title: string; body: string }
-export interface Props { steps?: Step[] }
+export interface Step {
+  title: string;
+  body: string;
+}
+export interface Props {
+  steps?: Step[];
+}
 
-const { steps = [
-  { title: 'Upload & Brief', body: 'Securely upload your document and share your goals.' },
-  { title: 'Expert Editing', body: 'PhD-qualified editor polishes structure, clarity, and style.' },
-  { title: 'Review & Finalize', body: 'Receive tracked changes and an editor memo. Revise with confidence.' },
-] } = Astro.props;
+const {
+  steps = [
+    { title: 'Upload & Brief', body: 'Securely upload your document and share your goals.' },
+    {
+      title: 'Expert Editing',
+      body: 'PhD-qualified editor polishes structure, clarity, and style.',
+    },
+    {
+      title: 'Review & Finalize',
+      body: 'Receive tracked changes and an editor memo. Revise with confidence.',
+    },
+  ],
+} = Astro.props;
 ---
 
 <section class="section bg-white">
   <div class="container">
-    <div class="grid md:grid-cols-3 gap-8">
-      {steps.map((s, i) => (
-        <article class="p-4 rounded border border-soft-gray bg-off-white">
-          <div class="text-accent-sage font-semibold mb-2">Step {i + 1}</div>
-          <h3 class="text-xl text-primary-navy font-semibold mb-1">{s.title}</h3>
-          <p class="text-text-secondary">{s.body}</p>
-        </article>
-      ))}
+    <div class="grid gap-8 md:grid-cols-3">
+      {
+        steps.map((s, i) => (
+          <article class="rounded border border-soft-gray bg-off-white p-4">
+            <div class="mb-2 font-semibold text-accent-sage">Step {i + 1}</div>
+            <h3 class="mb-1 text-xl font-semibold text-primary-navy">{s.title}</h3>
+            <p class="text-text-secondary">{s.body}</p>
+          </article>
+        ))
+      }
     </div>
   </div>
 </section>
-
