@@ -61,6 +61,20 @@ jobs:
       - name: Build project
         run: pnpm build
 
+      - name: Create Sentry release and upload source maps
+        uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+        with:
+          environment: ${{ github.ref_name == 'main' && 'production' || 'preview' }}
+          release: ${{ github.sha }}
+          sourcemaps: ./dist
+          url_prefix: ~/
+          finalize: true
+          set_commits: auto
+
       # Note: Add `pnpm exec playwright install chromium` here when E2E tests are enabled
 
       - name: Verify wrangler version

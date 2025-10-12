@@ -15,3 +15,9 @@ queue = "send-email-queue"
 binding = "SEND_EMAIL"
 
 # Do NOT add secrets here. Use Pages environment variables or Worker Secrets.
+
+[env.production]
+vars = { ENVIRONMENT = "production" }
+
+[env.preview]
+vars = { ENVIRONMENT = "preview" }
