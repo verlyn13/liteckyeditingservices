@@ -583,10 +583,11 @@ gopass show sentry/happy-patterns-llc/auth-token
 **⚠️ Important**: The CI/CD workflow (`.github/workflows/quality-gate.yml`) will skip Sentry release uploads if `SENTRY_AUTH_TOKEN` is not configured. This is intentional to prevent build failures during initial setup. The workflow will log a warning and continue without uploading sourcemaps.
 
 **To enable Sentry release tracking in CI:**
-1. Generate an Auth Token in Sentry Dashboard (Settings → Developer Settings → Auth Tokens)
-2. Grant the token `project:releases` and `org:read` scopes
-3. Add it to GitHub repository secrets as `SENTRY_AUTH_TOKEN`
-4. Subsequent builds will automatically upload sourcemaps
+1. Create an Internal Integration in Sentry Dashboard (Settings → Developer Settings → Internal Integrations)
+2. Configure with permissions: Project (Read & Write), Release (Admin), Organization (Read)
+3. Copy the Client Secret token generated after creating the integration
+4. Add token to GitHub repository secrets as `SENTRY_AUTH_TOKEN`
+5. Subsequent builds will automatically upload sourcemaps
 
 ### Configure Cloudflare Pages
 
