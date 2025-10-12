@@ -164,42 +164,47 @@ This includes:
 - `SENTRY_ORG`, `SENTRY_PROJECT` (build-time)
 - `SENTRY_AUTH_TOKEN` (build-time sourcemap upload)
 
-**4. Configure Cloudflare Pages manually** (or via Infisical sync):
+**4. Sync to Cloudflare Pages** (automated via Infisical + wrangler):
 
-**Production Environment:**
+**Automated Workflow:**
+
+```bash
+# Step 1: Pull secrets from Infisical and prepare for Cloudflare
+./scripts/secrets/cloudflare_prepare_from_infisical.sh
+
+# Step 2: Push all secrets to Cloudflare Pages (both Production and Preview)
+./scripts/secrets/sync-to-cloudflare-pages.sh
+```
+
+This automatically uploads all encrypted secrets to both environments via wrangler CLI:
+
+- ✅ GitHub OAuth: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
+- ✅ SendGrid: `SENDGRID_API_KEY`, `SENDGRID_FROM`, `SENDGRID_TO`
+- ✅ Sentry: `SENTRY_AUTH_TOKEN`, `SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`
+- ✅ Turnstile: `TURNSTILE_SECRET_KEY`
+
+**Manual Step** (public variables via Dashboard):
+
+Navigate to: Pages → liteckyeditingservices → Settings → Environment Variables
+
+**Production Environment Variables:**
 
 ```
 PUBLIC_SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
-SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAB27CNFPS0wEzPP5
 PUBLIC_SENTRY_ENVIRONMENT=production
 PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
-SENTRY_ORG=happy-patterns-llc
-SENTRY_PROJECT=javascript-astro
+ENVIRONMENT=production
 ```
 
-Secret (encrypted):
-
-```bash
-gopass show -o sentry/happy-patterns-llc/auth-token | \
-  pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices --env production
-```
-
-**Preview Environment:**
+**Preview Environment Variables:**
 
 ```
 PUBLIC_SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
-SENTRY_DSN=https://ceac9b5e11c505c52360476db9fa80e8@o4510172424699904.ingest.us.sentry.io/4510172426731520
+PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAB27CNFPS0wEzPP5
 PUBLIC_SENTRY_ENVIRONMENT=preview
 PUBLIC_SENTRY_RELEASE=$CF_PAGES_COMMIT_SHA
-SENTRY_ORG=happy-patterns-llc
-SENTRY_PROJECT=javascript-astro
-```
-
-Secret (encrypted):
-
-```bash
-gopass show -o sentry/happy-patterns-llc/auth-token | \
-  pnpm wrangler pages secret put SENTRY_AUTH_TOKEN --project-name=liteckyeditingservices --env preview
+ENVIRONMENT=preview
 ```
 
 **5. Local development:**
