@@ -14,13 +14,16 @@ const config = (() => {
   };
   const backend = { ...(base.backend ?? {}) } as Record<string, unknown>;
   backend.base_url = origin;
-  backend.auth_endpoint = 'api/auth';
+  backend.auth_endpoint = '/api/auth';
   const merged: Record<string, unknown> = { ...baseConfig, backend };
   return merged as typeof baseConfig;
 })();
 
 const cms = CMS as unknown as DecapCMS;
-cms.init?.({ config });
+// Prevent Decap from auto-loading /admin/config.yml when we provide config programmatically,
+// otherwise collections may be registered twice.
+// Cast to any to allow non-typed load_config_file flag supported by Decap runtime.
+(cms as any).init?.({ config, load_config_file: false });
 
 // Canonical popup message → persist + dispatch + navigate
 window.addEventListener(

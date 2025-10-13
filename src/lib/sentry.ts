@@ -42,6 +42,38 @@ export function initSentry(config: SentryConfig = {}) {
     return;
   }
 
+  // Prepare integrations with feature-detection for optional modules
+  const integrations: unknown[] = [
+    // Browser tracing for automatic instrumentation
+    Sentry.browserTracingIntegration({
+      // Track navigation/routing
+      enableInp: true,
+    }),
+
+    // Session replay for debugging
+    Sentry.replayIntegration({
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+
+    // Console logging integration
+    Sentry.consoleLoggingIntegration({
+      levels: ['error', 'warn'], // Only log errors and warnings
+    }),
+  ];
+
+  // Optional: httpClientIntegration not present in all bundles/targets
+  try {
+    const maybeHttp = (Sentry as unknown as Record<string, unknown>).httpClientIntegration as
+      | ((opts?: { failedRequestStatusCodes?: [number, number] }) => unknown)
+      | undefined;
+    if (typeof maybeHttp === 'function') {
+      integrations.push(maybeHttp({ failedRequestStatusCodes: [400, 599] }));
+    }
+  } catch {
+    // ignore missing integration
+  }
+
   Sentry.init({
     dsn,
     environment,
@@ -51,29 +83,7 @@ export function initSentry(config: SentryConfig = {}) {
 
     // Performance Monitoring
     tracesSampleRate,
-    integrations: [
-      // Browser tracing for automatic instrumentation
-      Sentry.browserTracingIntegration({
-        // Track navigation/routing
-        enableInp: true,
-      }),
-
-      // Session replay for debugging
-      Sentry.replayIntegration({
-        maskAllText: true,
-        blockAllMedia: true,
-      }),
-
-      // Console logging integration
-      Sentry.consoleLoggingIntegration({
-        levels: ['error', 'warn'], // Only log errors and warnings
-      }),
-
-      // HTTP client instrumentation
-      Sentry.httpClientIntegration({
-        failedRequestStatusCodes: [400, 599],
-      }),
-    ],
+    integrations: integrations as never,
 
     // Session Replay sampling
     replaysSessionSampleRate,

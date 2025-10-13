@@ -14,8 +14,8 @@ await build({
   // Let esbuild handle Node.js built-ins with its internal polyfills/empty shims
   define: {
     'process.env.NODE_ENV': '"production"',
-    'global': 'window',
-    'process': 'window.process',
+    global: 'window',
+    process: 'window.process',
   },
   alias: {
     // Map node: imports to browser-compatible versions or empties

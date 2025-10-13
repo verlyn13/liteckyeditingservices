@@ -13,6 +13,9 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
+    <!-- Non-production environment banner -->
+    <script src="/admin/preview-banner.js"></script>
+
     <!-- Sentry admin (classic, CSP-safe) -->
     <script src="/admin/sentry-admin.js" defer></script>
 
@@ -28,7 +31,7 @@
     <!-- PKCE launcher + acceptance must be available before Decap boot -->
     <script src="/admin/pkce-login.v3.js"></script>
     <!-- NPM delivery of Decap CMS app (replaces vendor bundle) -->
-    <script src="/admin/cms.211ec4c4.js" defer></script>
+    <script src="/admin/cms.b55bb0d8.js" defer></script>
     <!-- Optional shim: enable with ?auth_shim=1 to re-emit canonical success string from admin window -->
     <script src="/admin/decap-auth-shim.js" defer></script>
   </body>

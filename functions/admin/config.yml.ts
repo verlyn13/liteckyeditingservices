@@ -45,7 +45,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
   repo: verlyn13/liteckyeditingservices
   branch: main
   base_url: ${origin}
-  auth_endpoint: api/auth
+  auth_endpoint: /api/auth
 
 publish_mode: editorial_workflow
 

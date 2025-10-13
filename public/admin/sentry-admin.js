@@ -42,9 +42,10 @@
         integrations: [
           Sentry.browserTracingIntegration({ enableInp: true }),
           Sentry.replayIntegration({ maskAllText: true, blockAllMedia: true }),
-          Sentry.httpClientIntegration({
-            failedRequestStatusCodes: [400, 599],
-          }),
+          // httpClientIntegration not available in 8.48.0 bundle
+          // Sentry.httpClientIntegration({
+          //   failedRequestStatusCodes: [400, 599],
+          // }),
         ],
         replaysSessionSampleRate: 0.1,
         replaysOnErrorSampleRate: 1.0,
@@ -212,7 +213,7 @@
   script.integrity = 'sha384-gdAAufpzRZFoI7KqFiKJljH/2YMTO32L2rZL8rpO7ef1BTD8aJMPwdMiSJkjw/8I';
   script.crossOrigin = 'anonymous';
   script.onload = initSentry;
-  script.onerror = function() {
+  script.onerror = function () {
     try {
       console.error('[Sentry Admin] Failed to load Sentry SDK from CDN');
     } catch {}

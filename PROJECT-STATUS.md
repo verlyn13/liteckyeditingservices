@@ -2,7 +2,7 @@
 
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 12, 2025 (CI/CD enhancements and Sentry integration complete)
+**Last Updated**: October 12, 2025 (CMS configuration and Sentry fixes deployed)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment)
@@ -38,6 +38,14 @@
 - All security headers E2E tests passing (15/15)
 
 **Recent Progress - October 12, 2025**:
+
+- ✅ **CMS Configuration & Sentry Fixes** (Latest Deployment):
+  - Fixed CMS double-config load issue by adding `load_config_file: false` to cms.init() in src/admin/cms.ts
+  - Corrected auth_endpoint from `api/auth` to `/api/auth` (with leading slash) for proper OAuth routing
+  - Added admin preview banner script (preview-banner.js) to public/admin/index.html for environment indication
+  - Enhanced Sentry integration with conditional httpClientIntegration to prevent "not a function" errors
+  - Updated CSP headers to allow https://browser.sentry-cdn.com for Sentry sourcemap access
+  - All E2E tests passing: typecheck ✓, unit tests ✓, build ✓, smoke ✓, Sentry ✓, CMS headers ✓
 
 - ✅ **CI/CD Pipeline Enhancements** (Phase 1 - Complete):
   - Implemented preflight job to verify repository secrets/variables before workflow execution
