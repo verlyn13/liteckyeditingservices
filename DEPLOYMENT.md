@@ -133,6 +133,7 @@ Uses on-site Pages Functions at `/api/auth` and `/api/callback`. Admin is a stat
 External worker `litecky-decap-oauth` is no longer used. Legacy instructions are archived. CSP may still include its URL for troubleshooting, but production uses on-site `/api/auth` + `/api/callback`.
 
 Admin CSP allows Sentry CDN and ingest endpoints:
+
 - `script-src`: include `https://browser.sentry-cdn.com`
 - `connect-src`: include `https://*.sentry.io`
 

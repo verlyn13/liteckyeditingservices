@@ -15,13 +15,13 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, automation do
 
 **Purpose**: Technical specifications and requirements
 
-| Document                   | Lines | Status     | Purpose                                                   | Key Requirements                         |
-| -------------------------- | ----- | ---------- | --------------------------------------------------------- | ---------------------------------------- |
-| `project-document.md`      | 1355  | ✅ READ    | Core Astro 5 specs                                        | 8 components, 7 pages, styles, scripts   |
-| `production-files.md`      | 870   | ✅ READ    | Production implementations                                | OAuth Worker, email templates, functions |
-| `cloudflare-deployment.md` | 1310  | ✅ READ    | Cloudflare infrastructure                                 | Monorepo, Workers, D1, R2, Queues        |
-| `deployment-config.md`     | 500   | ✅ READ    | Deployment configuration                                  | DNS, OAuth, SendGrid, env vars           |
-| `decap-cms-setup.md`       | 750   | ⚠️ PARTIAL | CMS configuration                                         | Content collections, admin UI            |
+| Document                   | Lines | Status     | Purpose                                                                                                  | Key Requirements                         |
+| -------------------------- | ----- | ---------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `project-document.md`      | 1355  | ✅ READ    | Core Astro 5 specs                                                                                       | 8 components, 7 pages, styles, scripts   |
+| `production-files.md`      | 870   | ✅ READ    | Production implementations                                                                               | OAuth Worker, email templates, functions |
+| `cloudflare-deployment.md` | 1310  | ✅ READ    | Cloudflare infrastructure                                                                                | Monorepo, Workers, D1, R2, Queues        |
+| `deployment-config.md`     | 500   | ✅ READ    | Deployment configuration                                                                                 | DNS, OAuth, SendGrid, env vars           |
+| `decap-cms-setup.md`       | 750   | ⚠️ PARTIAL | CMS configuration                                                                                        | Content collections, admin UI            |
 | `DECAP-SPEC-COMPLIANCE.md` | —     | ✅ Updated | Current self-hosted setup (single bundle; admin config deprecated to 410; diagnostic at /api/config.yml) |
 
 ### 2. QUALITY & OPERATIONS (How to Build)

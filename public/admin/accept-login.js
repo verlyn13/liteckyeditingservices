@@ -196,24 +196,39 @@
   }
 
   // ---------- optional rescue: message listeners ----------
-  // CRITICAL: only process each message once to prevent infinite loops
-  let messageProcessed = false;
+  // CRITICAL: only process each unique message once to prevent infinite loops
+  const processedMessages = new Set();
   window.addEventListener(
     'message',
     (ev) => {
-      if (messageProcessed) return; // guard against duplicate processing
       if (ev.origin !== location.origin) return;
+
+      // Check if this is an OAuth message
+      let messageKey = null;
       if (typeof ev.data === 'string' && ev.data.startsWith('authorization:github:success:')) {
-        messageProcessed = true; // set flag before processing
-        log('OAuth callback message received', { messageType: 'string' });
-        handleCanonicalAuthString(ev.data);
+        messageKey = ev.data;
       } else if (
         ev.data &&
         typeof ev.data === 'object' &&
         ev.data.type === 'authorization:github:success'
       ) {
-        messageProcessed = true; // set flag before processing
-        log('OAuth callback message received', { messageType: 'object' });
+        messageKey = JSON.stringify(ev.data);
+      }
+
+      if (!messageKey) return;
+
+      // Check if we've already processed this exact message
+      if (processedMessages.has(messageKey)) {
+        log('Ignoring duplicate OAuth message');
+        return;
+      }
+
+      processedMessages.add(messageKey);
+      log('OAuth callback message received', { messageType: typeof ev.data });
+
+      if (typeof ev.data === 'string') {
+        handleCanonicalAuthString(ev.data);
+      } else {
         const s = `authorization:github:success:${JSON.stringify(ev.data.data || {})}`;
         setTimeout(() => handleCanonicalAuthString(s), 0);
       }
