@@ -13,7 +13,7 @@ This document records how our Decap CMS integration complies with current specs,
 ## Configuration
 
 - Admin uses inline config within `src/admin/cms.ts` (`CMS.init({ config })`).
-- Admin endpoint `/admin/config.yml` is deprecated and returns 410 Gone to prevent double-loading. Admin does not rely on a config link. A diagnostic config remains available at `/api/config.yml`.
+- Admin endpoint `/admin/config.yml` serves dynamic YAML (origin-aware base_url) and is referenced by a `<link rel="cms-config-url" type="text/yaml">` tag in the admin HTML.
 
 ## Initialization Mode (Manual)
 
@@ -39,7 +39,7 @@ This document records how our Decap CMS integration complies with current specs,
   - [Decap Backends Overview](https://decapcms.org/docs/backends-overview/) - GitHub + OAuth proxy requires `base_url` and `auth_endpoint`
   - [Cloud.gov Decap docs](https://docs.cloud.gov/pages/using-pages/getting-started-with-netlify-cms/) - Authoritative example showing both fields
   - [vencax OAuth provider](https://github.com/vencax/netlify-cms-github-oauth-provider) - Requires `base_url` in CMS config
-- Served via Pages Function at `/api/config.yml` for diagnostics; admin uses bundled config in `/admin/cms.js`.
+- Served via Pages Function at `/admin/config.yml` (auto-init) and `/api/config.yml` (diagnostics); admin bundle simply loads the app without programmatic init.
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 
@@ -98,10 +98,10 @@ This document records how our Decap CMS integration complies with current specs,
   - Sends both string and object message formats for compatibility
 - **October 2025 OAuth fix #3**: Added debug postMessage listener to diagnose message delivery
   - Confirmed messages arriving but Decap not processing them
-- **October 2025 OAuth fix #4 (CRITICAL)**: Moved to bundled config to avoid duplicate loading
-  - `CMS.init({ config, load_config_file: false })` used in `src/admin/cms.ts`
-  - `/admin/config.yml` returns 410 Gone (intentional)
-  - `/api/config.yml` kept for diagnostics/tools
+- **October 2025 OAuth fix #4 (CRITICAL)**: Adopted auto-initialization with dynamic config
+  - Admin HTML includes `<link rel="cms-config-url" href="/admin/config.yml" type="text/yaml">`
+  - `functions/admin/config.yml.ts` emits origin-aware YAML (includes base_url and /api/auth)
+  - No `CMS.init()` call in `src/admin/cms.ts` (programmatic mode removed)
 
 **Why:**
 

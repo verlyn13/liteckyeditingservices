@@ -191,7 +191,7 @@ cross-origin-opener-policy: unsafe-none
 - Self-hosted Decap bundle; Sentry CDN allowed for admin instrumentation.
 - `'unsafe-eval'` required by Decap.
 - COOP left as `unsafe-none` to preserve popup `window.opener`.
-- `/admin/config.yml` returns 410 Gone (config bundled); diagnostic config available at `/api/config.yml`.
+ - `/admin/config.yml` served dynamically; admin HTML includes `<link rel="cms-config-url" href="/admin/config.yml" type="text/yaml">` for auto-init. Diagnostic `/api/config.yml` also available.
 
 ### Turnstile Configuration
 
