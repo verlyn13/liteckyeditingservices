@@ -109,10 +109,14 @@ See `src/lib/sentry.ts` for the complete configuration. Key settings:
 Sentry initializes early in the page lifecycle:
 
 ```astro
-<script type="module" src={sentryInitUrl}></script>
+<script>
+  import '../scripts/sentry-init.ts';
+</script>
 ```
 
 This loads `src/scripts/sentry-init.ts`, which calls `initSentry()`.
+
+**Note:** The script uses a static import in an inline `<script>` tag. Astro's build process automatically transpiles the TypeScript to JavaScript. Do NOT use the `?url` import suffix for TypeScript files, as this causes MIME type errors in production.
 
 ### Admin/CMS (`public/admin/index.html`)
 
@@ -455,6 +459,28 @@ copy(window.__adminLog)      // Copy logs to clipboard
 2. Sample rate not zero: `replaysSessionSampleRate > 0`
 3. Browser compatibility: Replay requires modern browsers
 4. Storage quota: Check Sentry project settings
+
+### MIME Type Error for TypeScript Files
+
+**Symptom:** Error in browser console: "Expected a JavaScript-or-Wasm module script but the server responded with a MIME type of 'video/mp2t'"
+
+**Cause:** Using `?url` import suffix with TypeScript files causes Astro/Vite to serve them with incorrect MIME type in production.
+
+**Solution:**
+```astro
+<!-- ❌ WRONG: Using ?url with TypeScript -->
+---
+import sentryInitUrl from '../scripts/sentry-init.ts?url';
+---
+<script type="module" src={sentryInitUrl}></script>
+
+<!-- ✅ CORRECT: Static import in inline script -->
+<script>
+  import '../scripts/sentry-init.ts';
+</script>
+```
+
+Astro's build process will automatically transpile the TypeScript import to JavaScript.
 
 ---
 

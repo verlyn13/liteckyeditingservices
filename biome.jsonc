@@ -1,55 +1,55 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
-  "root": true,
-  "files": {
-    "includes": [
-      "src/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
-      "workers/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
-      "functions/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
-      "tests/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
-      "scripts/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
-      "config/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
-      "*.{js,ts,mjs,cjs,json,jsonc}",
-      "!node_modules",
-      "!dist",
-      "!build",
-      "!.wrangler",
-      "!.astro",
-      "!.svelte-kit",
-      "!.next",
-      "!.vercel",
-      "!coverage",
-      "!playwright-report",
-      "!test-results",
-      "!public",
-      "!_archive",
-      "!.git",
-      "!.mise",
-      "!tmp",
-      "!**/*.astro",
-      "!**/*.svelte",
-      "!**/*.vue",
-      "!src/admin/cms-config.ts",
-    ],
-    "maxSize": 1048576,
-    "ignoreUnknown": true,
-  },
-  "vcs": {
-    "enabled": true,
-    "clientKind": "git",
-    "useIgnoreFile": true,
-    "defaultBranch": "main",
-  },
-  "formatter": { "enabled": true },
-  "linter": {
-    "enabled": true,
-    "rules": {
-      "recommended": true,
-      "suspicious": {
-        "noExplicitAny": "warn",
-        "noAssignInExpressions": "warn",
-        "useIterableCallbackReturn": "warn",
-      },
-    },
-  },
+	"$schema": "https://biomejs.dev/schemas/2.2.5/schema.json",
+	"root": true,
+	"files": {
+		"includes": [
+			"src/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
+			"workers/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
+			"functions/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
+			"tests/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
+			"scripts/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
+			"config/**/*.{ts,tsx,js,mjs,cjs,json,jsonc}",
+			"*.{js,ts,mjs,cjs,json,jsonc}",
+			"!node_modules",
+			"!dist",
+			"!build",
+			"!.wrangler",
+			"!.astro",
+			"!.svelte-kit",
+			"!.next",
+			"!.vercel",
+			"!coverage",
+			"!playwright-report",
+			"!test-results",
+			"!public",
+			"!_archive",
+			"!.git",
+			"!.mise",
+			"!tmp",
+			"!**/*.astro",
+			"!**/*.svelte",
+			"!**/*.vue",
+			"!src/admin/cms-config.ts"
+		],
+		"maxSize": 1048576,
+		"ignoreUnknown": true
+	},
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true,
+		"defaultBranch": "main"
+	},
+	"formatter": { "enabled": true },
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"suspicious": {
+				"noExplicitAny": "warn",
+				"noAssignInExpressions": "warn",
+				"useIterableCallbackReturn": "warn"
+			}
+		}
+	}
 }
