@@ -8,6 +8,9 @@ Sentry.init({
   // Performance Monitoring
   tracesSampleRate: process.env.ENVIRONMENT === 'production' ? 0.1 : 1.0,
 
+  // Enable structured logs (Sentry recommended)
+  enableLogs: true,
+
   // Filter out noise
   beforeSend(event, _hint) {
     // Don't send events if no DSN is configured
@@ -19,6 +22,6 @@ Sentry.init({
     return event;
   },
 
-  // Send default PII for better debugging (includes IP and headers)
+  // Send default PII for better debugging (includes IP and headers, recommended by Sentry docs)
   sendDefaultPii: true,
 });

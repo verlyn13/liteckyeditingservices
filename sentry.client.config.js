@@ -12,6 +12,9 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 
+  // Enable structured logs (Sentry recommended)
+  enableLogs: true,
+
   integrations: [
     Sentry.browserTracingIntegration(),
     Sentry.replayIntegration({
@@ -40,6 +43,6 @@ Sentry.init({
     return event;
   },
 
-  // Send default PII for better debugging
-  sendDefaultPii: false, // Keep false for privacy
+  // Send default PII for better debugging (recommended by Sentry docs)
+  sendDefaultPii: true,
 });
