@@ -22,7 +22,7 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, automation do
 | `cloudflare-deployment.md` | 1310  | ✅ READ    | Cloudflare infrastructure                                 | Monorepo, Workers, D1, R2, Queues        |
 | `deployment-config.md`     | 500   | ✅ READ    | Deployment configuration                                  | DNS, OAuth, SendGrid, env vars           |
 | `decap-cms-setup.md`       | 750   | ⚠️ PARTIAL | CMS configuration                                         | Content collections, admin UI            |
-| `DECAP-SPEC-COMPLIANCE.md` | —     | ✅ Updated | Current self-hosted setup (single bundle, dynamic config) |
+| `DECAP-SPEC-COMPLIANCE.md` | —     | ✅ Updated | Current self-hosted setup (single bundle; admin config deprecated to 410; diagnostic at /api/config.yml) |
 
 ### 2. QUALITY & OPERATIONS (How to Build)
 

@@ -89,10 +89,12 @@ Go to https://sentry.io/ and check:
     browserTracingIntegration(),      // Performance tracking
     replayIntegration(),               // Session replay
     consoleLoggingIntegration(),      // Console log capture
-    httpClientIntegration(),          // HTTP request tracking
+    // httpClientIntegration(),        // HTTP request tracking
   ],
 }
 ```
+
+Note: In `src/lib/sentry.ts`, `httpClientIntegration` is feature-detected and added only if present in the runtime bundle. Some CDN bundles or older versions might not expose it; the site guards against this to avoid runtime errors.
 
 ### Admin Area (`public/admin/sentry-admin.js`)
 

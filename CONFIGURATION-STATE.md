@@ -179,7 +179,7 @@ Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), m
 #### Admin Headers (`/admin/*`) — set by `functions/admin/[[path]].ts`
 
 ```
-content-security-policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com 'sha256-7QABwjQQSmGVJbGBRzoLFPHLevIvlo/JR3nLf/9wfHA='; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev; frame-src 'self' https://challenges.cloudflare.com; child-src 'self' blob:; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'none'; object-src 'none'; form-action 'self' https://github.com
+content-security-policy: default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com https://browser.sentry-cdn.com; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://browser.sentry-cdn.com https://*.sentry.io; frame-src 'self' https://challenges.cloudflare.com; child-src 'self' blob:; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'none'; object-src 'none'; form-action 'self' https://github.com
 x-frame-options: SAMEORIGIN
 referrer-policy: strict-origin-when-cross-origin
 permissions-policy: camera=(), microphone=(), geolocation=(), usb=(), payment=()
@@ -188,9 +188,10 @@ cross-origin-opener-policy: unsafe-none
 
 **Notes**:
 
-- Self-hosted Decap bundle; no third‑party script CDNs used.
+- Self-hosted Decap bundle; Sentry CDN allowed for admin instrumentation.
 - `'unsafe-eval'` required by Decap.
 - COOP left as `unsafe-none` to preserve popup `window.opener`.
+ - `/admin/config.yml` returns 410 Gone (config bundled); diagnostic config available at `/api/config.yml`.
 
 ### Turnstile Configuration
 

@@ -38,7 +38,8 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
       bundleURL: `${origin}/admin/cms.js`,
     },
     notes: [
-      'base_url in /admin/config.yml must equal origin',
+      '/admin/config.yml is deprecated and returns 410 (bundled in /admin/cms.js)',
+      'Diagnostic config remains available at /api/config.yml',
       'callback must set COOP unsafe-none and allow inline script',
       "auth must echo Decap 'state' and set HttpOnly SameSite=Lax cookie",
     ],

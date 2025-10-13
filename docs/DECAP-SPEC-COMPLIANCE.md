@@ -13,7 +13,7 @@ This document records how our Decap CMS integration complies with current specs,
 ## Configuration
 
 - Admin uses inline config within `src/admin/cms.ts` (`CMS.init({ config })`).
-- Pages Function still serves `/admin/config.yml` and `/api/config.yml` for tooling/diagnostics; admin does not rely on the link element.
+- Admin endpoint `/admin/config.yml` is deprecated and returns 410 Gone to prevent double-loading. Admin does not rely on a config link. A diagnostic config remains available at `/api/config.yml`.
 
 ## Initialization Mode (Manual)
 
@@ -39,7 +39,7 @@ This document records how our Decap CMS integration complies with current specs,
   - [Decap Backends Overview](https://decapcms.org/docs/backends-overview/) - GitHub + OAuth proxy requires `base_url` and `auth_endpoint`
   - [Cloud.gov Decap docs](https://docs.cloud.gov/pages/using-pages/getting-started-with-netlify-cms/) - Authoritative example showing both fields
   - [vencax OAuth provider](https://github.com/vencax/netlify-cms-github-oauth-provider) - Requires `base_url` in CMS config
-- Served via Pages Function at `/admin/config.yml` (no static file).
+- Served via Pages Function at `/api/config.yml` for diagnostics; admin uses bundled config in `/admin/cms.js`.
 
 ## OAuth Provider (Spec: External OAuth Clients - Same-Origin Implementation)
 
@@ -98,11 +98,10 @@ This document records how our Decap CMS integration complies with current specs,
   - Sends both string and object message formats for compatibility
 - **October 2025 OAuth fix #3**: Added debug postMessage listener to diagnose message delivery
   - Confirmed messages arriving but Decap not processing them
-- **October 2025 OAuth fix #4 (CRITICAL)**: Created dynamic config.yml Pages Function
-  - `base_url` is **required** for external OAuth to work
-  - Without it, Decap doesn't enter "external-auth" mode and ignores postMessage
-  - Dynamic config ensures correct origin in both dev and prod
-  - Archived static `public/admin/config.yml` to `config.yml.static-archive`
+- **October 2025 OAuth fix #4 (CRITICAL)**: Moved to bundled config to avoid duplicate loading
+  - `CMS.init({ config, load_config_file: false })` used in `src/admin/cms.ts`
+  - `/admin/config.yml` returns 410 Gone (intentional)
+  - `/api/config.yml` kept for diagnostics/tools
 
 **Why:**
 

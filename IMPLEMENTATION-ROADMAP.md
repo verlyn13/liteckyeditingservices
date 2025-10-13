@@ -439,7 +439,7 @@ CF_GIT_CONNECTED=true       # disables Wrangler auto-promote job
 9. **Decap CMS Setup** ✅
 
 - ✅ public/admin/index.html - CMS admin interface (single bundle)
-- ✅ functions/admin/config.yml.ts → `/admin/config.yml` (dynamic `base_url` + `auth_endpoint`)
+- ✅ functions/admin/config.yml.ts → `/admin/config.yml` deprecated (returns 410 Gone; config bundled in `cms.js`)
 - ✅ GitHub OAuth App(s) created (dev + prod)
 - ✅ On‑site OAuth via Pages Functions (`/api/auth`, `/api/callback`)
 

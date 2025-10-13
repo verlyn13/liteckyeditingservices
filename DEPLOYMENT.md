@@ -120,7 +120,7 @@ Uses on-site Pages Functions at `/api/auth` and `/api/callback`. Admin is a stat
 - `GITHUB_CLIENT_ID` (secret)
 - `GITHUB_CLIENT_SECRET` (secret)
 
-**CMS Config**: Served dynamically by `functions/admin/config.yml.ts` at path `/admin/config.yml` with:
+**CMS Config**: Admin config is bundled in `public/admin/cms.js` (built from `src/admin/cms.ts`). The legacy endpoint `/admin/config.yml` is deprecated and returns 410 Gone to prevent double-loading. A diagnostic config remains available at `/api/config.yml` with:
 
 - `backend.base_url: <request origin>` (e.g., `https://www.liteckyeditingservices.com`)
 - `backend.auth_endpoint: /api/auth`
@@ -131,6 +131,10 @@ Uses on-site Pages Functions at `/api/auth` and `/api/callback`. Admin is a stat
 ### Legacy OAuth Worker (Decommissioned Oct 2025)
 
 External worker `litecky-decap-oauth` is no longer used. Legacy instructions are archived. CSP may still include its URL for troubleshooting, but production uses on-site `/api/auth` + `/api/callback`.
+
+Admin CSP allows Sentry CDN and ingest endpoints:
+- `script-src`: include `https://browser.sentry-cdn.com`
+- `connect-src`: include `https://*.sentry.io`
 
 Queue Consumer Worker ✅ **DEPLOYED**
 
