@@ -44,26 +44,73 @@ test('CMS admin forbids third-party script hosts (self-hosted)', async ({ page }
 
 test('CMS script loads without CSP violations', async ({ page }) => {
   const cspViolations: string[] = [];
+  const consoleMessages: Array<{ type: string; text: string }> = [];
+  const pageErrors: string[] = [];
+  const failedRequests: Array<{ url: string; status: number }> = [];
 
-  // Listen for CSP violations
+  // Capture ALL console output
   page.on('console', (msg) => {
-    if (msg.type() === 'error' && msg.text().includes('Content Security Policy')) {
-      cspViolations.push(msg.text());
+    const text = msg.text();
+    consoleMessages.push({ type: msg.type(), text });
+    if (msg.type() === 'error' && text.includes('Content Security Policy')) {
+      cspViolations.push(text);
+    }
+  });
+
+  // Capture JavaScript errors
+  page.on('pageerror', (error) => {
+    pageErrors.push(error.message);
+  });
+
+  // Capture failed network requests
+  page.on('response', (response) => {
+    if (response.status() >= 400) {
+      failedRequests.push({ url: response.url(), status: response.status() });
     }
   });
 
   await page.goto('/admin/');
 
   // Wait for CMS to initialize (self-hosted bundle loads and sets window.CMS or window.__cmsApp)
-  await page.waitForFunction(
-    () => {
+  try {
+    await page.waitForFunction(
+      () => {
+        const win = window as unknown as { CMS?: unknown; __cmsApp?: unknown };
+        return !!(win.CMS || win.__cmsApp);
+      },
+      {
+        timeout: 10000,
+      }
+    );
+  } catch (error) {
+    // Log diagnostics on failure
+    console.error('=== CMS INITIALIZATION FAILED ===');
+    console.error('Console messages:', JSON.stringify(consoleMessages, null, 2));
+    console.error('Page errors:', JSON.stringify(pageErrors, null, 2));
+    console.error('Failed requests:', JSON.stringify(failedRequests, null, 2));
+
+    // Check if bundle was loaded
+    const bundleLoaded = await page.evaluate(() => {
+      const scripts = Array.from(document.querySelectorAll('script[src*="cms"]'));
+      return scripts.map(s => ({ src: (s as HTMLScriptElement).src, loaded: true }));
+    });
+    console.error('CMS bundle scripts:', JSON.stringify(bundleLoaded, null, 2));
+
+    // Check window object state
+    const windowState = await page.evaluate(() => {
       const win = window as unknown as { CMS?: unknown; __cmsApp?: unknown };
-      return !!(win.CMS || win.__cmsApp);
-    },
-    {
-      timeout: 10000,
-    }
-  );
+      return {
+        hasCMS: !!win.CMS,
+        hasApp: !!win.__cmsApp,
+        cmsType: typeof win.CMS,
+        appType: typeof win.__cmsApp,
+        windowKeys: Object.keys(window).filter(k => k.toLowerCase().includes('cms')),
+      };
+    });
+    console.error('Window state:', JSON.stringify(windowState, null, 2));
+
+    throw error;
+  }
 
   // Verify no CSP violations occurred
   expect(cspViolations).toHaveLength(0);
@@ -117,10 +164,27 @@ test('Admin CMS initializes without CSP violations', async ({ page }) => {
 
   // Listen for CSP violations
   const cspViolations: string[] = [];
+  const consoleMessages: Array<{ type: string; text: string }> = [];
+  const pageErrors: string[] = [];
+  const failedRequests: Array<{ url: string; status: number }> = [];
+
   page.on('console', (msg) => {
     const text = msg.text();
+    consoleMessages.push({ type: msg.type(), text });
     if (/violat(es|ion).*content security policy/i.test(text)) {
       cspViolations.push(text);
+    }
+  });
+
+  // Capture JavaScript errors
+  page.on('pageerror', (error) => {
+    pageErrors.push(error.message);
+  });
+
+  // Capture failed network requests
+  page.on('response', (response) => {
+    if (response.status() >= 400) {
+      failedRequests.push({ url: response.url(), status: response.status() });
     }
   });
 
@@ -139,7 +203,42 @@ test('Admin CMS initializes without CSP violations', async ({ page }) => {
       }
     )
     .then(() => true)
-    .catch(() => false);
+    .catch(async () => {
+      // Log diagnostics on failure
+      console.error('=== CMS INITIALIZATION TIMEOUT (15s) ===');
+      console.error('Console messages:', JSON.stringify(consoleMessages, null, 2));
+      console.error('Page errors:', JSON.stringify(pageErrors, null, 2));
+      console.error('Failed requests:', JSON.stringify(failedRequests, null, 2));
+
+      // Check if bundle was loaded
+      const bundleLoaded = await page.evaluate(() => {
+        const scripts = Array.from(document.querySelectorAll('script'));
+        return scripts
+          .filter(s => (s as HTMLScriptElement).src.includes('cms') || (s as HTMLScriptElement).src.includes('admin'))
+          .map(s => ({
+            src: (s as HTMLScriptElement).src,
+            defer: (s as HTMLScriptElement).defer,
+            async: (s as HTMLScriptElement).async,
+          }));
+      });
+      console.error('Admin scripts:', JSON.stringify(bundleLoaded, null, 2));
+
+      // Check window object state
+      const windowState = await page.evaluate(() => {
+        const win = window as unknown as { CMS?: unknown; __cmsApp?: unknown };
+        return {
+          hasCMS: !!win.CMS,
+          hasApp: !!win.__cmsApp,
+          cmsType: typeof win.CMS,
+          appType: typeof win.__cmsApp,
+          windowKeys: Object.keys(window).filter(k => k.toLowerCase().includes('cms')),
+          allWindowKeys: Object.keys(window).slice(0, 50), // First 50 keys
+        };
+      });
+      console.error('Window state:', JSON.stringify(windowState, null, 2));
+
+      return false;
+    });
 
   // Verify CMS initialized
   expect(cmsInitialized).toBe(true);
