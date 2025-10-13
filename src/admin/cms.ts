@@ -20,10 +20,17 @@ const config = (() => {
 })();
 
 const cms = CMS as unknown as DecapCMS;
-// Prevent Decap from auto-loading /admin/config.yml when we provide config programmatically,
-// otherwise collections may be registered twice.
-// Cast to any to allow non-typed load_config_file flag supported by Decap runtime.
-(cms as any).init?.({ config, load_config_file: false });
+// Prevent auto-init by disabling config file loading
+// Must be set BEFORE calling init()
+(window as any).CMS_MANUAL_INIT = true;
+
+// Initialize with our programmatic config
+try {
+  (cms as any).init?.({ config, load_config_file: false });
+  console.log('[CMS Init] Programmatic config loaded, auto-init disabled');
+} catch (e) {
+  console.error('[CMS Init] Failed:', e);
+}
 
 // Canonical popup message → persist + dispatch + navigate
 window.addEventListener(
