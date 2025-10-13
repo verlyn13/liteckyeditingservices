@@ -4,8 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- feat(sentry): migrate to official @sentry/astro integration with proper client/server config files
+- fix(sentry): add DSN check to prevent "DSN not configured" warnings when environment variables are missing
 - fix(sentry): resolve MIME type error for TypeScript module loading by using static import instead of ?url suffix in BaseLayout.astro
-- fix(types): replace `any` types with proper Sentry Event types in functions/_middleware.ts
+- fix(types): replace `any` types with proper Sentry Event types in functions/\_middleware.ts
 - refactor(lint): apply template literal suggestions in path shims (biome auto-fix)
 - docs(sentry): add troubleshooting section for MIME type errors and update integration point documentation
 - feat(cms): comprehensive CMS configuration with 9 editable sections (3 file collections, 2 settings, 4 folder collections)

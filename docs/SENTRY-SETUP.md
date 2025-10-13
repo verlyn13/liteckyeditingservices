@@ -104,19 +104,35 @@ See `src/lib/sentry.ts` for the complete configuration. Key settings:
 
 ## 4. Integration Points
 
-### Main Site (`src/layouts/BaseLayout.astro`)
+### Main Site (Astro Integration)
 
-Sentry initializes early in the page lifecycle:
+Sentry is configured via the official `@sentry/astro` integration in `astro.config.mjs`:
 
-```astro
-<script>
-  import '../scripts/sentry-init.ts';
-</script>
+```javascript
+sentry({
+  dsn: process.env.PUBLIC_SENTRY_DSN,
+  enabled: !!process.env.PUBLIC_SENTRY_DSN,
+  sourceMapsUploadOptions: {
+    org: process.env.SENTRY_ORG || 'happy-patterns-llc',
+    project: process.env.SENTRY_PROJECT || 'javascript-astro',
+    authToken: process.env.SENTRY_AUTH_TOKEN,
+    enabled: !!process.env.SENTRY_AUTH_TOKEN,
+  },
+})
 ```
 
-This loads `src/scripts/sentry-init.ts`, which calls `initSentry()`.
+**Client-side configuration** is in `sentry.client.config.js`:
+- Automatic error tracking
+- Performance monitoring (traces)
+- Session replay
+- Browser extension error filtering
 
-**Note:** The script uses a static import in an inline `<script>` tag. Astro's build process automatically transpiles the TypeScript to JavaScript. Do NOT use the `?url` import suffix for TypeScript files, as this causes MIME type errors in production.
+**Server-side configuration** is in `sentry.server.config.js`:
+- Server-side error tracking (build time)
+- Performance monitoring
+- PII handling
+
+**Note:** The integration automatically injects Sentry into both client and server builds. No manual script tags needed in layouts.
 
 ### Admin/CMS (`public/admin/index.html`)
 
