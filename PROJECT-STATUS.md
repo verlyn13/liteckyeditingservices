@@ -2,7 +2,7 @@
 
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 12, 2025 (CMS configuration and Sentry fixes deployed)
+**Last Updated**: October 12, 2025 (CSP + Sentry ingest allowlist deployed; docs aligned)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment)
