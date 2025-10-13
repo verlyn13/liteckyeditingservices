@@ -5,7 +5,6 @@ import '@fontsource/lora/700.css';
 import '@fontsource-variable/inter';
 import '../styles/global.css';
 import menuToggleUrl from '../scripts/menu-toggle.js?url';
-import sentryInitUrl from '../scripts/sentry-init.ts?url';
 import Footer from '../components/Footer.astro';
 
 export interface Props {
@@ -73,12 +72,14 @@ const canonical = `${site}${Astro.url.pathname}`;
     })}</script>
 
     <!-- Sentry error tracking - load early to capture all errors -->
-    <script type="module" src={sentryInitUrl}></script>
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
     <slot />
     <Footer />
     <script type="module" src={menuToggleUrl} defer></script>
+    <script>
+      import '../scripts/sentry-init.ts';
+    </script>
   </body>
   </html>
