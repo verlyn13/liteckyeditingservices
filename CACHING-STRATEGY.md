@@ -13,6 +13,7 @@ We are currently in **Phase 1 (Early Production)**, prioritizing content freshne
 **Goal**: Ensure all CMS changes are immediately visible on the live site.
 
 **Implementation**:
+
 1. **Default Cache Headers** (`public/_headers`):
    - HTML pages: `Cache-Control: public, max-age=0, must-revalidate`
    - Admin panel: `Cache-Control: no-store` (never cached)
@@ -20,7 +21,7 @@ We are currently in **Phase 1 (Early Production)**, prioritizing content freshne
    - Media files: `Cache-Control: public, max-age=3600` (1 hour)
 
 2. **Automated Deployment Pipeline** (`.github/workflows/cms-content-sync.yml`):
-   - Triggers automatically when content files change
+   - Triggers automatically when content files change (`content/**/*.json`, `content/**/*.md`, `content/**/*.{yaml,yml}`)
    - Builds and deploys to Cloudflare Pages
    - Performs targeted cache purging for updated pages
 
@@ -49,6 +50,7 @@ When the site content stabilizes and performance becomes the priority, we'll tra
 **Goal**: Maximize cache hit ratio and performance while maintaining content freshness.
 
 **Implementation**:
+
 1. **Cloudflare Cache Rules**:
    - Immutable assets: Edge TTL 1 year, Browser TTL 1 year
    - Media content: Edge TTL 1 month, Browser TTL 1 week
@@ -67,11 +69,13 @@ When the site content stabilizes and performance becomes the priority, we'll tra
 ## Required Environment Variables
 
 ### GitHub Secrets
+
 - `CLOUDFLARE_API_TOKEN`: API token with Zone:Cache Purge:Purge permission
 - `CLOUDFLARE_ACCOUNT_ID`: Your Cloudflare account ID
 - `CLOUDFLARE_ZONE_ID`: Zone ID for liteckyeditingservices.com
 
 ### Cloudflare Worker Secrets (Phase 2)
+
 - `CLOUDFLARE_API_TOKEN`: Same as above
 - `CLOUDFLARE_ZONE_ID`: Same as above
 - `PURGE_SECRET`: Shared secret with GitHub Actions
@@ -79,6 +83,7 @@ When the site content stabilizes and performance becomes the priority, we'll tra
 ## Monitoring and Validation
 
 ### Key Metrics to Track
+
 1. **Cache Hit Ratio**: Monitor in Cloudflare Analytics
 2. **Response Times**: Track Core Web Vitals
 3. **Deployment Success Rate**: Check GitHub Actions logs
@@ -107,7 +112,7 @@ curl -I https://liteckyeditingservices.com/services/
 ### Cache not working as expected
 
 1. **Check headers**: Use browser DevTools Network tab
-2. **Verify _headers file**: Ensure it's properly formatted
+2. **Verify \_headers file**: Ensure it's properly formatted
 3. **Test with curl**: `curl -I <url>` to see raw headers
 
 ## Emergency Procedures

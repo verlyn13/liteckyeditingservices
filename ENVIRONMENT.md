@@ -6,10 +6,11 @@
 
 | Variable                            | Production                         | Preview                | Development                         | Type     | Required |
 | ----------------------------------- | ---------------------------------- | ---------------------- | ----------------------------------- | -------- | -------- |
-| **Cloudflare**                      |
-| `CF_API_TOKEN`                      | Via gopass                         | Via gopass             | Via gopass                          | Secret   | Yes      |
-| `CF_ZONE_ID`                        | a5e7c69768502d649a8f2c615f555eca   | Same                   | Same                                | Variable | Yes      |
-| `CF_ACCOUNT_ID`                     | 13eb584192d9cefb730fde0cfd271328   | Same                   | Same                                | Variable | Yes      |
+| **Cloudflare (CI/Pages)**           |
+| `CLOUDFLARE_API_TOKEN`              | Via gopass (GitHub Secret)         | Via gopass             | Via gopass                          | Secret   | Yes      |
+| `CLOUDFLARE_ZONE_ID`                | a5e7c69768502d649a8f2c615f555eca   | Same                   | Same                                | Secret   | Yes      |
+| `CLOUDFLARE_ACCOUNT_ID`             | 13eb584192d9cefb730fde0cfd271328   | Same                   | Same                                | Variable | Yes      |
+| _(Local aliases used by scripts: `CF_ZONE_ID`, `CF_ACCOUNT_ID`)_ |
 | **Workers**                         |
 | `DISPATCH_NAMESPACE`                | production                         | staging                | staging                             | Variable | No       |
 | `WORKERS_SUBDOMAIN`                 | Set after first deploy             | Same                   | localhost                           | Variable | No       |

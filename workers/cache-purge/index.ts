@@ -33,26 +33,28 @@ export default {
     // Parse request body
     let body: PurgeRequest;
     try {
-      body = await request.json() as PurgeRequest;
+      body = (await request.json()) as PurgeRequest;
     } catch (error) {
       return Response.json(
-        { success: false, message: 'Invalid JSON body' } satisfies PurgeResponse,
+        {
+          success: false,
+          message: 'Invalid JSON body',
+        } satisfies PurgeResponse,
         { status: 400 }
       );
     }
 
     // Validate secret
     if (body.secret !== env.PURGE_SECRET) {
-      return Response.json(
-        { success: false, message: 'Unauthorized' } satisfies PurgeResponse,
-        { status: 401 }
-      );
+      return Response.json({ success: false, message: 'Unauthorized' } satisfies PurgeResponse, {
+        status: 401,
+      });
     }
 
     // Build the Cloudflare API request
     const apiUrl = `https://api.cloudflare.com/client/v4/zones/${env.CLOUDFLARE_ZONE_ID}/purge_cache`;
     const apiHeaders = {
-      'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
+      Authorization: `Bearer ${env.CLOUDFLARE_API_TOKEN}`,
       'Content-Type': 'application/json',
     };
 
@@ -62,42 +64,53 @@ export default {
         apiBody = { purge_everything: true };
         break;
 
-      case 'urls':
+      case 'urls': {
         if (!body.items?.length) {
           return Response.json(
-            { success: false, message: 'No URLs provided' } satisfies PurgeResponse,
+            {
+              success: false,
+              message: 'No URLs provided',
+            } satisfies PurgeResponse,
             { status: 400 }
           );
         }
         // Transform relative paths to absolute URLs
-        const urls = body.items.map(item => {
+        const urls = body.items.map((item) => {
           if (item.startsWith('http')) return item;
           const path = item.startsWith('/') ? item : `/${item}`;
           return `https://liteckyeditingservices.com${path}`;
         });
         apiBody = { files: urls };
         break;
+      }
 
-      case 'prefixes':
+      case 'prefixes': {
         if (!body.items?.length) {
           return Response.json(
-            { success: false, message: 'No prefixes provided' } satisfies PurgeResponse,
+            {
+              success: false,
+              message: 'No prefixes provided',
+            } satisfies PurgeResponse,
             { status: 400 }
           );
         }
         // Ensure prefixes are properly formatted
-        const prefixes = body.items.map(item => {
+        const prefixes = body.items.map((item) => {
           if (item.startsWith('http')) return item;
           const path = item.startsWith('/') ? item : `/${item}`;
           return `liteckyeditingservices.com${path}`;
         });
         apiBody = { prefixes };
         break;
+      }
 
       case 'tags':
         if (!body.items?.length) {
           return Response.json(
-            { success: false, message: 'No tags provided' } satisfies PurgeResponse,
+            {
+              success: false,
+              message: 'No tags provided',
+            } satisfies PurgeResponse,
             { status: 400 }
           );
         }
@@ -106,7 +119,10 @@ export default {
 
       default:
         return Response.json(
-          { success: false, message: 'Invalid purge type' } satisfies PurgeResponse,
+          {
+            success: false,
+            message: 'Invalid purge type',
+          } satisfies PurgeResponse,
           { status: 400 }
         );
     }
@@ -119,7 +135,7 @@ export default {
         body: JSON.stringify(apiBody),
       });
 
-      const result = await response.json() as any;
+      const result = (await response.json()) as any;
 
       if (result.success) {
         // Log successful purge for monitoring

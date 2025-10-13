@@ -64,14 +64,16 @@ All secrets are stored in **gopass** as the authoritative source and should neve
 
 ### Cloudflare (Deployment/CI)
 
-| Variable               | CI (GitHub Actions)  | Gopass Path                                           |
-| ---------------------- | -------------------- | ----------------------------------------------------- |
-| `CLOUDFLARE_API_TOKEN` | ✅ Repository Secret | `cloudflare/api-tokens/initial-project-setup-master`  |
-| `CF_ACCOUNT_ID`        | Public (in code)     | `cloudflare/account/id`                               |
-| `CF_ZONE_ID`           | Public (in code)     | `cloudflare/zones/liteckyeditingservices-com/zone-id` |
+| Variable                 | CI (GitHub Actions)     | Gopass Path                                           |
+| ------------------------ | ----------------------- | ----------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`   | ✅ Repository Secret    | `cloudflare/api-tokens/initial-project-setup-master`  |
+| `CLOUDFLARE_ACCOUNT_ID`  | ✅ Repository Variable  | `cloudflare/account/id`                               |
+| `CLOUDFLARE_ZONE_ID`     | ✅ Repository Secret    | `cloudflare/zones/liteckyeditingservices-com/zone-id` |
 
-**Used by**: GitHub Actions workflows for deployment
-**Purpose**: Automated deployments to Cloudflare Pages
+Aliases used by local helper scripts only: `CF_ACCOUNT_ID`, `CF_ZONE_ID`.
+
+**Used by**: GitHub Actions workflows for deployment and cache purge
+**Purpose**: Automated deployments to Cloudflare Pages and targeted cache invalidation
 
 ## 🗂️ Gopass Structure
 
@@ -148,8 +150,12 @@ gopass show -o github/litecky/oauth/client-secret | pnpm wrangler pages secret p
 ### CI/CD Setup (GitHub Actions)
 
 1. Go to repository → Settings → Secrets and variables → Actions
-2. Add repository secrets:
-   - `CLOUDFLARE_API_TOKEN` (from gopass)
+2. Add repository items:
+   - Secrets:
+     - `CLOUDFLARE_API_TOKEN` (from gopass)
+     - `CLOUDFLARE_ZONE_ID` (from gopass)
+   - Variables:
+     - `CLOUDFLARE_ACCOUNT_ID`
 
 ## 🔄 Syncing Process
 
@@ -205,7 +211,9 @@ graph LR
 - [ ] `.dev.vars` exists and is populated from gopass
 - [ ] `.dev.vars` is listed in `.gitignore`
 - [ ] All required secrets set in Cloudflare Pages (Production)
-- [ ] GitHub Actions has `CLOUDFLARE_API_TOKEN` secret
+- [x] GitHub Actions has `CLOUDFLARE_API_TOKEN` secret
+- [x] GitHub Actions has `CLOUDFLARE_ACCOUNT_ID` variable
+- [x] GitHub Actions has `CLOUDFLARE_ZONE_ID` secret
 - [ ] GitHub OAuth App callback URL updated
 - [ ] Test OAuth flow locally: http://localhost:4321/admin/
 - [ ] Test OAuth flow in production: https://www.liteckyeditingservices.com/admin/

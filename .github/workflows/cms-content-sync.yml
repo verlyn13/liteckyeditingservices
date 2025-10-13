@@ -16,12 +16,43 @@ on:
         default: 'content'
         type: choice
         options:
-          - content      # Only HTML pages
-          - all         # Everything
-          - none        # Deploy only, no purge
+          - content # Only HTML pages
+          - all # Everything
+          - none # Deploy only, no purge
 
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify required secrets
+        run: |
+          MISSING_SECRETS=0
+
+          if [ -z "${{ secrets.CLOUDFLARE_API_TOKEN }}" ]; then
+            echo "❌ Missing CLOUDFLARE_API_TOKEN secret"
+            MISSING_SECRETS=1
+          fi
+
+          if [ -z "${{ secrets.CLOUDFLARE_ACCOUNT_ID }}" ]; then
+            echo "❌ Missing CLOUDFLARE_ACCOUNT_ID secret"
+            MISSING_SECRETS=1
+          fi
+
+          if [ -z "${{ secrets.CLOUDFLARE_ZONE_ID }}" ]; then
+            echo "❌ Missing CLOUDFLARE_ZONE_ID secret"
+            MISSING_SECRETS=1
+          fi
+
+          if [ $MISSING_SECRETS -eq 1 ]; then
+            echo ""
+            echo "⚠️  Please configure the required secrets in GitHub repository settings"
+            exit 1
+          fi
+
+          echo "✅ All required secrets are configured"
+
   detect-changes:
+    needs: preflight
     runs-on: ubuntu-latest
     outputs:
       content_changed: ${{ steps.changes.outputs.content }}
