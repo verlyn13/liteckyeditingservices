@@ -240,12 +240,22 @@
   let exchanging = false;
   window.addEventListener('message', async (event) => {
     try {
-      if (completed) return;
+      if (completed) {
+        console.log('[PKCE] Ignoring duplicate message (already completed)');
+        return;
+      }
       if (event.origin !== location.origin) return;
       const s = String(event.data || '');
       if (!s.startsWith('authorization:github:success:')) return;
+
+      // Mark as completed immediately to prevent re-processing
+      completed = true;
+
       const payload = JSON.parse(s.slice('authorization:github:success:'.length));
-      if (!payload) return;
+      if (!payload) {
+        completed = false; // reset if parse failed
+        return;
+      }
 
       const myState = sessionStorage.getItem('oauth_state') || '';
       if ((payload.code || payload.token) && payload.state && myState && payload.state !== myState)
@@ -262,14 +272,12 @@
       });
 
       if (payload.token) {
-        completed = true;
         const expected =
           localStorage.getItem('netlify-cms-auth:state') ||
           localStorage.getItem('decap-cms-auth:state') ||
           payload.state ||
           null;
-        const message = `authorization:github:success:${JSON.stringify({ token: payload.token, provider: 'github', state: expected })}`;
-        window.postMessage(message, location.origin);
+        // Do NOT re-post message here - let accept-login.js handle it via emitCanonical()
         try {
           window.__pkcePopup?.postMessage('authorization:ack', location.origin);
         } catch {}
@@ -330,8 +338,7 @@
         localStorage.getItem('decap-cms-auth:state') ||
         payload.state ||
         null;
-      const message = `authorization:github:success:${JSON.stringify({ token: accessToken, provider: 'github', state: expected })}`;
-      window.postMessage(message, location.origin);
+      // Do NOT re-post message here - let accept-login.js handle it via emitCanonical()
       try {
         window.__pkcePopup?.postMessage('authorization:ack', location.origin);
       } catch {}
@@ -351,7 +358,7 @@
           cap(e, { phase: 'onPkceSuccess:exchange' });
         }
       }
-      completed = true;
+      // completed is already set to true at the start
       try {
         sessionStorage.removeItem('pkce_code_verifier');
       } catch {}

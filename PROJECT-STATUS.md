@@ -42,7 +42,7 @@
 - ✅ **CMS Configuration & Sentry Fixes** (Latest Deployment - October 12, 2025):
   - **Double-config fix**: Set CMS_MANUAL_INIT flag + load_config_file: false to prevent duplicate collection registration
   - **Config endpoint deprecation**: /admin/config.yml now returns 410 Gone (config bundled in cms.js)
-  - **Sentry CSP**: Added https://*.sentry.io to connect-src to allow error envelope transmission
+  - **Sentry CSP**: Added https://\*.sentry.io to connect-src to allow error envelope transmission
   - **Auth endpoint**: Corrected from `api/auth` to `/api/auth` (with leading slash) for proper OAuth routing
   - **Preview banner**: Added preview-banner.js to indicate non-production environments
   - **Sentry integration**: Enhanced with conditional httpClientIntegration to prevent "not a function" errors

@@ -196,17 +196,24 @@
   }
 
   // ---------- optional rescue: message listeners ----------
+  // CRITICAL: only process each message once to prevent infinite loops
+  let messageProcessed = false;
   window.addEventListener(
     'message',
     (ev) => {
+      if (messageProcessed) return; // guard against duplicate processing
       if (ev.origin !== location.origin) return;
       if (typeof ev.data === 'string' && ev.data.startsWith('authorization:github:success:')) {
+        messageProcessed = true; // set flag before processing
+        log('OAuth callback message received', { messageType: 'string' });
         handleCanonicalAuthString(ev.data);
       } else if (
         ev.data &&
         typeof ev.data === 'object' &&
         ev.data.type === 'authorization:github:success'
       ) {
+        messageProcessed = true; // set flag before processing
+        log('OAuth callback message received', { messageType: 'object' });
         const s = `authorization:github:success:${JSON.stringify(ev.data.data || {})}`;
         setTimeout(() => handleCanonicalAuthString(s), 0);
       }
