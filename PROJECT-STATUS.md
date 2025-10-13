@@ -2,7 +2,7 @@
 
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 12, 2025 (CSP + Sentry ingest allowlist deployed; docs aligned)
+**Last Updated**: October 12, 2025 (Decap auto-init enabled; Sentry self-host fallback)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment)
@@ -40,9 +40,10 @@
 **Recent Progress - October 12, 2025**:
 
 - ✅ **CMS Configuration & Sentry Fixes** (Latest Deployment - October 12, 2025):
-  - **Double-config fix**: Set CMS_MANUAL_INIT flag + load_config_file: false to prevent duplicate collection registration
-  - **Config endpoint deprecation**: /admin/config.yml now returns 410 Gone (config bundled in cms.js)
+  - **Auto-init migration**: Removed programmatic CMS.init; Decap now auto-initializes with `<link rel="cms-config-url" href="/admin/config.yml">`
+  - **Dynamic config**: `/admin/config.yml` emits origin-aware YAML (base_url, /api/auth) for both dev and prod
   - **Sentry CSP**: Added https://\*.sentry.io to connect-src to allow error envelope transmission
+  - **Sentry self-host**: Added self-hosted admin Sentry bundle with CDN fallback to reduce ETP/adblock issues
   - **Auth endpoint**: Corrected from `api/auth` to `/api/auth` (with leading slash) for proper OAuth routing
   - **Preview banner**: Added preview-banner.js to indicate non-production environments
   - **Sentry integration**: Enhanced with conditional httpClientIntegration to prevent "not a function" errors

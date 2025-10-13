@@ -4,7 +4,16 @@
 
 import CMS from 'decap-cms-app';
 
-// Diagnostics: expose global reference for tests/inspections
+// Initialize Decap, letting it load /admin/config.yml via the link tag
 const cms = CMS as unknown as DecapCMS;
+try {
+  // Calling init with no config triggers config discovery from the link tag
+  (cms as any).init?.();
+  console.log('[CMS Init] Auto-init via /admin/config.yml');
+} catch (e) {
+  console.error('[CMS Init] Failed to auto-init', e);
+}
+
+// Diagnostics: expose global reference for tests/inspections
 (window as Window & { CMS?: unknown; __cmsApp?: unknown }).CMS = cms;
 (window as Window & { CMS?: unknown; __cmsApp?: unknown }).__cmsApp = cms;
