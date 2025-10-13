@@ -9,7 +9,7 @@ Sentry.init({
   tracesSampleRate: process.env.ENVIRONMENT === 'production' ? 0.1 : 1.0,
 
   // Filter out noise
-  beforeSend(event, hint) {
+  beforeSend(event, _hint) {
     // Don't send events if no DSN is configured
     const dsn = process.env.PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN;
     if (!dsn) {

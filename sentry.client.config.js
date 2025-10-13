@@ -21,16 +21,19 @@ Sentry.init({
   ],
 
   // Filter out noise
-  beforeSend(event, hint) {
+  beforeSend(event, _hint) {
     // Don't send events if no DSN is configured
     if (!import.meta.env.PUBLIC_SENTRY_DSN) {
       return null;
     }
 
     // Filter browser extension errors
-    if (event.exception?.values?.[0]?.stacktrace?.frames?.some(
-      frame => frame.filename?.includes('extension://') || frame.filename?.includes('moz-extension://')
-    )) {
+    if (
+      event.exception?.values?.[0]?.stacktrace?.frames?.some(
+        (frame) =>
+          frame.filename?.includes('extension://') || frame.filename?.includes('moz-extension://')
+      )
+    ) {
       return null;
     }
 

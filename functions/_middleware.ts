@@ -61,7 +61,7 @@ function scrubSentryEvent(event: ErrorEvent, _hint: EventHint): ErrorEvent | nul
 // Export an array of PagesFunction handlers (plugins + shared headers)
 export const onRequest: PagesFunction<Env>[] = [
   // 1) Sentry first in chain with enhanced configuration
-  (ctx: EventContext<Env, any, Record<string, unknown>>) => {
+  (ctx: EventContext<Env, string, Record<string, unknown>>) => {
     const dsn = ctx.env.SENTRY_DSN ?? ctx.env.PUBLIC_SENTRY_DSN ?? '';
     const environment = ctx.env.ENVIRONMENT ?? ctx.env.NODE_ENV ?? 'production';
     const release = ctx.env.SENTRY_RELEASE ?? ctx.env.CF_PAGES_COMMIT_SHA ?? 'unknown';
@@ -92,11 +92,12 @@ export const onRequest: PagesFunction<Env>[] = [
           },
         }),
       ],
-    })(ctx as unknown as any) as unknown as Response | Promise<Response>;
+      // biome-ignore lint/suspicious/noExplicitAny: sentryPagesPlugin uses incompatible internal types
+    })(ctx as any) as unknown as Response | Promise<Response>;
   },
 
   // 2) Shared security headers for dynamic responses
-  async (ctx: EventContext<Env, any, Record<string, unknown>>) => {
+  async (ctx: EventContext<Env, string, Record<string, unknown>>) => {
     const res = await ctx.next();
     const isProduction = ctx.env.ENVIRONMENT === 'production' || ctx.env.NODE_ENV === 'production';
 

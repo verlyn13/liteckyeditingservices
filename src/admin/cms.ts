@@ -8,7 +8,7 @@ import CMS from 'decap-cms-app';
 const cms = CMS as unknown as DecapCMS;
 try {
   // Calling init with no config triggers config discovery from the link tag
-  (cms as any).init?.();
+  (cms as unknown as { init?: () => void }).init?.();
   console.log('[CMS Init] Auto-init via /admin/config.yml');
 } catch (e) {
   console.error('[CMS Init] Failed to auto-init', e);
