@@ -6,20 +6,21 @@ This document records how our Decap CMS integration complies with current specs,
 
 - File: `public/admin/index.html` (static HTML, no framework)
 - Includes `<div id="nc-root"></div>` container to ensure reliable mount
-- Single `<script>` tag loading `/admin/cms.js`
-- Manual initialization via `decap-cms-app` (`CMS.init({ config })`)
+- Single `<script>` tag loading `/admin/cms.<hash>.js`
+- Auto-discovery initialization: `CMS.init()` called with no config, triggers discovery from `<link rel="cms-config-url">`
 - Rationale: First‑party bundle provides deterministic init, stable hydration, and extensibility. Avoids mixed vendor bundles.
-- Verify (console): `Array.from(document.scripts).map(s=>s.src).some(src=>/\/admin\/cms\.js/.test(src)) === true`
+- Verify (console): `Array.from(document.scripts).map(s=>s.src).some(src=>/\/admin\/cms\.[a-f0-9]+\.js/.test(src)) === true`
 
 ## Configuration
 
-- Admin uses inline config within `src/admin/cms.ts` (`CMS.init({ config })`).
-- Admin endpoint `/admin/config.yml` serves dynamic YAML (origin-aware base_url) and is referenced by a `<link rel="cms-config-url" type="text/yaml">` tag in the admin HTML.
+- Admin uses auto-discovery via `<link rel="cms-config-url" href="/admin/config.yml" type="text/yaml">` tag in the admin HTML.
+- `CMS.init()` is called with no parameters in `src/admin/cms.ts`, triggering config discovery from the link tag.
+- Admin endpoint `/admin/config.yml` serves dynamic YAML (origin-aware base_url) via `functions/admin/config.yml.ts`.
 
-## Initialization Mode (Manual)
+## Initialization Mode (Auto-Discovery)
 
-- Mode: Manual init via `decap-cms-app`.
-- Implementation: Single `<script>` in `public/admin/index.html` loads `/admin/cms.js`; `CMS.init()` runs inside.
+- Mode: Auto-discovery via programmatic init trigger (`CMS.init()` with no config).
+- Implementation: Single `<script>` in `public/admin/index.html` loads `/admin/cms.<hash>.js`; `CMS.init()` runs inside with no parameters, triggering config discovery from `<link rel="cms-config-url">`.
 - Verify (console): `typeof window.CMS !== 'undefined'` after load
 
 ## GitHub Backend Configuration (Spec: GitHub Backend)
@@ -99,10 +100,10 @@ This document records how our Decap CMS integration complies with current specs,
   - Sends both string and object message formats for compatibility
 - **October 2025 OAuth fix #3**: Added debug postMessage listener to diagnose message delivery
   - Confirmed messages arriving but Decap not processing them
-- **October 2025 OAuth fix #4 (CRITICAL)**: Adopted auto-initialization with dynamic config
+- **October 2025 OAuth fix #4 (CRITICAL)**: Adopted auto-discovery with programmatic init trigger
   - Admin HTML includes `<link rel="cms-config-url" href="/admin/config.yml" type="text/yaml">`
   - `functions/admin/config.yml.ts` emits origin-aware YAML (includes base_url and /api/auth)
-  - No `CMS.init()` call in `src/admin/cms.ts` (programmatic mode removed)
+  - `src/admin/cms.ts` calls `CMS.init()` with no parameters to trigger config discovery from link tag
 
 **Why:**
 

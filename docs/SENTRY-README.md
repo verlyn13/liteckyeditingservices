@@ -44,8 +44,9 @@ pnpm dev
 Admin (Decap) integration
 
 - The admin panel uses a classic (non-ESM) initializer at `public/admin/sentry-admin.js` to avoid CSP/module constraints.
+- The SDK is self-hosted as `public/admin/sentry.browser.bundle.js`; the initializer prefers self-hosted and only falls back to the CDN if the self-hosted bundle is missing.
 - Provide DSN via `<meta name="sentry-dsn" content="…">` in `public/admin/index.html` or via `window.SENTRY_DSN` from an external script.
-- If loading the SDK from the CDN in admin, ensure `/admin/*` CSP allows `https://browser.sentry-cdn.com` (script-src). The Pages Function for `/admin/*` includes this host.
+- Ensure `/admin/*` CSP allows `https://browser.sentry-cdn.com` (script-src) and `https://*.sentry.io` (connect-src). The Pages Function for `/admin/*` includes these hosts.
 
 ### 4. Verify in Sentry Dashboard
 

@@ -120,7 +120,7 @@ Uses on-site Pages Functions at `/api/auth` and `/api/callback`. Admin is a stat
 - `GITHUB_CLIENT_ID` (secret)
 - `GITHUB_CLIENT_SECRET` (secret)
 
-**CMS Config**: Auto-initialized via dynamic YAML served by `functions/admin/config.yml.ts` at `/admin/config.yml`. The admin HTML includes `<link rel="cms-config-url" href="/admin/config.yml" type="text/yaml">`. A diagnostic config mirror is available at `/api/config.yml` with:
+**CMS Config**: Auto-discovery via dynamic YAML served by `functions/admin/config.yml.ts` at `/admin/config.yml`. The admin HTML includes `<link rel="cms-config-url" href="/admin/config.yml" type="text/yaml">` and `CMS.init()` is called with no parameters to trigger discovery. A diagnostic config mirror is available at `/api/config.yml` with:
 
 - `backend.base_url: <request origin>` (e.g., `https://www.liteckyeditingservices.com`)
 - `backend.auth_endpoint: /api/auth`

@@ -47,7 +47,7 @@ Contact Submission (Queued)
 CMS Authentication (Current - On-Site OAuth, 2025 Spec-Aligned)
 
 1. `/admin` is served by a static HTML page (`public/admin/index.html`) with a single Decap bundle and **spec-required** config discovery: `<link href="/admin/config.yml" type="text/yaml" rel="cms-config-url">`
-2. Decap **auto-initializes** from the vendored bundle (no manual `CMS.init()` call) — eliminates double-mount errors
+2. Decap **auto-discovers config** from the link tag via `CMS.init()` with no parameters — eliminates double-mount errors
 3. `config.yml` specifies `backend: { name: github, repo: ..., auth_endpoint: /api/auth }` (same-origin OAuth via Pages Functions)
 4. On login, Decap opens popup to `https://www.liteckyeditingservices.com/api/auth` (GitHub OAuth start)
 5. Pages Function `/api/auth` sets state cookie and redirects to GitHub authorize
@@ -62,9 +62,9 @@ CMS Authentication (Current - On-Site OAuth, 2025 Spec-Aligned)
 
 **Spec Compliance & 2025 Best Practices**:
 
-- Single bundle and auto-init (per [Decap install docs](https://decapcms.org/docs/install-decap-cms/)) — prevents React double-mount errors
+- Single bundle and auto-discovery (per [Decap install docs](https://decapcms.org/docs/install-decap-cms/)) — prevents React double-mount errors
 - Config discovery via `<link type="text/yaml" rel="cms-config-url">` (per [Decap docs](https://decapcms.org/docs/configuration-options/))
-- Auto-init mode (default behavior, per [Decap docs](https://decapcms.org/docs/manual-initialization/))
+- Auto-discovery mode (CMS.init() with no config, per [Decap docs](https://decapcms.org/docs/manual-initialization/))
 - On-site OAuth with `auth_endpoint` only (per [GitHub backend docs](https://decapcms.org/docs/github-backend/)); works in dev with `wrangler pages dev` (single origin)
 - Success message format matches [community OAuth provider standard](https://github.com/vencax/netlify-cms-github-oauth-provider)
 

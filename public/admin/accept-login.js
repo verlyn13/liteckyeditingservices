@@ -123,7 +123,9 @@
       setTimeout(() => {
         if (!/[?&]flip=/.test(location.href)) {
           log('router no-op detected, forcing hard reload');
-          try { location.reload(); } catch {}
+          try {
+            location.reload();
+          } catch {}
         }
       }, 250);
     } catch (e) {

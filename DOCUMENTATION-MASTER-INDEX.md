@@ -15,14 +15,14 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, automation do
 
 **Purpose**: Technical specifications and requirements
 
-| Document                   | Lines | Status     | Purpose                                                                                                  | Key Requirements                         |
-| -------------------------- | ----- | ---------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `project-document.md`      | 1355  | ✅ READ    | Core Astro 5 specs                                                                                       | 8 components, 7 pages, styles, scripts   |
-| `production-files.md`      | 870   | ✅ READ    | Production implementations                                                                               | OAuth Worker, email templates, functions |
-| `cloudflare-deployment.md` | 1310  | ✅ READ    | Cloudflare infrastructure                                                                                | Monorepo, Workers, D1, R2, Queues        |
-| `deployment-config.md`     | 500   | ✅ READ    | Deployment configuration                                                                                 | DNS, OAuth, SendGrid, env vars           |
-| `decap-cms-setup.md`       | 750   | ⚠️ PARTIAL | CMS configuration                                                                                        | Content collections, admin UI            |
-| `DECAP-SPEC-COMPLIANCE.md` | —     | ✅ Updated | Current self-hosted setup (single bundle; admin config deprecated to 410; diagnostic at /api/config.yml) |
+| Document                   | Lines | Status     | Purpose                                                                                                   | Key Requirements                         |
+| -------------------------- | ----- | ---------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `project-document.md`      | 1355  | ✅ READ    | Core Astro 5 specs                                                                                        | 8 components, 7 pages, styles, scripts   |
+| `production-files.md`      | 870   | ✅ READ    | Production implementations                                                                                | OAuth Worker, email templates, functions |
+| `cloudflare-deployment.md` | 1310  | ✅ READ    | Cloudflare infrastructure                                                                                 | Monorepo, Workers, D1, R2, Queues        |
+| `deployment-config.md`     | 500   | ✅ READ    | Deployment configuration                                                                                  | DNS, OAuth, SendGrid, env vars           |
+| `decap-cms-setup.md`       | 750   | ⚠️ PARTIAL | CMS configuration                                                                                         | Content collections, admin UI            |
+| `DECAP-SPEC-COMPLIANCE.md` | —     | ✅ Updated | Current self-hosted setup (single bundle; auto-init via /admin/config.yml; diagnostic at /api/config.yml) |
 
 ### 2. QUALITY & OPERATIONS (How to Build)
 
@@ -72,7 +72,7 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, automation do
 | ---------------------------------- | ----------------------------------- | ---------- | --------------------------------------- |
 | `src/lib/sentry.ts` | Core configuration & helpers | ✅ Created | BaseLayout.astro |
 | `src/scripts/sentry-init.ts` | Client-side initialization | ✅ Created | sentry.ts |
-| `public/admin/sentry-admin.js` | Admin/CMS instrumentation (classic) | ✅ Created | admin/index.html; CSP allows Sentry CDN |
+| `public/admin/sentry-admin.js` | Admin/CMS instrumentation (classic) | ✅ Created | Self-hosted Sentry bundle with CDN fallback; CSP allows Sentry CDN and ingest |
 | `src/pages/test-sentry.astro` | Interactive test page (dev only) | ✅ Created | SENTRY-README.md |
 | `tests/sentry-integration.spec.ts` | Objective Playwright tests | ✅ Created | SENTRY-SETUP.md |
 | `functions/_middleware.ts` | Server-side Sentry + headers | ✅ Created | @sentry/cloudflare integration |

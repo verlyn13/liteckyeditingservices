@@ -13,7 +13,7 @@
 
 **Status**: ✅ **PRODUCTION READY** - Git-connected deployment live; CI/CD optimized; comprehensive monitoring.
 **Auth Hardening**: 🟢 Completed — PKCE-only flow enforced; canonical Decap message; pinned bundle; clearer errors.
-**October 12 Update**: ✅ CI/CD pipeline enhancements complete (caching, preflight, concurrency); Sentry integration enhanced with privacy protection and environment-based sampling. Evening: Decap auto-init finalized; OAuth popup handshake hardened with ack; admin Sentry self-host fallback; hard reload after accept to ensure editor boot.
+**October 12 Update**: ✅ CI/CD pipeline enhancements complete (caching, preflight, concurrency); Sentry integration enhanced with privacy protection and environment-based sampling. Evening: Decap auto-discovery finalized (CMS.init() with no config); OAuth popup handshake hardened with ack; admin Sentry self-host fallback; hard reload after accept to ensure editor boot.
 
 ### ✅ SUCCESSFUL MIGRATION (October 5, 2025)
 
@@ -40,7 +40,7 @@
 **Recent Progress - October 12, 2025**:
 
 - ✅ **CMS Configuration & Sentry Fixes** (Latest Deployment - October 12, 2025):
-  - **Auto-init migration**: Removed programmatic CMS.init; Decap now auto-initializes with `<link rel="cms-config-url" href="/admin/config.yml">`
+  - **Auto-discovery migration**: CMS.init() called with no config; Decap discovers config via `<link rel="cms-config-url" href="/admin/config.yml">`
   - **Dynamic config**: `/admin/config.yml` emits origin-aware YAML (base_url, /api/auth) for both dev and prod
   - **Sentry CSP**: Added https://\*.sentry.io to connect-src to allow error envelope transmission
   - **Sentry self-host**: Added self-hosted admin Sentry bundle with CDN fallback to reduce ETP/adblock issues
@@ -153,11 +153,11 @@
 
 **Recent Progress - October 9, 2025**:
 
-- ✅ **Admin on Static HTML**: Decap CMS admin served via `public/admin/index.html` with single bundle + auto-init
+- ✅ **Admin on Static HTML**: Decap CMS admin served via `public/admin/index.html` with single bundle + auto-discovery
   - Archived previous Astro admin and runtime boot scripts to `_archive/admin-migration-2025-10-09/`
   - Config served dynamically at `/admin/config.yml` with `base_url` and `auth_endpoint`
-  - **Why**: Eliminates React double-mount/"removeChild" errors from multiple init paths; follows Decap install docs (static HTML, single bundle, auto-init from config link)
-  - **Spec compliance**: Auto-init mode only (no `CMS.init()`), config discovery via `<link type="text/yaml" rel="cms-config-url">`
+  - **Why**: Eliminates React double-mount/"removeChild" errors from multiple init paths; follows Decap install docs (static HTML, single bundle, auto-discovery from config link)
+  - **Spec compliance**: Auto-discovery mode (CMS.init() with no config), config discovery via `<link type="text/yaml" rel="cms-config-url">`
   - **Local testing**: `pnpm build && npx wrangler pages dev` serves localhost:8788 with admin + Pages Functions on one origin
 - ✅ **OAuth Debug Logging**: Added inline debug listener in `public/admin/index.html` (hash-allowed by CSP) to monitor postMessage events during OAuth flow
   - Logs auth-related messages (string/object) and origin
@@ -201,7 +201,7 @@
 - 🔧 **Dev UX**: Guarded admin boot loader to prevent duplicate Decap initialization under HMR (avoids React removeChild errors)
 - 🔧 **OAuth State Echo**: /api/auth now honors Decap-provided `state` and opener origin; /api/callback posts Decap-compatible payload including `token_type:"bearer"` and `state` (string + object formats) with robust resend loop and ACK; opener origin cookie fallback added
 - 🔧 **Same-Origin Config**: `public/admin/config.yml` simplified to `auth_endpoint: /api/auth` (no `base_url`) for seamless local (wrangler pages dev) and production behavior
-- 🔧 **Admin Boot**: Removed explicit `CMS.init` call; Decap auto-initializes from `<link rel="cms-config-url">` to avoid double render and React removeChild errors
+- 🔧 **Admin Boot**: CMS.init() called with no config; Decap discovers config from `<link rel="cms-config-url">` to avoid double render and React removeChild errors
 - ✅ **OAuth Origin + Headers**: On-site Pages Functions (`/api/auth`, `/api/callback`) set COOP/CSP and post back to the opener origin with Decap‑compatible payloads; fixes "Authenticated successfully" but no editor UI.
 - 🔧 **Acceptance Hardening** (Oct 10): Switched callback to string‑only `authorization:github:success:` postMessage for maximum Decap compatibility, and enhanced admin diagnostics to compare localStorage state with message state.
 - 🔧 **Config Discovery Endpoint** (Oct 10): Added `/api/config.yml` (mirrors `/admin/config.yml`) and pointed admin `<link rel="cms-config-url">` to `/api/config.yml`. Set `auth_endpoint: api/auth` (no leading slash) to mirror docs' append semantics.
