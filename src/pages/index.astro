@@ -5,18 +5,21 @@ import Hero from '../components/Hero.astro';
 import TrustBar from '../components/TrustBar.astro';
 import ProcessSnapshot from '../components/ProcessSnapshot.astro';
 import FeaturedTestimonial from '../components/FeaturedTestimonial.astro';
+
+// Load homepage data from CMS-editable JSON file
+import homeData from '../../content/pages/home.json';
 ---
 
 <BaseLayout title="Home" description="Professional academic editing services">
   <Header currentPath={Astro.url.pathname} />
   <main id="main">
-    <Hero title="Expert Academic Editing" />
+    <Hero title={homeData.hero.title} />
     <TrustBar />
     <ProcessSnapshot />
     <FeaturedTestimonial
-      quote="They transformed my dissertation into a polished, publication-ready document."
-      author="Doctoral Candidate"
-      role="Education"
+      quote={homeData.featuredTestimonial.quote}
+      author={homeData.featuredTestimonial.author}
+      role={homeData.featuredTestimonial.role}
     />
   </main>
 </BaseLayout>

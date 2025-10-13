@@ -1,0 +1,185 @@
+name: cms-content-sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/**/*.json'
+      - 'content/**/*.md'
+      - 'content/**/*.yaml'
+      - 'content/**/*.yml'
+  workflow_dispatch:
+    inputs:
+      purge_type:
+        description: 'Cache purge type'
+        required: false
+        default: 'content'
+        type: choice
+        options:
+          - content      # Only HTML pages
+          - all         # Everything
+          - none        # Deploy only, no purge
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      content_changed: ${{ steps.changes.outputs.content }}
+      changed_files: ${{ steps.changes.outputs.changed_files }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect content changes
+        id: changes
+        run: |
+          # Get list of changed content files
+          CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD -- 'content/' || echo "")
+
+          if [ -n "$CHANGED_FILES" ]; then
+            echo "content=true" >> $GITHUB_OUTPUT
+            echo "changed_files<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "📝 Content changes detected:"
+            echo "$CHANGED_FILES"
+          else
+            echo "content=false" >> $GITHUB_OUTPUT
+            echo "changed_files=" >> $GITHUB_OUTPUT
+            echo "No content changes detected"
+          fi
+
+  deploy-and-purge:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.content_changed == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CF_PAGES_PROJECT_NAME: liteckyeditingservices
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.17.1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build site
+        run: pnpm build
+
+      - name: Install Wrangler
+        run: pnpm add -D wrangler@latest
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        run: |
+          OUTPUT=$(pnpm exec wrangler pages deploy dist \
+            --project-name=${{ env.CF_PAGES_PROJECT_NAME }} \
+            --commit-message "CMS content update from $GITHUB_SHA" 2>&1)
+
+          echo "$OUTPUT"
+
+          # Extract deployment URL
+          DEPLOYMENT_URL=$(echo "$OUTPUT" | grep -oE 'https://[a-zA-Z0-9.-]+\.pages\.dev' | head -1)
+          echo "deployment_url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+
+          echo "✅ Deployed to: $DEPLOYMENT_URL"
+
+      - name: Wait for deployment propagation
+        run: |
+          echo "⏳ Waiting 10 seconds for deployment to propagate..."
+          sleep 10
+
+      - name: Purge Cloudflare cache (content only)
+        if: github.event.inputs.purge_type != 'none'
+        run: |
+          PURGE_TYPE="${{ github.event.inputs.purge_type || 'content' }}"
+
+          if [ "$PURGE_TYPE" == "all" ]; then
+            echo "🔄 Purging all cache..."
+            curl -X POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data '{"purge_everything":true}'
+          else
+            echo "🔄 Purging HTML content cache..."
+
+            # Build list of URLs to purge based on changed files
+            URLS_TO_PURGE="["
+
+            # Always purge homepage
+            URLS_TO_PURGE="${URLS_TO_PURGE}\"https://liteckyeditingservices.com/\","
+            URLS_TO_PURGE="${URLS_TO_PURGE}\"https://www.liteckyeditingservices.com/\""
+
+            # Add specific pages if their content changed
+            if echo "${{ needs.detect-changes.outputs.changed_files }}" | grep -q "home.json"; then
+              echo "  - Homepage content changed"
+            fi
+
+            if echo "${{ needs.detect-changes.outputs.changed_files }}" | grep -q "services.json"; then
+              URLS_TO_PURGE="${URLS_TO_PURGE},\"https://liteckyeditingservices.com/services/\","
+              URLS_TO_PURGE="${URLS_TO_PURGE}\"https://www.liteckyeditingservices.com/services/\""
+            fi
+
+            if echo "${{ needs.detect-changes.outputs.changed_files }}" | grep -q "about.json"; then
+              URLS_TO_PURGE="${URLS_TO_PURGE},\"https://liteckyeditingservices.com/about/\","
+              URLS_TO_PURGE="${URLS_TO_PURGE}\"https://www.liteckyeditingservices.com/about/\""
+            fi
+
+            URLS_TO_PURGE="${URLS_TO_PURGE}]"
+
+            echo "Purging URLs: $URLS_TO_PURGE"
+
+            curl -X POST "https://api.cloudflare.com/client/v4/zones/${CLOUDFLARE_ZONE_ID}/purge_cache" \
+              -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+              -H "Content-Type: application/json" \
+              --data "{\"files\":${URLS_TO_PURGE}}"
+          fi
+
+          echo "✅ Cache purge completed"
+
+      - name: Verify deployment
+        run: |
+          DEPLOYMENT_URL="${{ steps.deploy.outputs.deployment_url }}"
+          if [ -n "$DEPLOYMENT_URL" ]; then
+            echo "🔍 Verifying deployment at $DEPLOYMENT_URL"
+            curl -s -o /dev/null -w "%{http_code}" "$DEPLOYMENT_URL" || true
+          fi
+
+  notify:
+    needs: [detect-changes, deploy-and-purge]
+    if: always() && needs.detect-changes.outputs.content_changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summary
+        run: |
+          echo "## 📋 CMS Content Sync Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ "${{ needs.deploy-and-purge.result }}" == "success" ]; then
+            echo "✅ **Status**: Content successfully deployed and cache purged" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status**: Deployment failed" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Changed Files:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ needs.detect-changes.outputs.changed_files }}" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY

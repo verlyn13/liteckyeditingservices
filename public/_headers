@@ -1,6 +1,37 @@
-# Cache control for admin assets to avoid stale JS during auth rollout
+# PHASE 1: EARLY PRODUCTION CACHING STRATEGY
+# Priority: Content freshness and immediate updates
+# Default behavior: max-age=0 with must-revalidate for HTML
+
+# HTML pages - immediate revalidation to ensure fresh content
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Admin panel - never cache (dynamic SPA)
 /admin/*
   Cache-Control: no-store
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com https://browser.sentry-cdn.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://browser.sentry-cdn.com https://*.sentry.io; frame-src 'self' https://challenges.cloudflare.com; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self' https://github.com; base-uri 'none'; frame-ancestors 'self'
+
+# Immutable versioned assets (with content hash)
 /admin/cms.*.js
   Cache-Control: public, max-age=31536000, immutable
+
+/_assets/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/_assets/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Media files - moderate caching during early production
+/images/*
+  Cache-Control: public, max-age=3600
+
+/uploads/*
+  Cache-Control: public, max-age=3600

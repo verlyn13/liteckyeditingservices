@@ -1,0 +1,12 @@
+name = "litecky-cache-purge"
+main = "index.ts"
+compatibility_date = "2025-10-13"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+route = { pattern = "api.liteckyeditingservices.com/cache/purge", zone_name = "liteckyeditingservices.com" }
+
+# Environment variables (set via Cloudflare dashboard or wrangler secret)
+# CLOUDFLARE_API_TOKEN - Scoped token with Zone:Cache Purge:Purge permission
+# CLOUDFLARE_ZONE_ID - The zone ID for liteckyeditingservices.com
+# PURGE_SECRET - Shared secret with GitHub Actions
