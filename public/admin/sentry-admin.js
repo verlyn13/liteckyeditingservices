@@ -207,16 +207,26 @@
     }, 10000);
   }
 
-  // Load Sentry SDK (bundled tracing+replay) from CDN
-  const script = document.createElement('script');
-  script.src = 'https://browser.sentry-cdn.com/8.48.0/bundle.tracing.replay.min.js';
-  script.integrity = 'sha384-gdAAufpzRZFoI7KqFiKJljH/2YMTO32L2rZL8rpO7ef1BTD8aJMPwdMiSJkjw/8I';
-  script.crossOrigin = 'anonymous';
-  script.onload = initSentry;
-  script.onerror = function () {
-    try {
-      console.error('[Sentry Admin] Failed to load Sentry SDK from CDN');
-    } catch {}
+  // Prefer self-hosted bundle to avoid ETP/adblock issues; fallback to CDN if missing
+  if (window.Sentry) {
+    initSentry();
+    return;
+  }
+  const selfScript = document.createElement('script');
+  selfScript.src = '/admin/sentry.browser.bundle.js';
+  selfScript.onload = initSentry;
+  selfScript.onerror = function () {
+    // Final fallback: CDN load (may be blocked by ETP)
+    const cdn = document.createElement('script');
+    cdn.src = 'https://browser.sentry-cdn.com/8.48.0/bundle.tracing.replay.min.js';
+    cdn.crossOrigin = 'anonymous';
+    cdn.onload = initSentry;
+    cdn.onerror = function () {
+      try {
+        console.error('[Sentry Admin] Failed to load Sentry (self-host and CDN)');
+      } catch {}
+    };
+    document.head.appendChild(cdn);
   };
-  document.head.appendChild(script);
+  document.head.appendChild(selfScript);
 })();

@@ -36,10 +36,12 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
     decap: {
       delivery: 'npm-app',
       bundleURL: `${origin}/admin/cms.js`,
+      autoInit: true,
+      configDiscovery: 'link[rel="cms-config-url"][href="/admin/config.yml"]',
     },
     notes: [
-      '/admin/config.yml is deprecated and returns 410 (bundled in /admin/cms.js)',
-      'Diagnostic config remains available at /api/config.yml',
+      '/admin/config.yml served dynamically with origin-aware base_url',
+      'Auto-init via link rel="cms-config-url"',
       'callback must set COOP unsafe-none and allow inline script',
       "auth must echo Decap 'state' and set HttpOnly SameSite=Lax cookie",
     ],

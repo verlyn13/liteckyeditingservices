@@ -2,14 +2,14 @@ import { expect, test } from '@playwright/test';
 
 const isProd = !!process.env.BASE_URL && !/localhost|127\.0\.0\.1/i.test(process.env.BASE_URL);
 
-test('/admin/config.yml returns 410 (config now bundled)', async ({ request }) => {
+test('/admin/config.yml returns dynamic YAML (auto-init)', async ({ request }) => {
   const res = await request.get('/admin/config.yml');
-  // Config is now bundled in cms.js to prevent double-loading
-  expect(res.status()).toBe(410);
-  const cache = res.headers()['cache-control'] || '';
-  expect(cache).toMatch(/no-store/i);
-  const note = res.headers()['x-config-note'] || '';
-  expect(note).toContain('cms.js');
+  expect(res.status()).toBe(200);
+  const ctype = res.headers()['content-type'] || '';
+  expect(ctype).toMatch(/text\/yaml/);
+  const body = await res.text();
+  expect(body).toMatch(/backend:\n\s+name: github/);
+  expect(body).toMatch(/auth_endpoint: \/api\/auth/);
 });
 
 test('/api/callback diagnostic headers reflect production handoff needs', async ({ request }) => {
