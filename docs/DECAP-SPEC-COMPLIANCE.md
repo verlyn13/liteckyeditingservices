@@ -5,6 +5,7 @@ This document records how our Decap CMS integration complies with current specs,
 ## Admin Page (Spec: Install Decap CMS)
 
 - File: `public/admin/index.html` (static HTML, no framework)
+- Includes `<div id="nc-root"></div>` container to ensure reliable mount
 - Single `<script>` tag loading `/admin/cms.js`
 - Manual initialization via `decap-cms-app` (`CMS.init({ config })`)
 - Rationale: First‑party bundle provides deterministic init, stable hydration, and extensibility. Avoids mixed vendor bundles.
