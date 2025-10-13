@@ -569,7 +569,8 @@ Planned (Oct 11–13, 2025)
 
 - [ ] PKCE client helper (`public/admin/pkce-login.js`):
   - Generate `code_verifier` (sessionStorage only) + `code_challenge` (S256)
-  - Pre‑write Decap state key in localStorage before opening popup
+- Pre‑write Decap state key in localStorage before opening popup
+- Two-way OAuth handshake: popup waits for 'authorization:github:success:ack' from admin before closing; admin responds immediately upon receipt for reliability
   - Open `/api/auth?code_challenge=…&code_challenge_method=S256&client_state=…`
 - [ ] `/api/auth` to honor `client_state` + pass through PKCE params
 - [ ] `/api/callback` to post `code` (not token) to opener (string‑only)
