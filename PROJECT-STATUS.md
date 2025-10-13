@@ -39,12 +39,14 @@
 
 **Recent Progress - October 12, 2025**:
 
-- ✅ **CMS Configuration & Sentry Fixes** (Latest Deployment):
-  - Fixed CMS double-config load issue by adding `load_config_file: false` to cms.init() in src/admin/cms.ts
-  - Corrected auth_endpoint from `api/auth` to `/api/auth` (with leading slash) for proper OAuth routing
-  - Added admin preview banner script (preview-banner.js) to public/admin/index.html for environment indication
-  - Enhanced Sentry integration with conditional httpClientIntegration to prevent "not a function" errors
-  - Updated CSP headers to allow https://browser.sentry-cdn.com for Sentry sourcemap access
+- ✅ **CMS Configuration & Sentry Fixes** (Latest Deployment - October 12, 2025):
+  - **Double-config fix**: Set CMS_MANUAL_INIT flag + load_config_file: false to prevent duplicate collection registration
+  - **Config endpoint deprecation**: /admin/config.yml now returns 410 Gone (config bundled in cms.js)
+  - **Sentry CSP**: Added https://*.sentry.io to connect-src to allow error envelope transmission
+  - **Auth endpoint**: Corrected from `api/auth` to `/api/auth` (with leading slash) for proper OAuth routing
+  - **Preview banner**: Added preview-banner.js to indicate non-production environments
+  - **Sentry integration**: Enhanced with conditional httpClientIntegration to prevent "not a function" errors
+  - **Sourcemaps**: Updated CSP to allow https://browser.sentry-cdn.com for Sentry sourcemap access
   - All E2E tests passing: typecheck ✓, unit tests ✓, build ✓, smoke ✓, Sentry ✓, CMS headers ✓
 
 - ✅ **CI/CD Pipeline Enhancements** (Phase 1 - Complete):
