@@ -13,7 +13,7 @@
 
 **Status**: ✅ **PRODUCTION READY** - Git-connected deployment live; CI/CD optimized; comprehensive monitoring.
 **Auth Hardening**: 🟢 Completed — PKCE-only flow enforced; canonical Decap message; pinned bundle; clearer errors.
-**October 12 Update**: ✅ CI/CD pipeline enhancements complete (caching, preflight, concurrency); Sentry integration enhanced with privacy protection and environment-based sampling.
+**October 12 Update**: ✅ CI/CD pipeline enhancements complete (caching, preflight, concurrency); Sentry integration enhanced with privacy protection and environment-based sampling. Evening: Decap auto-init finalized; OAuth popup handshake hardened with ack; admin Sentry self-host fallback; hard reload after accept to ensure editor boot.
 
 ### ✅ SUCCESSFUL MIGRATION (October 5, 2025)
 

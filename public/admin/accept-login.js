@@ -114,19 +114,18 @@
 
   async function navigateToEditor(state = 'pkce') {
     try {
-      // Cache-busted, hash-changing hard nav to defeat "same URL" no-op
-      const base = '/admin/#/';
-      const url = `${base}?flip=${encodeURIComponent(state)}&t=${Date.now()}`;
-      log('navigating to editor (hard flip)', { url });
-      location.assign(url);
+      // Force a full document navigation by changing search params (not only hash)
+      const url = `/admin/?flip=${encodeURIComponent(state)}&t=${Date.now()}#/`;
+      log('navigating to editor (hard reload)', { url });
+      location.replace(url);
 
-      // Final guard to force transition even if router swallows it
+      // Final guard to force reload if browser optimizes away
       setTimeout(() => {
         if (!/[?&]flip=/.test(location.href)) {
-          log('router no-op detected, forcing reload');
-          location.replace(`/admin/#/?flip=${encodeURIComponent(state)}&t=${Date.now()}`);
+          log('router no-op detected, forcing hard reload');
+          try { location.reload(); } catch {}
         }
-      }, 150);
+      }, 250);
     } catch (e) {
       error('navigation failed', String(e));
       location.href = '/admin/#/';
