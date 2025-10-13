@@ -39,6 +39,7 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, automation do
 - Biome v2.2.5 Strategy: `docs/decisions/2025-10-12-biome-2.2.5.md`
 - Biome Playbook: `docs/playbooks/biome.md`
 - Architecture Audit Checklist: `docs/audits/edge-native-architecture-checklist.md`
+- Images & Icons: `docs/assets-images-icons.md`
 
 ### 3. PROJECT DOCUMENTATION (How to Use)
 

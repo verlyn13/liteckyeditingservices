@@ -1,0 +1,43 @@
+{
+  "hero": {
+    "title": "Expert Academic Editing",
+    "subtitle": "Expert academic editing for dissertations and theses. PhD-qualified editors, 2–3 day turnaround, secure and confidential.",
+    "primaryCta": {
+      "label": "Get Started",
+      "href": "/contact"
+    },
+    "secondaryCta": {
+      "label": "View Services",
+      "href": "/services"
+    },
+    "statsBadge": {
+      "primary": "20+ Years Experience",
+      "secondary": "5,000+ Papers Edited"
+    }
+  },
+  "trustBar": {
+    "tagline": "Trusted by scholars from",
+    "logos": []
+  },
+  "processSnapshot": {
+    "steps": [
+      {
+        "title": "Upload & Brief",
+        "body": "Securely upload your document and share your goals."
+      },
+      {
+        "title": "Expert Editing",
+        "body": "PhD-qualified editor polishes structure, clarity, and style."
+      },
+      {
+        "title": "Review & Finalize",
+        "body": "Receive tracked changes and an editor memo. Revise with confidence."
+      }
+    ]
+  },
+  "featuredTestimonial": {
+    "quote": "They transformed my dissertation into a polished, publication-ready document.",
+    "author": "Doctoral Candidate",
+    "role": "Education"
+  }
+}

@@ -64,6 +64,21 @@ pnpm check        # Run all quality checks
 pnpm test:e2e     # Run Playwright tests
 pnpm lint:fix     # Auto-fix linting issues
 pnpm biome:check  # Biome v2.2.5 (format+lint JS/TS/JSON)
+pnpm icons:build  # Rebuild favicon.ico and PNG icons from SVG
+```
+
+## Icons
+
+- Source SVG: `public/icons/logo.svg` (copied from your `~/Pictures`)
+- Build script: `scripts/build-icons.sh`
+- Outputs: `public/icons/favicon.ico`, `public/icons/icon-{16,32,48,64,180,192,256,384,512}.png`
+
+See also: `docs/assets-images-icons.md` for full guidance (sources of truth, manifest, and troubleshooting).
+
+Rebuild icons after changing the SVG:
+
+```bash
+pnpm icons:build
 ```
 
 ## Windsurf/Cascade

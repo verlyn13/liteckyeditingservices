@@ -1,0 +1,26 @@
+{
+  "title": "The Process",
+  "description": "A simple, predictable editing journey",
+  "headline": "The Process",
+  "intro": "A linear, stress-free experience. You'll always know what happens next.",
+  "steps": [
+    {
+      "title": "Upload & Brief",
+      "description": "Share your document and goals securely. We confirm scope and timeline.",
+      "detail": "🔒 256-bit encryption • Your work stays confidential",
+      "icon": "🔒"
+    },
+    {
+      "title": "Expert Editing",
+      "description": "Your editor improves structure, clarity, and style. Track changes for full transparency.",
+      "detail": "✓ PhD-qualified • Same-field expertise when possible",
+      "icon": "✓"
+    },
+    {
+      "title": "Review & Finalize",
+      "description": "You receive edits and a brief memo. We handle final polish as needed.",
+      "detail": "📅 2–3 day turnaround • On-time delivery guaranteed",
+      "icon": "📅"
+    }
+  ]
+}
