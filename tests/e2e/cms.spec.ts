@@ -92,7 +92,10 @@ test('CMS script loads without CSP violations', async ({ page }) => {
     // Check if bundle was loaded
     const bundleLoaded = await page.evaluate(() => {
       const scripts = Array.from(document.querySelectorAll('script[src*="cms"]'));
-      return scripts.map(s => ({ src: (s as HTMLScriptElement).src, loaded: true }));
+      return scripts.map((s) => ({
+        src: (s as HTMLScriptElement).src,
+        loaded: true,
+      }));
     });
     console.error('CMS bundle scripts:', JSON.stringify(bundleLoaded, null, 2));
 
@@ -104,7 +107,7 @@ test('CMS script loads without CSP violations', async ({ page }) => {
         hasApp: !!win.__cmsApp,
         cmsType: typeof win.CMS,
         appType: typeof win.__cmsApp,
-        windowKeys: Object.keys(window).filter(k => k.toLowerCase().includes('cms')),
+        windowKeys: Object.keys(window).filter((k) => k.toLowerCase().includes('cms')),
       };
     });
     console.error('Window state:', JSON.stringify(windowState, null, 2));
@@ -214,8 +217,12 @@ test('Admin CMS initializes without CSP violations', async ({ page }) => {
       const bundleLoaded = await page.evaluate(() => {
         const scripts = Array.from(document.querySelectorAll('script'));
         return scripts
-          .filter(s => (s as HTMLScriptElement).src.includes('cms') || (s as HTMLScriptElement).src.includes('admin'))
-          .map(s => ({
+          .filter(
+            (s) =>
+              (s as HTMLScriptElement).src.includes('cms') ||
+              (s as HTMLScriptElement).src.includes('admin')
+          )
+          .map((s) => ({
             src: (s as HTMLScriptElement).src,
             defer: (s as HTMLScriptElement).defer,
             async: (s as HTMLScriptElement).async,
@@ -231,7 +238,7 @@ test('Admin CMS initializes without CSP violations', async ({ page }) => {
           hasApp: !!win.__cmsApp,
           cmsType: typeof win.CMS,
           appType: typeof win.__cmsApp,
-          windowKeys: Object.keys(window).filter(k => k.toLowerCase().includes('cms')),
+          windowKeys: Object.keys(window).filter((k) => k.toLowerCase().includes('cms')),
           allWindowKeys: Object.keys(window).slice(0, 50), // First 50 keys
         };
       });

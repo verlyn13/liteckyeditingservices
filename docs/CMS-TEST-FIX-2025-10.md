@@ -101,6 +101,40 @@ These diagnostics help identify the root cause of persistent test timeouts. When
 
 **Commit:** `test(cms): add comprehensive diagnostics to failing tests` (11888345)
 
+### Critical Runtime Fixes (October 12, 2025 - Update)
+Browser diagnostic output revealed two critical errors blocking CMS initialization:
+
+**Error 1: Sentry SRI Integrity Mismatch** (Blocking Script Load)
+```
+Failed to find a valid digest in the 'integrity' attribute for resource
+'https://browser.sentry-cdn.com/8.48.0/bundle.tracing.replay.min.js'
+with computed SHA-384 integrity 'gdAAufpzRZFoI7KqFiKJljH/2YMTO32L2rZL8rpO7ef1BTD8aJMPwdMiSJkjw/8I'.
+The resource has been blocked.
+```
+
+- **Cause**: Incorrect SHA-384 hash in `public/admin/sentry-admin.js`
+- **Fix**: Updated to correct hash from actual CDN resource
+- **Additional**: Added onerror handler for better diagnostics
+
+**Error 2: Node.js Module in Browser Bundle** (Fatal Runtime Error)
+```
+Uncaught Error: Dynamic require of "node:url" is not supported
+    at cms.ca65a782.js:1:407
+```
+
+- **Cause**: esbuild `external: ['node:*']` marks as external, causing browser to attempt `require()` at runtime
+- **Root**: Decap CMS dependencies (likely ajv validator) import `node:url` for schema validation
+- **Fix**: Created browser-compatible shims for node: imports
+  - `scripts/shims/url.js` - Uses native browser URL APIs
+  - `scripts/shims/path.js` - Browser-safe path operations
+  - `scripts/shims/buffer.js` - Minimal Buffer implementation
+  - `scripts/shims/process.js` - Browser process shim
+- **Build**: Removed `external: ['node:*']` from `scripts/build-cms.mjs`
+- **Build**: Added alias mapping for node: imports to shims
+- **Result**: New bundle `cms.211ec4c4.js` (4.2MB)
+
+**Commit:** `fix(cms): resolve Sentry SRI mismatch and node:url bundling errors` (207ea7e5)
+
 ### CI/CD Considerations
 - Tests should now pass in CI pipeline
 - No changes needed to CI configuration

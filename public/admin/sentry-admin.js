@@ -209,8 +209,13 @@
   // Load Sentry SDK (bundled tracing+replay) from CDN
   const script = document.createElement('script');
   script.src = 'https://browser.sentry-cdn.com/8.48.0/bundle.tracing.replay.min.js';
-  script.integrity = 'sha384-sNEPSS1a7GrAqcTpBz8TxPvP//wnrJTVHxYgXXQ7OOA+OeQpC0JC8nKzT3f0r7Ju';
+  script.integrity = 'sha384-gdAAufpzRZFoI7KqFiKJljH/2YMTO32L2rZL8rpO7ef1BTD8aJMPwdMiSJkjw/8I';
   script.crossOrigin = 'anonymous';
   script.onload = initSentry;
+  script.onerror = function() {
+    try {
+      console.error('[Sentry Admin] Failed to load Sentry SDK from CDN');
+    } catch {}
+  };
   document.head.appendChild(script);
 })();
