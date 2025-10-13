@@ -40,23 +40,27 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, automation do
 - Biome Playbook: `docs/playbooks/biome.md`
 - Architecture Audit Checklist: `docs/audits/edge-native-architecture-checklist.md`
 - Images & Icons: `docs/assets-images-icons.md`
+- Caching Strategy: `CACHING-STRATEGY.md`
+- CMS Content Update Playbook: `docs/playbooks/cms-content-update.md`
 
 ### 3. PROJECT DOCUMENTATION (How to Use)
 
 **Purpose**: User-facing documentation (from `documentation.md`)
 
-| Document                           | Purpose                        | Status     | Template Provided         |
-| ---------------------------------- | ------------------------------ | ---------- | ------------------------- |
-| `README.md`                        | Project overview & quick start | ✅ Created | ✅ Yes (lines 4-89)       |
-| `CONTRIBUTING.md`                  | Development workflow           | ✅ Created | ✅ Yes (lines 92-260)     |
-| `ARCHITECTURE.md`                  | System design                  | ✅ Created | ✅ Yes (lines 263-452)    |
-| `DEPLOYMENT.md`                    | Deployment procedures          | ✅ Created | ✅ Yes (lines 455-696)    |
-| `DEPLOYMENT-SUMMARY-2025-10-02.md` | Oct 2 deployment record        | ✅ Created | N/A (deployment artifact) |
-| `SECRETS.md`                       | Secret inventory               | ✅ Created | ✅ Yes (lines 699-858)    |
-| `ENVIRONMENT.md`                   | Environment variables          | ✅ Created | ✅ Yes (lines 861-1017)   |
-| `docs/onboarding.md`               | Developer setup                | ✅ Created | ✅ Yes (lines 1023-1239)  |
-| `docs/playbooks/email-issues.md`   | Email troubleshooting          | ✅ Created | ✅ Yes (lines 1242-1406)  |
-| `.github/CODEOWNERS`               | Code ownership                 | ✅ Created | ✅ Yes (lines 1409-1430)  |
+| Document                               | Purpose                        | Status     | Template Provided         |
+| -------------------------------------- | ------------------------------ | ---------- | ------------------------- |
+| `README.md`                            | Project overview & quick start | ✅ Created | ✅ Yes (lines 4-89)       |
+| `CONTRIBUTING.md`                      | Development workflow           | ✅ Created | ✅ Yes (lines 92-260)     |
+| `ARCHITECTURE.md`                      | System design                  | ✅ Created | ✅ Yes (lines 263-452)    |
+| `DEPLOYMENT.md`                        | Deployment procedures          | ✅ Created | ✅ Yes (lines 455-696)    |
+| `DEPLOYMENT-SUMMARY-2025-10-02.md`     | Oct 2 deployment record        | ✅ Created | N/A (deployment artifact) |
+| `SECRETS.md`                           | Secret inventory               | ✅ Created | ✅ Yes (lines 699-858)    |
+| `ENVIRONMENT.md`                       | Environment variables          | ✅ Created | ✅ Yes (lines 861-1017)   |
+| `CACHING-STRATEGY.md`                  | Caching phases and workflows   | ✅ Created | ✅ Yes                    |
+| `docs/playbooks/cms-content-update.md` | CMS update end-to-end guide    | ✅ Created | ✅ Yes                    |
+| `docs/onboarding.md`                   | Developer setup                | ✅ Created | ✅ Yes (lines 1023-1239)  |
+| `docs/playbooks/email-issues.md`       | Email troubleshooting          | ✅ Created | ✅ Yes (lines 1242-1406)  |
+| `.github/CODEOWNERS`                   | Code ownership                 | ✅ Created | ✅ Yes (lines 1409-1430)  |
 
 ### 3.1 ERROR TRACKING & MONITORING (Sentry)
 

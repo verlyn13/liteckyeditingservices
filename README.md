@@ -139,6 +139,7 @@ Validators and Rego policies enforce these constraints to prevent drift.
 ### How to Update Content
 
 #### Via CMS (Recommended for Editors)
+
 1. Login to admin panel: https://liteckyeditingservices.com/admin (GitHub authentication required)
 2. Make content changes and save
 3. Changes commit to GitHub `main` branch automatically
@@ -146,6 +147,7 @@ Validators and Rego policies enforce these constraints to prevent drift.
 5. Cache is automatically purged for affected pages
 
 #### Via Direct Edit (For Developers)
+
 1. Edit JSON/Markdown files in `content/` directory
 2. Commit and push to `main` branch
 3. Automatic deployment and cache purge triggered by CMS content sync workflow
@@ -166,12 +168,14 @@ gh workflow run cms-content-sync.yml
 ### Caching Strategy (Phase 1: Freshness-First)
 
 **Current State**: Freshness priority with instant invalidation
+
 - HTML pages: `Cache-Control: public, max-age=0, must-revalidate`
 - All assets: Same headers (will be optimized in Phase 2)
 - Content changes trigger automatic cache purge via workflow
 - Security headers configured via `public/_headers` and `functions/admin/[[path]].ts`
 
 **Phase 2** (Future): Performance-first with Cache Rules
+
 - Immutable assets: 1 year edge cache
 - HTML pages: 4 hours edge, 5 minutes browser
 - Granular purging via dedicated worker
@@ -180,11 +184,13 @@ gh workflow run cms-content-sync.yml
 ### Monitoring Cache Performance
 
 Check cache headers:
+
 ```bash
 curl -I https://liteckyeditingservices.com
 ```
 
 View deployment status:
+
 ```bash
 gh run list --workflow=cms-content-sync.yml --limit 5
 ```
