@@ -223,6 +223,11 @@
         return;
       }
 
+      // Acknowledge to the popup immediately so it can close reliably
+      try {
+        ev.source?.postMessage('authorization:github:success:ack', ev.origin);
+      } catch {}
+
       processedMessages.add(messageKey);
       log('OAuth callback message received', { messageType: typeof ev.data });
 

@@ -199,7 +199,7 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
   <title>Authenticating…</title>
 </head>
 <body>
-  <p>Authentication successful. Closing window...</p>
+  <p>Authentication successful. Waiting for site to receive token…</p>
   <script>
     (function() {
       if (!window.opener) {
@@ -210,24 +210,45 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
       const target = ${JSON.stringify(targetOrigin)};
       const strMsg = ${JSON.stringify(stringMessage)};
 
-      console.log('[Callback] Sending messages to opener; id=${traceId}');
+      const traceId = ${JSON.stringify(traceId)};
+      console.log('[Callback] Ready to send message to opener; id=' + traceId);
 
-      // Send every 100ms up to 10 tries, then close
+      // Listen for acknowledgment from the opener
+      function receiveAck(event) {
+        if (event.origin === target && event.data === 'authorization:github:success:ack') {
+          console.log('[Callback] Acknowledgment received. Closing popup now; id=' + traceId);
+          window.removeEventListener('message', receiveAck);
+          clearInterval(timer);
+          try { window.close(); } catch {}
+        }
+      }
+      window.addEventListener('message', receiveAck);
+
+      // Send the auth message every 100ms for up to 5 seconds
       var tries = 0;
       var timer = setInterval(function() {
+        tries++;
+        if (tries > 50) { // 5s timeout
+          clearInterval(timer);
+          window.removeEventListener('message', receiveAck);
+          console.warn('[Callback] Timed out waiting for ack. Closing popup; id=' + traceId);
+          try { window.close(); } catch {}
+          return;
+        }
         try {
           if (window.opener && !window.opener.closed) {
             window.opener.postMessage(strMsg, target);
-            console.log('[Callback] Messages sent; id=${traceId}; try=' + tries);
+            console.log('[Callback] Message sent; id=' + traceId + '; try=' + tries);
+          } else if (window.opener && window.opener.closed) {
+            clearInterval(timer);
+            window.removeEventListener('message', receiveAck);
+            try { window.close(); } catch {}
           }
         } catch (e) {
-          console.error('[Callback] Error:', e);
-        }
-        tries++;
-        if (tries >= 10) {
+          console.warn('[Callback] postMessage failed, opener may have closed.');
           clearInterval(timer);
-          console.log('[Callback] Closing popup; id=${traceId}');
-          window.close();
+          window.removeEventListener('message', receiveAck);
+          try { window.close(); } catch {}
         }
       }, 100);
     })();
