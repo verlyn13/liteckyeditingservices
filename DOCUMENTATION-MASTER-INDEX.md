@@ -39,7 +39,9 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, CMS pipeline 
 - Biome v2.2.5 Strategy: `docs/decisions/2025-10-12-biome-2.2.5.md`
 - Biome Playbook: `docs/playbooks/biome.md`
 - Architecture Audit Checklist: `docs/audits/edge-native-architecture-checklist.md`
-- Images & Icons: `docs/assets-images-icons.md`
+- **Assets & Images (Comprehensive)**: `docs/ASSETS-AND-IMAGES.md` *(New Oct 13, 2025 - Modern standards)*
+- Images & Icons (Legacy): `docs/assets-images-icons.md` *(Updated Oct 13, 2025)*
+- Email Templates: `docs/EMAIL-TEMPLATES.md` *(New Oct 13, 2025)*
 - Caching Strategy: `CACHING-STRATEGY.md`
 - CMS Content Update Playbook: `docs/playbooks/cms-content-update.md`
 
