@@ -2,10 +2,10 @@
 
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 13, 2025 (Caching strategy implemented for CMS content updates)
+**Last Updated**: October 13, 2025 (CMS integration bug fixes + CSP improvements)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
-**Overall Completion**: 100% (Live in Production with Git-Connected Deployment + Caching Infrastructure)
+**Overall Completion**: 100% (Live in Production with Git-Connected Deployment + Full CMS Integration)
 
 ---
 
@@ -50,6 +50,15 @@
   - **Verification**: Local build confirmed "Professional academic editing" now appears (was stuck on "Expert")
   - **Result**: Complete CMS → GitHub → Deploy pipeline now functional; content changes will propagate correctly
   - **Related**: This bug was causing visual test failures (expected vs actual text mismatch)
+  - **Files Changed**: `src/pages/index.astro`, `src/components/Hero.astro`
+  - **Commit**: `18ba60e9`
+
+- ✅ **CSP Enhancement - GitHub Status Checks** (October 13, 2025 - Evening):
+  - **Issue**: Decap CMS GitHub status API calls blocked by CSP (harmless but noisy console warnings)
+  - **Fix**: Added `https://www.githubstatus.com` to admin CSP `connect-src` directive
+  - **Impact**: Clean browser console; improved admin UX
+  - **File Changed**: `public/_headers`
+  - **Commit**: `e194b3e8`
 
 - ✅ **Caching Infrastructure & CMS Content Sync** (October 13, 2025):
   - **Problem Identified**: CMS changes saved to GitHub but not triggering rebuilds/deployments

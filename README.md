@@ -1,14 +1,13 @@
-# Litecky Editing Services — Website
+# Litecky Editing Services
 
 ![Quality Gate](https://github.com/verlyn13/liteckyeditingservices/actions/workflows/quality-gate.yml/badge.svg)
 ![Docs Health](https://github.com/verlyn13/liteckyeditingservices/actions/workflows/docs-health.yml/badge.svg)
 
-Professional academic editing services for graduate students, built with modern web technologies and a focus on simplicity and reliability.
+Academic editing services website built with Astro, Svelte, and Cloudflare Pages.
 
-**Status**: ✅ Live in Production (DNS migrated October 4, 2025)
-**Production**: https://liteckyeditingservices.com | https://www.liteckyeditingservices.com
-**Preview**: Auto-deployed via Cloudflare Pages on PRs
-**CMS**: /admin (GitHub auth required)
+**Production**: https://liteckyeditingservices.com
+**Status**: Live with automatic deployments
+**CMS**: /admin (requires GitHub authentication)
 
 ## Stack
 
@@ -134,64 +133,46 @@ This project deploys **ONLY to Cloudflare Pages**. Do not add or use:
 Current output is `static`. When SSR is required, use `@astrojs/cloudflare`.
 Validators and Rego policies enforce these constraints to prevent drift.
 
-## Content Management & Caching
+## Content Management
 
-### How to Update Content
+### Updating Content
 
-#### Via CMS (Recommended for Editors)
+**Via CMS** (Recommended):
+1. Login: https://liteckyeditingservices.com/admin
+2. Edit and save changes
+3. Auto-commits to GitHub `main` branch
+4. Auto-deploys within 2-3 minutes
+5. Cache purges automatically
 
-1. Login to admin panel: https://liteckyeditingservices.com/admin (GitHub authentication required)
-2. Make content changes and save
-3. Changes commit to GitHub `main` branch automatically
-4. GitHub Actions deploys updates within 2-3 minutes
-5. Cache is automatically purged for affected pages
+**Via Git** (Developers):
+1. Edit files in `content/` directory
+2. Commit and push to `main`
+3. Triggers same deployment workflow
 
-#### Via Direct Edit (For Developers)
+### Caching Strategy
 
-1. Edit JSON/Markdown files in `content/` directory
-2. Commit and push to `main` branch
-3. Automatic deployment and cache purge triggered by CMS content sync workflow
+**Current** (Phase 1 - Freshness First):
+- HTML: `max-age=0, must-revalidate` (always fresh)
+- Assets: Standard caching
+- Auto-purge on content changes
 
-### Manual Cache Purge
+**Future** (Phase 2 - Performance):
+- Immutable assets: 1 year cache
+- HTML: 4 hours edge, 5 minutes browser
+- Granular purging via worker
+
+See `CACHING-STRATEGY.md` for details.
+
+### Manual Operations
 
 ```bash
-# Purge all cache (emergency use only)
+# Purge all cache (emergency)
 gh workflow run cms-content-sync.yml -f purge_type=all
 
-# Deploy without purging cache
-gh workflow run cms-content-sync.yml -f purge_type=none
-
-# Default: Purge only HTML pages
-gh workflow run cms-content-sync.yml
-```
-
-### Caching Strategy (Phase 1: Freshness-First)
-
-**Current State**: Freshness priority with instant invalidation
-
-- HTML pages: `Cache-Control: public, max-age=0, must-revalidate`
-- All assets: Same headers (will be optimized in Phase 2)
-- Content changes trigger automatic cache purge via workflow
-- Security headers configured via `public/_headers` and `functions/admin/[[path]].ts`
-
-**Phase 2** (Future): Performance-first with Cache Rules
-
-- Immutable assets: 1 year edge cache
-- HTML pages: 4 hours edge, 5 minutes browser
-- Granular purging via dedicated worker
-- See `CACHING-STRATEGY.md` for details
-
-### Monitoring Cache Performance
-
-Check cache headers:
-
-```bash
+# Check cache headers
 curl -I https://liteckyeditingservices.com
-```
 
-View deployment status:
-
-```bash
+# View recent deployments
 gh run list --workflow=cms-content-sync.yml --limit 5
 ```
 
