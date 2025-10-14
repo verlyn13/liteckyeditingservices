@@ -1,17 +1,17 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "compilerOptions": {
-    "types": ["vite/client", "astro/client"]
-  },
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": [
-    "dist",
-    "public",
-    "playwright-report",
-    "test-results",
-    "coverage",
-    "node_modules",
-    "vitest.config.ts",
-    "astro.config.mjs"
-  ]
+	"extends": "astro/tsconfigs/strict",
+	"compilerOptions": {
+		"types": ["vite/client", "astro/client"]
+	},
+	"include": [".astro/types.d.ts", "**/*"],
+	"exclude": [
+		"dist",
+		"public",
+		"playwright-report",
+		"test-results",
+		"coverage",
+		"node_modules",
+		"vitest.config.ts",
+		"astro.config.mjs"
+	]
 }
