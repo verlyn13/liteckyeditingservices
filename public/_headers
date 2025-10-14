@@ -17,7 +17,7 @@
 # Admin panel - never cache (dynamic SPA)
 /admin/*
   Cache-Control: no-store
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com https://browser.sentry-cdn.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://browser.sentry-cdn.com https://*.sentry.io; frame-src 'self' https://challenges.cloudflare.com; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self' https://github.com; base-uri 'none'; frame-ancestors 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com https://browser.sentry-cdn.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://www.githubstatus.com https://browser.sentry-cdn.com https://*.sentry.io; frame-src 'self' https://challenges.cloudflare.com; worker-src 'self' blob:; child-src 'self' blob:; form-action 'self' https://github.com; base-uri 'none'; frame-ancestors 'self'
 
 # Immutable versioned assets (with content hash)
 /admin/cms.*.js
