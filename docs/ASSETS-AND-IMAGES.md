@@ -128,14 +128,17 @@ public/icons/
 **File:** `src/layouts/BaseLayout.astro`
 
 ```astro
-<!-- Favicon and PWA Icons -->
-<link rel="icon" type="image/x-icon" href="/icons/favicon.ico" sizes="16x16 32x32 48x48" />
-<link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png" />
-<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png" />
-<link rel="icon" type="image/png" sizes="48x48" href="/icons/icon-48.png" />
-<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png" />
-<link rel="manifest" href="/site.webmanifest" />
+<!-- Favicon and PWA Icons (with cache busting) -->
+<link rel="icon" type="image/x-icon" href="/icons/favicon.ico?v=2" sizes="16x16 32x32 48x48" />
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png?v=2" />
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png?v=2" />
+<link rel="icon" type="image/png" sizes="48x48" href="/icons/icon-48.png?v=2" />
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180.png?v=2" />
+<link rel="manifest" href="/site.webmanifest?v=2" />
 ```
+
+**Browser Cache Management:**
+Favicon links include a version parameter (`?v=2`) to force browser cache invalidation when icons are updated. Browsers aggressively cache favicons, so increment the version number in `src/layouts/BaseLayout.astro` after regenerating icons.
 
 #### PWA Manifest
 
@@ -701,6 +704,7 @@ pnpm build && pnpm preview                          # Preview production build
 
 ## Changelog
 
+- **2025-10-13** - Added cache-busting version parameters to favicon links to force browser refresh
 - **2025-10-13** - Comprehensive modern standards documentation created
 - **2025-10-12** - Icon pipeline updated to support PNG sources
 - **2025-10-11** - Initial icon documentation
