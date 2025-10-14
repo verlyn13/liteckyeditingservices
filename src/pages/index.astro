@@ -13,7 +13,12 @@ import homeData from '../../content/pages/home.json';
 <BaseLayout title="Home" description="Professional academic editing services">
   <Header currentPath={Astro.url.pathname} />
   <main id="main">
-    <Hero title={homeData.hero.title} />
+    <Hero
+      title={homeData.hero.title}
+      subtitle={homeData.hero.subtitle}
+      primaryCta={homeData.hero.primaryCta}
+      secondaryCta={homeData.hero.secondaryCta}
+    />
     <TrustBar />
     <ProcessSnapshot />
     <FeaturedTestimonial

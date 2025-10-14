@@ -40,6 +40,17 @@
 
 **Recent Progress - October 13, 2025**:
 
+- ✅ **CRITICAL BUG FIX - CMS Content Not Propagating** (October 13, 2025 - Evening):
+  - **Root Cause Identified**: Hero component was not receiving subtitle and CTA data from CMS
+  - **Problem**: `src/pages/index.astro` only passed `title` prop to Hero component; subtitle had hardcoded default
+  - **Impact**: CMS edits to hero subtitle/CTAs were being ignored; users saw stale content even after successful deployments
+  - **Fix Applied**:
+    - Updated index.astro to pass all hero props from home.json (subtitle, primaryCta, secondaryCta)
+    - Updated Hero.astro default subtitle value to match current CMS content
+  - **Verification**: Local build confirmed "Professional academic editing" now appears (was stuck on "Expert")
+  - **Result**: Complete CMS → GitHub → Deploy pipeline now functional; content changes will propagate correctly
+  - **Related**: This bug was causing visual test failures (expected vs actual text mismatch)
+
 - ✅ **Caching Infrastructure & CMS Content Sync** (October 13, 2025):
   - **Problem Identified**: CMS changes saved to GitHub but not triggering rebuilds/deployments
   - **Phase 1 Strategy Implemented**: Early Production caching with immediate content freshness priority
