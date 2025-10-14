@@ -1,11 +1,15 @@
 # Visual Regression Testing Guide
 
-**Last Updated**: October 5, 2025
+**Last Updated**: October 14, 2025
 **Status**: ✅ Modernized with October 2025 best practices
+
+> **For PR workflow and developer usage**, see **[docs/playbooks/pr-workflow.md](../playbooks/pr-workflow.md)**
+>
+> This guide focuses on **technical implementation details** and configuration.
 
 ## Overview
 
-Visual regression testing ensures our UI remains consistent across deployments by comparing screenshots against baseline images. We use **Playwright's built-in visual testing** with modern stability techniques.
+Visual regression testing ensures our UI remains consistent across deployments by comparing screenshots against baseline images. We use **Playwright's built-in visual testing** with modern stability techniques integrated into our professional CI/CD workflow.
 
 ## Modern Configuration (October 2025)
 
@@ -148,6 +152,8 @@ await expect(header).toHaveScreenshot('header.png', snapshotOptions);
 
 ## Workflow Management
 
+> **For complete PR workflow with visual regression testing**, see **[docs/playbooks/pr-workflow.md](../playbooks/pr-workflow.md)**
+
 ### Running Visual Tests Locally
 
 ```bash
@@ -166,13 +172,16 @@ pnpm exec playwright test tests/e2e/visual.spec.ts --ui
 
 ### CI/CD Workflows
 
-**1. e2e-visual.yml** (Auto on push to main; blocking)
+See [.github/workflows/README.md](../../.github/workflows/README.md) for complete workflow documentation.
 
-- Runs on every push to main
+**1. e2e-visual.yml** (Auto on push to main and PRs; blocking)
+
+- Runs automatically on every PR and push to main
 - Uses Linux baselines (platform-specific)
 - Installs system fonts to match seeding env; kills port 4321 before server start
+- **Fails PRs when snapshots don't match** (expected behavior for UI changes)
 
-**2. Visual Tests (Modern)** (Manual trigger)
+**2. Visual Tests (Modern)** (Manual trigger for baseline updates)
 
 - Trigger with `updateBaselines=true` (optionally pass `ref=<SHA>` to seed from exact commit)
 - Uploads artifacts and can auto-open a PR with updated baselines
@@ -180,20 +189,26 @@ pnpm exec playwright test tests/e2e/visual.spec.ts --ui
 
 ### Updating Baselines
 
-**Locally** (macOS/darwin):
+**Standard Workflow** (Developers - see [pr-workflow.md](../playbooks/pr-workflow.md)):
 
 ```bash
+# Local update (macOS/darwin)
 pnpm test:visual:update
+
+# Commit and push
+git add tests/e2e/__screenshots__/
+git commit -m "test: update visual baselines for [reason]"
+git push
 ```
 
-**Via CI** (Linux baselines on GitHub Actions):
+**Advanced: CI Baseline Update** (Linux baselines on GitHub Actions):
 
 ```bash
-# Trigger workflow by file path (requires gh auth). Optionally pass a specific ref SHA.
+# Trigger workflow manually (requires gh auth)
 gh workflow run .github/workflows/visual-modern.yml -f updateBaselines=true -f ref=<SHA>
 
-# The workflow uploads an artifact named "updated-baselines" and can auto-open a PR.
-# If you prefer manual commit:
+# The workflow uploads an artifact and can auto-open a PR
+# Manual commit alternative:
 gh run download <RUN_ID> -n updated-baselines -D tmp/baselines
 mv tmp/baselines/visual.spec.ts/*.png tests/e2e/__screenshots__/visual.spec.ts/
 git add tests/e2e/__screenshots__/visual.spec.ts/

@@ -56,14 +56,26 @@ pnpm dev
 ## Key Commands
 
 ```bash
-pnpm dev          # Start development server
-pnpm build        # Build for production
-pnpm preview      # Preview production build
-pnpm check        # Run all quality checks
-pnpm test:e2e     # Run Playwright tests
-pnpm lint:fix     # Auto-fix linting issues
-pnpm biome:check  # Biome v2.2.5 (format+lint JS/TS/JSON)
-pnpm icons:build  # Rebuild favicon.ico and PNG icons from SVG
+# Development
+pnpm dev               # Start development server
+pnpm build             # Build for production
+pnpm preview           # Preview production build
+
+# Quality & Testing
+pnpm check             # Run all quality checks
+pnpm test              # Unit tests (Vitest)
+pnpm test:e2e          # E2E tests (Playwright)
+pnpm test:visual       # Visual regression tests
+pnpm test:visual:update  # Update visual baselines
+pnpm test:a11y         # Accessibility tests
+
+# Code Quality
+pnpm lint:fix          # Auto-fix linting issues
+pnpm biome:check       # Biome v2.2.5 (format+lint JS/TS/JSON)
+pnpm typecheck         # TypeScript validation
+
+# Assets
+pnpm icons:build       # Rebuild favicon.ico and PNG icons from SVG
 ```
 
 ## Icons
@@ -182,16 +194,25 @@ gh run list --workflow=cms-content-sync.yml --limit 5
 
 ## Getting Help
 
-- Project Status: see `PROJECT-STATUS.md`
-- Implementation Roadmap: see `IMPLEMENTATION-ROADMAP.md`
-- Documentation Index: see `DOCUMENTATION-MASTER-INDEX.md`
-- Architecture Audit Checklist: see `docs/audits/edge-native-architecture-checklist.md`
-- Biome Strategy (v2.2.5): see `docs/decisions/2025-10-12-biome-2.2.5.md`
-- Biome Playbook: see `docs/playbooks/biome.md`
-- Production secrets: see `docs/INFISICAL-QUICKSTART.md`
-- New developer setup: see `docs/onboarding.md`
-- Workflow overview: see `WORKFLOW.md`
-- Specific problems: check `docs/playbooks/`
+### Quick Start
+- **New developer setup**: `docs/onboarding.md`
+- **Daily workflow**: `WORKFLOW.md`
+- **PR workflow & visual testing**: `docs/playbooks/pr-workflow.md` ⭐
+
+### Project Documentation
+- **Project Status**: `PROJECT-STATUS.md`
+- **Implementation Roadmap**: `IMPLEMENTATION-ROADMAP.md`
+- **Documentation Index**: `DOCUMENTATION-MASTER-INDEX.md`
+
+### Technical Guides
+- **Visual Regression Testing**: `docs/testing/VISUAL-REGRESSION-GUIDE.md`
+- **Biome Playbook**: `docs/playbooks/biome.md`
+- **Biome Strategy (v2.2.5)**: `docs/decisions/2025-10-12-biome-2.2.5.md`
+- **Architecture Checklist**: `docs/audits/edge-native-architecture-checklist.md`
+
+### Operations
+- **Production secrets**: `docs/INFISICAL-QUICKSTART.md`
+- **Troubleshooting**: `docs/playbooks/` (specific problem guides)
 
 ## License
 

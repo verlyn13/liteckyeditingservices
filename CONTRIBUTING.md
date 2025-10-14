@@ -23,13 +23,18 @@ chore: update dependencies
 
 ### Pull Request Process
 
+> **For complete PR workflow with visual regression testing**, see **[docs/playbooks/pr-workflow.md](docs/playbooks/pr-workflow.md)**
+
 1. Create feature branch from `main`
 2. Make changes and test locally
 3. Run quality checks: `pnpm check`
-4. Push and open PR
-5. Wait for CI checks to pass
-6. Request review if needed
-7. Merge after approval
+4. **Run visual tests**: `pnpm test:visual` (update baselines if UI changed)
+5. Push and open PR
+6. **CI runs automatically**: Quality Gate + Visual Regression Tests
+7. **If visual tests fail**: Run `pnpm test:visual:update`, commit baselines, push
+8. Wait for all CI checks to pass (green ✅)
+9. Request review if needed
+10. Merge after approval
 
 ## Development Setup
 
@@ -72,7 +77,7 @@ pnpm exec prettier --check .     # verify formatting (optional)
 ### Testing
 
 ```bash
-# Unit tests (if any)
+# Unit tests
 pnpm test
 
 # E2E tests
@@ -80,7 +85,18 @@ pnpm test:e2e
 
 # E2E with UI
 pnpm test:e2e:ui
+
+# Visual regression tests
+pnpm test:visual
+
+# Update visual baselines (after UI changes)
+pnpm test:visual:update
+
+# Accessibility tests
+pnpm test:a11y
 ```
+
+**Important**: Always run visual tests before pushing UI changes. See [docs/playbooks/pr-workflow.md](docs/playbooks/pr-workflow.md) for complete workflow.
 
 ## Code Style
 
@@ -127,15 +143,41 @@ pnpm test:e2e:ui
 
 ## CI/CD Pipeline
 
+> **For complete CI/CD workflow details**, see **[docs/playbooks/pr-workflow.md](docs/playbooks/pr-workflow.md)**
+
 ### Automated Checks
 
 Every PR runs:
 
-1. Code quality (Biome, Prettier, ESLint)
-2. Type checking (TypeScript, Astro, Svelte)
-3. Build verification
-4. E2E tests (Playwright)
-5. Deployment preview
+1. **Quality Gate** (`quality-gate.yml`):
+   - Preflight checks (CI configuration validation)
+   - Structure validation (required files/directories)
+   - Code quality (Biome, Prettier, ESLint)
+   - Type checking (TypeScript, Astro, Svelte)
+   - Build verification
+   - Sentry sourcemap upload
+
+2. **Visual Regression Tests** (`e2e-visual.yml`):
+   - Component screenshots (header, footer, hero, contact form)
+   - Comparison against baseline snapshots
+   - **Fails PR if snapshots don't match** (expected for UI changes)
+   - Platform-specific baselines (Linux in CI, Darwin locally)
+
+3. **Preview Deployment**:
+   - Automatic Cloudflare Pages preview deployment
+   - Preview URL posted in PR comments
+   - Manual verification in live environment
+
+### Handling Visual Test Failures
+
+When visual tests fail (snapshot mismatch):
+
+1. **Review the changes**: Is this expected? (e.g., you changed colors, layout, favicon)
+2. **Update baselines locally**: `pnpm test:visual:update`
+3. **Commit updated snapshots**: `git add tests/e2e/__screenshots__/ && git commit -m "test: update visual baselines for [reason]"`
+4. **Push to PR**: CI re-runs and passes
+
+See [docs/playbooks/pr-workflow.md](docs/playbooks/pr-workflow.md) for detailed troubleshooting.
 
 ## Branch Management
 
