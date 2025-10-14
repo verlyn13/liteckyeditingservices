@@ -138,6 +138,7 @@ Validators and Rego policies enforce these constraints to prevent drift.
 ### Updating Content
 
 **Via CMS** (Recommended):
+
 1. Login: https://liteckyeditingservices.com/admin
 2. Edit and save changes
 3. Auto-commits to GitHub `main` branch
@@ -145,6 +146,7 @@ Validators and Rego policies enforce these constraints to prevent drift.
 5. Cache purges automatically
 
 **Via Git** (Developers):
+
 1. Edit files in `content/` directory
 2. Commit and push to `main`
 3. Triggers same deployment workflow
@@ -152,11 +154,13 @@ Validators and Rego policies enforce these constraints to prevent drift.
 ### Caching Strategy
 
 **Current** (Phase 1 - Freshness First):
+
 - HTML: `max-age=0, must-revalidate` (always fresh)
 - Assets: Standard caching
 - Auto-purge on content changes
 
 **Future** (Phase 2 - Performance):
+
 - Immutable assets: 1 year cache
 - HTML: 4 hours edge, 5 minutes browser
 - Granular purging via worker
