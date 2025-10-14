@@ -704,7 +704,8 @@ pnpm build && pnpm preview                          # Preview production build
 
 ## Changelog
 
-- **2025-10-13** - Added cache-busting version parameters to favicon links to force browser refresh
+- **2025-10-13** - Implemented book_and_check.svg as the official favicon (replaces logo.svg)
+- **2025-10-13** - Added cache-busting version parameters to favicon links (`?v=2`) to force browser refresh
 - **2025-10-13** - Comprehensive modern standards documentation created
 - **2025-10-12** - Icon pipeline updated to support PNG sources
 - **2025-10-11** - Initial icon documentation

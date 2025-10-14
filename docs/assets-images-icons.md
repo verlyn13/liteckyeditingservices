@@ -10,8 +10,9 @@ Last updated: 2025-10-13
 ## Overview
 
 - Main site logo (on-page): `public/images/les-logo.png` (1024×1024 PNG)
+- **Current favicon source:** `public/icons/book_and_check.svg` (book with checkmark, brand icon as of 2025-10-13)
 - Icon source (simplified, with baked-in padding):
-  - **SVG:** `public/icons/logo.svg` (vector, recommended)
+  - **SVG:** `public/icons/logo.svg` or `public/icons/book_and_check.svg` (vector, recommended)
   - **PNG:** `public/icons/source.png` (raster, supported as of 2025-10-13)
   - **Other:** JPG, WebP also supported
 - Generated outputs (favicons + PWA icons):
