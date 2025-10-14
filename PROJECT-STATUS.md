@@ -55,10 +55,13 @@
 
 - ✅ **CSP Enhancement - GitHub Status Checks** (October 13, 2025 - Evening):
   - **Issue**: Decap CMS GitHub status API calls blocked by CSP (harmless but noisy console warnings)
-  - **Fix**: Added `https://www.githubstatus.com` to admin CSP `connect-src` directive
-  - **Impact**: Clean browser console; improved admin UX
-  - **File Changed**: `public/_headers`
-  - **Commit**: `e194b3e8`
+  - **Initial Fix Attempt**: Added `https://www.githubstatus.com` to `public/_headers` admin CSP
+  - **Root Cause Discovered**: Cloudflare Pages Function at `functions/admin/[[path]].ts` programmatically sets CSP headers, overriding `_headers` file for `/admin/*` routes
+  - **Correct Fix**: Added `https://www.githubstatus.com` to `connect-src` directive in Pages Function CSP configuration
+  - **Impact**: Clean browser console; improved admin UX; proper understanding of Pages Functions header precedence
+  - **Files Changed**: `public/_headers` (line 20), `functions/admin/[[path]].ts` (line 41)
+  - **Commits**: `e194b3e8` (initial), `8fa079d6` (final fix)
+  - **Lesson**: Pages Functions take precedence over `_headers` for routes they handle
 
 - ✅ **Caching Infrastructure & CMS Content Sync** (October 13, 2025):
   - **Problem Identified**: CMS changes saved to GitHub but not triggering rebuilds/deployments

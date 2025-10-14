@@ -37,8 +37,8 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     // Decap requires unsafe-eval for AJV codegen
     // Optional: Sentry CDN allowed for admin instrumentation bundle load
     "script-src 'self' 'unsafe-eval' https://challenges.cloudflare.com https://browser.sentry-cdn.com",
-    // Direct-to-GitHub (not proxying yet) + Sentry CDN for SDK/sourcemaps + Sentry ingest
-    "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://browser.sentry-cdn.com https://*.sentry.io https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
+    // Direct-to-GitHub (not proxying yet) + Sentry CDN for SDK/sourcemaps + Sentry ingest + GitHub status
+    "connect-src 'self' https://api.github.com https://raw.githubusercontent.com https://github.com https://www.githubstatus.com https://browser.sentry-cdn.com https://*.sentry.io https://litecky-decap-oauth.jeffreyverlynjohnson.workers.dev",
     "frame-src 'self' https://challenges.cloudflare.com",
     "child-src 'self' blob:",
     "worker-src 'self' blob:",
