@@ -44,6 +44,7 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, CMS pipeline 
 - Email Templates: `docs/EMAIL-TEMPLATES.md` _(New Oct 13, 2025)_
 - Caching Strategy: `CACHING-STRATEGY.md`
 - CMS Content Update Playbook: `docs/playbooks/cms-content-update.md`
+- **PR Workflow & Visual Regression**: `docs/playbooks/pr-workflow.md` _(New Oct 14, 2025 - Professional CI/CD workflow)_
 
 ### 3. PROJECT DOCUMENTATION (How to Use)
 
