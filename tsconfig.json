@@ -1,24 +1,22 @@
 {
-  "extends": "astro/tsconfigs/strict",
-  "compilerOptions": {
-    "types": ["vite/client", "astro/client", "node"],
-    "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "@sendgrid/mail": ["src/types/stubs/sendgrid-mail.d.ts"],
-      "@sendgrid/helpers/*": ["src/types/stubs/sendgrid-helpers.d.ts"]
-    }
-  },
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": [
-    "dist",
-    "public",
-    "playwright-report",
-    "test-results",
-    "coverage",
-    "node_modules",
-    "vitest.config.ts",
-    "astro.config.mjs",
-    "src/lib/email.ts"
-  ]
+	"extends": "astro/tsconfigs/strict",
+	"compilerOptions": {
+		"types": ["vite/client", "astro/client", "node"],
+		"skipLibCheck": true,
+		"baseUrl": ".",
+		"paths": {
+			"@sendgrid/mail": ["src/types/stubs/sendgrid-mail.d.ts"]
+		}
+	},
+	"include": [".astro/types.d.ts", "**/*"],
+	"exclude": [
+		"dist",
+		"public",
+		"playwright-report",
+		"test-results",
+		"coverage",
+		"node_modules",
+		"vitest.config.ts",
+		"astro.config.mjs"
+	]
 }

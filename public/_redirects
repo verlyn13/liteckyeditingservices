@@ -1,3 +1,2 @@
-# Canonical origin enforcement (October 2025 best practice)
-# Redirect apex to www for consistent OAuth handoff
-https://liteckyeditingservices.com/* https://www.liteckyeditingservices.com/:splat 301!
+# Canonical host redirect is handled in functions/_middleware.ts for Cloudflare Pages
+# (Cloudflare Pages _redirects only supports relative paths; host-level redirects are done in code)
