@@ -177,7 +177,7 @@ Validators and Rego policies enforce these constraints to prevent drift.
 - HTML: 4 hours edge, 5 minutes browser
 - Granular purging via worker
 
-See `CACHING-STRATEGY.md` for details.
+See `docs/architecture/CACHING-STRATEGY.md` for details.
 
 ### Manual Operations
 
@@ -203,8 +203,8 @@ gh run list --workflow=cms-content-sync.yml --limit 5
 ### Project Documentation
 
 - **Project Status**: `PROJECT-STATUS.md`
-- **Implementation Roadmap**: `IMPLEMENTATION-ROADMAP.md`
-- **Documentation Index**: `DOCUMENTATION-MASTER-INDEX.md`
+- **Implementation Roadmap**: `docs/planning/IMPLEMENTATION-ROADMAP.md`
+- **Documentation Index**: `docs/DOCUMENTATION-INDEX.md`
 
 ### Technical Guides
 

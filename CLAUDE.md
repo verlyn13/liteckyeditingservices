@@ -82,10 +82,12 @@ Build sequence:
 ## Project Status Tracking
 
 **PROJECT-STATUS.md** - Single source of truth for progress (currently 15% complete)
-**IMPLEMENTATION-ROADMAP.md** - Detailed build order with dependencies
-**DOCUMENTATION-MASTER-INDEX.md** - Index of all documentation
+**docs/planning/IMPLEMENTATION-ROADMAP.md** - Detailed build order with dependencies
+**docs/DOCUMENTATION-INDEX.md** - Index of all documentation
 
 Check these files to understand current state and next actions.
+
+**Note**: For current AI assistant guidelines, see **AGENTS.md** (primary reference).
 
 ## Memory Bank System
 
