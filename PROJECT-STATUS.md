@@ -2,7 +2,7 @@
 
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 15, 2025 (Visual test stability fixes + canonical redirect implementation)
+**Last Updated**: October 15, 2025 (Stage 1b: Type Hygiene + Edge-Safe TypeScript)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment + Full CMS Integration)
@@ -93,6 +93,30 @@
     - `tests/e2e/__screenshots__/visual.spec.ts/hero-chromium-darwin.png` - Updated baseline
     - `docs/ASSETS-AND-IMAGES.md` - Cache-busting documentation and changelog
     - `docs/assets-images-icons.md` - Current favicon reference updated
+
+**Recent Progress - October 15, 2025 (Evening)**:
+
+- ✅ **Stage 1b — Type Hygiene & Edge-Safe TypeScript** (October 15, 2025):
+  - **Type Safety Improvements**: Eliminated all Biome linting warnings for production-ready type safety
+    - Removed non-null assertions in `functions/api/contact.ts` (lines 72, 128) where TypeScript narrowing already guaranteed non-null
+    - Replaced all `any` types in `src/lib/email.ts` with proper typed imports from SendGrid SDK
+    - Created minimal but precise SendGrid type stub (`src/types/stubs/sendgrid-mail.d.ts`) for edge runtime compatibility
+  - **Global Type Augmentations**: Added proper TypeScript support for edge-safe patterns
+    - `src/types/globals.d.ts` - Augments globalThis with `__SG_API_KEY__` for edge-safe API key storage
+    - `src/types/import-meta.d.ts` - Augments Vite's ImportMetaEnv with custom environment variables
+    - Triple-slash references in `src/lib/email.ts` ensure TypeScript recognizes augmentations
+  - **File Changes**:
+    - Added: `src/types/globals.d.ts`, `src/types/import-meta.d.ts`
+    - Modified: `src/lib/email.ts` (triple-slash references, removed any casts)
+    - Modified: `functions/api/contact.ts` (removed redundant non-null assertions)
+    - Modified: `tsconfig.json` (removed src/lib/email.ts from exclude list)
+    - Deleted: `src/types/sendgrid-https-shim.d.ts`, `src/types/sendgrid-shims.d.ts`, `src/types/stubs/sendgrid-helpers.d.ts`
+  - **Code Quality Achievements**:
+    - ✅ Zero TypeScript errors across all projects (main, functions, workers)
+    - ✅ Zero Biome warnings (all files pass strict linting)
+    - ✅ Biome auto-formatting applied to all files for consistency
+  - **Technical Approach**: Type-level changes only with zero runtime behavior impact
+  - **Commit**: `68beeb0f`
 
 **Recent Progress - October 14, 2025**:
 
