@@ -74,6 +74,16 @@
     - `docs/ASSETS-AND-IMAGES.md` - Cache-busting documentation and changelog
     - `docs/assets-images-icons.md` - Current favicon reference updated
 
+**Recent Progress - October 14, 2025**:
+
+- ✅ **Phase 1 — Email Foundation Established**
+  - Brand-aligned templates (Admin + User) with preheaders and updated palette (#192a51 / #5a716a)
+  - Email helpers: List-Id mapping, quiet-hours check (AKT), AKT formatter
+  - Refactored contact paths (API + Queue) to centralized templates
+  - List-Id: `les-projects.liteckyeditingservices.com` for intake; categories set per role
+  - TypeScript passing: root + functions + workers
+  - Docs updated; completion report: `docs/email-templates/PHASE-1-COMPLETE.md`
+
 **Recent Progress - October 13, 2025**:
 
 - ✅ **CRITICAL BUG FIX - CMS Content Not Propagating** (October 13, 2025 - Evening):

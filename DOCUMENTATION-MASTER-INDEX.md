@@ -50,15 +50,16 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, CMS pipeline 
 
 **Purpose**: Testing infrastructure, workflows, and guides
 
-| Document                                        | Lines | Status  | Purpose                                                                      |
-| ----------------------------------------------- | ----- | ------- | ---------------------------------------------------------------------------- |
-| `docs/playbooks/pr-workflow.md`                 | 575   | ✅ READ | **PRIMARY**: Professional PR workflow with visual regression testing         |
-| `docs/testing/VISUAL-REGRESSION-GUIDE.md`       | 367   | ✅ READ | Technical implementation details for visual regression testing               |
-| `docs/testing/ACCESSIBILITY-TESTING.md`         | —     | ✅ READ | Accessibility testing guide (pa11y)                                          |
-| `docs/testing/E2E-CMS-TESTING.md`               | —     | ✅ READ | CMS integration testing guide                                                |
-| `.github/workflows/README.md`                   | 151   | ✅ READ | GitHub Actions workflows documentation (includes e2e-visual.yml details)     |
+| Document                                  | Lines | Status  | Purpose                                                                  |
+| ----------------------------------------- | ----- | ------- | ------------------------------------------------------------------------ |
+| `docs/playbooks/pr-workflow.md`           | 575   | ✅ READ | **PRIMARY**: Professional PR workflow with visual regression testing     |
+| `docs/testing/VISUAL-REGRESSION-GUIDE.md` | 367   | ✅ READ | Technical implementation details for visual regression testing           |
+| `docs/testing/ACCESSIBILITY-TESTING.md`   | —     | ✅ READ | Accessibility testing guide (pa11y)                                      |
+| `docs/testing/E2E-CMS-TESTING.md`         | —     | ✅ READ | CMS integration testing guide                                            |
+| `.github/workflows/README.md`             | 151   | ✅ READ | GitHub Actions workflows documentation (includes e2e-visual.yml details) |
 
 **Cross-References**:
+
 - Visual regression workflow: `docs/playbooks/pr-workflow.md` (PRIMARY for developers)
 - Technical implementation: `docs/testing/VISUAL-REGRESSION-GUIDE.md` (configuration and best practices)
 - Workflow automation: `.github/workflows/README.md` (e2e-visual.yml, visual-modern.yml)

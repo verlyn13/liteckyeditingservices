@@ -38,7 +38,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promi
       return json({ error: 'Missing required fields: name, email' }, 400);
     }
 
-    // If a Queue producer is bound, enqueue an email job
+    // Prefer queue if bound; quiet-hours aware (log-only default)
     const queue = env.SEND_EMAIL;
     if (queue && typeof queue.send === 'function') {
       await queue.send({ kind: 'contact', data });
@@ -51,6 +51,24 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promi
     const from = env.EMAIL_FROM;
 
     if (apiKey && to && from) {
+      // Build branded templates and metadata
+      const { createAdminNotification, createUserConfirmation } = await import(
+        '../../src/lib/email'
+      );
+      const { getListId, shouldQueueForQuietHours } = await import('../../src/lib/email-helpers');
+
+      const admin = createAdminNotification({
+        name: data.name,
+        email: data.email!,
+        service: data.service ?? '-',
+        deadline: '-',
+        message: data.message ?? '-',
+        quoteId: `Q-${Date.now()}`,
+      });
+
+      const listId = getListId('intake');
+      const quiet = shouldQueueForQuietHours(new Date(), 'America/Anchorage');
+
       const payload = {
         personalizations: [
           {
@@ -60,13 +78,14 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promi
         ],
         from: { email: from },
         reply_to: { email: data.email },
+        headers: { 'List-Id': listId },
+        categories: ['intake', 'project'],
+        custom_args: { quiet_hours: String(quiet) },
         content: [
-          {
-            type: 'text/plain',
-            value: `Name: ${data.name}\nEmail: ${data.email}\nService: ${data.service ?? '-'}\nMessage: ${data.message ?? '-'}`,
-          },
+          { type: 'text/plain', value: admin.text },
+          { type: 'text/html', value: admin.html },
         ],
-      };
+      } as Record<string, unknown>;
 
       const resp = await fetch('https://api.sendgrid.com/v3/mail/send', {
         method: 'POST',
@@ -77,10 +96,46 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promi
         body: JSON.stringify(payload),
       });
 
-      if (resp.ok) {
-        return json({ status: 'sent' }, 202);
+      if (!resp.ok) {
+        return json({ status: 'accepted-no-email', reason: 'sendgrid_error' }, 202);
       }
-      return json({ status: 'accepted-no-email', reason: 'sendgrid_error' }, 202);
+
+      // Optionally send user confirmation when FROM is configured
+      try {
+        const user = createUserConfirmation({
+          name: data.name,
+          service: data.service ?? '-',
+          deadline: '-',
+          message: data.message ?? '-',
+          quoteId: `Q-${Date.now()}`,
+        });
+        const userPayload = {
+          personalizations: [
+            {
+              to: [{ email: data.email! }],
+              subject: '[LES] Inquiry received — Thank you',
+            },
+          ],
+          from: { email: from },
+          headers: { 'List-Id': listId },
+          categories: ['intake', 'customer'],
+          custom_args: { quiet_hours: String(quiet) },
+          content: [
+            { type: 'text/plain', value: user.text },
+            { type: 'text/html', value: user.html },
+          ],
+        } as Record<string, unknown>;
+        await fetch('https://api.sendgrid.com/v3/mail/send', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userPayload),
+        });
+      } catch {}
+
+      return json({ status: 'sent' }, 202);
     }
 
     // Accept without email if SendGrid not configured yet

@@ -195,22 +195,26 @@ gh run list --workflow=cms-content-sync.yml --limit 5
 ## Getting Help
 
 ### Quick Start
+
 - **New developer setup**: `docs/onboarding.md`
 - **Daily workflow**: `WORKFLOW.md`
 - **PR workflow & visual testing**: `docs/playbooks/pr-workflow.md` ⭐
 
 ### Project Documentation
+
 - **Project Status**: `PROJECT-STATUS.md`
 - **Implementation Roadmap**: `IMPLEMENTATION-ROADMAP.md`
 - **Documentation Index**: `DOCUMENTATION-MASTER-INDEX.md`
 
 ### Technical Guides
+
 - **Visual Regression Testing**: `docs/testing/VISUAL-REGRESSION-GUIDE.md`
 - **Biome Playbook**: `docs/playbooks/biome.md`
 - **Biome Strategy (v2.2.5)**: `docs/decisions/2025-10-12-biome-2.2.5.md`
 - **Architecture Checklist**: `docs/audits/edge-native-architecture-checklist.md`
 
 ### Operations
+
 - **Production secrets**: `docs/INFISICAL-QUICKSTART.md`
 - **Troubleshooting**: `docs/playbooks/` (specific problem guides)
 

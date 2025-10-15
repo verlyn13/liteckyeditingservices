@@ -3,15 +3,17 @@
  * September 2025 - Modern implementation with full telemetry
  */
 
-import type { ClientResponse, MailDataRequired } from '@sendgrid/mail';
-import sgMail from '@sendgrid/mail';
+// Lazy import SendGrid to keep Workers-friendly typecheck
+type ClientResponse = { headers: Record<string, string>; statusCode: number };
+type MailDataRequired = Record<string, unknown>;
 
 // Initialize SendGrid with API key
 export function initSendgrid(apiKey: string) {
   if (!apiKey) {
     throw new Error('SendGrid API key is required');
   }
-  sgMail.setApiKey(apiKey);
+  // Initialized on first send (lazy)
+  (globalThis as any).__SG_API_KEY__ = apiKey;
 }
 
 // Email message interface with full SendGrid features
@@ -65,6 +67,11 @@ export async function sendEmail(
   const timestamp = new Date().toISOString();
 
   try {
+    // Lazy import and init
+    const sgMail = (await import('@sendgrid/mail')).default as any;
+    if ((globalThis as any).__SG_API_KEY__) {
+      sgMail.setApiKey((globalThis as any).__SG_API_KEY__);
+    }
     // Use em subdomain for transactional emails if specified
     const fromEmail =
       message.useEmDomain && message.from.includes('@liteckyeditingservices.com')
@@ -115,10 +122,11 @@ export async function sendEmail(
     }
 
     if (message.customArgs) {
+      const mode = (import.meta as any)?.env?.MODE || 'development';
       mail.customArgs = {
         ...message.customArgs,
         timestamp,
-        env: import.meta.env.MODE || 'development',
+        env: mode,
       };
     }
 
@@ -133,7 +141,9 @@ export async function sendEmail(
 
     // Mail settings
     const sandboxEnabled =
-      options.devSandbox ?? (import.meta.env.DEV && !import.meta.env.SENDGRID_FORCE_SEND);
+      options.devSandbox ??
+      (((import.meta as any)?.env?.DEV as boolean) &&
+        !(import.meta as any)?.env?.SENDGRID_FORCE_SEND);
     (
       mail as MailDataRequired & {
         mailSettings?: { sandboxMode?: { enable?: boolean } };
@@ -310,6 +320,8 @@ export function createAdminNotification(data: {
   message: string;
   quoteId: string;
 }): { text: string; html: string } {
+  const preheader = `New contact request ${data.name} — ${data.service}`;
+
   const text = `New Contact Form Submission
 
 Quote ID: ${data.quoteId}
@@ -329,13 +341,13 @@ Received at: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York'
 <html>
 <head>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #2c2c2c; background: #f7f7f5; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #1e3a8a; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-    .content { background: #f8f9fa; padding: 20px; border-radius: 0 0 8px 8px; border: 1px solid #dee2e6; }
+    .header { background: #192a51; color: #ffffff; padding: 20px; border-radius: 8px 8px 0 0; }
+    .content { background: #ffffff; padding: 20px; border-radius: 0 0 8px 8px; border: 1px solid #dee2e6; }
     .field { margin-bottom: 15px; }
-    .label { font-weight: bold; color: #495057; }
-    .value { margin-top: 5px; padding: 10px; background: white; border-radius: 4px; }
+    .label { font-weight: bold; color: #192a51; }
+    .value { margin-top: 5px; padding: 10px; background: #f7f7f5; border-radius: 4px; }
     .quote-id { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px; margin-bottom: 20px; }
     .message { white-space: pre-wrap; }
     .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #dee2e6; font-size: 12px; color: #6c757d; }
@@ -343,6 +355,8 @@ Received at: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York'
 </head>
 <body>
   <div class="container">
+    <!-- Preheader (hidden) -->
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${preheader}</div>
     <div class="header">
       <h2 style="margin: 0;">New Contact Form Submission</h2>
     </div>
@@ -402,6 +416,8 @@ export function createUserConfirmation(data: {
   message: string;
   quoteId: string;
 }): { text: string; html: string } {
+  const preheader = `We received your inquiry — Quote ID ${data.quoteId}`;
+
   const text = `Thank you for contacting Litecky Editing Services
 
 Dear ${data.name},
@@ -428,17 +444,19 @@ For questions, please email hello@liteckyeditingservices.com`;
 <html>
 <head>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #2c2c2c; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: #1e3a8a; color: white; padding: 30px; border-radius: 8px 8px 0 0; text-align: center; }
-    .content { background: white; padding: 30px; border: 1px solid #dee2e6; border-radius: 0 0 8px 8px; }
-    .quote-id { background: #dbeafe; border-left: 4px solid #1e3a8a; padding: 15px; margin: 20px 0; font-size: 18px; }
-    .message-box { background: #f8f9fa; padding: 20px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #1e3a8a; }
+    .header { background: #192a51; color: #ffffff; padding: 30px; border-radius: 8px 8px 0 0; text-align: center; }
+    .content { background: #ffffff; padding: 30px; border: 1px solid #dee2e6; border-radius: 0 0 8px 8px; }
+    .quote-id { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; font-size: 18px; }
+    .message-box { background: #f7f7f5; padding: 20px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #5a716a; }
     .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #dee2e6; font-size: 12px; color: #6c757d; text-align: center; }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Preheader (hidden) -->
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${preheader}</div>
     <div class="header">
       <h1 style="margin: 0;">Thank You for Your Inquiry</h1>
     </div>

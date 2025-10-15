@@ -145,25 +145,31 @@ git add src/lib/email.ts
 git commit -m "feat(email): update [template name] template"
 ```
 
-## Design System
+## Design System (Scholarly Minimalist)
 
-### Colors
+### Colors (Email-Safe)
 
 Use hex codes for maximum email client compatibility:
 
-| Color | Hex Code | Usage |
+| Token | Hex Code | Usage |
 |-------|----------|-------|
-| Primary Blue | `#1e3a8a` | Headers, emphasis, links |
-| Warning Yellow | `#f59e0b` | Quote ID badges, alerts |
-| Light Gray | `#f8f9fa` | Backgrounds, subtle sections |
-| Dark Gray | `#333333` | Body text |
+| Primary Navy | `#192a51` | Headers, emphasis, links |
+| Accent Sage | `#5a716a` | Buttons, accents |
+| Light Sage | `#87a96b` | Hovers, subtle accents |
+| Off-White | `#f7f7f5` | Backgrounds |
+| Text Primary | `#2c2c2c` | Body text |
+| Warning | `#f59e0b` | ID badges, alerts |
 | Border Gray | `#dee2e6` | Borders, dividers |
-| White | `#ffffff` | Cards, containers |
 
 ### Typography
 
+Prefer web-safe fallbacks; load Lora/Inter only if your ESP supports it.
+
 ```css
-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+/* Headings */
+font-family: "Lora", Georgia, serif;
+/* Body */
+font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 line-height: 1.6;
 font-size: 16px; /* Use pixels, not rem/em */
 ```
@@ -180,7 +186,7 @@ border-radius: 8px; /* Modern look */
 
 #### Header Section
 ```html
-<div class="header" style="background: #1e3a8a; color: white; padding: 30px; text-align: center;">
+<div class="header" style="background: #192a51; color: #ffffff; padding: 30px; text-align: center;">
   <h1 style="margin: 0; font-size: 24px;">Header Text</h1>
 </div>
 ```

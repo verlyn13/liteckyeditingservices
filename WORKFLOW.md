@@ -30,16 +30,19 @@ This is the quickest way to understand how to work with the repo.
 ## Commands
 
 ### Development
+
 - `pnpm dev` — Start dev server
 - `pnpm build` — Type-check and build
 - `pnpm preview` — Serve production build
 
 ### Quality & Validation
+
 - `pnpm check` — Validate versions/structure/paths + Biome + TypeScript
 - `pnpm typecheck` — TypeScript validation only
 - `pnpm lint:fix` — Auto-fix linting issues
 
 ### Testing
+
 - `pnpm test` — Unit tests (Vitest)
 - `pnpm test:e2e` — E2E tests (Playwright, auto-starts dev server)
 - `pnpm test:visual` — Visual regression tests ⭐
@@ -47,4 +50,5 @@ This is the quickest way to understand how to work with the repo.
 - `pnpm test:a11y` — Accessibility checks (pa11y)
 
 ### Workflows
+
 - See [docs/playbooks/pr-workflow.md](docs/playbooks/pr-workflow.md) for PR workflow with visual testing

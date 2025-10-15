@@ -34,17 +34,34 @@ export default {
           continue;
         }
 
+        // Build branded admin email
+        const { createAdminNotification } = await import('../../../src/lib/email');
+        const { getListId, shouldQueueForQuietHours } = await import(
+          '../../../src/lib/email-helpers'
+        );
+        const admin = createAdminNotification({
+          name,
+          email,
+          service: service ?? '-',
+          deadline: '-',
+          message: message ?? '-',
+          quoteId: `Q-${Date.now()}`,
+        });
+        const listId = getListId('intake');
+        const quiet = shouldQueueForQuietHours(new Date(), 'America/Anchorage');
+
         const payload = {
           personalizations: [{ to: [{ email: to }], subject: `New Quote Request from ${name}` }],
           from: { email: from },
           reply_to: { email },
+          headers: { 'List-Id': listId },
+          categories: ['intake', 'project'],
+          custom_args: { quiet_hours: String(quiet) },
           content: [
-            {
-              type: 'text/plain',
-              value: `Name: ${name}\nEmail: ${email}\nService: ${service ?? '-'}\nMessage: ${message ?? '-'}`,
-            },
+            { type: 'text/plain', value: admin.text },
+            { type: 'text/html', value: admin.html },
           ],
-        };
+        } as Record<string, unknown>;
 
         const resp = await fetch('https://api.sendgrid.com/v3/mail/send', {
           method: 'POST',

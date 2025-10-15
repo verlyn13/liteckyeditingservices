@@ -80,16 +80,19 @@
 > **For developer workflow**, see **[docs/playbooks/pr-workflow.md](../../docs/playbooks/pr-workflow.md)**
 
 **What it does**:
+
 - Captures screenshots of 4 key components (header, footer, hero, contact form)
 - Compares against baseline snapshots
 - **Fails PR if snapshots don't match** (expected when UI changes)
 - Requires developers to update baselines locally and push
 
 **Platform-specific baselines**:
+
 - **Linux** (`*-chromium-linux.png`) - Used in CI
 - **Darwin** (`*-chromium-darwin.png`) - Used locally on macOS
 
 **How to handle failures**:
+
 ```bash
 # When visual tests fail on your PR:
 pnpm test:visual:update           # Update baselines locally
@@ -109,11 +112,13 @@ See [docs/playbooks/pr-workflow.md](../../docs/playbooks/pr-workflow.md) for com
 > **Most developers should update baselines locally** - see [docs/playbooks/pr-workflow.md](../../docs/playbooks/pr-workflow.md)
 
 **When to use this**:
+
 - Bulk baseline regeneration after Playwright version upgrade
 - Linux baseline updates when local Mac baselines are already correct
 - Font or rendering environment changes that affect CI only
 
 **How it works**:
+
 - Protected runner for seeding/updating Linux visual baselines
 - Uses `concurrency: baselines-${{ github.ref }}` to prevent overlap
 - Accepts `ref` input to seed from an exact branch/SHA
@@ -121,6 +126,7 @@ See [docs/playbooks/pr-workflow.md](../../docs/playbooks/pr-workflow.md) for com
 - Optionally creates PR with updated baselines (if permissions allow)
 
 **Manual trigger**:
+
 ```bash
 gh workflow run .github/workflows/visual-modern.yml \
   -f updateBaselines=true \
@@ -130,12 +136,14 @@ gh workflow run .github/workflows/visual-modern.yml \
 ### Required vs Advisory Checks
 
 **Required** (must pass before merge):
+
 - `quality-gate` - Code quality, type checking, build verification
 - `e2e-visual` - Visual regression testing (blocking on PRs)
 - `preview-validation` - Preview deployment smoke tests
 - `post-deploy-validation` - Production validation (after deploy)
 
 **Advisory** (informational):
+
 - `admin-check` - Periodic CMS health checks
 
 ### Version Pin Policy
@@ -147,6 +155,7 @@ gh workflow run .github/workflows/visual-modern.yml \
 ## Workflow Documentation
 
 For complete CI/CD workflow details and developer usage:
+
 - **PR Workflow & Visual Regression**: [docs/playbooks/pr-workflow.md](../../docs/playbooks/pr-workflow.md)
 - **Visual Regression Technical Guide**: [docs/testing/VISUAL-REGRESSION-GUIDE.md](../../docs/testing/VISUAL-REGRESSION-GUIDE.md)
 
