@@ -2,7 +2,7 @@
 
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 14, 2025 (Visual regression testing documentation + favicon implementation)
+**Last Updated**: October 15, 2025 (Visual test stability fixes + canonical redirect implementation)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment + Full CMS Integration)
@@ -13,6 +13,7 @@
 
 **Status**: ✅ **PRODUCTION READY** - Git-connected deployment live; CI/CD optimized; comprehensive monitoring; caching strategy active; professional visual regression testing workflow.
 **Auth Hardening**: 🟢 Completed — PKCE-only flow enforced; canonical Decap message; pinned bundle; clearer errors.
+**October 15 Update**: ✅ Visual test stability fixes - Moved canonical redirect to middleware, stabilized Hero component with CMS-driven content for reliable visual regression testing.
 **October 14 Update**: ✅ Professional CI/CD visual regression testing workflow documented - Complete PR workflow guide with visual test failure handling, favicon cache-busting implementation, comprehensive documentation consolidation and cross-referencing.
 **October 13 Update**: ✅ Caching infrastructure implemented - Phase 1 (Early Production) strategy active with automatic CMS content deployments and cache purging.
 **October 12 Update**: ✅ CI/CD pipeline enhancements complete (caching, preflight, concurrency); Sentry integration enhanced with privacy protection and environment-based sampling. Evening: Decap auto-discovery finalized (CMS.init() with no config); OAuth popup handshake hardened with ack; admin Sentry self-host fallback; hard reload after accept to ensure editor boot.
@@ -38,6 +39,25 @@
 - Admin panel functional at /admin/ (GitHub OAuth end-to-end)
 - Automatic builds triggered by Git commits
 - All security headers E2E tests passing (15/15)
+
+**Recent Progress - October 15, 2025**:
+
+- ✅ **Visual Test Stability & Canonical Redirect** (October 15, 2025):
+  - **Canonical Redirect Migration**: Moved apex → www redirect from `public/_redirects` to middleware
+    - Reason: Cloudflare Pages `_redirects` only supports relative paths; host redirects require Pages Functions
+    - Implementation: Added redirect handler in `functions/_middleware.ts` (first in middleware chain)
+    - Production-only: Redirect only active when `ENVIRONMENT === 'production'` to avoid dev conflicts
+  - **Hero Component Content Stabilization**: Made Hero component use CMS-driven statsBadge prop
+    - Before: Hardcoded "20+ Years Experience" and "5,000+ Papers Edited" in component
+    - After: Props passed from `content/pages/home.json` via index.astro
+    - Benefit: Content consistency for visual regression tests; CMS edits reflect immediately
+  - **TypeScript Fix**: Added `EventContext` type to middleware canonical redirect handler
+  - **Files Changed**:
+    - `functions/_middleware.ts` - Added typed canonical redirect handler (line 64-72)
+    - `src/components/Hero.astro` - Added `statsBadge` prop with defaults (lines 7, 15, 40-41)
+    - `src/pages/index.astro` - Pass `statsBadge` from CMS data (line 21)
+  - **Impact**: Eliminates visual test drift from hardcoded content; proper host-level redirects
+  - **Commit**: `8869fe1a`
 
 **Recent Progress - October 14, 2025**:
 
