@@ -14,6 +14,7 @@ Plan and execute multi-file refactors with behavior preservation guarantees.
 ### 1. Scope Definition
 
 Define refactor boundaries:
+
 - **Files affected** (list all files to touch)
 - **Functions/components** to modify
 - **Dependencies** (imports, exports, types)
@@ -22,6 +23,7 @@ Define refactor boundaries:
 ### 2. Behavior Preservation Strategy
 
 Ensure refactor is **behavior-preserving**:
+
 - Identify public API surface (exports, props, endpoints)
 - List expected inputs and outputs
 - Document edge cases and error handling
@@ -30,6 +32,7 @@ Ensure refactor is **behavior-preserving**:
 ### 3. Test-First Verification
 
 Before refactoring:
+
 1. **Run existing tests** to establish baseline
    ```fish
    pnpm test && pnpm test:e2e
@@ -42,6 +45,7 @@ Before refactoring:
 ### Phase 1: Preparation
 
 1. **Create feature branch**
+
    ```fish
    git checkout -b refactor/[description]
    ```
@@ -57,24 +61,28 @@ Before refactoring:
 Execute refactor in **small, testable steps**:
 
 **Step 1:** Extract/rename (no logic changes)
+
 - Move functions to new modules
 - Rename variables/functions
 - Update imports
 - ✅ Run tests after each change
 
 **Step 2:** Modify internals (preserve interfaces)
+
 - Refactor implementation
 - Update types
 - Add validation
 - ✅ Run tests after each change
 
 **Step 3:** Update call sites
+
 - Adjust function calls
 - Update component props
 - Fix type errors
 - ✅ Run tests after each change
 
 **Step 4:** Clean up
+
 - Remove dead code
 - Update docs
 - Run linter
@@ -83,21 +91,25 @@ Execute refactor in **small, testable steps**:
 ### Phase 3: Verification
 
 1. **Type check**
+
    ```fish
    pnpm typecheck
    ```
 
 2. **Lint check**
+
    ```fish
    pnpm biome check
    ```
 
 3. **Full test suite**
+
    ```fish
    pnpm test && pnpm test:e2e
    ```
 
 4. **Policy gate**
+
    ```fish
    pnpm validate:all && pnpm policy:check
    ```
@@ -117,6 +129,7 @@ If refactor introduces issues:
    - What test failed?
 
 2. **Rollback strategy**
+
    ```fish
    git reset --hard HEAD~1  # Undo last commit
    # OR
@@ -155,6 +168,7 @@ Testing: pnpm test (all passing)
 ## Usage
 
 In Cascade:
+
 - Type `/refactor_plan` before starting a refactor
 - Provide context: files, functions, goals
 - Cascade will generate a step-by-step checklist
