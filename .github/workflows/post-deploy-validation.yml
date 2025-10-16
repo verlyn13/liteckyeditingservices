@@ -10,6 +10,7 @@ on:
 
 jobs:
   validate:
+    timeout-minutes: 5
     runs-on: ubuntu-latest
     env:
       CI: true
@@ -56,37 +57,20 @@ jobs:
             echo "COEP must NOT be set on /admin/ (breaks popup handoff): $coep"; exit 1;
           fi
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.17.1
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          node-version: '20'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps
+      - name: Install Playwright Browsers and Dependencies
+        uses: microsoft/playwright-github-action@v1
 
       - name: Production smoke tests
         run: |
