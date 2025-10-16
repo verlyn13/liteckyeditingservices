@@ -48,6 +48,20 @@ jobs:
 
           echo "✅ All required CI configuration verified"
 
+  validate-docs:
+    name: Validate Documentation Accuracy
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.modified, '.md') || contains(github.event.pull_request.changed_files, '.md')
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Validate documentation accuracy
+        run: node scripts/validate/docs-accuracy.mjs
+
   validate-structure:
     name: Validate Repository Structure
     runs-on: ubuntu-latest

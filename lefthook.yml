@@ -22,6 +22,11 @@ pre-commit:
       glob: '*.{js,mjs,ts,tsx,astro,svelte}'
       run: pnpm check
 
+    docs-accuracy:
+      glob: '*.md'
+      run: node scripts/validate/docs-accuracy.mjs
+      tags: docs
+
 pre-push:
   commands:
     docs-gate:

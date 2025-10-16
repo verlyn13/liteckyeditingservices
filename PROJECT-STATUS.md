@@ -92,7 +92,7 @@
     - `package.json` - Default icon source updated to book_and_check.svg
     - `tests/e2e/__screenshots__/visual.spec.ts/hero-chromium-darwin.png` - Updated baseline
     - `docs/ASSETS-AND-IMAGES.md` - Cache-busting documentation and changelog
-    - `docs/assets-images-icons.md` - Current favicon reference updated
+    - Archived legacy favicon documentation
 
 **Recent Progress - October 15, 2025 (Evening)**:
 
@@ -283,7 +283,7 @@
 - 🛠️ **Post-Boot Hydrator** (Oct 11): Added `public/admin/post-boot-hydrator.js` which, after navigation to `/admin/#/`, guarantees Decap hydration if LS already contains a user. It waits for the store, re-emits the canonical token message, manually dispatches as a fallback, and finally performs a one-time soft reload. All steps emit Sentry breadcrumbs (`hydr:*`) and capture exceptions with context. Admin HTML now emits `admin:html-start` and diagnostics logs `admin:diagnostics-loaded` for traceability.
 - 🚀 **Cache Bust + Rescue** (Oct 11): Versioned admin scripts (`pkce-login.v3.js`, `diagnostics.v2.js`) and added `public/_headers` with `Cache-Control: no-store` for `/admin/*` to defeat CDN/browser cache. Diagnostics includes a temporary rescue that seeds a user on token receipt if LS is empty, then navigates to `/#/`.
 - 🔐 **CSP + Sentry Fixes** (Oct 11): Removed inline scripts in `public/admin/index.html` to satisfy CSP; added `public/admin/html-start.js` for the early breadcrumb. Replaced ESM `sentry-admin.js` with a classic IIFE (no `import.meta`), loaded via `<script defer>` to avoid module/inline CSP issues. The admin Sentry initializer now reads config from `<meta name="sentry-*">` or `window.SENTRY_*` if present and exposes `window.__sentry` for other admin scripts.
-- 🧰 **Robust Acceptance Helper** (Oct 11): Added `admin/accept-login.js` with structured logs, idempotent guard, dispatch attempt, hard navigation, and post-nav verification. `pkce-login.v3` prefers `window.__acceptAndFlipFromToken` when present.
+- 🧰 **Robust Acceptance Helper** (Oct 11): Added `public/admin/accept-login.js` with structured logs, idempotent guard, dispatch attempt, hard navigation, and post-nav verification. `pkce-login.v3` prefers `window.__acceptAndFlipFromToken` when present.
 - 🔧 **Token Exchange Fix**: `/api/exchange-token` now uses `application/x-www-form-urlencoded` for GitHub’s token endpoint (JSON body returned 400).
 - 🧩 **Admin Script Order** (Oct 11): Admin now loads `diagnostics.js`, `pkce-boot.js`, and `pkce-login.js` before the single self-hosted Decap bundle to ensure interceptors and acceptance logic are active at boot.
 - 🔧 **Media Paths Sanity**: Repo-side check + CI step for `public/uploads` and config values.
@@ -733,7 +733,7 @@
 - ✅ `docs/infrastructure/UPTIME-MONITORING.md` - External uptime monitoring setup
 - ✅ `docs/infrastructure/ERROR-ALERTING.md` - Cloudflare error monitoring with Workers
 - ✅ `docs/infrastructure/QUEUE-HEALTH.md` - Queue health monitoring implementation
-- ✅ `docs/PHASE-7-PROGRESS.md` - Week 1 progress tracking
+- ✅ Phase 7 progress tracking (archived in `_archive/phase-7/`)
 
 **Archived Specifications** (`_archive/`):
 
