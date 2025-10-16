@@ -8,7 +8,7 @@ This directory contains all developer documentation, playbooks, and technical gu
 Start here: **[../README.md](../README.md)** → **[onboarding.md](onboarding.md)**
 
 ### 🔍 Looking for Something Specific?
-See **[../DOCUMENTATION-MASTER-INDEX.md](../DOCUMENTATION-MASTER-INDEX.md)** for complete documentation inventory.
+See **[DOCUMENTATION-INDEX.md](DOCUMENTATION-INDEX.md)** for complete documentation inventory.
 
 ---
 
@@ -87,7 +87,7 @@ See **[../DOCUMENTATION-MASTER-INDEX.md](../DOCUMENTATION-MASTER-INDEX.md)** for
 → [playbooks/DECAP-OAUTH-WORKFLOW.md](playbooks/DECAP-OAUTH-WORKFLOW.md) and [troubleshooting/](troubleshooting/)
 
 **Deploy to production**
-→ [../DEPLOYMENT.md](../DEPLOYMENT.md) and [migrations/PAGES-GIT-CUTOVER-RUNBOOK.md](migrations/PAGES-GIT-CUTOVER-RUNBOOK.md)
+→ [../DEPLOYMENT.md](../DEPLOYMENT.md) and [deployment/WORKER-DEPLOYMENT.md](deployment/WORKER-DEPLOYMENT.md)
 
 **Troubleshoot email delivery**
 → [playbooks/email-issues.md](playbooks/email-issues.md) and [infrastructure/SENDGRID-SETUP.md](infrastructure/SENDGRID-SETUP.md)
@@ -124,7 +124,7 @@ See **[../DOCUMENTATION-MASTER-INDEX.md](../DOCUMENTATION-MASTER-INDEX.md)** for
 
 ## 🆘 Getting Help
 
-1. **Check the docs**: Use search (Cmd+F) or check the [master index](../DOCUMENTATION-MASTER-INDEX.md)
+1. **Check the docs**: Use search (Cmd+F) or check the [documentation index](DOCUMENTATION-INDEX.md)
 2. **Check playbooks**: Operational issues often have playbooks in [playbooks/](playbooks/)
 3. **Check troubleshooting**: Known issues documented in [troubleshooting/](troubleshooting/)
 4. **Check archived docs**: Historical context in [../_archive/](../_archive/)
@@ -134,4 +134,5 @@ See **[../DOCUMENTATION-MASTER-INDEX.md](../DOCUMENTATION-MASTER-INDEX.md)** for
 
 **For the complete project overview**: See [../README.md](../README.md)
 **For implementation status**: See [../PROJECT-STATUS.md](../PROJECT-STATUS.md)
-**For complete documentation index**: See [../DOCUMENTATION-MASTER-INDEX.md](../DOCUMENTATION-MASTER-INDEX.md)
+**For complete documentation index**: See [DOCUMENTATION-INDEX.md](DOCUMENTATION-INDEX.md)
+**For implementation roadmap**: See [planning/IMPLEMENTATION-ROADMAP.md](planning/IMPLEMENTATION-ROADMAP.md)

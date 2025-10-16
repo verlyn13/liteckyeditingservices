@@ -32,8 +32,8 @@ jobs:
             "CONTRIBUTING.md"
             "ENVIRONMENT.md"
             "PROJECT-STATUS.md"
-            "IMPLEMENTATION-ROADMAP.md"
-            "DOCUMENTATION-MASTER-INDEX.md"
+            "docs/planning/IMPLEMENTATION-ROADMAP.md"
+            "docs/DOCUMENTATION-INDEX.md"
             "docs/onboarding.md"
           )
 
