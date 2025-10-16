@@ -92,19 +92,41 @@ Rebuild icons after changing the SVG:
 pnpm icons:build
 ```
 
-## Windsurf/Cascade
+## Windsurf / Cascade
 
-- **Config location**: `.windsurf/` contains `cascade.yaml` and `mcp.json`.
-- **Workflows** (run from Windsurf/Cascade panel):
-  - **Dev Loop**: `pnpm install` → `pnpm check` → `pnpm test` → `pnpm test:e2e` → `pnpm lint:fix`
-  - **Quick Validate**: `pnpm validate:all` → `pnpm typecheck`
-  - **A11y + E2E**: `pnpm test:a11y` → `pnpm test:e2e`
-  - **Build Preview**: `pnpm build` → `pnpm preview`
-  - **Docs Gate**: `pnpm gate:docs`
-  - **Policy Gate**: `pnpm validate:all` → `pnpm policy:check`
-- **Context**: Cascade focuses on `src/`, `tests/`, `docs/`, `policy/`, `scripts/`, `desired-state/`, `workers/`, `functions/`, and key config files (`astro.config.mjs`, `package.json`, etc.).
-- **MCP servers**: Filesystem, Ripgrep, and Git via `pnpm dlx` (see `.windsurf/mcp.json`). No global installs required.
-- **Prereqs**: Run `mise install` then `pnpm install` before using workflows that start the dev server.
+This repository integrates [Windsurf](https://windsurf.codeium.com) and Cascade for AI-assisted development workflows.
+
+### Configuration
+
+- **Global rules**: `~/.codeium/windsurf/memories/global_rules.md` (v1.0-prod, cross-workspace)
+- **Local config**: `.windsurf/cascade.yaml` + `.windsurf/mcp.json`
+- **Workspace rules**: `.windsurf/rules/astro-svelte-stack.md` (project-specific conventions)
+- **Workflows**: `.windsurf/workflows/` (trigger with `/` in Cascade)
+- **Policy Gate**: ensures build + test + lint + security pass before merge
+
+### Available Workflows
+
+**Automated (via `cascade.yaml`):**
+- **Dev Loop**: `pnpm install` → `pnpm check` → `pnpm test` → `pnpm test:e2e` → `pnpm lint:fix`
+- **Quick Validate**: `pnpm validate:all` → `pnpm typecheck`
+- **A11y + E2E**: `pnpm test:a11y` → `pnpm test:e2e`
+- **Build Preview**: `pnpm build` → `pnpm preview`
+- **Docs Gate**: `pnpm gate:docs`
+- **Policy Gate**: `pnpm validate:all` → `pnpm policy:check`
+
+**Cascade Workflows** (trigger with `/` command):
+- `/policy_gate` — Comprehensive quality gates before merge
+- `/test_gen` — Generate or patch missing tests based on context
+- `/refactor_plan` — Staged refactor checklist with behavior preservation
+- `/doc_sync` — Update docs after API, schema, or architecture changes
+
+See `docs/WORKFLOWS.md` for detailed workflow documentation.
+
+### Tools & Context
+
+- **MCP servers**: Filesystem, Ripgrep, and Git via `pnpm dlx` (see `.windsurf/mcp.json`)
+- **Context scope**: `src/`, `tests/`, `docs/`, `policy/`, `scripts/`, `desired-state/`, `workers/`, `functions/`, and key config files
+- **Prerequisites**: Run `mise install` then `pnpm install` before using workflows
 
 ## Styling
 
