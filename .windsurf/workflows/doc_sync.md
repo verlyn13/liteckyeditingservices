@@ -12,6 +12,7 @@ Maintain documentation consistency with codebase changes.
 ## When to Trigger
 
 Run this workflow after:
+
 - **API changes** (new endpoints, changed signatures)
 - **Schema changes** (database, CMS content types, env vars)
 - **Architecture changes** (new modules, refactored patterns)
@@ -23,6 +24,7 @@ Run this workflow after:
 ### Core Documentation Files
 
 **Root Level:**
+
 - `README.md` — Project overview, quick start, setup
 - `AGENTS.md` — Agent/AI assistant guidelines (structure, conventions)
 - `ARCHITECTURE.md` — High-level design patterns
@@ -31,6 +33,7 @@ Run this workflow after:
 - `CHANGELOG.md` — User-facing changes (semver-aligned)
 
 **docs/ Directory:**
+
 - `docs/decisions/ADR-*.md` — Architecture Decision Records
 - `docs/api/` — API endpoint documentation
 - `docs/playbooks/` — Operational procedures
@@ -39,12 +42,14 @@ Run this workflow after:
 ### Decision: When to Create an ADR
 
 Create an ADR (`docs/decisions/ADR-####-[title].md`) when:
+
 - Introducing a new architectural pattern
 - Making a significant technology choice
 - Changing build or deployment strategy
 - Resolving a contentious design trade-off
 
 **ADR Template:**
+
 ```markdown
 # ADR-####: [Title]
 
@@ -63,10 +68,12 @@ Create an ADR (`docs/decisions/ADR-####-[title].md`) when:
 ## Consequences
 
 **Positive:**
+
 - Benefit 1
 - Benefit 2
 
 **Negative:**
+
 - Trade-off 1
 - Mitigation strategy
 
@@ -123,11 +130,13 @@ Create an ADR (`docs/decisions/ADR-####-[title].md`) when:
 ### 1. Identify Changed Surface
 
 Run git diff to see what changed:
+
 ```fish
 git diff main...HEAD --name-status
 ```
 
 Check for:
+
 - New files in `src/pages/api/`
 - Changed function signatures in `src/lib/`
 - Modified env var usage
@@ -136,6 +145,7 @@ Check for:
 ### 2. Update Relevant Docs
 
 Use this priority order:
+
 1. **Critical:** API, schema, breaking changes
 2. **Important:** Architecture, deployment procedures
 3. **Nice-to-have:** Internal implementation notes
@@ -150,6 +160,7 @@ Use this priority order:
 ### 4. Commit Documentation
 
 Separate docs commits from code commits:
+
 ```fish
 git add docs/ README.md ARCHITECTURE.md
 git commit -m "docs: update API documentation for new pricing endpoint"
@@ -159,14 +170,16 @@ git commit -m "docs: update API documentation for new pricing endpoint"
 
 While syncing, also update **inline code comments**:
 
-**Good comments** (explain *why*):
+**Good comments** (explain _why_):
+
 ```typescript
 // Use exponential backoff to avoid overwhelming the CMS API
 // during bulk content migrations (ADR-0023)
 await retry(() => fetchContent(id), { maxAttempts: 3 });
 ```
 
-**Bad comments** (explain *what*, which is obvious):
+**Bad comments** (explain _what_, which is obvious):
+
 ```typescript
 // Fetch content by ID
 await fetchContent(id);
@@ -175,6 +188,7 @@ await fetchContent(id);
 ## Usage
 
 In Cascade:
+
 - Type `/doc_sync` after making changes
 - Provide context: what changed, which files affected
 - Cascade will generate a documentation update checklist
@@ -185,16 +199,19 @@ In Cascade:
 After documentation sync:
 
 1. **Build docs site** (if using docs generator)
+
    ```fish
    pnpm docs:build
    ```
 
 2. **Spell check** (optional)
+
    ```fish
    pnpm docs:spell-check
    ```
 
 3. **Link check** (optional)
+
    ```fish
    pnpm docs:link-check
    ```
@@ -206,6 +223,7 @@ After documentation sync:
 ## Documentation Debt
 
 If immediate documentation is not feasible:
+
 1. Create GitHub issue labeled `documentation`
 2. Reference the code change (commit hash)
 3. Assign to next sprint

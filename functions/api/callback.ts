@@ -2,48 +2,44 @@
 // Validates state, exchanges code for token, posts message to opener, and closes popup
 
 type Env = {
-	GITHUB_CLIENT_ID: string;
-	GITHUB_CLIENT_SECRET: string;
+  GITHUB_CLIENT_ID: string;
+  GITHUB_CLIENT_SECRET: string;
 };
 
 interface EventContext<Env = unknown> {
-	request: Request;
-	env: Env;
-	params: Record<string, string>;
-	waitUntil: (promise: Promise<unknown>) => void;
-	next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-	data: Record<string, unknown>;
+  request: Request;
+  env: Env;
+  params: Record<string, string>;
+  waitUntil: (promise: Promise<unknown>) => void;
+  next: (input?: Request | string, init?: RequestInit) => Promise<Response>;
+  data: Record<string, unknown>;
 }
 
 type PagesFunction<Env = unknown> = (
-	context: EventContext<Env>,
-	next?: (
-		request: Request,
-		env: Env,
-		ctx: EventContext<Env>,
-	) => Promise<Response>,
+  context: EventContext<Env>,
+  next?: (request: Request, env: Env, ctx: EventContext<Env>) => Promise<Response>
 ) => Response | Promise<Response>;
 
 function parseCookies(h: string | null): Record<string, string> {
-	const out: Record<string, string> = {};
-	(h || "")
-		.split(";")
-		.map((c) => c.trim())
-		.forEach((c) => {
-			const i = c.indexOf("=");
-			if (i > 0) out[c.slice(0, i)] = c.slice(i + 1);
-		});
-	return out;
+  const out: Record<string, string> = {};
+  (h || '')
+    .split(';')
+    .map((c) => c.trim())
+    .forEach((c) => {
+      const i = c.indexOf('=');
+      if (i > 0) out[c.slice(0, i)] = c.slice(i + 1);
+    });
+  return out;
 }
 
 export const onRequestGet: PagesFunction<Env> = async (ctx) => {
-	try {
-		const reqUrl = new URL(ctx.request.url);
+  try {
+    const reqUrl = new URL(ctx.request.url);
 
-		// Diagnostic mode: return a minimal HTML shell with the same
-		// security headers as a successful callback, without posting tokens.
-		if (reqUrl.searchParams.get("diag") === "1") {
-			const html = `<!doctype html>
+    // Diagnostic mode: return a minimal HTML shell with the same
+    // security headers as a successful callback, without posting tokens.
+    if (reqUrl.searchParams.get('diag') === '1') {
+      const html = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -56,152 +52,145 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 </body>
 </html>`;
 
-			const isHttps = reqUrl.protocol === "https:";
-			const secure = isHttps ? "; Secure" : "";
-			return new Response(html, {
-				headers: {
-					"Content-Type": "text/html; charset=utf-8",
-					"Cache-Control": "no-store",
-					"Set-Cookie": [
-						`decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
-						`decap_opener_origin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
-					].join(", "),
-					"Cross-Origin-Opener-Policy": "unsafe-none",
-					"Content-Security-Policy":
-						"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
-				},
-			});
-		}
+      const isHttps = reqUrl.protocol === 'https:';
+      const secure = isHttps ? '; Secure' : '';
+      return new Response(html, {
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-store',
+          'Set-Cookie': [
+            `decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+            `decap_opener_origin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+          ].join(', '),
+          'Cross-Origin-Opener-Policy': 'unsafe-none',
+          'Content-Security-Policy':
+            "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
+        },
+      });
+    }
 
-		const code = reqUrl.searchParams.get("code") ?? "";
-		const state = reqUrl.searchParams.get("state") ?? "";
+    const code = reqUrl.searchParams.get('code') ?? '';
+    const state = reqUrl.searchParams.get('state') ?? '';
 
-		console.log("[/api/callback] Request received:", {
-			url: reqUrl.toString(),
-			hasCode: !!code,
-			state: `${state.slice(0, 8)}...`,
-		});
+    console.log('[/api/callback] Request received:', {
+      url: reqUrl.toString(),
+      hasCode: !!code,
+      state: `${state.slice(0, 8)}...`,
+    });
 
-		const cookie = ctx.request.headers.get("Cookie") || "";
-		const cookies = parseCookies(cookie);
-		const wantState = cookies.oauth_state || cookies.decap_oauth_state || "";
-		const openerOrigin = ""; // not used; target derived from reqUrl.origin
-		const traceId = cookies.oauth_trace || crypto.randomUUID();
+    const cookie = ctx.request.headers.get('Cookie') || '';
+    const cookies = parseCookies(cookie);
+    const wantState = cookies.oauth_state || cookies.decap_oauth_state || '';
+    const openerOrigin = ''; // not used; target derived from reqUrl.origin
+    const traceId = cookies.oauth_trace || crypto.randomUUID();
 
-		console.log(
-			JSON.stringify({
-				evt: "oauth_callback_begin",
-				id: traceId,
-				url: reqUrl.toString(),
-				hasCode: !!code,
-				statePreview: `${state.slice(0, 8)}...`,
-			}),
-		);
+    console.log(
+      JSON.stringify({
+        evt: 'oauth_callback_begin',
+        id: traceId,
+        url: reqUrl.toString(),
+        hasCode: !!code,
+        statePreview: `${state.slice(0, 8)}...`,
+      })
+    );
 
-		console.log(
-			JSON.stringify({
-				evt: "oauth_callback_cookies",
-				id: traceId,
-				wantStatePreview: `${wantState.slice(0, 8)}...`,
-				openerOrigin,
-				stateMatch: state === wantState,
-			}),
-		);
+    console.log(
+      JSON.stringify({
+        evt: 'oauth_callback_cookies',
+        id: traceId,
+        wantStatePreview: `${wantState.slice(0, 8)}...`,
+        openerOrigin,
+        stateMatch: state === wantState,
+      })
+    );
 
-		// Basic CSRF/state check
-		if (!code || !state || !wantState || state !== wantState) {
-			try {
-				console.error(
-					JSON.stringify({
-						evt: "oauth_state_invalid",
-						id: traceId,
-						hasCode: !!code,
-						hasState: !!state,
-						hasWantState: !!wantState,
-						stateMatch: state === wantState,
-					}),
-				);
-			} catch {}
-			const html = `<!doctype html><meta charset="utf-8"><title>Authentication Error</title>
+    // Basic CSRF/state check
+    if (!code || !state || !wantState || state !== wantState) {
+      try {
+        console.error(
+          JSON.stringify({
+            evt: 'oauth_state_invalid',
+            id: traceId,
+            hasCode: !!code,
+            hasState: !!state,
+            hasWantState: !!wantState,
+            stateMatch: state === wantState,
+          })
+        );
+      } catch {}
+      const html = `<!doctype html><meta charset="utf-8"><title>Authentication Error</title>
 <div style="font-family:system-ui;padding:16px;color:#b00020">
   <h2 style="margin:0 0 8px;">Invalid OAuth state</h2>
   <div>Request ID: ${traceId}</div>
   <div>Please close this window and try again.</div>
 </div>`;
-			return new Response(html, {
-				status: 400,
-				headers: {
-					"Content-Type": "text/html; charset=utf-8",
-					"Cache-Control": "no-store",
-				},
-			});
-		}
+      return new Response(html, {
+        status: 400,
+        headers: {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-store',
+        },
+      });
+    }
 
-		const clientId = ctx.env.GITHUB_CLIENT_ID;
-		const clientSecret = ctx.env.GITHUB_CLIENT_SECRET;
+    const clientId = ctx.env.GITHUB_CLIENT_ID;
+    const clientSecret = ctx.env.GITHUB_CLIENT_SECRET;
 
-		console.log(
-			JSON.stringify({
-				evt: "oauth_credentials",
-				id: traceId,
-				clientId: clientId ? "present" : "MISSING",
-				clientSecret: clientSecret ? "present" : "MISSING",
-			}),
-		);
+    console.log(
+      JSON.stringify({
+        evt: 'oauth_credentials',
+        id: traceId,
+        clientId: clientId ? 'present' : 'MISSING',
+        clientSecret: clientSecret ? 'present' : 'MISSING',
+      })
+    );
 
-		if (!clientId || !clientSecret) {
-			console.error("[/api/callback] Missing GitHub credentials");
-			return new Response("Missing GitHub credentials", { status: 500 });
-		}
+    if (!clientId || !clientSecret) {
+      console.error('[/api/callback] Missing GitHub credentials');
+      return new Response('Missing GitHub credentials', { status: 500 });
+    }
 
-		// Try server-side exchange using PKCE verifier cookie; fallback to code message
-		const verifierCookie =
-			cookies.oauth_pkce_verifier || cookies.pkce_verifier || "";
-		let token: string | null = null;
-		if (verifierCookie) {
-			try {
-				const res = await fetch("https://github.com/login/oauth/access_token", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded",
-						Accept: "application/json",
-					},
-					body: new URLSearchParams({
-						client_id: clientId,
-						client_secret: clientSecret,
-						code,
-						code_verifier: decodeURIComponent(verifierCookie),
-						redirect_uri: `${reqUrl.origin}/api/callback`,
-					}),
-				});
-				const parsed: unknown = await res.json().catch(() => ({}));
-				let at: string | undefined;
-				if (
-					parsed !== null &&
-					typeof parsed === "object" &&
-					"access_token" in parsed
-				) {
-					const v = (parsed as { access_token?: unknown }).access_token;
-					if (typeof v === "string") at = v;
-				}
-				if (res.ok && at) token = at;
-			} catch (e) {
-				console.warn("[/api/callback] server-side exchange failed", e);
-			}
-		}
+    // Try server-side exchange using PKCE verifier cookie; fallback to code message
+    const verifierCookie = cookies.oauth_pkce_verifier || cookies.pkce_verifier || '';
+    let token: string | null = null;
+    if (verifierCookie) {
+      try {
+        const res = await fetch('https://github.com/login/oauth/access_token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            Accept: 'application/json',
+          },
+          body: new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            code,
+            code_verifier: decodeURIComponent(verifierCookie),
+            redirect_uri: `${reqUrl.origin}/api/callback`,
+          }),
+        });
+        const parsed: unknown = await res.json().catch(() => ({}));
+        let at: string | undefined;
+        if (parsed !== null && typeof parsed === 'object' && 'access_token' in parsed) {
+          const v = (parsed as { access_token?: unknown }).access_token;
+          if (typeof v === 'string') at = v;
+        }
+        if (res.ok && at) token = at;
+      } catch (e) {
+        console.warn('[/api/callback] server-side exchange failed', e);
+      }
+    }
 
-		const targetOrigin = reqUrl.origin;
-		const stringMessage = token
-			? `authorization:github:success:${JSON.stringify({ token, state })}`
-			: `authorization:github:success:${JSON.stringify({ code, state })}`;
+    const targetOrigin = reqUrl.origin;
+    const stringMessage = token
+      ? `authorization:github:success:${JSON.stringify({ token, state })}`
+      : `authorization:github:success:${JSON.stringify({ code, state })}`;
 
-		console.log(
-			JSON.stringify({ evt: "oauth_render_callback_html", id: traceId }),
-		);
+    console.log(JSON.stringify({ evt: 'oauth_render_callback_html', id: traceId }));
 
-		// HTML with inline script to post message and close window
-		// This script runs in the popup window that Decap opened
-		const html = `<!doctype html>
+    // HTML with inline script to post message and close window
+    // This script runs in the popup window that Decap opened
+    const html = `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -267,33 +256,31 @@ export const onRequestGet: PagesFunction<Env> = async (ctx) => {
 </body>
 </html>`;
 
-		const isHttps = reqUrl.protocol === "https:";
-		const secure = isHttps ? "; Secure" : "";
-		const clearCookies = [
-			`oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
-			`decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
-			`oauth_trace=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
-			`oauth_inflight=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
-			`oauth_pkce_verifier=; Path=/; SameSite=Lax; Max-Age=0${secure}`,
-		];
+    const isHttps = reqUrl.protocol === 'https:';
+    const secure = isHttps ? '; Secure' : '';
+    const clearCookies = [
+      `oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+      `decap_oauth_state=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+      `oauth_trace=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+      `oauth_inflight=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secure}`,
+      `oauth_pkce_verifier=; Path=/; SameSite=Lax; Max-Age=0${secure}`,
+    ];
 
-		return new Response(html, {
-			headers: {
-				"Content-Type": "text/html; charset=utf-8",
-				"Cache-Control": "no-store",
-				"Set-Cookie": clearCookies.join(", "),
-				"Cross-Origin-Opener-Policy": "unsafe-none",
-				// Allow inline script in THIS response only
-				"Content-Security-Policy":
-					"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
-			},
-		});
-	} catch (error) {
-		try {
-			console.error(
-				JSON.stringify({ evt: "oauth_callback_error", error: String(error) }),
-			);
-		} catch {}
-		return new Response("OAuth callback error", { status: 500 });
-	}
+    return new Response(html, {
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'no-store',
+        'Set-Cookie': clearCookies.join(', '),
+        'Cross-Origin-Opener-Policy': 'unsafe-none',
+        // Allow inline script in THIS response only
+        'Content-Security-Policy':
+          "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",
+      },
+    });
+  } catch (error) {
+    try {
+      console.error(JSON.stringify({ evt: 'oauth_callback_error', error: String(error) }));
+    } catch {}
+    return new Response('OAuth callback error', { status: 500 });
+  }
 };

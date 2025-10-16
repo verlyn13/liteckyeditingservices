@@ -718,7 +718,7 @@
 
 **Cloudflare Documentation**:
 
-- ✅ Active infrastructure docs in [`docs/infrastructure/`](docs/infrastructure/) (CLOUDFLARE-*.md)
+- ✅ Active infrastructure docs in [`docs/infrastructure/`](docs/infrastructure/) (CLOUDFLARE-\*.md)
 - ✅ Archived deployment guides in `_archive/cloudflare-setup/` (historical reference)
 
 **Specialized Guides**:

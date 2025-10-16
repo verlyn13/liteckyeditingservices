@@ -29,23 +29,24 @@ For new functions or components in `src/`:
    - API route handlers
 
 2. **Create test file structure**
+
    ```typescript
    // tests/unit/[module-name].test.ts
    import { describe, it, expect, vi } from 'vitest';
    import { functionName } from '@/path/to/module';
-   
+
    describe('functionName', () => {
      it('should handle expected input', () => {
        // Arrange
        const input = 'test';
-       
+
        // Act
        const result = functionName(input);
-       
+
        // Assert
        expect(result).toBe('expected');
      });
-     
+
      it('should handle edge cases', () => {
        expect(functionName(null)).toThrow();
      });
@@ -53,9 +54,10 @@ For new functions or components in `src/`:
    ```
 
 3. **Mock external dependencies**
+
    ```typescript
    vi.mock('@/lib/api', () => ({
-     fetchData: vi.fn().mockResolvedValue({ data: 'mocked' })
+     fetchData: vi.fn().mockResolvedValue({ data: 'mocked' }),
    }));
    ```
 
@@ -77,15 +79,16 @@ For new pages or user flows:
    - Authentication flows
 
 2. **Create E2E test structure**
+
    ```typescript
    // tests/e2e/[feature-name].spec.ts
    import { test, expect } from '@playwright/test';
-   
+
    test.describe('Feature Name', () => {
      test('should complete user flow', async ({ page }) => {
        await page.goto('/');
        await expect(page).toHaveTitle(/Expected Title/);
-       
+
        await page.click('button[aria-label="Action"]');
        await expect(page.locator('.result')).toBeVisible();
      });
@@ -103,16 +106,19 @@ For new pages or user flows:
 After generating tests:
 
 1. **Run unit tests**
+
    ```fish
    pnpm test
    ```
 
 2. **Run E2E tests**
+
    ```fish
    pnpm test:e2e
    ```
 
 3. **Check coverage**
+
    ```fish
    pnpm test:coverage
    ```
@@ -122,6 +128,7 @@ After generating tests:
 ## Usage
 
 In Cascade:
+
 - Type `/test_gen` with file context
 - Or: "Generate tests for `src/lib/utils.ts`"
 - Or: "Add E2E test for the contact form flow"

@@ -107,6 +107,7 @@ This repository integrates [Windsurf](https://windsurf.codeium.com) and Cascade 
 ### Available Workflows
 
 **Automated (via `cascade.yaml`):**
+
 - **Dev Loop**: `pnpm install` → `pnpm check` → `pnpm test` → `pnpm test:e2e` → `pnpm lint:fix`
 - **Quick Validate**: `pnpm validate:all` → `pnpm typecheck`
 - **A11y + E2E**: `pnpm test:a11y` → `pnpm test:e2e`
@@ -115,6 +116,7 @@ This repository integrates [Windsurf](https://windsurf.codeium.com) and Cascade 
 - **Policy Gate**: `pnpm validate:all` → `pnpm policy:check`
 
 **Cascade Workflows** (trigger with `/` command):
+
 - `/policy_gate` — Comprehensive quality gates before merge
 - `/test_gen` — Generate or patch missing tests based on context
 - `/refactor_plan` — Staged refactor checklist with behavior preservation
