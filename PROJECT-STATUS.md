@@ -2,7 +2,7 @@
 
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: October 15, 2025 (Stage 1b: Type Hygiene + Edge-Safe TypeScript)
+**Last Updated**: October 15, 2025 (Documentation Health Audit & Reorganization + Stage 1b Type Hygiene)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment + Full CMS Integration)
@@ -53,16 +53,16 @@
     - Benefit: Content consistency for visual regression tests; CMS edits reflect immediately
   - **TypeScript Fix**: Added `EventContext` type to middleware canonical redirect handler
   - **Files Changed**:
-    - `functions/_middleware.ts` - Added typed canonical redirect handler (line 64-72)
-    - `src/components/Hero.astro` - Added `statsBadge` prop with defaults (lines 7, 15, 40-41)
-    - `src/pages/index.astro` - Pass `statsBadge` from CMS data (line 21)
+    - [`functions/_middleware.ts`](functions/_middleware.ts) - Added typed canonical redirect handler
+    - [`src/components/Hero.astro`](src/components/Hero.astro) - Added `statsBadge` prop with defaults
+    - [`src/pages/index.astro`](src/pages/index.astro) - Pass `statsBadge` from CMS data
   - **Impact**: Eliminates visual test drift from hardcoded content; proper host-level redirects
   - **Commit**: `8869fe1a`
 
 **Recent Progress - October 14, 2025**:
 
 - ✅ **Professional CI/CD Visual Regression Testing Workflow** (October 14, 2025):
-  - **Documentation Created**: Comprehensive PR workflow guide (`docs/playbooks/pr-workflow.md`, 575 lines)
+  - **Documentation Created**: Comprehensive [PR workflow guide](docs/playbooks/pr-workflow.md)
     - Step-by-step PR process with visual test failure handling
     - Automated quality gates documentation (pre-commit, pre-push, GitHub Actions)
     - Visual regression testing details (baselines, platforms, components tested)
@@ -74,7 +74,7 @@
     - `CONTRIBUTING.md` - Enhanced PR process with visual regression steps
     - `.github/workflows/README.md` - Detailed e2e-visual.yml and visual-modern.yml docs
     - `WORKFLOW.md` - Added visual testing to daily flow
-    - `DOCUMENTATION-MASTER-INDEX.md` - Referenced new PR workflow guide
+    - `docs/DOCUMENTATION-INDEX.md` - Referenced new PR workflow guide
   - **Workflow Already Implemented**: Discovered existing professional setup:
     - `e2e-visual.yml` runs automatically on all PRs (exact "pro level" workflow requested)
     - `visual-modern.yml` provides manual baseline update workflow
@@ -85,7 +85,7 @@
   - **New Favicon**: Implemented book_and_check.svg as official site favicon (replaces logo.svg)
   - **Cache-Busting**: Added `?v=2` query parameters to all favicon links in BaseLayout.astro
   - **Icon Generation**: Updated icon build pipeline to use book_and_check.svg as default source
-  - **Visual Baseline Update**: Regenerated hero-chromium-darwin.png baseline (53k from 45k)
+  - **Visual Baseline Update**: Regenerated hero-chromium-darwin.png baseline
   - **Documentation**: Updated ASSETS-AND-IMAGES.md and assets-images-icons.md with cache-busting instructions
   - **Files Modified**:
     - `src/layouts/BaseLayout.astro` - Cache-busting favicon links
@@ -169,7 +169,7 @@
     - Secure API endpoint for granular cache invalidation
     - Support for URLs, prefixes, tags, and full purge
     - Authentication via shared secret
-  - **Documentation**: Created comprehensive `CACHING-STRATEGY.md` with:
+  - **Documentation**: Created comprehensive [`docs/architecture/CACHING-STRATEGY.md`](docs/architecture/CACHING-STRATEGY.md) with:
     - Two-phase lifecycle approach (Phase 1: Freshness, Phase 2: Performance)
     - Migration checklist for Phase 1 → Phase 2 transition
     - Troubleshooting guide and emergency procedures
@@ -257,7 +257,7 @@
   - Configured environment variables (PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_ENVIRONMENT, PUBLIC_SENTRY_RELEASE)
   - Created three-tier documentation (SENTRY-README.md, SENTRY-SETUP.md, SENTRY-INTEGRATIONS.md)
   - Updated ENVIRONMENT.md with Sentry configuration section
-  - Added Sentry to DOCUMENTATION-MASTER-INDEX.md with cross-references
+  - Added Sentry to `docs/DOCUMENTATION-INDEX.md` with cross-references
 - ✅ **Sentry Integrations**: Enabled browser tracing, session replay, console logging, and HTTP client tracking
 - ✅ **Privacy Settings**: Configured replay integration with maskAllText and blockAllMedia defaults
 - ✅ **Sampling Rates**: Set to 10% transactions, 10% session replays, 100% error replays (free tier optimized)
@@ -424,7 +424,7 @@
 
 ### ✅ Frontend (100% Complete)
 
-**Components** (8/8):
+**Components**:
 
 - ✅ Header.astro - Responsive navigation with mobile menu
 - ✅ Hero.astro - Homepage hero with CTAs
@@ -435,7 +435,7 @@
 - ✅ ValueProp.svelte - Interactive service comparisons (Svelte 5)
 - ✅ FileUpload.svelte - Drag-and-drop file upload (Svelte 5)
 
-**Pages** (7/7):
+**Pages**:
 
 - ✅ index.astro - Homepage with all components
 - ✅ services.astro - Service offerings
@@ -447,7 +447,7 @@
 
 **Styling & Assets**:
 
-- ✅ Tailwind CSS v4.1.13 with @tailwindcss/vite plugin
+- ✅ Tailwind CSS v4.1.13 (latest) with @tailwindcss/vite plugin
 - ✅ Single-source global.css with design tokens
 - ✅ Mobile navigation script (menu-toggle.js)
 - ✅ Contact form script with validation (contact-form.js)
@@ -505,7 +505,7 @@
 
 **Policy as Code Framework**:
 
-- ✅ **6 Rego policies** in `policy/`:
+- ✅ **Policy as Code Framework** in [`policy/`](policy/):
   - `cms/decap.rego` - CMS configuration rules
   - `code/architecture.rego` - Architecture standards
   - `code/quality.rego` - Code quality rules
@@ -522,7 +522,7 @@
 
 **Linting & Formatting**:
 
-- ✅ Biome 2.2.4 - Fast linting and formatting
+- ✅ Biome 2.2.5 - Fast linting and formatting
 - ✅ ESLint 9.36.0 - Flat config with Astro + Svelte plugins
 - ✅ Prettier 3.6.2 - With astro + tailwindcss plugins
 - ✅ `.prettierrc.json` configured for Tailwind v4
@@ -530,7 +530,7 @@
 **TypeScript**:
 
 - ✅ TypeScript 5.9.3 with strict mode
-- ✅ **3 tsconfig.json** files (root, functions/, workers/queue-consumer/)
+- ✅ Multiple `tsconfig.json` files (root, functions/, workers/queue-consumer/)
 - ✅ All type checks passing ✓
 - ✅ @cloudflare/workers-types 4.20251001.0 for Pages Functions
 
@@ -551,7 +551,7 @@
 
 **Email Service** (SendGrid 8.1.6):
 
-- ✅ Production-grade implementation: `src/lib/email.ts` (505 lines)
+- ✅ Production-grade implementation: [`src/lib/email.ts`](src/lib/email.ts)
 - ✅ Features implemented:
   - ✅ Admin notification emails (HTML + plain text)
   - ✅ User confirmation emails (HTML + plain text)
@@ -583,7 +583,7 @@
 
 **Decap CMS**:
 
-- ✅ **Version**: 3.8.3 (upgraded from broken 3.3.3)
+- ✅ **Version**: 3.8.4
 - ✅ Admin interface: `public/admin/index.html`
 - ✅ Configuration: dynamic at `/admin/config.yml` (served by `functions/admin/config.yml.ts`)
 - ✅ GitHub backend configured
@@ -713,16 +713,13 @@
 **Tracking Documents**:
 
 - ✅ `PROJECT-STATUS.md` - This file
-- ✅ `IMPLEMENTATION-ROADMAP.md` - Build sequence and dependencies
-- ✅ `DOCUMENTATION-MASTER-INDEX.md` - Complete documentation index
+- ✅ [`docs/planning/IMPLEMENTATION-ROADMAP.md`](docs/planning/IMPLEMENTATION-ROADMAP.md) - Build sequence and dependencies
+- ✅ [`docs/DOCUMENTATION-INDEX.md`](docs/DOCUMENTATION-INDEX.md) - Complete documentation index
 
 **Cloudflare Documentation**:
 
-- ✅ `CLOUDFLARE-DEPLOYMENT-WORKFLOW.md` - 6-phase deployment guide
-- ✅ `CLOUDFLARE-DEPLOYMENT-DIRECTIVE.md` - Deployment instructions
-- ✅ `CLOUDFLARE-WORKERS-SETUP.md` - Workers configuration
-- ✅ `CLOUDFLARE-REQUIREMENTS.md` - Infrastructure requirements
-- ✅ `CLOUDFLARE-DOCUMENTATION-SUMMARY.md` - Overview
+- ✅ Active infrastructure docs in [`docs/infrastructure/`](docs/infrastructure/) (CLOUDFLARE-*.md)
+- ✅ Archived deployment guides in `_archive/cloudflare-setup/` (historical reference)
 
 **Specialized Guides**:
 
