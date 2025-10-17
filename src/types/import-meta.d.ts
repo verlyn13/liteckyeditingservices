@@ -14,6 +14,14 @@ declare global {
     readonly PROD: boolean;
     /** Optional flag to force real SendGrid sends even in dev mode */
     readonly SENDGRID_FORCE_SEND?: string;
+
+    // Cal.com Integration
+    /** Cal.com API key for programmatic access (secret) */
+    readonly CALCOM_API_KEY: string;
+    /** Cal.com webhook secret for signature verification (secret) */
+    readonly CALCOM_WEBHOOK_SECRET: string;
+    /** Cal.com embed URL for inline scheduling widget (public) */
+    readonly PUBLIC_CALCOM_EMBED_URL: string;
   }
 
   interface ImportMeta {
