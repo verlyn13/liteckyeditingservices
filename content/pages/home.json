@@ -1,7 +1,7 @@
 {
   "hero": {
     "title": "Professional Academic Editing",
-    "subtitle": "Professional academic editing for dissertations and theses. PhD-qualified editors, 2–3 day turnaround, secure and confidential.",
+    "subtitle": "Professional academic editing for dissertations and theses. PhD-qualified editors, 2–3 day turnaround, secure and confidential..",
     "primaryCta": {
       "label": "Get Started",
       "href": "/contact"
@@ -10,7 +10,10 @@
       "label": "View Services",
       "href": "/services"
     },
-    "statsBadge": { "primary": "20+ Years Experience", "secondary": "5,000+ Papers Edited" }
+    "statsBadge": {
+      "primary": "20+ Years Experience",
+      "secondary": "5,000+ Papers Edited"
+    }
   },
   "trustBar": {
     "tagline": "Trusted by scholars from",
