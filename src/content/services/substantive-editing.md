@@ -1,7 +1,7 @@
 ---
 title: Substantive Editing
 description: Detailed feedback to strengthen organization and expression while
-  preserving the author’s unique voice.
+  preserving your unique voice.
 price: Custom quote
 features:
   - Structural and paragraph-level edits
