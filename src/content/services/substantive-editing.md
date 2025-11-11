@@ -1,6 +1,7 @@
 ---
 title: Substantive Editing
-description: Structure, argument flow, and clarity improvements with suggestions and an editor memo.
+description: Detailed feedback to strengthen organization and expression while
+  preserving the author’s unique voice.
 price: Custom quote
 features:
   - Structural and paragraph-level edits
