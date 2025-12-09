@@ -34,8 +34,8 @@ interface Env {
     send: (msg: unknown) => Promise<void>;
   };
   SENDGRID_API_KEY?: string;
-  EMAIL_TO?: string;
-  EMAIL_FROM?: string;
+  SENDGRID_TO?: string;
+  SENDGRID_FROM?: string;
   ENVIRONMENT?: string;
   NODE_ENV?: string;
 }
@@ -177,8 +177,8 @@ async function processWebhookEvent(
 
   // Fallback: Send email directly via SendGrid
   const apiKey = env.SENDGRID_API_KEY;
-  const to = env.EMAIL_TO;
-  const from = env.EMAIL_FROM;
+  const to = env.SENDGRID_TO;
+  const from = env.SENDGRID_FROM;
 
   if (!apiKey || !to || !from) {
     console.warn('[Cal.com Webhook] SendGrid not configured, email not sent');

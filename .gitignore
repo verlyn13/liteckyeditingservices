@@ -48,3 +48,4 @@ playwright/.cache/
 .pnpm-store/
 # Cloudflare wrangler local state
 .wrangler/
+*.backup
