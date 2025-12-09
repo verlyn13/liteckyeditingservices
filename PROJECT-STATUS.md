@@ -2,7 +2,7 @@
 
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: December 9, 2025 (Email Migration + Security Updates)
+**Last Updated**: December 9, 2025 (UX Changes + Email Migration + Security Updates)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment + Full CMS Integration)
@@ -14,6 +14,7 @@
 
 **Status**: ✅ **PRODUCTION READY** - Git-connected deployment live; CI/CD optimized; comprehensive monitoring; caching strategy active; professional visual regression testing workflow.
 **Auth Hardening**: 🟢 Completed — PKCE-only flow enforced; canonical Decap message; pinned bundle; clearer errors.
+**December 9 Update (UX Changes)**: ✅ **UX IMPROVEMENTS** - Fixed CMS bug where ProcessSnapshot wasn't using CMS data (was using hardcoded defaults); removed TrustBar from homepage; removed Process page from site/navigation; enhanced About page with CMS-driven content and photo support; added Page Settings collection to CMS for Home and About page editing.
 **December 9 Update (Evening)**: ✅ **EMAIL MIGRATION COMPLETE** - Migrated from SendGrid to self-hosted Postal (postal.jefahnierocks.com). Created `src/lib/postal.ts`, updated contact.ts, calcom-webhook.ts, queue-consumer, wrangler.toml. Removed @sendgrid/mail dependency. New env vars: `POSTAL_API_KEY` (secret), `POSTAL_FROM_EMAIL`, `POSTAL_TO_EMAIL`. Fixed HTTP 521 issue by configuring Cloudflare Tunnel for Postal origin access. Contact form verified working. **Security updates**: Updated astro (5.16.4), happy-dom (20.0.11), vite (7.2.7), @sentry/* (10.29.0) to fix critical RCE and XSS vulnerabilities.
 **December 9 Update (Earlier)**: 🔧 Contact form email variable mismatch fix (superseded by Postal migration).
 **October 16 Update**: ✅ Cal.com Integration Phase 1 Complete - API key stored in gopass + Infisical, local dev configured, 15 files created/updated, ready for Cloudflare deployment.

@@ -1,36 +1,78 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
+
+// Load about page data from CMS-editable JSON file
+import aboutData from '../../content/pages/about.json';
 ---
 
-<BaseLayout title="About" description="Academic editing grounded in clarity and care">
-  <script type="application/ld+json" is:inline>{JSON.stringify({
+<BaseLayout title={aboutData.title} description={aboutData.description}>
+  <script type="application/ld+json" is:inline set:html={JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'AboutPage',
     'mainEntity': {
       '@type': 'ProfessionalService',
       'name': 'Litecky Editing Services',
-      'description': 'Expert academic editing with over 20 years of experience',
-      'foundingDate': '2003',
+      'description': aboutData.description,
+      'foundingDate': '2009',
       'founder': {
         '@type': 'Person',
-        'name': 'Dr. Litecky',
-        'alumniOf': 'PhD University',
+        'name': aboutData.founder.name,
+        'image': `https://www.liteckyeditingservices.com${aboutData.founder.photo}`,
+        'hasCredential': {
+          '@type': 'EducationalOccupationalCredential',
+          'credentialCategory': aboutData.founder.credentials
+        },
         'hasOccupation': {
           '@type': 'Occupation',
           'name': 'Academic Editor',
           'description': 'Professional editing of dissertations and theses'
         }
       },
-      'knowsAbout': ['Academic Writing', 'Dissertation Editing', 'Thesis Editing', 'APA Style', 'MLA Style', 'Chicago Style']
+      'knowsAbout': aboutData.expertise
     }
-  })}</script>
+  })} />
   <Header currentPath={Astro.url.pathname} />
   <main id="main" class="section">
     <div class="container max-w-prose">
-      <h1 class="text-3xl md:text-4xl font-bold text-primary-navy">About</h1>
-      <p class="mt-3 text-text-secondary">Litecky Editing Services offers expert academic editing with a calm, structured approach. Our goal is to reduce anxiety and deliver clear, publication-ready documents.</p>
-      <p class="mt-3 text-text-secondary">We focus on transparent process, secure handling, and respectful collaboration—especially for graduate students under pressure.</p>
+      <h1 class="text-3xl md:text-4xl font-bold text-primary-navy">{aboutData.headline}</h1>
+
+      <!-- Founder section with photo -->
+      <div class="mt-8 flex flex-col md:flex-row gap-6 items-start">
+        {aboutData.founder.photo && (
+          <div class="flex-shrink-0">
+            <img
+              src={aboutData.founder.photo}
+              alt={aboutData.founder.name}
+              class="w-48 h-48 object-cover rounded-lg shadow-md"
+              loading="lazy"
+            />
+          </div>
+        )}
+        <div>
+          <p class="font-semibold text-lg text-primary-navy">{aboutData.founder.name}</p>
+          <p class="text-sm text-text-secondary">{aboutData.founder.credentials} | {aboutData.founder.years} years experience</p>
+        </div>
+      </div>
+
+      <!-- Intro content -->
+      <div class="mt-6 space-y-4">
+        {aboutData.intro.split('\n\n').map((paragraph: string) => (
+          <p class="text-text-secondary">{paragraph}</p>
+        ))}
+      </div>
+
+      <!-- Expertise section -->
+      {aboutData.expertise && aboutData.expertise.length > 0 && (
+        <div class="mt-8">
+          <h2 class="text-xl font-semibold text-primary-navy mb-4">Areas of Expertise</h2>
+          <ul class="flex flex-wrap gap-2">
+            {aboutData.expertise.map((skill: string) => (
+              <li class="px-3 py-1 bg-soft-gray rounded-full text-sm text-text-secondary">{skill}</li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   </main>
 </BaseLayout>

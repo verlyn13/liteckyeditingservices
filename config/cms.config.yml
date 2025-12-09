@@ -13,6 +13,78 @@ public_folder: /uploads
 publish_mode: editorial_workflow
 
 collections:
+  - name: page_settings
+    label: 🏠 Page Settings
+    editor:
+      preview: false
+    files:
+      - name: about
+        label: About Page
+        file: content/pages/about.json
+        fields:
+          - { label: Title, name: title, widget: string, required: true }
+          - { label: Description, name: description, widget: text, required: true }
+          - { label: Headline, name: headline, widget: string, required: true }
+          - { label: Intro, name: intro, widget: text, required: true }
+          - label: Founder
+            name: founder
+            widget: object
+            fields:
+              - { label: Name, name: name, widget: string, required: true }
+              - { label: Credentials, name: credentials, widget: string, required: true }
+              - { label: Years Experience, name: years, widget: string, required: true }
+              - { label: Photo, name: photo, widget: image, required: false }
+          - label: Expertise
+            name: expertise
+            widget: list
+            field: { label: Skill, name: skill, widget: string }
+            default: []
+      - name: home
+        label: Home Page
+        file: content/pages/home.json
+        fields:
+          - label: Hero
+            name: hero
+            widget: object
+            fields:
+              - { label: Title, name: title, widget: string, required: true }
+              - { label: Subtitle, name: subtitle, widget: text, required: true }
+              - label: Primary CTA
+                name: primaryCta
+                widget: object
+                fields:
+                  - { label: Label, name: label, widget: string }
+                  - { label: Href, name: href, widget: string }
+              - label: Secondary CTA
+                name: secondaryCta
+                widget: object
+                fields:
+                  - { label: Label, name: label, widget: string }
+                  - { label: Href, name: href, widget: string }
+              - label: Stats Badge
+                name: statsBadge
+                widget: object
+                fields:
+                  - { label: Label, name: label, widget: string }
+                  - { label: Value, name: value, widget: string }
+          - label: Process Snapshot
+            name: processSnapshot
+            widget: object
+            fields:
+              - label: Steps
+                name: steps
+                widget: list
+                fields:
+                  - { label: Title, name: title, widget: string }
+                  - { label: Body, name: body, widget: text }
+          - label: Featured Testimonial
+            name: featuredTestimonial
+            widget: object
+            fields:
+              - { label: Quote, name: quote, widget: text }
+              - { label: Author, name: author, widget: string }
+              - { label: Role, name: role, widget: string }
+
   - name: pages
     label: 📄 Pages
     label_singular: Page

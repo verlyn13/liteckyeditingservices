@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Hero from '../components/Hero.astro';
-import TrustBar from '../components/TrustBar.astro';
 import ProcessSnapshot from '../components/ProcessSnapshot.astro';
 import FeaturedTestimonial from '../components/FeaturedTestimonial.astro';
 
@@ -20,8 +19,7 @@ import homeData from '../../content/pages/home.json';
       secondaryCta={homeData.hero.secondaryCta}
       statsBadge={homeData.hero.statsBadge}
     />
-    <TrustBar />
-    <ProcessSnapshot />
+    <ProcessSnapshot steps={homeData.processSnapshot.steps} />
     <FeaturedTestimonial
       quote={homeData.featuredTestimonial.quote}
       author={homeData.featuredTestimonial.author}

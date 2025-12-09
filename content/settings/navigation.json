@@ -1,11 +1,10 @@
 {
   "headerNav": [
     { "label": "Services", "href": "/services", "order": 1 },
-    { "label": "Process", "href": "/process", "order": 2 },
-    { "label": "About", "href": "/about", "order": 3 },
-    { "label": "Testimonials", "href": "/testimonials", "order": 4 },
-    { "label": "FAQ", "href": "/faq", "order": 5 },
-    { "label": "Contact", "href": "/contact", "order": 6 }
+    { "label": "About", "href": "/about", "order": 2 },
+    { "label": "Testimonials", "href": "/testimonials", "order": 3 },
+    { "label": "FAQ", "href": "/faq", "order": 4 },
+    { "label": "Contact", "href": "/contact", "order": 5 }
   ],
   "footerNav": {
     "services": [
@@ -15,7 +14,6 @@
     ],
     "company": [
       { "label": "About Us", "href": "/about" },
-      { "label": "Our Process", "href": "/process" },
       { "label": "Testimonials", "href": "/testimonials" }
     ],
     "legal": [
