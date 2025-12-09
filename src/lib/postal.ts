@@ -55,6 +55,8 @@ export async function sendPostalEmail(
   }
 
   try {
+    console.log('[Postal] Sending email to:', recipients.join(', '));
+
     const response = await fetch(POSTAL_API_URL, {
       method: 'POST',
       headers: {
@@ -64,7 +66,20 @@ export async function sendPostalEmail(
       body: JSON.stringify(body),
     });
 
-    const result = (await response.json()) as PostalResponse;
+    const responseText = await response.text();
+    console.log('[Postal] Response status:', response.status, 'body:', responseText.substring(0, 500));
+
+    let result: PostalResponse;
+    try {
+      result = JSON.parse(responseText) as PostalResponse;
+    } catch {
+      console.error('[Postal] Failed to parse response as JSON');
+      return {
+        status: 'error',
+        time: 0,
+        error: `Invalid JSON response: ${responseText.substring(0, 200)}`,
+      };
+    }
 
     if (!response.ok) {
       console.error('[Postal] API error:', {
@@ -87,7 +102,7 @@ export async function sendPostalEmail(
     return result;
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[Postal] Send failed:', message);
+    console.error('[Postal] Send failed:', message, error);
     return {
       status: 'error',
       time: 0,

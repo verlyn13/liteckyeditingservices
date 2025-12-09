@@ -14,7 +14,7 @@
 
 **Status**: ✅ **PRODUCTION READY** - Git-connected deployment live; CI/CD optimized; comprehensive monitoring; caching strategy active; professional visual regression testing workflow.
 **Auth Hardening**: 🟢 Completed — PKCE-only flow enforced; canonical Decap message; pinned bundle; clearer errors.
-**December 9 Update (Evening)**: 🔄 **EMAIL MIGRATION** - Migrated from SendGrid to self-hosted Postal (postal.jefahnierocks.com). Created `src/lib/postal.ts`, updated contact.ts, calcom-webhook.ts, queue-consumer, wrangler.toml. Removed @sendgrid/mail dependency. New env vars: `POSTAL_API_KEY` (secret), `POSTAL_FROM_EMAIL`, `POSTAL_TO_EMAIL`.
+**December 9 Update (Evening)**: 🔄 **EMAIL MIGRATION** - Migrated from SendGrid to self-hosted Postal (postal.jefahnierocks.com). Created `src/lib/postal.ts`, updated contact.ts, calcom-webhook.ts, queue-consumer, wrangler.toml. Removed @sendgrid/mail dependency. New env vars: `POSTAL_API_KEY` (secret), `POSTAL_FROM_EMAIL`, `POSTAL_TO_EMAIL`. Enhanced error logging for debugging. **BLOCKER**: HTTP 521 from Cloudflare Workers to Postal - origin server not responding to Cloudflare edge requests (works locally, blocked from Workers). Check Postal Cloudflare WAF/Bot rules.
 **December 9 Update (Earlier)**: 🔧 Contact form email variable mismatch fix (superseded by Postal migration).
 **October 16 Update**: ✅ Cal.com Integration Phase 1 Complete - API key stored in gopass + Infisical, local dev configured, 15 files created/updated, ready for Cloudflare deployment.
 **October 15 Update**: ✅ Visual test stability fixes - Moved canonical redirect to middleware, stabilized Hero component with CMS-driven content for reliable visual regression testing.
