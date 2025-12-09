@@ -17,9 +17,10 @@ docs
 # Let Biome format JS/TS/JSON/JSONC to avoid formatter contention
 **/*.{js,ts,tsx,mjs,cjs,json,jsonc}
 
-# Large generated files
+# Large generated/vendor files
 public/admin/cms.*.js
 public/admin/cms.js
+public/admin/sentry.browser.bundle.js
 
 # Test reports
 playwright-report
