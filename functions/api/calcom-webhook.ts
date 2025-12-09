@@ -12,7 +12,7 @@
  * - Validates webhook secret before processing
  *
  * Integration:
- * - Queues email notifications via SendGrid
+ * - Queues email notifications via Postal
  * - Logs events for monitoring and debugging
  * - Reports errors to Sentry
  *
@@ -26,6 +26,7 @@ import {
   formatBookingForEmail,
   verifyWebhookSignature,
 } from '../../src/lib/calcom-webhook';
+import { sendPostalEmail } from '../../src/lib/postal';
 
 // Environment bindings for Cloudflare Pages
 interface Env {
@@ -33,9 +34,9 @@ interface Env {
   SEND_EMAIL?: {
     send: (msg: unknown) => Promise<void>;
   };
-  SENDGRID_API_KEY?: string;
-  SENDGRID_TO?: string;
-  SENDGRID_FROM?: string;
+  POSTAL_API_KEY?: string;
+  POSTAL_TO_EMAIL?: string;
+  POSTAL_FROM_EMAIL?: string;
   ENVIRONMENT?: string;
   NODE_ENV?: string;
 }
@@ -171,78 +172,37 @@ async function processWebhookEvent(
       return;
     } catch (error) {
       console.error('[Cal.com Webhook] Failed to queue email:', error);
-      // Fall through to direct SendGrid send
+      // Fall through to direct Postal send
     }
   }
 
-  // Fallback: Send email directly via SendGrid
-  const apiKey = env.SENDGRID_API_KEY;
-  const to = env.SENDGRID_TO;
-  const from = env.SENDGRID_FROM;
+  // Fallback: Send email directly via Postal
+  const apiKey = env.POSTAL_API_KEY;
+  const to = env.POSTAL_TO_EMAIL;
+  const from = env.POSTAL_FROM_EMAIL;
 
   if (!apiKey || !to || !from) {
-    console.warn('[Cal.com Webhook] SendGrid not configured, email not sent');
+    console.warn('[Cal.com Webhook] Postal not configured, email not sent');
     return;
   }
 
   try {
-    await sendEmailViaSendGrid(
-      {
-        to,
-        from,
-        subject,
-        text: `${summary}\n\n${details}`,
-        html: formatEmailHtml(subject, summary, details),
-      },
-      apiKey
-    );
-    console.log(`[Cal.com Webhook] Email sent directly for booking: ${booking.uid}`);
+    const result = await sendPostalEmail(apiKey, {
+      to,
+      from,
+      subject,
+      plainBody: `${summary}\n\n${details}`,
+      htmlBody: formatEmailHtml(subject, summary, details),
+    });
+
+    if (result.status === 'success') {
+      console.log(`[Cal.com Webhook] Email sent directly for booking: ${booking.uid}`);
+    } else {
+      console.error('[Cal.com Webhook] Failed to send email via Postal:', result.error);
+    }
   } catch (error) {
-    console.error('[Cal.com Webhook] Failed to send email via SendGrid:', error);
+    console.error('[Cal.com Webhook] Failed to send email via Postal:', error);
     // Don't throw - webhook should still return 200 to Cal.com
-  }
-}
-
-/**
- * Send email directly via SendGrid API
- */
-async function sendEmailViaSendGrid(
-  email: {
-    to: string;
-    from: string;
-    subject: string;
-    text: string;
-    html: string;
-  },
-  apiKey: string
-): Promise<void> {
-  const payload = {
-    personalizations: [
-      {
-        to: [{ email: email.to }],
-        subject: email.subject,
-      },
-    ],
-    from: { email: email.from },
-    categories: ['calcom', 'booking'],
-    content: [
-      { type: 'text/plain', value: email.text },
-      { type: 'text/html', value: email.html },
-    ],
-  };
-
-  const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`SendGrid API error: ${response.status} ${errorText}`);
   }
 }
 

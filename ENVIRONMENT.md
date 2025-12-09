@@ -4,48 +4,51 @@
 
 ## Variable Matrix
 
-| Variable                                                         | Production                         | Preview                | Development                         | Type     | Required |
-| ---------------------------------------------------------------- | ---------------------------------- | ---------------------- | ----------------------------------- | -------- | -------- |
+| Variable                                                         | Production                                   | Preview                | Development                         | Type     | Required |
+| ---------------------------------------------------------------- | -------------------------------------------- | ---------------------- | ----------------------------------- | -------- | -------- |
 | **Cloudflare (CI/Pages)**                                        |
-| `CLOUDFLARE_API_TOKEN`                                           | Via gopass (GitHub Secret)         | Via gopass             | Via gopass                          | Secret   | Yes      |
-| `CLOUDFLARE_ZONE_ID`                                             | a5e7c69768502d649a8f2c615f555eca   | Same                   | Same                                | Secret   | Yes      |
-| `CLOUDFLARE_ACCOUNT_ID`                                          | 13eb584192d9cefb730fde0cfd271328   | Same                   | Same                                | Variable | Yes      |
+| `CLOUDFLARE_API_TOKEN`                                           | Via gopass (GitHub Secret)                   | Via gopass             | Via gopass                          | Secret   | Yes      |
+| `CLOUDFLARE_ZONE_ID`                                             | a5e7c69768502d649a8f2c615f555eca             | Same                   | Same                                | Secret   | Yes      |
+| `CLOUDFLARE_ACCOUNT_ID`                                          | 13eb584192d9cefb730fde0cfd271328             | Same                   | Same                                | Variable | Yes      |
 | _(Local aliases used by scripts: `CF_ZONE_ID`, `CF_ACCOUNT_ID`)_ |
 | **Workers**                                                      |
-| `DISPATCH_NAMESPACE`                                             | production                         | staging                | staging                             | Variable | No       |
-| `WORKERS_SUBDOMAIN`                                              | Set after first deploy             | Same                   | localhost                           | Variable | No       |
+| `DISPATCH_NAMESPACE`                                             | production                                   | staging                | staging                             | Variable | No       |
+| `WORKERS_SUBDOMAIN`                                              | Set after first deploy                       | Same                   | localhost                           | Variable | No       |
 | **OAuth (Pages Functions)**                                      |
-| `GITHUB_CLIENT_ID`                                               | Production ID                      | Preview ID             | Dev ID                              | Variable | Yes      |
-| `GITHUB_CLIENT_SECRET`                                           | Via wrangler secret                | Via wrangler secret    | Dev secret                          | Secret   | Yes      |
+| `GITHUB_CLIENT_ID`                                               | Production ID                                | Preview ID             | Dev ID                              | Variable | Yes      |
+| `GITHUB_CLIENT_SECRET`                                           | Via wrangler secret                          | Via wrangler secret    | Dev secret                          | Secret   | Yes      |
 | **Turnstile**                                                    |
-| `PUBLIC_TURNSTILE_SITE_KEY`                                      | 0x4AAAAAAB27CNFPS0wEzPP5           | Same                   | 1x00000000000000000000AA            | Public   | Yes      |
-| `TURNSTILE_SECRET_KEY`                                           | Via wrangler secret                | Via wrangler secret    | 2x0000000000000000000000000000000AA | Secret   | Yes      |
-| `USE_TURNSTILE_TEST`                                             | -                                  | `1`                    | `1`                                 | Variable | No       |
-| `TURNSTILE_TEST_SITE_KEY`                                        | -                                  | Test key               | Test key                            | Variable | No       |
-| `TURNSTILE_TEST_SECRET_KEY`                                      | -                                  | Test secret            | Test secret                         | Secret   | No       |
-| **SendGrid**                                                     |
-| `SENDGRID_API_KEY`                                               | Real key                           | Real key               | Test key                            | Secret   | Yes      |
-| `SENDGRID_FROM`                                                  | noreply@liteckyeditingservices.com | Same                   | Same                                | Variable | Yes      |
-| `SENDGRID_CONTACT_TEMPLATE_ID`                                   | `d-prod123`                        | `d-prev456`            | `d-test789`                         | Variable | Yes      |
-| `SENDGRID_CONFIRMATION_TEMPLATE_ID`                              | `d-prod234`                        | `d-prev567`            | `d-test890`                         | Variable | Yes      |
+| `PUBLIC_TURNSTILE_SITE_KEY`                                      | 0x4AAAAAAB27CNFPS0wEzPP5                     | Same                   | 1x00000000000000000000AA            | Public   | Yes      |
+| `TURNSTILE_SECRET_KEY`                                           | Via wrangler secret                          | Via wrangler secret    | 2x0000000000000000000000000000000AA | Secret   | Yes      |
+| `USE_TURNSTILE_TEST`                                             | -                                            | `1`                    | `1`                                 | Variable | No       |
+| `TURNSTILE_TEST_SITE_KEY`                                        | -                                            | Test key               | Test key                            | Variable | No       |
+| `TURNSTILE_TEST_SECRET_KEY`                                      | -                                            | Test secret            | Test secret                         | Secret   | No       |
+| **Postal (Email)**                                               |
+| `POSTAL_API_KEY`                                                 | Server API key                               | Server API key         | Test key                            | Secret   | Yes      |
+| `POSTAL_FROM_EMAIL`                                              | contact@liteckyeditingservices.com           | Same                   | Same                                | Variable | Yes      |
+| `POSTAL_TO_EMAIL`                                                | ahnie@liteckyeditingservices.com             | Same                   | Same                                | Variable | Yes      |
 | **Admin**                                                        |
-| `ADMIN_EMAIL`                                                    | admin@domain                       | admin@domain           | test@test                           | Variable | Yes      |
+| `ADMIN_EMAIL`                                                    | admin@domain                                 | admin@domain           | test@test                           | Variable | Yes      |
 | **Site**                                                         |
-| `PUBLIC_SITE_NAME`                                               | Litecky Editing                    | Litecky (Preview)      | Litecky (Dev)                       | Variable | Yes      |
-| `PUBLIC_SITE_URL`                                                | https://site.com                   | Preview URL            | http://localhost                    | Variable | Yes      |
+| `PUBLIC_SITE_NAME`                                               | Litecky Editing                              | Litecky (Preview)      | Litecky (Dev)                       | Variable | Yes      |
+| `PUBLIC_SITE_URL`                                                | https://site.com                             | Preview URL            | http://localhost                    | Variable | Yes      |
 | **System**                                                       |
-| `ENVIRONMENT`                                                    | `production`                       | `preview`              | `development`                       | Variable | Yes      |
-| `DEBUG`                                                          | -                                  | `true`                 | `true`                              | Variable | No       |
+| `ENVIRONMENT`                                                    | `production`                                 | `preview`              | `development`                       | Variable | Yes      |
+| `DEBUG`                                                          | -                                            | `true`                 | `true`                              | Variable | No       |
 | **Error Tracking (Sentry)**                                      |
-| `PUBLIC_SENTRY_DSN`                                              | `https://ceac9b5e...@o4510...`     | Same DSN               | Same DSN (or dev project)           | Public   | No       |
-| `SENTRY_DSN`                                                     | Same as PUBLIC_SENTRY_DSN          | Same DSN               | Same DSN                            | Variable | No       |
-| `PUBLIC_SENTRY_ENVIRONMENT`                                      | `production`                       | `preview`              | `development`                       | Public   | No       |
-| `PUBLIC_SENTRY_RELEASE`                                          | `$CF_PAGES_COMMIT_SHA`             | `$CF_PAGES_COMMIT_SHA` | `1.0.0`                             | Public   | No       |
-| `SENTRY_ORG`                                                     | `happy-patterns-llc`               | Same                   | Same                                | Variable | Yes (CI) |
-| `SENTRY_PROJECT`                                                 | `javascript-astro`                 | Same                   | Same                                | Variable | Yes (CI) |
-| `SENTRY_AUTH_TOKEN`                                              | From gopass (secret)               | Same secret            | Not needed locally                  | Secret   | Yes (CI) |
+| `PUBLIC_SENTRY_DSN`                                              | `https://ceac9b5e...@o4510...`               | Same DSN               | Same DSN (or dev project)           | Public   | No       |
+| `SENTRY_DSN`                                                     | Same as PUBLIC_SENTRY_DSN                    | Same DSN               | Same DSN                            | Variable | No       |
+| `PUBLIC_SENTRY_ENVIRONMENT`                                      | `production`                                 | `preview`              | `development`                       | Public   | No       |
+| `PUBLIC_SENTRY_RELEASE`                                          | `$CF_PAGES_COMMIT_SHA`                       | `$CF_PAGES_COMMIT_SHA` | `1.0.0`                             | Public   | No       |
+| `SENTRY_ORG`                                                     | `happy-patterns-llc`                         | Same                   | Same                                | Variable | Yes (CI) |
+| `SENTRY_PROJECT`                                                 | `javascript-astro`                           | Same                   | Same                                | Variable | Yes (CI) |
+| `SENTRY_AUTH_TOKEN`                                              | From gopass (secret)                         | Same secret            | Not needed locally                  | Secret   | Yes (CI) |
 | **Admin Feature Flags**                                          |
-| `ADMIN_CMS_NPM`                                                  | `0` (off)                          | `1` (preview flip)     | `0` (off)                           | Variable | No       |
+| `ADMIN_CMS_NPM`                                                  | `0` (off)                                    | `1` (preview flip)     | `0` (off)                           | Variable | No       |
+| **Cal.com (Scheduling)**                                         |
+| `CALCOM_API_KEY`                                                 | Production key                               | Production key         | Test key                            | Secret   | Yes      |
+| `CALCOM_WEBHOOK_SECRET`                                          | Production secret                            | Production secret      | Test secret                         | Secret   | Yes      |
+| `PUBLIC_CALCOM_EMBED_URL`                                        | https://cal.com/litecky-editing/consultation | Same                   | Same (or test)                      | Public   | Yes      |
 
 ## Setting Environment Variables
 
@@ -74,11 +77,9 @@ Example `.dev.vars` structure:
 # .dev.vars (project root)
 PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAB27CNFPS0wEzPP5
 TURNSTILE_SECRET_KEY=0x4AAAAAAB27CNz7ilbhng3rNxH8TK2Bg7Q
-SENDGRID_API_KEY=SG.test_key_here
-EMAIL_FROM=hello@liteckyeditingservices.com
-EMAIL_TO=ahnie@liteckyeditingservices.com
-SENDGRID_DOMAIN_ID=54920324
-# SENDGRID_FORCE_SEND=true  # Uncomment to send real emails in dev
+POSTAL_API_KEY=your_postal_api_key_here
+POSTAL_FROM_EMAIL=contact@liteckyeditingservices.com
+POSTAL_TO_EMAIL=ahnie@liteckyeditingservices.com
 GITHUB_CLIENT_ID=iv_DEV_CLIENT_ID
 GITHUB_CLIENT_SECRET=dev_client_secret
 ```
@@ -88,7 +89,7 @@ GITHUB_CLIENT_SECRET=dev_client_secret
 Credentials are stored in the following gopass paths:
 
 - `development/turnstile/*` - Turnstile test keys
-- `development/sendgrid/*` - SendGrid configuration
+- `seven-springs/litecky-editing/postal-api-key` - Postal API key
 - `github/oauth/litecky-editing/*` - GitHub OAuth credentials
 
 ### Pages Functions Secrets (OAuth)
@@ -183,8 +184,8 @@ interface Env {
 ```typescript
 // Validate at startup
 function validateEnv(env: unknown): Env {
-  if (!env.SENDGRID_API_KEY) {
-    throw new Error('SENDGRID_API_KEY required');
+  if (!env.POSTAL_API_KEY) {
+    throw new Error('POSTAL_API_KEY required');
   }
   // ... more checks
   return env as Env;
@@ -298,11 +299,11 @@ Visit `/test-sentry` in development to verify integration.
 
 Set the following in Pages (Project → Settings → Environment variables):
 
-- SENDGRID_API_KEY — SendGrid API key (secret)
-- SENDGRID_FROM — Verified sender address (e.g., quotes@liteckyeditingservices.com)
-- SENDGRID_TO — Internal recipient for quote requests
+- POSTAL_API_KEY — Postal server API key (secret)
+- POSTAL_FROM_EMAIL — Sender address (e.g., contact@liteckyeditingservices.com)
+- POSTAL_TO_EMAIL — Internal recipient for quote requests (e.g., ahnie@liteckyeditingservices.com)
 
-These enable `/api/contact` to send emails. If not set, the endpoint still accepts requests but responds with `accepted-no-email`.
+These enable `/api/contact` to send emails via Postal. If not set, the endpoint still accepts requests but responds with `accepted-no-email`.
 
 ### Decap OAuth (Pages Functions)
 

@@ -37,14 +37,14 @@
 - [ ] Verify commit `8869fe1a` exists
 
 **Stage 1b - Type Hygiene (lines 99-119)**:
-- [ ] Verify `src/types/globals.d.ts` exists
-- [ ] Verify `src/types/import-meta.d.ts` exists
-- [ ] Verify `src/types/stubs/sendgrid-mail.d.ts` exists
-- [ ] Verify deleted files are actually deleted
-- [ ] Verify `tsconfig.json` changes
-- [ ] Verify commit `68beeb0f` exists
-- [ ] Run `pnpm typecheck` to verify "zero errors" claim
-- [ ] Run `pnpm biome:check` to verify "zero warnings" claim
+- [x] ~~Verify `src/types/globals.d.ts` exists~~ (Removed in Dec 2025 Postal migration)
+- [x] Verify `src/types/import-meta.d.ts` exists
+- [x] ~~Verify `src/types/stubs/sendgrid-mail.d.ts` exists~~ (Removed in Dec 2025 Postal migration)
+- [x] Verify deleted files are actually deleted
+- [x] Verify `tsconfig.json` changes
+- [x] Verify commit `68beeb0f` exists
+- [x] Run `pnpm typecheck` to verify "zero errors" claim
+- [x] Run `pnpm biome:check` to verify "zero warnings" claim
 
 ### 5. Recent Progress - October 14, 2025
 **Professional CI/CD Visual Regression (lines 64-82)**:

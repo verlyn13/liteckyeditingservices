@@ -14,10 +14,21 @@ enabled = true
 queue = "send-email-queue"
 binding = "SEND_EMAIL"
 
-# Do NOT add secrets here. Use Pages environment variables or Worker Secrets.
+# Shared vars (apply to local dev, inherited by production/preview)
+[vars]
+POSTAL_FROM_EMAIL = "contact@liteckyeditingservices.com"
+POSTAL_TO_EMAIL = "ahnie@liteckyeditingservices.com"
 
-[env.production]
-vars = { ENVIRONMENT = "production" }
+# Production environment
+# Note: POSTAL_API_KEY is a secret, set via: wrangler pages secret put POSTAL_API_KEY
+[env.production.vars]
+ENVIRONMENT = "production"
+POSTAL_FROM_EMAIL = "contact@liteckyeditingservices.com"
+POSTAL_TO_EMAIL = "ahnie@liteckyeditingservices.com"
 
-[env.preview]
-vars = { ENVIRONMENT = "preview" }
+# Preview environment
+# Note: POSTAL_API_KEY is a secret, set via: wrangler pages secret put POSTAL_API_KEY
+[env.preview.vars]
+ENVIRONMENT = "preview"
+POSTAL_FROM_EMAIL = "contact@liteckyeditingservices.com"
+POSTAL_TO_EMAIL = "ahnie@liteckyeditingservices.com"

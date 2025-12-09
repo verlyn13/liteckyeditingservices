@@ -12,8 +12,14 @@ declare global {
     readonly DEV: boolean;
     /** Vite built-in: true in production mode, false otherwise */
     readonly PROD: boolean;
-    /** Optional flag to force real SendGrid sends even in dev mode */
-    readonly SENDGRID_FORCE_SEND?: string;
+
+    // Postal Email
+    /** Postal API key for email delivery (secret) */
+    readonly POSTAL_API_KEY?: string;
+    /** Postal from email address (public) */
+    readonly POSTAL_FROM_EMAIL?: string;
+    /** Postal recipient email address (public) */
+    readonly POSTAL_TO_EMAIL?: string;
 
     // Cal.com Integration
     /** Cal.com API key for programmatic access (secret) */

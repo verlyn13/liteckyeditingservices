@@ -13,11 +13,16 @@ GITHUB_CLIENT_SECRET=your-github-oauth-client-secret
 PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA
 TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
 
-# ===== SendGrid (email service) =====
-# Source: gopass development/sendgrid/*
-# Leave commented to disable email sending in development
-# SENDGRID_API_KEY=your-sendgrid-test-api-key
-# SENDGRID_FROM=noreply@liteckyeditingservices.com
-# SENDGRID_TO=test@example.com
-# SENDGRID_DOMAIN_ID=54920324
-# SENDGRID_FORCE_SEND=true  # Uncomment to send real emails in dev
+# ===== Postal (email service) =====
+# Source: gopass seven-springs/litecky-editing/postal-api-key
+# Leave API key commented to disable email sending in development
+# POSTAL_API_KEY=your-postal-api-key
+POSTAL_FROM_EMAIL=contact@liteckyeditingservices.com
+POSTAL_TO_EMAIL=ahnie@liteckyeditingservices.com
+
+# ===== Cal.com (scheduling) =====
+# Source: gopass calcom/litecky-editing-test/* (or production fallback)
+# Use test account for development, production keys for preview/prod
+CALCOM_API_KEY=cal_test_xxxxxxxxxxxx
+CALCOM_WEBHOOK_SECRET=whsec_test_xxxxxxxxxxxx
+PUBLIC_CALCOM_EMBED_URL=https://cal.com/litecky-editing/consultation

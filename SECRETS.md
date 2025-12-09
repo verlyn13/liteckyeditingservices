@@ -11,14 +11,19 @@ Cloudflare Pages (site + Functions)
 - GITHUB_CLIENT_ID — GitHub OAuth Client ID for Decap CMS (Pages env secret)
 - GITHUB_CLIENT_SECRET — GitHub OAuth Client Secret for Decap CMS (Pages env secret)
 - TURNSTILE_SECRET_KEY — Server-side verification secret (Pages env secret)
-- SENDGRID_API_KEY — API key for email delivery (Pages env secret)
-- SENDGRID_FROM — Verified sender address, e.g., quotes@liteckyeditingservices.com (env var)
-- SENDGRID_TO — Internal recipient for quote requests (env var)
+- POSTAL_API_KEY — Postal server API key for email delivery (Pages env secret)
+- POSTAL_FROM_EMAIL — Sender address, e.g., contact@liteckyeditingservices.com (env var)
+- POSTAL_TO_EMAIL — Internal recipient for quote requests (env var)
+- CALCOM_API_KEY — Cal.com API v2 Bearer token for backend calls (Pages env secret)
+- CALCOM_WEBHOOK_SECRET — Webhook signature verification secret (Pages env secret)
+- PUBLIC_CALCOM_EMBED_URL — Public booking URL (env var)
 
 Cloudflare Workers
 
 - workers/queue-consumer
-  - SENDGRID_API_KEY — Same as Pages (for queue-based email sending)
+  - POSTAL_API_KEY — Same as Pages (for queue-based email sending)
+  - POSTAL_FROM_EMAIL — Sender address
+  - POSTAL_TO_EMAIL — Recipient address
 
 GitHub Actions (CI)
 
@@ -31,8 +36,9 @@ Local Development (via gopass → .dev.vars)
 - GITHUB_CLIENT_SECRET — GitHub OAuth Client Secret (from gopass github/litecky/oauth/client-secret)
 - TURNSTILE_SECRET_KEY — Use test secret: 1x0000000000000000000000000000000AA
 - PUBLIC_TURNSTILE_SITE_KEY — Test site key: 1x00000000000000000000AA
-- SENDGRID_API_KEY — Test key (optional; leave commented to disable emails)
-- SENDGRID_FROM / SENDGRID_TO — Local testing values (optional)
+- POSTAL_API_KEY — Postal server API key (from gopass seven-springs/litecky-editing/postal-api-key)
+- POSTAL_FROM_EMAIL — contact@liteckyeditingservices.com
+- POSTAL_TO_EMAIL — ahnie@liteckyeditingservices.com
 
 Reference: ENVIRONMENT.md for full variable matrix and usage.
 
@@ -41,7 +47,7 @@ Reference: ENVIRONMENT.md for full variable matrix and usage.
 - Gopass (authoritative for dev/test credentials):
   - github/litecky/oauth/\* (GitHub OAuth for Decap CMS)
   - development/turnstile/\* (Turnstile test keys)
-  - development/sendgrid/\* (SendGrid test config)
+  - seven-springs/litecky-editing/postal-api-key (Postal API key)
   - sentry/happy-patterns-llc/\* (Sentry configuration):
     - org-token (sntrys\_... organization auth token)
     - personal-token (sntryu\_... personal auth token)
@@ -50,8 +56,15 @@ Reference: ENVIRONMENT.md for full variable matrix and usage.
     - org (organization slug: happy-patterns-llc)
     - project (project slug: javascript-astro)
   - cloudflare/litecky/turnstile/\* (Turnstile production keys)
-  - sendgrid/api-keys/liteckyeditingservices-\* (SendGrid production)
   - cloudflare/account/_, cloudflare/api-tokens/_ (Cloudflare API access)
+  - calcom/litecky-editing/\* (Cal.com production):
+    - api-key (cal_live_xxxxxxxxxxxx)
+    - webhook-secret (whsec_xxxxxxxxxxxx)
+    - embed-url (https://cal.com/litecky-editing/consultation)
+  - calcom/litecky-editing-test/\* (Cal.com test/development):
+    - api-key (cal_test_xxxxxxxxxxxx)
+    - webhook-secret (whsec_test_xxxxxxxxxxxx)
+    - embed-url (test booking URL)
 - Cloudflare Dashboard → Pages → Settings → Environment variables (production/preview)
 - Cloudflare Dashboard → Workers → Worker → Settings → Variables (for decap-oauth)
 - GitHub → Settings → Secrets and variables → Actions (CI/CD)
@@ -85,13 +98,13 @@ See `secrets/PRODUCTION_KEYS.md` for the canonical list of required keys.
 
 ## Rotation Procedures
 
-SendGrid API Key
+Postal API Key
 
-1. Create new API key in SendGrid (Restricted: Mail Send + Stats)
-2. Update Cloudflare Pages secret `SENDGRID_API_KEY` (Production and Preview)
-3. Update gopass entry for development
-4. Validate by sending a test via `/api/contact` (preview)
-5. Revoke old API key after validation
+1. Generate new server API key in Postal admin (https://postal.jefahnierocks.com)
+2. Update gopass: `gopass insert -f seven-springs/litecky-editing/postal-api-key`
+3. Update Cloudflare Pages secret `POSTAL_API_KEY` (Production and Preview)
+4. Update queue consumer worker secrets
+5. Validate by sending a test via `/api/contact` (preview)
 
 Turnstile Secret
 
@@ -179,7 +192,7 @@ This includes:
 This automatically uploads all encrypted secrets to both environments via wrangler CLI:
 
 - ✅ GitHub OAuth: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
-- ✅ SendGrid: `SENDGRID_API_KEY`, `SENDGRID_FROM`, `SENDGRID_TO`
+- ✅ Postal: `POSTAL_API_KEY`, `POSTAL_FROM_EMAIL`, `POSTAL_TO_EMAIL`
 - ✅ Sentry: `SENTRY_AUTH_TOKEN`, `SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`
 - ✅ Turnstile: `TURNSTILE_SECRET_KEY`
 
@@ -220,12 +233,68 @@ Cloudflare API Token (CI)
 2. Update GitHub Actions secret `CLOUDFLARE_API_TOKEN`
 3. Validate CI runs that access Cloudflare
 
+Cal.com API Key & Webhook Secret
+
+**Frequency**: Every 90 days (same cadence as GitHub OAuth)
+
+**Rotation Steps**:
+
+1. Generate new API key in Cal.com dashboard:
+   - Go to: https://app.cal.com/settings/developer/api-keys
+   - Click "Generate new key"
+   - Copy new key: `cal_live_xxxxxxxxxxxx`
+
+2. Update gopass:
+
+   ```bash
+   # Store new production API key
+   echo "cal_live_NEW_KEY_HERE" | gopass insert -f calcom/litecky-editing/api-key
+   ```
+
+3. Sync to Infisical:
+
+   ```bash
+   ./scripts/secrets/infisical_seed_prod_from_gopass.sh
+   ```
+
+4. Deploy to Cloudflare Pages:
+
+   ```bash
+   ./scripts/secrets/cloudflare_prepare_from_infisical.sh
+   ./scripts/secrets/sync-to-cloudflare-pages.sh
+   ```
+
+5. Test in preview environment:
+   - Trigger preview deployment
+   - Test Cal.com webhook endpoint
+   - Verify booking confirmation emails
+
+6. Deploy to production (automatic via Git push)
+
+7. Revoke old API key in Cal.com dashboard
+
+**Webhook Secret Rotation**:
+
+1. Create new webhook in Cal.com:
+   - Go to: https://app.cal.com/settings/developer/webhooks
+   - Update webhook URL: `https://www.liteckyeditingservices.com/api/calcom-webhook`
+   - Copy new secret: `whsec_xxxxxxxxxxxx`
+
+2. Update gopass and sync (same steps as API key above)
+
+**Quick Setup Script**:
+
+```bash
+# Interactive script to store all Cal.com secrets
+./scripts/secrets/store-calcom-secrets.sh
+```
+
 ## Emergency Procedures
 
 If you suspect compromise:
 
-- Immediately revoke affected keys in their provider dashboards (SendGrid/Turnstile/GitHub/Cloudflare)
+- Immediately revoke affected keys in their provider dashboards (Postal/Turnstile/GitHub/Cloudflare)
 - Replace with new secrets following rotation steps
-- Temporarily disable email sending by clearing `SENDGRID_API_KEY` in Preview environment to reduce risk while investigating
+- Temporarily disable email sending by clearing `POSTAL_API_KEY` in Preview environment to reduce risk while investigating
 - Review Cloudflare Pages/Workers logs and GitHub Actions logs
 - Document incident and follow up with tighter scopes/permissions

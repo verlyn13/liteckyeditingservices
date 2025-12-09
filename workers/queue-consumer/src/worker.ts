@@ -9,12 +9,14 @@ export interface ContactMessage {
 }
 
 type Env = {
-  SENDGRID_API_KEY?: string;
-  SENDGRID_FROM?: string;
-  SENDGRID_TO?: string;
+  POSTAL_API_KEY?: string;
+  POSTAL_FROM_EMAIL?: string;
+  POSTAL_TO_EMAIL?: string;
 };
 
 import type { MessageBatch } from '@cloudflare/workers-types';
+
+const POSTAL_API_URL = 'https://postal.jefahnierocks.com/api/v1/send/message';
 
 export default {
   async queue(batch: MessageBatch<ContactMessage>, env: Env): Promise<void> {
@@ -25,9 +27,9 @@ export default {
         }
         const { name, email, service, message } = msg.body.data;
 
-        const apiKey = env.SENDGRID_API_KEY;
-        const from = env.SENDGRID_FROM;
-        const to = env.SENDGRID_TO;
+        const apiKey = env.POSTAL_API_KEY;
+        const from = env.POSTAL_FROM_EMAIL;
+        const to = env.POSTAL_TO_EMAIL;
         if (!apiKey || !from || !to) {
           // No email config; ack and continue
           msg.ack();
@@ -36,9 +38,6 @@ export default {
 
         // Build branded admin email
         const { createAdminNotification } = await import('../../../src/lib/email');
-        const { getListId, shouldQueueForQuietHours } = await import(
-          '../../../src/lib/email-helpers'
-        );
         const admin = createAdminNotification({
           name,
           email,
@@ -47,26 +46,20 @@ export default {
           message: message ?? '-',
           quoteId: `Q-${Date.now()}`,
         });
-        const listId = getListId('intake');
-        const quiet = shouldQueueForQuietHours(new Date(), 'America/Anchorage');
 
         const payload = {
-          personalizations: [{ to: [{ email: to }], subject: `New Quote Request from ${name}` }],
-          from: { email: from },
-          reply_to: { email },
-          headers: { 'List-Id': listId },
-          categories: ['intake', 'project'],
-          custom_args: { quiet_hours: String(quiet) },
-          content: [
-            { type: 'text/plain', value: admin.text },
-            { type: 'text/html', value: admin.html },
-          ],
-        } as Record<string, unknown>;
+          to: [to],
+          from,
+          reply_to: email,
+          subject: `New Quote Request from ${name}`,
+          plain_body: admin.text,
+          html_body: admin.html,
+        };
 
-        const resp = await fetch('https://api.sendgrid.com/v3/mail/send', {
+        const resp = await fetch(POSTAL_API_URL, {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${apiKey}`,
+            'X-Server-API-Key': apiKey,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(payload),

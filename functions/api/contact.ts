@@ -1,13 +1,15 @@
 import type { Response as CFResponse, PagesFunction } from '@cloudflare/workers-types';
+import { sendPostalEmail } from '../../src/lib/postal';
+import { createAdminNotification, createUserConfirmation } from '../../src/lib/email';
 
 // Environment bindings for Cloudflare Pages
 interface Env {
   SEND_EMAIL?: {
     send: (msg: unknown) => Promise<void>;
   };
-  SENDGRID_API_KEY?: string;
-  SENDGRID_TO?: string;
-  SENDGRID_FROM?: string;
+  POSTAL_API_KEY?: string;
+  POSTAL_TO_EMAIL?: string;
+  POSTAL_FROM_EMAIL?: string;
 }
 
 export const onRequestOptions: PagesFunction<Env> = async (): Promise<CFResponse> => {
@@ -38,107 +40,71 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promi
       return json({ error: 'Missing required fields: name, email' }, 400);
     }
 
-    // Prefer queue if bound; quiet-hours aware (log-only default)
+    // Prefer queue if bound
     const queue = env.SEND_EMAIL;
     if (queue && typeof queue.send === 'function') {
       await queue.send({ kind: 'contact', data });
       return json({ status: 'enqueued' }, 202);
     }
 
-    // Otherwise, if SendGrid env vars are present, attempt to send an email directly
-    const apiKey = env.SENDGRID_API_KEY;
-    const to = env.SENDGRID_TO;
-    const from = env.SENDGRID_FROM;
+    // Otherwise, send directly via Postal if configured
+    const apiKey = env.POSTAL_API_KEY;
+    const to = env.POSTAL_TO_EMAIL;
+    const from = env.POSTAL_FROM_EMAIL;
 
     if (apiKey && to && from) {
-      // Build branded templates and metadata
-      const { createAdminNotification, createUserConfirmation } = await import(
-        '../../src/lib/email'
-      );
-      const { getListId, shouldQueueForQuietHours } = await import('../../src/lib/email-helpers');
+      const quoteId = `Q-${Date.now()}`;
 
+      // Build branded admin notification
       const admin = createAdminNotification({
         name: data.name,
         email: data.email,
         service: data.service ?? '-',
         deadline: '-',
         message: data.message ?? '-',
-        quoteId: `Q-${Date.now()}`,
+        quoteId,
       });
 
-      const listId = getListId('intake');
-      const quiet = shouldQueueForQuietHours(new Date(), 'America/Anchorage');
-
-      const payload = {
-        personalizations: [
-          {
-            to: [{ email: to }],
-            subject: `New Quote Request from ${data.name}`,
-          },
-        ],
-        from: { email: from },
-        reply_to: { email: data.email },
-        headers: { 'List-Id': listId },
-        categories: ['intake', 'project'],
-        custom_args: { quiet_hours: String(quiet) },
-        content: [
-          { type: 'text/plain', value: admin.text },
-          { type: 'text/html', value: admin.html },
-        ],
-      } as Record<string, unknown>;
-
-      const resp = await fetch('https://api.sendgrid.com/v3/mail/send', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+      // Send admin notification
+      const adminResult = await sendPostalEmail(apiKey, {
+        to,
+        from,
+        replyTo: data.email,
+        subject: `New Quote Request from ${data.name}`,
+        plainBody: admin.text,
+        htmlBody: admin.html,
       });
 
-      if (!resp.ok) {
-        return json({ status: 'accepted-no-email', reason: 'sendgrid_error' }, 202);
+      if (adminResult.status !== 'success') {
+        console.error('[Contact] Failed to send admin notification:', adminResult.error);
+        return json({ status: 'accepted-no-email', reason: 'postal_error' }, 202);
       }
 
-      // Optionally send user confirmation when FROM is configured
+      // Send user confirmation
       try {
         const user = createUserConfirmation({
           name: data.name,
           service: data.service ?? '-',
           deadline: '-',
           message: data.message ?? '-',
-          quoteId: `Q-${Date.now()}`,
+          quoteId,
         });
-        const userPayload = {
-          personalizations: [
-            {
-              to: [{ email: data.email }],
-              subject: '[LES] Inquiry received — Thank you',
-            },
-          ],
-          from: { email: from },
-          headers: { 'List-Id': listId },
-          categories: ['intake', 'customer'],
-          custom_args: { quiet_hours: String(quiet) },
-          content: [
-            { type: 'text/plain', value: user.text },
-            { type: 'text/html', value: user.html },
-          ],
-        } as Record<string, unknown>;
-        await fetch('https://api.sendgrid.com/v3/mail/send', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(userPayload),
+
+        await sendPostalEmail(apiKey, {
+          to: data.email,
+          from,
+          subject: '[LES] Inquiry received — Thank you',
+          plainBody: user.text,
+          htmlBody: user.html,
         });
-      } catch {}
+      } catch {
+        // User confirmation is optional, don't fail the request
+      }
 
       return json({ status: 'sent' }, 202);
     }
 
-    // Accept without email if SendGrid not configured yet
+    // Accept without email if Postal not configured
     return json({ status: 'accepted-no-email' }, 202);
   } catch (_err) {
     return json({ error: 'Invalid JSON' }, 400);

@@ -2,7 +2,7 @@
 
 ## Single Source of Truth for Implementation Progress
 
-**Last Updated**: December 9, 2025 (Contact Form Email Delivery Fix)
+**Last Updated**: December 9, 2025 (Email Migration: SendGrid → Postal)
 **Repository**: https://github.com/verlyn13/liteckyeditingservices
 **Current Branch**: main
 **Overall Completion**: 100% (Live in Production with Git-Connected Deployment + Full CMS Integration)
@@ -14,7 +14,8 @@
 
 **Status**: ✅ **PRODUCTION READY** - Git-connected deployment live; CI/CD optimized; comprehensive monitoring; caching strategy active; professional visual regression testing workflow.
 **Auth Hardening**: 🟢 Completed — PKCE-only flow enforced; canonical Decap message; pinned bundle; clearer errors.
-**December 9 Update**: 🔧 **CRITICAL BUG FIX** - Contact form emails now working. Fixed environment variable mismatch: code expected `EMAIL_TO`/`EMAIL_FROM` but Cloudflare had `SENDGRID_TO`/`SENDGRID_FROM`. Also removed exposed `.dev.vars.backup` file and added `*.backup` to .gitignore.
+**December 9 Update (Evening)**: 🔄 **EMAIL MIGRATION** - Migrated from SendGrid to self-hosted Postal (postal.jefahnierocks.com). Created `src/lib/postal.ts`, updated contact.ts, calcom-webhook.ts, queue-consumer, wrangler.toml. Removed @sendgrid/mail dependency. New env vars: `POSTAL_API_KEY` (secret), `POSTAL_FROM_EMAIL`, `POSTAL_TO_EMAIL`.
+**December 9 Update (Earlier)**: 🔧 Contact form email variable mismatch fix (superseded by Postal migration).
 **October 16 Update**: ✅ Cal.com Integration Phase 1 Complete - API key stored in gopass + Infisical, local dev configured, 15 files created/updated, ready for Cloudflare deployment.
 **October 15 Update**: ✅ Visual test stability fixes - Moved canonical redirect to middleware, stabilized Hero component with CMS-driven content for reliable visual regression testing.
 **October 14 Update**: ✅ Professional CI/CD visual regression testing workflow documented - Complete PR workflow guide with visual test failure handling, favicon cache-busting implementation, comprehensive documentation consolidation and cross-referencing.
@@ -102,18 +103,17 @@
 - ✅ **Stage 1b — Type Hygiene & Edge-Safe TypeScript** (October 15, 2025):
   - **Type Safety Improvements**: Eliminated all Biome linting warnings for production-ready type safety
     - Removed non-null assertions in `functions/api/contact.ts` (lines 72, 128) where TypeScript narrowing already guaranteed non-null
-    - Replaced all `any` types in `src/lib/email.ts` with proper typed imports from SendGrid SDK
-    - Created minimal but precise SendGrid type stub (`src/types/stubs/sendgrid-mail.d.ts`) for edge runtime compatibility
+    - Replaced all `any` types in `src/lib/email.ts` with proper typed imports (Deleted: Dec 2025 Postal migration removed SendGrid SDK)
+    - Created minimal type stub (Deleted: Dec 2025 Postal migration removed sendgrid-mail.d.ts)
   - **Global Type Augmentations**: Added proper TypeScript support for edge-safe patterns
-    - `src/types/globals.d.ts` - Augments globalThis with `__SG_API_KEY__` for edge-safe API key storage
     - `src/types/import-meta.d.ts` - Augments Vite's ImportMetaEnv with custom environment variables
-    - Triple-slash references in `src/lib/email.ts` ensure TypeScript recognizes augmentations
+    - (Deleted in Dec 2025 Postal migration: globals.d.ts)
   - **File Changes**:
-    - Added: `src/types/globals.d.ts`, `src/types/import-meta.d.ts`
+    - Added: `src/types/import-meta.d.ts`
     - Modified: `src/lib/email.ts` (triple-slash references, removed any casts)
     - Modified: `functions/api/contact.ts` (removed redundant non-null assertions)
     - Modified: `tsconfig.json` (removed src/lib/email.ts from exclude list)
-    - Deleted: `src/types/sendgrid-https-shim.d.ts`, `src/types/sendgrid-shims.d.ts`, `src/types/stubs/sendgrid-helpers.d.ts`
+    - Deleted: sendgrid-https-shim.d.ts, sendgrid-shims.d.ts, stubs/sendgrid-helpers.d.ts
   - **Code Quality Achievements**:
     - ✅ Zero TypeScript errors across all projects (main, functions, workers)
     - ✅ Zero Biome warnings (all files pass strict linting)

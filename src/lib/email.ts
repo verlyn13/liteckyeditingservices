@@ -1,265 +1,15 @@
 /**
- * Production-grade email service using SendGrid
- * September 2025 - Modern implementation with full telemetry
+ * Email Templates and Utilities
+ *
+ * Provides branded email templates for contact form and booking notifications.
+ * Email delivery is handled by src/lib/postal.ts
  */
-
-/// <reference path="../types/globals.d.ts" />
-/// <reference path="../types/import-meta.d.ts" />
-
-import type { MailDataRequired } from '@sendgrid/mail';
-
-type ClientResponse = { headers?: Record<string, string>; statusCode?: number };
-
-// Initialize SendGrid with API key
-export function initSendgrid(apiKey: string) {
-  if (!apiKey) {
-    throw new Error('SendGrid API key is required');
-  }
-  // Initialized on first send (lazy)
-  globalThis.__SG_API_KEY__ = apiKey;
-}
-
-// Email message interface with full SendGrid features
-export interface EmailMessage {
-  to: string | string[];
-  from: string;
-  fromName?: string;
-  replyTo?: string;
-  subject: string;
-  text: string;
-  html: string;
-  // SendGrid Dynamic Transactional Templates
-  templateId?: string;
-  dynamicTemplateData?: Record<string, unknown>;
-  categories?: string[];
-  customArgs?: Record<string, string>;
-  attachments?: Array<{
-    content: string; // Base64 encoded
-    filename: string;
-    type?: string;
-    disposition?: 'attachment' | 'inline';
-  }>;
-  // Use 'em' subdomain for transactional emails (better deliverability)
-  useEmDomain?: boolean;
-}
-
-// Email send options
-export interface SendOptions {
-  devSandbox?: boolean; // Enable sandbox mode for testing
-  trackClicks?: boolean; // Track link clicks (default: true)
-  trackOpens?: boolean; // Track email opens (default: true)
-  listId?: string; // List-Id header for grouping
-}
-
-// Send result with telemetry
-export interface SendResult {
-  success: boolean;
-  messageId?: string;
-  statusCode?: number;
-  error?: string;
-  timestamp: string;
-}
-
-/**
- * Send email via SendGrid with full telemetry and error handling
- */
-export async function sendEmail(
-  message: EmailMessage,
-  options: SendOptions = {}
-): Promise<SendResult> {
-  const timestamp = new Date().toISOString();
-
-  try {
-    // Grab API key injected via initSendgrid()
-    const API_KEY = globalThis.__SG_API_KEY__;
-    if (!API_KEY) {
-      return { success: false, error: 'Missing SendGrid API key', timestamp };
-    }
-    // Dynamic import with typed stub for edge-safe runtime
-    const { default: sgMail } = await import('@sendgrid/mail');
-    sgMail.setApiKey(API_KEY);
-    // Use em subdomain for transactional emails if specified
-    const fromEmail =
-      message.useEmDomain && message.from.includes('@liteckyeditingservices.com')
-        ? message.from.replace('@liteckyeditingservices.com', '@em.liteckyeditingservices.com')
-        : message.from;
-
-    // Prepare mail object - SendGrid requires at least one content item
-    const mail: MailDataRequired = {
-      to: message.to,
-      from: {
-        email: fromEmail,
-        name: message.fromName || 'Litecky Editing Services',
-      },
-      subject: message.subject,
-      content: [{ type: 'text/plain', value: message.text || message.html || '' }],
-    };
-
-    // Template and content
-    if (message.templateId) {
-      (mail as MailDataRequired & { templateId?: string }).templateId = message.templateId;
-      if (message.dynamicTemplateData) {
-        (
-          mail as MailDataRequired & {
-            dynamicTemplateData?: Record<string, unknown>;
-          }
-        ).dynamicTemplateData = message.dynamicTemplateData;
-      }
-    }
-    const content: Array<{ type: 'text/plain' | 'text/html'; value: string }> = [];
-    if (message.text) content.push({ type: 'text/plain', value: message.text });
-    if (message.html) content.push({ type: 'text/html', value: message.html });
-    if (content.length > 0) {
-      (
-        mail as MailDataRequired & {
-          content?: Array<{ type: string; value: string }>;
-        }
-      ).content = content;
-    }
-
-    // Add optional fields
-    if (message.replyTo) {
-      (mail as MailDataRequired & { replyTo?: string | { email: string } }).replyTo =
-        message.replyTo;
-    }
-
-    if (message.categories && message.categories.length > 0) {
-      mail.categories = message.categories;
-    }
-
-    if (message.customArgs) {
-      const mode = import.meta.env.MODE;
-      mail.customArgs = {
-        ...message.customArgs,
-        timestamp,
-        env: mode,
-      };
-    }
-
-    if (message.attachments && message.attachments.length > 0) {
-      mail.attachments = message.attachments.map((a) => ({
-        content: a.content,
-        filename: a.filename,
-        type: a.type,
-        disposition: a.disposition,
-      }));
-    }
-
-    // Mail settings
-    const sandboxEnabled =
-      options.devSandbox ?? (import.meta.env.DEV && !import.meta.env.SENDGRID_FORCE_SEND);
-    (
-      mail as MailDataRequired & {
-        mailSettings?: { sandboxMode?: { enable?: boolean } };
-      }
-    ).mailSettings = {
-      sandboxMode: {
-        enable: sandboxEnabled,
-      },
-    };
-
-    // Tracking settings
-    (
-      mail as MailDataRequired & {
-        trackingSettings?: {
-          clickTracking?: { enable?: boolean; enableText?: boolean };
-          openTracking?: { enable?: boolean };
-        };
-      }
-    ).trackingSettings = {
-      clickTracking: {
-        enable: options.trackClicks ?? true,
-        enableText: false, // Don't add tracking to plain text
-      },
-      openTracking: {
-        enable: options.trackOpens ?? true,
-      },
-    };
-
-    // Add List-Id header if provided
-    if (options.listId) {
-      (mail as MailDataRequired & { headers?: Record<string, string> }).headers = {
-        'List-Id': options.listId,
-      };
-    }
-
-    // Send the email
-    const [response] = (await sgMail.send(mail)) as ClientResponse[];
-
-    // Extract Message-ID from headers
-    const messageId = response.headers?.['x-message-id'] || response.headers?.['message-id'];
-
-    // Log success for telemetry
-    console.log('Email sent successfully:', {
-      to: Array.isArray(message.to) ? message.to : [message.to],
-      from: fromEmail,
-      subject: message.subject,
-      categories: message.categories,
-      messageId,
-      statusCode: response.statusCode,
-      sandboxMode: sandboxEnabled,
-      timestamp,
-    });
-
-    return {
-      success: true,
-      messageId,
-      statusCode: response.statusCode,
-      timestamp,
-    };
-  } catch (error: unknown) {
-    // Parse SendGrid error details
-    let errorMessage = 'Unknown error occurred';
-    let statusCode: number | undefined;
-
-    if (error && typeof error === 'object' && 'response' in error) {
-      const errorObj = error as {
-        response?: { status?: number; body?: unknown };
-      };
-      statusCode = errorObj.response?.status;
-      const body = errorObj.response?.body as
-        | {
-            errors?: Array<{ field?: string; message?: string }>;
-            message?: string;
-          }
-        | undefined;
-
-      if (body?.errors && Array.isArray(body.errors)) {
-        errorMessage = body.errors
-          .map((e: { field?: string; message?: string }) => `${e.field}: ${e.message}`)
-          .join('; ');
-      } else if (body?.message) {
-        errorMessage = body.message;
-      }
-    } else if (error && typeof error === 'object' && 'message' in error) {
-      errorMessage = String(error.message);
-    }
-
-    // Log error for telemetry
-    console.error('Email send failed:', {
-      to: Array.isArray(message.to) ? message.to : [message.to],
-      subject: message.subject,
-      error: errorMessage,
-      statusCode,
-      timestamp,
-    });
-
-    return {
-      success: false,
-      error: errorMessage,
-      statusCode,
-      timestamp,
-    };
-  }
-}
 
 // ============================================================================
 // EMAIL TEMPLATES
 // ============================================================================
 // These templates define the content and styling for transactional emails.
 // To modify email content or design, edit the functions below.
-//
-// 📍 LOCATION: src/lib/email.ts (lines 243-530)
 //
 // TEMPLATE EDITING GUIDE:
 // ----------------------
@@ -278,14 +28,15 @@ export async function sendEmail(
 // DESIGN SYSTEM:
 // --------------
 // Colors (use hex codes for email compatibility):
-//   - Primary blue: #1e3a8a (headers, emphasis)
+//   - Primary blue: #192a51 (headers, emphasis)
+//   - Accent green: #5a716a (borders, highlights)
 //   - Warning yellow: #f59e0b (quote ID badges)
-//   - Light gray: #f8f9fa (backgrounds)
-//   - Dark gray: #333333 (body text)
+//   - Light gray: #f7f7f5 (backgrounds)
+//   - Dark gray: #2c2c2c (body text)
 //   - Border gray: #dee2e6
 //
 // Typography:
-//   - Font stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif
+//   - Font stack: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif
 //   - Line height: 1.6 for readability
 //   - Font sizes: Use pixels (not rem/em) for email compatibility
 //
@@ -293,11 +44,6 @@ export async function sendEmail(
 //   - Max width: 600px (optimal for email clients)
 //   - Padding: 20px minimum for mobile readability
 //   - Border radius: 4-8px for modern look
-//
-// TESTING:
-// --------
-// After making changes, test with: pnpm test:sendgrid
-// This will send test emails to verify rendering
 // ============================================================================
 
 /**
@@ -337,7 +83,7 @@ Message:
 ${data.message}
 
 ---
-Received at: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })}`;
+Received at: ${new Date().toLocaleString('en-US', { timeZone: 'America/Anchorage' })} (AKT)`;
 
   const html = `
 <!DOCTYPE html>
@@ -388,7 +134,7 @@ Received at: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York'
         <div class="value message">${data.message.replace(/\n/g, '<br>')}</div>
       </div>
       <div class="footer">
-        Received at: ${new Date().toLocaleString('en-US', { timeZone: 'America/New_York' })}
+        Received at: ${new Date().toLocaleString('en-US', { timeZone: 'America/Anchorage' })} (AKT)
       </div>
     </div>
   </div>
