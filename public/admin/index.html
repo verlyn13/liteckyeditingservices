@@ -16,6 +16,36 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png" />
   </head>
   <body>
+    <!-- Build status banner (for editor awareness) -->
+    <style>
+      .cms-status-banner {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(90deg, #fef3c7 0%, #fde68a 100%);
+        border-bottom: 1px solid #f59e0b;
+        padding: 8px 16px;
+        text-align: center;
+        font-size: 13px;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        z-index: 9999;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+      .cms-status-banner a {
+        color: #92400e;
+        font-weight: 600;
+        text-decoration: underline;
+        margin-left: 8px;
+      }
+      /* Push Decap UI down to accommodate banner */
+      #nc-root {
+        margin-top: 40px;
+      }
+    </style>
     <div id="nc-root"></div>
     <!-- Non-production environment banner -->
     <script src="/admin/preview-banner.js"></script>
@@ -38,5 +68,19 @@
     <script src="/admin/cms.3027120f.js" defer></script>
     <!-- Optional shim: enable with ?auth_shim=1 to re-emit canonical success string from admin window -->
     <script src="/admin/decap-auth-shim.js" defer></script>
+
+    <!-- Build status banner injection -->
+    <script>
+      window.addEventListener('load', function () {
+        var banner = document.createElement('div');
+        banner.className = 'cms-status-banner';
+        banner.innerHTML =
+          '✏️ After publishing, changes appear on the live site in ~2 minutes. <a href="https://dash.cloudflare.com/13eb584192d9cefb730fde0cfd271328/pages/view/liteckyeditingservices/deployments" target="_blank" rel="noopener">View build status →</a>';
+        document.body.insertBefore(banner, document.body.firstChild);
+      });
+    </script>
+
+    <!-- Preview stylesheet for content editing -->
+    <link rel="stylesheet" href="/admin/preview.css" />
   </body>
 </html>

@@ -1,470 +1,511 @@
 // Generated from config/cms.config.yml — do not edit manually
 export default {
-  "backend": {
-    "name": "github",
-    "repo": "verlyn13/liteckyeditingservices",
-    "branch": "main",
-    "use_graphql": true
+  backend: {
+    name: 'github',
+    repo: 'verlyn13/liteckyeditingservices',
+    branch: 'main',
+    use_graphql: true,
   },
-  "site_url": "https://www.liteckyeditingservices.com",
-  "media_folder": "public/uploads",
-  "public_folder": "/uploads",
-  "publish_mode": "editorial_workflow",
-  "collections": [
+  site_url: 'https://www.liteckyeditingservices.com',
+  media_folder: 'public/uploads',
+  public_folder: '/uploads',
+  publish_mode: 'editorial_workflow',
+  collections: [
     {
-      "name": "page_settings",
-      "label": "🏠 Page Settings",
-      "editor": {
-        "preview": false
+      name: 'page_settings',
+      label: '🏠 Page Settings',
+      description: 'Edit content for the main pages (Home, About)',
+      editor: {
+        preview: false,
       },
-      "files": [
+      files: [
         {
-          "name": "about",
-          "label": "About Page",
-          "file": "content/pages/about.json",
-          "fields": [
+          name: 'about',
+          label: 'About Page',
+          file: 'content/pages/about.json',
+          fields: [
             {
-              "label": "Title",
-              "name": "title",
-              "widget": "string",
-              "required": true
+              label: 'Title',
+              name: 'title',
+              widget: 'string',
+              required: true,
+              hint: 'Page title shown in browser tab and search results',
             },
             {
-              "label": "Description",
-              "name": "description",
-              "widget": "text",
-              "required": true
+              label: 'Description',
+              name: 'description',
+              widget: 'text',
+              required: true,
+              hint: 'Short summary for search engines (1-2 sentences)',
             },
             {
-              "label": "Headline",
-              "name": "headline",
-              "widget": "string",
-              "required": true
+              label: 'Headline',
+              name: 'headline',
+              widget: 'string',
+              required: true,
+              hint: 'Main heading visitors see at the top of the page',
             },
             {
-              "label": "Intro",
-              "name": "intro",
-              "widget": "text",
-              "required": true
+              label: 'Intro',
+              name: 'intro',
+              widget: 'text',
+              required: true,
+              hint: 'Opening paragraph about the business (2-3 sentences)',
             },
             {
-              "label": "Founder",
-              "name": "founder",
-              "widget": "object",
-              "fields": [
+              label: 'Founder',
+              name: 'founder',
+              widget: 'object',
+              fields: [
                 {
-                  "label": "Name",
-                  "name": "name",
-                  "widget": "string",
-                  "required": true
+                  label: 'Name',
+                  name: 'name',
+                  widget: 'string',
+                  required: true,
+                  hint: "Full name (e.g., 'Ahnie Litecky')",
                 },
                 {
-                  "label": "Credentials",
-                  "name": "credentials",
-                  "widget": "string",
-                  "required": true
+                  label: 'Credentials',
+                  name: 'credentials',
+                  widget: 'string',
+                  required: true,
+                  hint: "Professional qualifications (e.g., 'MA, PhD Candidate')",
                 },
                 {
-                  "label": "Years Experience",
-                  "name": "years",
-                  "widget": "string",
-                  "required": true
+                  label: 'Years Experience',
+                  name: 'years',
+                  widget: 'string',
+                  required: true,
+                  hint: "Experience statement (e.g., '15+ years')",
                 },
                 {
-                  "label": "Photo",
-                  "name": "photo",
-                  "widget": "image",
-                  "required": false
-                }
-              ]
+                  label: 'Photo',
+                  name: 'photo',
+                  widget: 'image',
+                  required: false,
+                  hint: 'Professional headshot (recommended: square, min 400x400px)',
+                },
+              ],
             },
             {
-              "label": "Expertise",
-              "name": "expertise",
-              "widget": "list",
-              "field": {
-                "label": "Skill",
-                "name": "skill",
-                "widget": "string"
+              label: 'Expertise',
+              name: 'expertise',
+              widget: 'list',
+              field: {
+                label: 'Skill',
+                name: 'skill',
+                widget: 'string',
               },
-              "default": []
-            }
-          ]
-        },
-        {
-          "name": "home",
-          "label": "Home Page",
-          "file": "content/pages/home.json",
-          "fields": [
-            {
-              "label": "Hero",
-              "name": "hero",
-              "widget": "object",
-              "fields": [
-                {
-                  "label": "Title",
-                  "name": "title",
-                  "widget": "string",
-                  "required": true
-                },
-                {
-                  "label": "Subtitle",
-                  "name": "subtitle",
-                  "widget": "text",
-                  "required": true
-                },
-                {
-                  "label": "Primary CTA",
-                  "name": "primaryCta",
-                  "widget": "object",
-                  "fields": [
-                    {
-                      "label": "Label",
-                      "name": "label",
-                      "widget": "string"
-                    },
-                    {
-                      "label": "Href",
-                      "name": "href",
-                      "widget": "string"
-                    }
-                  ]
-                },
-                {
-                  "label": "Secondary CTA",
-                  "name": "secondaryCta",
-                  "widget": "object",
-                  "fields": [
-                    {
-                      "label": "Label",
-                      "name": "label",
-                      "widget": "string"
-                    },
-                    {
-                      "label": "Href",
-                      "name": "href",
-                      "widget": "string"
-                    }
-                  ]
-                },
-                {
-                  "label": "Stats Badge",
-                  "name": "statsBadge",
-                  "widget": "object",
-                  "fields": [
-                    {
-                      "label": "Label",
-                      "name": "label",
-                      "widget": "string"
-                    },
-                    {
-                      "label": "Value",
-                      "name": "value",
-                      "widget": "string"
-                    }
-                  ]
-                }
-              ]
+              default: [],
+              hint: "List of specialties (e.g., 'APA formatting', 'Dissertation editing')",
             },
-            {
-              "label": "Process Snapshot",
-              "name": "processSnapshot",
-              "widget": "object",
-              "fields": [
-                {
-                  "label": "Steps",
-                  "name": "steps",
-                  "widget": "list",
-                  "fields": [
-                    {
-                      "label": "Title",
-                      "name": "title",
-                      "widget": "string"
-                    },
-                    {
-                      "label": "Body",
-                      "name": "body",
-                      "widget": "text"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "label": "Featured Testimonial",
-              "name": "featuredTestimonial",
-              "widget": "object",
-              "fields": [
-                {
-                  "label": "Quote",
-                  "name": "quote",
-                  "widget": "text"
-                },
-                {
-                  "label": "Author",
-                  "name": "author",
-                  "widget": "string"
-                },
-                {
-                  "label": "Role",
-                  "name": "role",
-                  "widget": "string"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "pages",
-      "label": "📄 Pages",
-      "label_singular": "Page",
-      "folder": "src/content/pages",
-      "create": true,
-      "extension": "md",
-      "format": "frontmatter",
-      "slug": "{{slug}}",
-      "editor": {
-        "preview": false
-      },
-      "fields": [
-        {
-          "label": "Title",
-          "name": "title",
-          "widget": "string",
-          "required": true
-        },
-        {
-          "label": "Description",
-          "name": "description",
-          "widget": "text",
-          "required": false
-        },
-        {
-          "label": "SEO",
-          "name": "seo",
-          "widget": "object",
-          "required": false,
-          "fields": [
-            {
-              "label": "Meta Title",
-              "name": "metaTitle",
-              "widget": "string",
-              "required": false
-            },
-            {
-              "label": "Meta Description",
-              "name": "metaDescription",
-              "widget": "text",
-              "required": false
-            },
-            {
-              "label": "No Index",
-              "name": "noindex",
-              "widget": "boolean",
-              "default": false,
-              "required": false
-            }
-          ]
-        },
-        {
-          "label": "Body",
-          "name": "body",
-          "widget": "markdown",
-          "required": true
-        }
-      ]
-    },
-    {
-      "name": "services",
-      "label": "💼 Services",
-      "label_singular": "Service",
-      "folder": "src/content/services",
-      "create": true,
-      "extension": "md",
-      "format": "frontmatter",
-      "slug": "{{slug}}",
-      "sortable_fields": [
-        "order",
-        "title"
-      ],
-      "editor": {
-        "preview": false
-      },
-      "fields": [
-        {
-          "label": "Title",
-          "name": "title",
-          "widget": "string",
-          "required": true
-        },
-        {
-          "label": "Description",
-          "name": "description",
-          "widget": "text",
-          "required": true
-        },
-        {
-          "label": "Price",
-          "name": "price",
-          "widget": "string",
-          "required": false
-        },
-        {
-          "label": "Features",
-          "name": "features",
-          "widget": "list",
-          "field": {
-            "label": "Feature",
-            "name": "feature",
-            "widget": "string"
-          },
-          "default": []
-        },
-        {
-          "label": "Order",
-          "name": "order",
-          "widget": "number",
-          "default": 0
-        },
-        {
-          "label": "Body",
-          "name": "body",
-          "widget": "markdown",
-          "required": true
-        }
-      ]
-    },
-    {
-      "name": "testimonials",
-      "label": "⭐ Testimonials",
-      "label_singular": "Testimonial",
-      "folder": "src/content/testimonials",
-      "create": true,
-      "extension": "md",
-      "format": "frontmatter",
-      "slug": "{{year}}-{{month}}-{{author}}",
-      "summary": "{{author}} - {{university}}",
-      "sortable_fields": [
-        "date",
-        "author",
-        "featured",
-        "rating"
-      ],
-      "editor": {
-        "preview": false
-      },
-      "fields": [
-        {
-          "label": "Quote",
-          "name": "quote",
-          "widget": "text",
-          "required": true
-        },
-        {
-          "label": "Author",
-          "name": "author",
-          "widget": "string",
-          "required": true
-        },
-        {
-          "label": "Role",
-          "name": "role",
-          "widget": "string",
-          "required": false
-        },
-        {
-          "label": "University",
-          "name": "university",
-          "widget": "string",
-          "required": false
-        },
-        {
-          "label": "Rating",
-          "name": "rating",
-          "widget": "number",
-          "default": 5,
-          "min": 1,
-          "max": 5,
-          "value_type": "int"
-        },
-        {
-          "label": "Featured",
-          "name": "featured",
-          "widget": "boolean",
-          "default": false
-        },
-        {
-          "label": "Date",
-          "name": "date",
-          "widget": "datetime",
-          "required": true
-        },
-        {
-          "label": "Full Testimonial",
-          "name": "body",
-          "widget": "markdown",
-          "required": false
-        }
-      ]
-    },
-    {
-      "name": "faq",
-      "label": "❓ FAQ",
-      "label_singular": "FAQ",
-      "folder": "src/content/faq",
-      "create": true,
-      "extension": "md",
-      "format": "frontmatter",
-      "slug": "{{category}}-{{slug}}",
-      "summary": "{{category}}: {{question}}",
-      "sortable_fields": [
-        "category",
-        "order"
-      ],
-      "editor": {
-        "preview": false
-      },
-      "fields": [
-        {
-          "label": "Question",
-          "name": "question",
-          "widget": "string",
-          "required": true
-        },
-        {
-          "label": "Answer",
-          "name": "answer",
-          "widget": "text",
-          "required": true
-        },
-        {
-          "label": "Category",
-          "name": "category",
-          "widget": "select",
-          "options": [
-            "General",
-            "Services",
-            "Process",
-            "Pricing",
-            "Security"
           ],
-          "default": "General"
         },
         {
-          "label": "Order",
-          "name": "order",
-          "widget": "number",
-          "default": 0
+          name: 'home',
+          label: 'Home Page',
+          file: 'content/pages/home.json',
+          fields: [
+            {
+              label: 'Hero Section',
+              name: 'hero',
+              widget: 'object',
+              fields: [
+                {
+                  label: 'Title',
+                  name: 'title',
+                  widget: 'string',
+                  required: true,
+                  hint: 'Main headline - keep under 10 words for impact',
+                },
+                {
+                  label: 'Subtitle',
+                  name: 'subtitle',
+                  widget: 'text',
+                  required: true,
+                  hint: 'Supporting text below headline (1-2 sentences)',
+                },
+                {
+                  label: 'Primary CTA',
+                  name: 'primaryCta',
+                  widget: 'object',
+                  hint: "Main button (e.g., 'Get Started')",
+                  fields: [
+                    {
+                      label: 'Label',
+                      name: 'label',
+                      widget: 'string',
+                      hint: "Button text (e.g., 'Submit Your Document')",
+                    },
+                    {
+                      label: 'Href',
+                      name: 'href',
+                      widget: 'string',
+                      hint: "Link destination (e.g., '/contact' or '/upload')",
+                    },
+                  ],
+                },
+                {
+                  label: 'Secondary CTA',
+                  name: 'secondaryCta',
+                  widget: 'object',
+                  hint: "Secondary button (e.g., 'Learn More')",
+                  fields: [
+                    {
+                      label: 'Label',
+                      name: 'label',
+                      widget: 'string',
+                    },
+                    {
+                      label: 'Href',
+                      name: 'href',
+                      widget: 'string',
+                    },
+                  ],
+                },
+                {
+                  label: 'Stats Badge',
+                  name: 'statsBadge',
+                  widget: 'object',
+                  hint: 'Small highlight stat near the hero',
+                  fields: [
+                    {
+                      label: 'Label',
+                      name: 'label',
+                      widget: 'string',
+                      hint: "What the stat measures (e.g., 'Documents Edited')",
+                    },
+                    {
+                      label: 'Value',
+                      name: 'value',
+                      widget: 'string',
+                      hint: "The number or value (e.g., '1,000+')",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              label: 'Process Snapshot',
+              name: 'processSnapshot',
+              widget: 'object',
+              hint: '3-step process overview on homepage',
+              fields: [
+                {
+                  label: 'Steps',
+                  name: 'steps',
+                  widget: 'list',
+                  max: 3,
+                  fields: [
+                    {
+                      label: 'Title',
+                      name: 'title',
+                      widget: 'string',
+                      hint: "Step name (e.g., 'Upload', 'Review', 'Receive')",
+                    },
+                    {
+                      label: 'Body',
+                      name: 'body',
+                      widget: 'text',
+                      hint: 'Brief description (1 sentence)',
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              label: 'Featured Testimonial',
+              name: 'featuredTestimonial',
+              widget: 'object',
+              hint: 'Highlighted client quote on homepage',
+              fields: [
+                {
+                  label: 'Quote',
+                  name: 'quote',
+                  widget: 'text',
+                  hint: "Client's testimonial in their words (2-4 sentences)",
+                },
+                {
+                  label: 'Author',
+                  name: 'author',
+                  widget: 'string',
+                  hint: "Client name (e.g., 'Sarah M.')",
+                },
+                {
+                  label: 'Role',
+                  name: 'role',
+                  widget: 'string',
+                  hint: "Their title (e.g., 'PhD Candidate, Psychology')",
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'pages',
+      label: '📄 Pages',
+      label_singular: 'Page',
+      description: 'Create and edit general content pages',
+      folder: 'src/content/pages',
+      create: true,
+      extension: 'md',
+      format: 'frontmatter',
+      slug: '{{slug}}',
+      editor: {
+        preview: false,
+      },
+      fields: [
+        {
+          label: 'Title',
+          name: 'title',
+          widget: 'string',
+          required: true,
+          hint: 'Page title for browser tab and navigation',
         },
         {
-          "label": "Detailed Answer",
-          "name": "body",
-          "widget": "markdown",
-          "required": true
-        }
-      ]
-    }
-  ]
+          label: 'Description',
+          name: 'description',
+          widget: 'text',
+          required: false,
+          hint: 'Brief summary for search results',
+        },
+        {
+          label: 'SEO Settings',
+          name: 'seo',
+          widget: 'object',
+          collapsed: true,
+          required: false,
+          hint: 'Advanced search engine settings (optional)',
+          fields: [
+            {
+              label: 'Meta Title',
+              name: 'metaTitle',
+              widget: 'string',
+              required: false,
+              hint: 'Custom title for search results (leave blank to use page title)',
+            },
+            {
+              label: 'Meta Description',
+              name: 'metaDescription',
+              widget: 'text',
+              required: false,
+              hint: 'Custom description for search results',
+            },
+            {
+              label: 'Hide from Search Engines',
+              name: 'noindex',
+              widget: 'boolean',
+              default: false,
+              required: false,
+              hint: 'Toggle ON to prevent this page from appearing in Google',
+            },
+          ],
+        },
+        {
+          label: 'Body',
+          name: 'body',
+          widget: 'markdown',
+          required: true,
+          hint: 'Main page content - use the toolbar to format text',
+        },
+      ],
+    },
+    {
+      name: 'services',
+      label: '📋 Services',
+      label_singular: 'Service',
+      description: 'Manage service offerings and pricing',
+      folder: 'src/content/services',
+      create: true,
+      extension: 'md',
+      format: 'frontmatter',
+      slug: '{{slug}}',
+      sortable_fields: ['order', 'title'],
+      editor: {
+        preview: false,
+      },
+      fields: [
+        {
+          label: 'Service Name',
+          name: 'title',
+          widget: 'string',
+          required: true,
+          hint: "Name of the service (e.g., 'Substantive Editing')",
+        },
+        {
+          label: 'Short Description',
+          name: 'description',
+          widget: 'text',
+          required: true,
+          hint: 'One-sentence summary shown in service cards',
+        },
+        {
+          label: 'Price',
+          name: 'price',
+          widget: 'string',
+          required: false,
+          hint: "Pricing info (e.g., '$0.02/word' or 'Starting at $150')",
+        },
+        {
+          label: 'Features',
+          name: 'features',
+          widget: 'list',
+          field: {
+            label: 'Feature',
+            name: 'feature',
+            widget: 'string',
+          },
+          default: [],
+          hint: "Bullet points of what's included",
+        },
+        {
+          label: 'Display Order',
+          name: 'order',
+          widget: 'number',
+          default: 0,
+          hint: 'Lower numbers appear first on the services page',
+        },
+        {
+          label: 'Full Description',
+          name: 'body',
+          widget: 'markdown',
+          required: true,
+          hint: 'Detailed service description with formatting',
+        },
+      ],
+    },
+    {
+      name: 'testimonials',
+      label: '⭐ Client Testimonials',
+      label_singular: 'Testimonial',
+      description: 'Manage client reviews and feedback',
+      folder: 'src/content/testimonials',
+      create: true,
+      extension: 'md',
+      format: 'frontmatter',
+      slug: '{{year}}-{{month}}-{{author}}',
+      summary: '{{author}} - {{university}}',
+      sortable_fields: ['date', 'author', 'featured', 'rating'],
+      editor: {
+        preview: false,
+      },
+      fields: [
+        {
+          label: 'Testimonial Text',
+          name: 'quote',
+          widget: 'text',
+          required: true,
+          hint: "The client's feedback in their own words (2-4 sentences)",
+        },
+        {
+          label: 'Client Name',
+          name: 'author',
+          widget: 'string',
+          required: true,
+          hint: "First name and last initial (e.g., 'Sarah M.')",
+        },
+        {
+          label: 'Client Role',
+          name: 'role',
+          widget: 'string',
+          required: false,
+          hint: "Their title or position (e.g., 'PhD Candidate')",
+        },
+        {
+          label: 'Institution',
+          name: 'university',
+          widget: 'string',
+          required: false,
+          hint: 'University or organization name',
+        },
+        {
+          label: 'Rating',
+          name: 'rating',
+          widget: 'number',
+          default: 5,
+          min: 1,
+          max: 5,
+          value_type: 'int',
+          hint: 'Star rating from 1-5',
+        },
+        {
+          label: 'Feature on Homepage',
+          name: 'featured',
+          widget: 'boolean',
+          default: false,
+          hint: 'Toggle ON to display this testimonial prominently',
+        },
+        {
+          label: 'Date Received',
+          name: 'date',
+          widget: 'datetime',
+          required: true,
+          hint: 'When this testimonial was received',
+        },
+        {
+          label: 'Extended Testimonial',
+          name: 'body',
+          widget: 'markdown',
+          required: false,
+          hint: 'Longer version of the testimonial (optional)',
+        },
+      ],
+    },
+    {
+      name: 'faq',
+      label: '❓ FAQ',
+      label_singular: 'Question',
+      description: 'Frequently asked questions and answers',
+      folder: 'src/content/faq',
+      create: true,
+      extension: 'md',
+      format: 'frontmatter',
+      slug: '{{category}}-{{slug}}',
+      summary: '{{category}}: {{question}}',
+      sortable_fields: ['category', 'order'],
+      editor: {
+        preview: false,
+      },
+      fields: [
+        {
+          label: 'Question',
+          name: 'question',
+          widget: 'string',
+          required: true,
+          hint: 'The question as a client would ask it',
+        },
+        {
+          label: 'Short Answer',
+          name: 'answer',
+          widget: 'text',
+          required: true,
+          hint: 'Brief answer (1-2 sentences) shown in collapsed view',
+        },
+        {
+          label: 'Category',
+          name: 'category',
+          widget: 'select',
+          options: ['General', 'Services', 'Process', 'Pricing', 'Security'],
+          default: 'General',
+          hint: 'Group related questions together',
+        },
+        {
+          label: 'Display Order',
+          name: 'order',
+          widget: 'number',
+          default: 0,
+          hint: 'Lower numbers appear first within each category',
+        },
+        {
+          label: 'Detailed Answer',
+          name: 'body',
+          widget: 'markdown',
+          required: true,
+          hint: 'Full answer with formatting (shown when expanded)',
+        },
+      ],
+    },
+  ],
 } as const;
