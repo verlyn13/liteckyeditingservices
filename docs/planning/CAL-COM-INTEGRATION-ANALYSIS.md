@@ -1,9 +1,15 @@
 # Cal.com Integration Analysis
 
 **Project**: Litecky Editing Services Website
-**Date**: 2025-10-14
-**Status**: Planning / Analysis Phase
+**Cal.com Profile**: https://cal.com/litecky-editing
+**Date**: 2025-10-14 (Updated: 2025-10-16)
+**Status**: Phase 1 Complete (Secrets Management) - Planning for Phases 2-8
 **Purpose**: Comprehensive examination of Cal.com integration requirements across all system components
+
+**Related Documentation**:
+- **API Strategy**: [`docs/planning/CAL-COM-API.md`](./CAL-COM-API.md) - Configuration as Code blueprint, v2 API reference
+- **Secrets Setup**: [`docs/planning/CAL-COM-SECRETS-SETUP.md`](./CAL-COM-SECRETS-SETUP.md) - Complete secrets management guide
+- **Username Config**: [`docs/planning/CAL-COM-USERNAME.md`](./CAL-COM-USERNAME.md) - Profile configuration
 
 ---
 
@@ -314,11 +320,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }): Promi
 };
 ```
 
-**Webhook URL**: `https://liteckyeditingservices.com/api/calcom-webhook`
+**Webhook URL**: `https://www.liteckyeditingservices.com/api/calcom-webhook` (www required; apex redirects)
 
 **Configuration in Cal.com Dashboard**:
 1. Go to Settings → Webhooks
-2. Add webhook URL: `https://liteckyeditingservices.com/api/calcom-webhook`
+2. Add webhook URL: `https://www.liteckyeditingservices.com/api/calcom-webhook`
 3. Select events: Booking Created, Booking Rescheduled, Booking Cancelled
 4. Copy webhook secret → store in secrets management
 

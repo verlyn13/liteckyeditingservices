@@ -38,6 +38,9 @@ SENTRY_ORG|sentry/happy-patterns-llc/org
 SENTRY_PROJECT|sentry/happy-patterns-llc/project
 SENDGRID_FROM|sendgrid/litecky/from development/sendgrid/email-from
 SENDGRID_TO|sendgrid/litecky/to development/sendgrid/email-to
+CALCOM_API_KEY|calcom/litecky-editing/api-key
+CALCOM_WEBHOOK_SECRET|calcom/litecky-editing/webhook-secret
+PUBLIC_CALCOM_EMBED_URL|calcom/litecky-editing/embed-url
 EOF
 )
 

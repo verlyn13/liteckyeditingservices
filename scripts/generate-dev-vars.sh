@@ -104,6 +104,24 @@ echo "" >> .dev.vars
 
 cat >> .dev.vars << 'EOF'
 
+# Cal.com Configuration (Scheduling)
+EOF
+
+# Get Cal.com configuration (use test account for dev)
+echo -n "CALCOM_API_KEY=" >> .dev.vars
+(gopass show -o calcom/litecky-editing-test/api-key 2>/dev/null || gopass show -o calcom/litecky-editing/api-key 2>/dev/null || echo "# Missing calcom api-key") >> .dev.vars
+echo "" >> .dev.vars
+
+echo -n "CALCOM_WEBHOOK_SECRET=" >> .dev.vars
+(gopass show -o calcom/litecky-editing-test/webhook-secret 2>/dev/null || gopass show -o calcom/litecky-editing/webhook-secret 2>/dev/null || echo "# Missing calcom webhook-secret") >> .dev.vars
+echo "" >> .dev.vars
+
+echo -n "PUBLIC_CALCOM_EMBED_URL=" >> .dev.vars
+(gopass show -o calcom/litecky-editing-test/embed-url 2>/dev/null || echo "https://cal.com/litecky-editing/consultation") >> .dev.vars
+echo "" >> .dev.vars
+
+cat >> .dev.vars << 'EOF'
+
 # Force SendGrid to actually send emails in dev (bypasses sandbox mode)
 # Uncomment to send real emails during testing
 # SENDGRID_FORCE_SEND=true
@@ -117,6 +135,7 @@ echo "   • GitHub OAuth: github/litecky/oauth/*"
 echo "   • Turnstile keys: development/turnstile/*"
 echo "   • SendGrid config: development/sendgrid/*"
 echo "   • Sentry tokens: sentry/happy-patterns-llc/*"
+echo "   • Cal.com config: calcom/litecky-editing-test/* (or production fallback)"
 echo ""
 
 # Check if any credentials are missing
@@ -130,6 +149,12 @@ for path in "github/litecky/oauth/client-id" "github/litecky/oauth/client-secret
         missing=true
     fi
 done
+
+# Check Cal.com credentials (optional)
+if ! gopass show "calcom/litecky-editing/api-key" &>/dev/null && \
+   ! gopass show "calcom/litecky-editing-test/api-key" &>/dev/null; then
+    echo "ℹ️  Optional: Cal.com API key not configured (calcom/litecky-editing/api-key)"
+fi
 
 if [ "$missing" = true ]; then
     echo ""

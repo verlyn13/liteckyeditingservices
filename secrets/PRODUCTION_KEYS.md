@@ -36,6 +36,11 @@ Categories and required keys:
   - SENTRY_PROJECT (variable)
   - SENTRY_AUTH_TOKEN (secret)
 
+- Cal.com (scheduling)
+  - CALCOM_API_KEY (secret)
+  - CALCOM_WEBHOOK_SECRET (secret)
+  - PUBLIC_CALCOM_EMBED_URL (variable)
+
 How to populate via Infisical CLI:
 
 1. Login if needed: `infisical login --domain $INFISICAL_API_URL`

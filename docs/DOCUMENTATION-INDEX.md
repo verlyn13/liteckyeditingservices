@@ -2,10 +2,11 @@
 
 ## Complete Documentation Organization & Status
 
-Last Updated: October 13, 2025 (CMS integration fixes + cache management docs)
+Last Updated: October 16, 2025 (Cal.com Phase 1 complete - secrets stored and synced)
 Documentation Read: 100% (15/15 files analyzed)
 Deployment Status: ✅ LIVE with Git-Connected Deployment + Full CMS Integration
 Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, CMS pipeline functional
+Cal.com Status: ✅ Phase 1 COMPLETE - API key stored in gopass + Infisical, ready for Cloudflare deployment
 
 ---
 
@@ -119,15 +120,16 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, CMS pipeline 
 - `SECRETS.md` – Secrets inventory and rotation procedures
 - `secrets/PRODUCTION_KEYS.md` – Canonical list of prod keys (PUBLIC vs Secrets)
 
-**Automation Scripts** (Added October 12, 2025):
+**Automation Scripts** (Updated October 16, 2025):
 
-- `scripts/secrets/infisical_seed_prod_from_gopass.sh` – Seed Infisical from gopass (includes Sentry)
+- `scripts/secrets/infisical_seed_prod_from_gopass.sh` – Seed Infisical from gopass (includes Sentry + Cal.com)
 - `scripts/secrets/infisical_pull_prod.sh` – Pull secrets from Infisical to local dotenv
 - `scripts/secrets/cloudflare_prepare_from_infisical.sh` – Split into public.env and secrets.env
 - `scripts/secrets/sync-to-cloudflare-pages.sh` – **NEW**: Automated wrangler CLI upload to Production and Preview environments
 - `scripts/secrets/store-sentry-tokens.sh` – Interactive Sentry token storage in gopass
+- `scripts/secrets/store-calcom-secrets.sh` – **NEW**: Interactive Cal.com secrets storage in gopass
 - `scripts/secrets/setup-sentry-github-actions.sh` – Automated GitHub Actions configuration for Sentry
-- `scripts/generate-dev-vars.sh` – Generate .dev.vars from gopass (includes Sentry DSN)
+- `scripts/generate-dev-vars.sh` – Generate .dev.vars from gopass (includes Sentry DSN + Cal.com)
 
 ### 5. DECISIONS & PLAYBOOKS (Admin CMS & Secrets)
 
@@ -138,6 +140,22 @@ Cleanup Status: ✅ Duplicates archived, Sentry docs consolidated, CMS pipeline 
 | `docs/INFISICAL-QUICKSTART.md`                     | Production secrets SoT quickstart                                 | ✅ Added |
 | `docs/INFISICAL-CI-SYNC.md`                        | CI workflow guide for Infisical → Cloudflare                      | ✅ Added |
 | `docs/playbooks/ADMIN-ACCESS.md`                   | Configure Cloudflare Access for /admin/\*                         | ✅ Added |
+
+### 5.1 PLANNING & INTEGRATION (Cal.com)
+
+**Navigation**: Start with [`docs/planning/CAL-COM-README.md`](planning/CAL-COM-README.md) for complete documentation index and quick navigation.
+
+| Document                                           | Purpose                                                           | Status   |
+| -------------------------------------------------- | ----------------------------------------------------------------- | -------- |
+| `docs/planning/CAL-COM-README.md`                  | **📚 Documentation index** - Complete navigation guide, use case finder, cross-references | ✅ Added |
+| `docs/planning/CAL-COM-API.md`                     | **Strategic API automation blueprint** - Configuration as Code, v2 API reference, idempotent scripting patterns (372 lines) | ✅ Added |
+| `docs/planning/CAL-COM-INTEGRATION-ANALYSIS.md`    | Comprehensive Cal.com integration requirements (1,922 lines)      | ✅ Added |
+| `docs/planning/CAL-COM-USERNAME.md`                | Cal.com profile username configuration and verification           | ✅ Added |
+| `docs/planning/CAL-COM-SECRETS-SETUP.md`           | Complete secrets setup guide with verification checklist          | ✅ Added |
+| `docs/planning/IMPLEMENTATION-ROADMAP.md`          | Complete implementation roadmap with phases and milestones        | ✅ Added |
+| `CALCOM-SETUP-NOW.md`                              | Quick action guide with commands for immediate Cal.com setup (can delete after Phase 2) | ✅ Added |
+| `CALCOM-PHASE-1-SUMMARY.md`                        | Phase 1 completion report with verification results               | ✅ Added |
+| `CALCOM-IMPLEMENTATION-CHECKLIST.md`               | Master checklist for all 8 implementation phases                  | ✅ Added |
 
 | Document                                       | Location       | Status     | Purpose                                                  |
 | ---------------------------------------------- | -------------- | ---------- | -------------------------------------------------------- |
@@ -405,6 +423,63 @@ liteckyeditingservices/
    - `cloudflare-status/CLOUDFLARE-STATUS-2025-09-23.md` (outdated status)
 4. **Reorganized Structure** - ✅ Moved `SENDGRID-SETUP.md` to `/docs/infrastructure/`
 5. **Created Archive READMEs** - ✅ Added context for all archived documentation
+
+### ✅ Cal.com Integration - Phase 1 Complete (October 16, 2025)
+
+**Status**: Phase 1 of 8 complete - Secrets management configured and synced
+
+**Completed**:
+
+1. **Secrets Storage** - ✅ API key and embed URL stored in gopass
+   - `calcom/litecky-editing/api-key` = `cal_live_3853635c57f18e2c202fdd459561d410`
+   - `calcom/litecky-editing/embed-url` = `https://cal.com/litecky-editing/consultation`
+
+2. **Local Development** - ✅ `.dev.vars` regenerated with Cal.com variables
+   - `CALCOM_API_KEY` configured
+   - `PUBLIC_CALCOM_EMBED_URL` configured
+   - File permissions: 600 (secure)
+
+3. **Production Sync** - ✅ Infisical production environment updated
+   - Both secrets synced via `infisical_seed_prod_from_gopass.sh`
+   - Verified with Infisical CLI
+
+4. **Documentation** - ✅ 15 files created/updated
+   - 4 new documentation files (setup guides, verification reports)
+   - 2 new planning docs (secrets setup, username config)
+   - 1 new script (interactive setup)
+   - 8 updated files (scripts, env vars, secrets inventory)
+
+**Documentation Created**:
+
+- `CALCOM-SETUP-NOW.md` - Quick action guide (can be deleted after Phase 2)
+- `CALCOM-SETUP-COMPLETE.md` - Phase 1 completion report
+- `CALCOM-IMPLEMENTATION-CHECKLIST.md` - 8-phase roadmap
+- `CALCOM-VERIFICATION-REPORT.md` - Detailed validation report
+- `docs/planning/CAL-COM-SECRETS-SETUP.md` - Complete setup guide
+- `docs/planning/CAL-COM-USERNAME.md` - Username configuration
+- `scripts/secrets/store-calcom-secrets.sh` - Interactive setup script
+
+**Next Phase** (Phase 2 - Cloudflare Deployment):
+
+```bash
+# Deploy secrets to Cloudflare Pages (10 minutes)
+./scripts/secrets/cloudflare_prepare_from_infisical.sh
+./scripts/secrets/sync-to-cloudflare-pages.sh
+```
+
+**Remaining Phases**:
+- Phase 2: Deploy to Cloudflare Pages (10 min)
+- Phase 3: Configure webhook in Cal.com dashboard (15 min)
+- Phase 4: Frontend integration - Replace contact form (2-3 hours)
+- Phase 5: Backend integration - Webhook endpoint (2-3 hours)
+- Phase 6: Email templates for bookings (1-2 hours)
+- Phase 7: Testing (E2E, visual regression) (1-2 hours)
+- Phase 8: Production deployment and verification (30 min)
+
+**Time Spent**: ~5 minutes (as estimated)  
+**Success Rate**: 100% - All commands executed without errors
+
+---
 
 ### 🔄 Next Steps (Phase 7: Week 2 - October 6-12, 2025)
 

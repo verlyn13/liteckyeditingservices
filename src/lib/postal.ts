@@ -67,7 +67,12 @@ export async function sendPostalEmail(
     });
 
     const responseText = await response.text();
-    console.log('[Postal] Response status:', response.status, 'body:', responseText.substring(0, 500));
+    console.log(
+      '[Postal] Response status:',
+      response.status,
+      'body:',
+      responseText.substring(0, 500)
+    );
 
     let result: PostalResponse;
     try {

@@ -1,6 +1,6 @@
 import type { Response as CFResponse, PagesFunction } from '@cloudflare/workers-types';
-import { sendPostalEmail } from '../../src/lib/postal';
 import { createAdminNotification, createUserConfirmation } from '../../src/lib/email';
+import { sendPostalEmail } from '../../src/lib/postal';
 
 // Environment bindings for Cloudflare Pages
 interface Env {

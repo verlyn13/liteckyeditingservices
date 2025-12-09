@@ -226,9 +226,10 @@ gh run list --workflow=cms-content-sync.yml --limit 5
 
 ### Project Documentation
 
-- **Project Status**: `PROJECT-STATUS.md`
+- **Project Status**: `PROJECT-STATUS.md` (includes Cal.com roadmap)
 - **Implementation Roadmap**: `docs/planning/IMPLEMENTATION-ROADMAP.md`
 - **Documentation Index**: `docs/DOCUMENTATION-INDEX.md`
+- **Cal.com Integration**: `docs/planning/CAL-COM-README.md` (Phase 1/8 complete)
 
 ### Technical Guides
 
